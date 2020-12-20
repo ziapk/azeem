@@ -1,0 +1,3 @@
+ALTER TABLE `customers` ADD `address` VARCHAR(255) NULL AFTER `phoneNumber`, ADD `type` INT(3) NOT NULL DEFAULT '1' COMMENT '1 = normal, 2 = foodpanda' AFTER `address`;
+ALTER TABLE `orders` ADD `flag` INT NOT NULL DEFAULT '1' COMMENT '1 = active, 2 = inactive' AFTER `order_date`;
+ALTER TABLE `orders` ADD `reason` VARCHAR(255) NULL AFTER `flag`;

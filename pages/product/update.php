@@ -1,0 +1,276 @@
+<?php 
+    include_once dirname(__FILE__).'/../../include/settings.php';
+
+
+    $productObj = new Products();
+    $categoryObj = new Categories();
+
+    $ownerId = $userData['role'] == 'owner' ? $userData['id'] : $userData['created_by'];
+    $userId = $userData['id'];
+
+
+    $error = "";
+    $message = "";
+    if(!empty($_POST) && isset($_POST['createCode'] )) {
+        $error = "";
+        if(empty($_POST['code'])) {
+            $error = "Please fill all fields";
+        }
+        else {
+
+            $data = [                
+                'product_id' => $_GET['id'],
+                'code' => $_POST['code']
+            ];
+
+            $create = $productObj->createProductCode($data);
+
+            if($create) {
+                $message = "Successfully Added!";
+            } else {
+                $message = "Nothing Added";
+            }
+
+        }
+
+
+    }
+    if(!empty($_POST) && isset($_POST['updateCode'] )) {
+        $error = "";
+        if(empty($_POST['code'])) {
+            $error = "Please fill all fields";
+        }
+        else {
+
+            $data = [                
+                'id' => $_POST['id'],
+                'code' => $_POST['code']
+            ];
+
+            $update = $productObj->updateProductCode($data);
+
+            if($update) {
+                $message = "Successfully saved!";
+            } else {
+                $message = "Nothing change";
+            }
+
+        }
+
+
+    }
+    
+    if(!empty($_POST) && isset($_POST['deleteCode'] )) {
+        $error = "";
+        $data = [                
+            'id' => $_POST['id'],
+            'code' => $_POST['code']
+        ];
+
+        $delete = $productObj->deleteProductCode($data);
+
+        if($delete) {
+            $message = "Successfully deleted!";
+        } else {
+            $message = "Nothing deleted";
+        }
+    }
+    if(!empty($_POST) && isset($_POST['update'] )) {
+
+        $error = "";
+
+        
+        if(empty($_POST['full_name']) || empty($_POST['price'])) {
+            $error = "Please fill all fields";
+        }
+        else {
+
+            $photo = $_FILES['image'];
+            $uploaded = false;
+            $image = "";
+            if(isset($photo) && count($photo) ) {
+                if($photo['error'] == 0) {
+                    $img = explode('.', $photo['name']);
+                    $photo['dst_path'] 	= dirname(__FILE__).'/../../uploads/products/';
+                    
+                    $image = time().'.'.$img[1];
+
+                    if (!file_exists($photo['dst_path'])) {
+
+					    mkdir($photo['dst_path'], 0777, true);
+
+                    }
+                    
+                    $moved = move_uploaded_file($photo['tmp_name'], $photo['dst_path'].$image);
+					if($moved) {	
+						$uploaded = true;
+
+					}
+            
+                }
+            }
+
+            $p = $productObj->getProduct($_GET['id'], $ownerId);
+            
+            $data = [                
+                'id' => $_GET['id'],
+                'owner_id' => $ownerId,
+                'userId' => $userId,
+                'full_name' => $_POST['full_name'],
+                'price' => $_POST['price'],
+                'code' => $_POST['code'],
+                'description' => $_POST['description'],
+                'group' => $_POST['group'],
+                'in_hand' => $_POST['in_hand'],
+                'min_qty' => $_POST['min_qty'],
+                'pack_size' => $_POST['pack_size'],
+                'pack_price' => $_POST['pack_price'],
+                'pprice' => $_POST['pprice'],
+                'image' => $uploaded ? $image : $p['image'],
+            ];
+
+            $update = $productObj->updateProduct($data);
+            
+            if($update) {
+                $message = "Successfully saved!";
+            } else {
+                $message = "Nothing change";
+            }
+        }
+    }
+
+      
+    if(empty($_GET['id']) || !is_numeric($_GET['id']) ) {
+        header('location: '.SITE_URL.'');
+    }
+
+    $store = $productObj->getProduct($_GET['id'], $ownerId);
+    
+    if(empty($store)) {
+        header('location: '.SITE_URL.'');
+    }
+
+    $categories = $categoryObj->getOwnerCategories($ownerId);
+
+    echo mainHeader();
+
+?>
+<div class="container" ng-controller="orderController">
+    <h4>Update Product</h4>
+    <form method="POST" action="" autocomplete="off" enctype="multipart/form-data">
+        <?php if(!empty($message)) { ?><div class="alert alert-success"><?php echo $message; ?></div><?php } ?>
+        <?php if(!empty($error)) { ?><div  class="alert alert-danger"><?php echo $error; ?></div><?php } ?>
+            <div class="product-image"><img src="<?php echo SITE_URL.'uploads/products/'.$store['image'];?>" alt="" /></div>
+        <div class="row">
+            <div class="col-sm-4 form-group">
+                <label>Title</label>
+                <input type="text" ng-model="form.full_name" name="full_name" class="form-control">
+            </div>
+            <div class="col-sm-4 form-group">
+                <label>Price</label>
+                <input name="price" ng-model="form.price" type="text" class="form-control" placeholder="price">
+            </div>
+            <div class="col-sm-4 form-group">
+                <label>Image</label>
+                <input name="image" type="file">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-4 form-group">
+                <label>Stock In Hand</label>
+                <input type="text" ng-model="form.in_hand" name="in_hand" placeholder="i.e 100, 150" class="form-control">
+            </div>
+            <div class="col-sm-4 form-group">
+                <label>Purchase Price</label>
+                <input type="text" ng-model="form.pprice" name="pprice" placeholder="i.e 100, 150" class="form-control">
+            </div>
+            <div class="col-sm-4 form-group">
+                <label>Code</label>
+                <input type="text" name="code" ng-model="form.code" placeholder="i.e BTL, SRF" class="form-control">
+            </div>
+            <div class="col-sm-4 form-group">
+                <label>Group</label>
+                    <input type="text" class="form-control" ng-model="form.group" name="group" placeholder="i.e Oil, Shampoo, Soap" typeahead-on-select="selectProduct($item)" uib-typeahead="address as address.group for address in searchProduct($viewValue)" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="0">
+            </div>
+            <div class="col-sm-4 form-group">
+                <label>Description</label>
+                <input type="text" name="description" ng-model="form.description" placeholder="i.e Any thing about product" class="form-control">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-4 form-group">
+                <label>Pack Size</label>
+                <input type="text" ng-model="form.pack_size" name="pack_size" placeholder="i.e 6, 12" class="form-control">
+            </div>
+            <div class="col-sm-4 form-group">
+                <label>Pack Price</label>
+                <input type="text" ng-model="form.pack_price" name="pack_price" placeholder="i.e 150, 300" class="form-control">
+            </div>
+            <div class="col-sm-4 form-group">
+                <label>Min Qty</label>
+                <input type="text" ng-model="form.min_qty" name="min_qty" placeholder="i.e 6, 12" class="form-control">
+            </div>
+            <div class="col-sm-12 form-group">
+                <input type="submit" name="update" value="Update" class="btn btn-success">
+            </div>
+        </div>
+    </form>
+    <form method="POST" action="" autocomplete="off">
+        <h4>Add BarCode/QRCode</h4>
+        <div class="row">
+            <div class="col-sm-12 form-group">
+                <textarea name="code" class="form-control" rows="5" placeholder="Move Cursor here, and scane code" id="barcode" ng-mouseover="setFocus()"></textarea>
+            </div>
+            <div class="col-sm-12 form-group">
+                <input type="submit" name="createCode" value="Add" class="btn btn-success">
+            </div>
+        </div>
+    </form>
+    <h4>Assigned BarCode/QRCode</h4>
+    <form ng-if="form && form.codes" ng-repeat="cp in form.codes track by $index" method="POST" action="" autocomplete="off">
+        <div class="row">
+            <div class="col-sm-5 form-group">
+                <input type="hidden" name="id" ng-value="cp.id" />
+                <input class="form-control" name="code" placeholder="code" ng-value="cp.code" />
+            </div>
+            <div class="col-sm-5 form-group">
+                <input type="submit" name="updateCode" value="Update" class="btn btn-success">
+                <input type="submit" name="deleteCode" value="Delete" class="btn btn-danger">
+            </div>
+        </div>
+    </form>
+</div>
+
+
+<script type="text/ng-template" id="row.html">
+  <a>
+      <span ng-bind-html="match.model.group | uibTypeaheadHighlight:query"></span>
+  </a>
+</script>
+
+<script type="text/javascript">
+app.controller('orderController', function($scope, $http, $window) {
+    $scope.list = [];
+    $scope.priceList = [];
+    $scope.items = [];
+    $scope.form = <?php echo json_encode($store);?>
+
+    $scope.selectProduct = function (p) {
+    }
+
+    $scope.setFocus = () => {
+        const field = $window.document.getElementById('barcode');
+        field.focus()
+    }
+
+    $scope.searchProduct = function (term) {
+        return $http.get(<?php echo SITE_URL?>+"api/getGroups.php", {params: {term}})
+        .then(function(response) {
+            return response.data
+        });
+    }
+});
+</script>
+
+<?php
+echo mainFooter();  
