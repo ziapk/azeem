@@ -1,0 +1,97 @@
+<?php 
+include_once dirname(__FILE__).'/../../include/settings.php';
+
+$orders = [];
+$from = $_POST['from'];
+$to = $_POST['to'];
+$reportType = $_POST['reportType'];
+
+$ordersObj = new Orders();
+
+$columns = [];
+$columns = [];
+$srNo = true;
+// $sum = [];
+
+
+?>
+
+<style>
+h2 {
+	margin-bottom: 10px;
+}
+h4 {
+	margin-top: 0;
+}
+	body {
+		margin: 0
+	}
+    .table {
+        border: 1px solid;
+        width: 100%;
+        border-collapse: collapse;
+    }
+    td, th {
+        padding: 5px;
+        border: 1px solid
+    }
+    
+</style>
+<?php
+
+switch ($reportType) {
+    case '1':
+        $orders = $ordersObj->ordersReport($userData['shopId'], $from, $to);
+        include_once dirname(__FILE__).'/salesReport.php';
+		exit;
+		// $headers = ['Order #', 'Date', 'Customer Name', 'Price', 'Discount.', 'Paid', 'Status'];
+		// $columns = ['id', 'order_date', 'full_name', 'price', 'discount','paid_amount', 'status'];
+        // $sum = ['price', 'discount', 'paid_amount'];
+		
+	break;
+	case '2':
+		$orders = $ordersObj->ordersReportProductWise($userData['shopId'], $from, $to);
+        include_once dirname(__FILE__).'/salesReportProductWise.php';
+		exit;
+	break;
+    
+	case '3':
+		$orders = $ordersObj->ordersReportDateWise($userData['shopId'], $from, $to);
+        include_once dirname(__FILE__).'/salesReportDateWise.php';
+		exit;
+	break;
+	case '4':
+		$orders = $ordersObj->returnReportProductWise($userData['shopId'], $from, $to);
+        include_once dirname(__FILE__).'/returnReportProductWise.php';
+		exit;
+	break;
+	case '5':
+        $inventoryReport = true;
+		$orders = $ordersObj->inventoryReturnReport($userData['shopId'], $from, $to, 1);
+        include_once dirname(__FILE__).'/inventoryReturnReport.php';
+		exit;
+    break;
+    case '6':
+        $faultyReport = true;
+		$orders = $ordersObj->inventoryReturnReport($userData['shopId'], $from, $to, 2);
+        include_once dirname(__FILE__).'/inventoryReturnReport.php';
+		exit;
+		case '8':
+			$expensesObj = new Expenses();
+			$expenses = $expensesObj->getExpensesForReport($_POST['groupName'], $from, $to);
+			include_once dirname(__FILE__).'/expenseReport.php';
+		exit;
+		case '9':
+			$expensesObj = new Expenses();
+			$expenses = $expensesObj->getExpensesSummeryReport($_POST['groupName'], $from, $to);
+			include_once dirname(__FILE__).'/expenseSummeryReport.php';
+		exit;
+	break;
+    
+    default:
+        # code...
+        break;
+}
+
+$totals = [];
+?>

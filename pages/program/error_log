@@ -1,0 +1,2 @@
+[10-Aug-2021 17:41:57 UTC] PHP Notice:  Undefined variable: loginPage in /home/reclydmy/public_html/pos/include/settings.php on line 9
+[10-Aug-2021 17:41:57 UTC] PHP Notice:  Undefined index: role in /home/reclydmy/public_html/pos/pages/program/index.php on line 28

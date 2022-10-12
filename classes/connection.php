@@ -4,9 +4,9 @@
 class Connection 
 {
 	private $host = 'localhost';
-	private $dbname = 'azeem';
-	private $user = 'root';
-	private $pass = '';
+	private $dbname = 'reclydmy_azeem';
+	private $user = 'reclydmy_pos';
+	private $pass = ';4B)pQC=K0&v';
 
 	public $dbh;
 	

@@ -1,0 +1,221 @@
+.text-danger {
+    color: red;
+}
+.text-success {
+    color: #5cb85c;
+}
+.logo-section {
+    width: 150px;
+    margin: 50px auto 20px;
+    text-align: center;
+    font-size: 16px;
+    font-weight: bold;
+    color: #999;
+}
+
+html {
+    /* height: 100%; */
+    background: url(../img/bg.jpg);
+}
+body{
+    /* min-height: 100%; */
+    font-family: 'Poppins', sans-serif;
+    position: relative;
+    background: #fff;;
+    min-height: 100vh;
+    padding-bottom: 50px;
+    max-width: 1170px;
+    margin: 0 auto;
+}
+
+.footer {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    left: 0;
+}
+
+
+.dropdown-wrapper {
+    width: 260px;
+    position: relative;
+}
+.dropdown-wrapper
+    .dropdown-menu {
+        min-width: 100%
+    }
+.dropdown-wrapper .list-group {
+    position: absolute;
+    left: 0;
+    top: 100%;
+    right: 0;
+    z-index: 1;
+}
+
+
+.recipt-search-dropdown a {
+    font-size: 12px;
+}
+.list-group-item {
+    padding: 6px 12px;
+}
+.recipt-search-dropdown h4{
+    font-size: 12px;
+    /* font-weight: bold; */
+    margin: 0;
+}
+.recipt-search-dropdown h4 span {
+    float: right;
+}
+
+
+
+body {
+    color: #A04402;
+    position: relative;
+    z-index: 1;
+}
+body:before {
+    content: "";
+    display: block;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    z-index: -1;
+    background: rgba(255,255,255,0.90);
+}
+.btn-primary {
+    background-color: #A04402;
+    border-color: #8b3b02;
+}
+.btn-primary:hover {
+    background-color: #8b3b02;
+    border-color: #8b3b02;
+}
+
+.product-image img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+}
+.product-image {
+    border: 1px solid rgba(0,0,0,0.15);
+    padding: 3px;
+    display: inline-block;
+    max-width: 200px;
+}
+.feature-products {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+.feature-product {
+    float: left;
+    border: 1px solid #ccc;
+    width: 210px;
+    text-align: center;
+    margin-bottom: 44px;
+    border-radius: 8px;
+    padding-bottom: 30px;
+    position: relative;
+
+}
+.feature-product .image {
+    width: auto;
+    max-width: 100%;
+    height: auto;
+    min-height: 210px;
+    background: #ccc;
+    display: block;
+    margin: auto;
+    margin-bottom: 7px;
+    border-radius: 8px 8px 0 0;
+}
+.feature-product .price,
+.feature-product .title {
+    display: block;
+    margin: 10px;
+    font-weight: 600;
+    font-size: 12px;
+    color: #111;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.feature-product .price em {
+    font-style: normal;
+    font-size: 0.6em;
+}
+.feature-product .price {
+    color: #fa381d;
+    font-size: 16px;
+}
+.feature-product .btn-wrap {
+    position: absolute;
+    left: 0;
+    bottom: -23px;
+    right: 0;
+}
+.feature-product .btn-cart {
+    border-radius: 40px;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 0;
+    padding-left: 24px;
+    padding-right: 24px;
+    line-height: 44px;
+}
+.cart-menu {
+    min-width: 350px;
+}
+.cart-list {
+    padding-left: 10px;
+    padding-right: 10px;
+}
+.cart-list .cart-list-item {
+    border-bottom: 1px solid #eee;
+}
+.cart-list .cart-list-item a:hover {
+    text-decoration: none;
+}
+.cart-list .cart-list-item a {
+    color: #998;
+    -webkit-user-select: none; /* Safari */
+    -ms-user-select: none; /* IE 10 and IE 11 */
+    user-select: none; /* Standard syntax */   
+}
+.cart-list .cart-item-title {
+    font-weight: bold;
+    color: #333;
+}
+.cart-list .qty {
+    font-size: 1.3em;
+    min-width: 1.7em;
+    display: inline-block;
+    text-align: center;
+    font-weight: normal;
+}
+.cart-list .cart-list-image {
+    width: 60px;
+    height: 60px;
+    margin: 5px 10px 5px 0 
+}
+.cart-list .cart-item-controls {
+    display: block;
+}
+.cart-list .cart-total-row .cart-right {
+    font-size: 1.5em;
+    padding: 10px 0;
+}
+.cart-list .cart-total-row {
+    color: #666;
+    text-align: right;
+}
+.cart-list .cart-right {
+    text-align: right;
+}

@@ -1,0 +1,86 @@
+<?php
+
+class Publishers extends Connection
+{
+    
+	private $table = 'publishers';
+	
+	public function getPublishersPagination($params) {
+		try {
+			
+			$stmt = "SELECT COUNT(id) as total FROM `{$this->table}`";
+			$prepare = $this->dbh->prepare($stmt);
+			$prepare->execute();
+			$result = $prepare->fetch(PDO::FETCH_ASSOC);
+			
+			$no_of_records_per_page = $params['perPage'] ? $params['perPage'] : 10;
+			$total_rows = $result['total'];
+			$total_pages = ceil($total_rows / $no_of_records_per_page);
+			$currentPage = $total_pages >= $params['page'] ? $params['page'] : $total_pages;
+			$offset = (($currentPage-1) < 0 ? 0 : ($currentPage-1)) * $no_of_records_per_page;
+			$search = "(full_name LIKE '%".$params["search"]."%' ) ";
+			$stmt = "SELECT * FROM `{$this->table}` WHERE $search LIMIT :offset, :perPage";
+			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':offset',$offset,PDO::PARAM_INT);
+			$prepare->bindParam(':perPage',$no_of_records_per_page,PDO::PARAM_INT);
+			$prepare->execute();
+			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
+			return ['page' => $currentPage, 'totalRecords'=> $total_rows, 'perPage' => $no_of_records_per_page, 'records' => $result];
+
+		} catch (PDOException $e) {
+		    die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
+
+	public function getPublishers($ownerId) {
+		$stmt = "SELECT * FROM  `{$this->table}` where owner_id=:owner_id";
+		$prepare = $this->dbh->prepare($stmt);
+		$prepare->bindParam(':owner_id',$ownerId,PDO::PARAM_STR);
+		//$prepare->bindParam(':search',$search,PDO::PARAM_STR);
+		$prepare->execute();
+		$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
+		return $result;		
+	}
+    
+    public function updatePublisher($array) {
+		try {
+			$stmt = "UPDATE `{$this->table}` SET full_name=:full_name, discount_type=:discount_type, discount_amount=:discount_amount, discount_status=:discount_status WHERE id=:id";
+            $prepare = $this->dbh->prepare($stmt);
+            $prepare->bindParam(':full_name',$array['full_name'],PDO::PARAM_STR);
+            $prepare->bindParam(':id',$array['id'],PDO::PARAM_STR);
+            $prepare->bindParam(':discount_type',$array['discount_type'],PDO::PARAM_STR);
+            $prepare->bindParam(':discount_amount',$array['discount_amount'],PDO::PARAM_STR);
+            $prepare->bindParam(':discount_status',$array['discount_status'],PDO::PARAM_STR);
+			$prepare->execute();
+			$result = $prepare->rowCount();
+			return $result;
+		} catch (PDOException $e) {
+		    die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
+	public function createPublisher($array) {
+		try {
+			$stmt = "INSERT INTO `{$this->table}` (`full_name`, `discount_type`, `discount_amount`, `discount_status`) VALUES (:full_name, :discount_type, :discount_amount, :discount_status)";
+            $prepare = $this->dbh->prepare($stmt);
+            $prepare->bindParam(':full_name',$array['full_name'],PDO::PARAM_STR);
+            $prepare->bindParam(':discount_type',$array['discount_type'],PDO::PARAM_STR);
+            $prepare->bindParam(':discount_amount',$array['discount_amount'],PDO::PARAM_STR);
+            $prepare->bindParam(':discount_status',$array['discount_status'],PDO::PARAM_STR);
+            $prepare->execute();
+			$result = $this->dbh->lastInsertId();
+			return $result;
+		} catch (PDOException $e) {
+		    die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
+	public function deletePublisher($array) {
+		try {
+			$stmt = "DELETE FROM `{$this->table}` WHERE id=:id";
+			$prepare = $this->dbh->prepare($stmt);
+            $prepare->bindParam(':id',$array['id'],PDO::PARAM_INT);
+			return $prepare->execute();
+		} catch (PDOException $e) {
+		    die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
+}
