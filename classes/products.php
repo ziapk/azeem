@@ -7,21 +7,104 @@ class Products extends Connection
     private $table_st = 'store_products';
     private $pc_table = 'products_code';
 
-    public function getOwnerProductsPagination($owner_id, $params) {
+    public function getOwnerProductsPagination($owner_id, $params, $shopId = null) {
 		try {
+
+			$searchQry = "";
+			$sortByQry = "";
+
+			$pin = "";
+			if(!empty($params['pin'])) {
+				$pin .= " AND p.pin > 0";
+			}
 			
-			$stmt = "SELECT COUNT(id) as total FROM `{$this->table}`";
+			if($params['searchBy'] == 'cource' && !empty($params["courceId"])) {
+				$searchQry = "AND c.program_id = ".$params["courceId"];	
+			}
+			else if(!empty($params['searchBy']) && $params['searchBy'] == 'multi') {
+				if(!empty($params['full_name'])) {
+					$searchQry .= " AND p.full_name LIKE '%".$params["full_name"]."%'";	
+				}
+				if(!empty($params['author'])) {
+					$searchQry .= " AND p.author LIKE '%".$params["author"]."%'";	
+				}
+				if(!empty($params['board'])) {
+					$searchQry .= " AND p.board LIKE '%".$params["board"]."%'";	
+				}
+				if(!empty($params['group'])) {
+					$searchQry = " AND p.group LIKE '%".$params["group"]."%'";	
+				}
+			}
+			else if(!empty($params['searchBy']) && !empty($params["search"]) ) {
+				$name = $params['searchBy'];
+				if($name == 'group') {
+					$searchQry = "AND p.group LIKE '%".$params["search"]."%'";	
+				}
+				else if($name == 'author') {
+					$searchQry = "AND p.author LIKE '%".$params["search"]."%'";	
+				}
+				else if($name == 'board') {
+					$searchQry = "AND p.board LIKE '%".$params["search"]."%'";	
+				}
+				else if($name == 'category') {
+					$searchQry = "AND p.cat LIKE '%".$params["search"]."%'";	
+				}
+				else if($name == 'subCategory') {
+					$searchQry = "AND p.sub_cat LIKE '%".$params["search"]."%'";	
+				}
+				else $searchQry = "AND (p.full_name LIKE '%".$params["search"]."%' OR p.code LIKE '%".$params["search"]."%' OR p.group LIKE '%".$params["search"]."%' OR p.description LIKE '%".$params["search"]."%' OR p.board LIKE '%".$params["search"]."%' OR p.author LIKE '%".$params["search"]."%' OR p.price LIKE '%".$params["search"]."%' OR pc.code LIKE '%".$params["search"]."%' ) ";
+			}
+			else {
+				$searchQry = "AND (p.full_name LIKE '%".$params["search"]."%' OR p.code LIKE '%".$params["search"]."%' OR p.group LIKE '%".$params["search"]."%' OR p.description LIKE '%".$params["search"]."%' OR p.board LIKE '%".$params["search"]."%' OR p.author LIKE '%".$params["search"]."%' OR p.price LIKE '%".$params["search"]."%' OR pc.code LIKE '%".$params["search"]."%' ) ";
+			}
+
+			if(!empty($params['sortByField'])) {
+				$name = $params['sortByField'];
+				$order = $params['sortByOrder'];
+				if($name == 'title') {
+					$sortByQry= " ORDER BY p.full_name ".$params['sortByOrder'];
+				}
+				if($name == 'group') {
+					$sortByQry= " ORDER BY p.group ".$params['sortByOrder'];
+				}
+				if($name == 'author') {
+					$sortByQry= " ORDER BY p.author ".$params['sortByOrder'];
+				}
+				if($name == 'price') {
+					$sortByQry= " ORDER BY p.price ".$params['sortByOrder'];
+				}
+				if($name == 'stock') {
+					$sortByQry= " ORDER BY p.in_hand ".$params['sortByOrder'];
+				}
+			}
+
+			$innerJoin = "";
+			if(!empty($shopId)) {
+				$innerJoin .= " INNER JOIN {$this->table_st} as sp on sp.product_id = p.id and shopId=$shopId ";
+			}
+
+			$column = "";
+
+			if(!empty($shopId)) {
+				$column = ", (sp.qty - sp.stock_out) as qty ";
+			}
+			
+			$stmt = "SELECT count(p.id) as count FROM `{$this->table}` as p $innerJoin LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id  LEFT JOIN program_books as c ON c.product_id = p.id WHERE p.owner_id=:owner_id $pin $searchQry GROUP by p.id";
 			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':owner_id',$owner_id,PDO::PARAM_STR);
 			$prepare->execute();
-			$result = $prepare->fetch(PDO::FETCH_ASSOC);
+			$total = $prepare->fetch(PDO::FETCH_ASSOC);
 			
-			$no_of_records_per_page = 10;
-			$total_rows = $result['total'];
+			$no_of_records_per_page = !empty($params['perPage']) ? $params['perPage'] : 10;
+			$total_rows = empty($total) ? 0 : $total['count'];
 			$total_pages = ceil($total_rows / $no_of_records_per_page);
 			$currentPage = $total_pages >= $params['page'] ? $params['page'] : $total_pages;
-			$offset = ($currentPage-1) * $no_of_records_per_page;
-			$search = "AND (p.full_name LIKE '%".$params["search"]."%' OR p.code LIKE '%".$params["search"]."%' OR p.group LIKE '%".$params["search"]."%' OR p.description LIKE '%".$params["search"]."%' OR p.price LIKE '%".$params["search"]."%' OR pc.code LIKE '%".$params["search"]."%' ) ";
-			$stmt = "SELECT p.* FROM `{$this->table}` as p LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id  WHERE `owner_id`=:owner_id  $search GROUP BY p.id LIMIT :offset, :perPage";
+			$offset =  ((!empty($currentPage) ? $currentPage : 1) -1) * $no_of_records_per_page;
+			
+
+			
+
+			$stmt = "SELECT p.* $column  FROM `{$this->table}` as p $innerJoin LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id LEFT JOIN program_books as c ON c.product_id = p.id  WHERE p.`owner_id`=:owner_id  $pin $searchQry  GROUP BY p.id $sortByQry LIMIT :offset, :perPage";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':owner_id',$owner_id,PDO::PARAM_STR);
 			$prepare->bindParam(':offset',$offset,PDO::PARAM_INT);
@@ -48,16 +131,38 @@ class Products extends Connection
 		}
 	}
 	public function searchProducts($shopId, $search) {
-		$stmt = "SELECT * FROM  `{$this->table}` WHERE full_name LIKE '".$search."%' LIMIT 10";
+		$searchQuery = "(p.full_name LIKE '%".$search."%' OR p.code LIKE '%".$search."%' OR p.group LIKE '%".$search."%' OR p.description LIKE '%".$search."%' OR p.board LIKE '%".$search."%' OR p.author LIKE '%".$search."%' OR p.price LIKE '%".$search."%' OR pc.code LIKE '%".$search."%' ) ";
+		$stmt = "SELECT p.* FROM  `{$this->table}` as p LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id WHERE $searchQuery GROUP BY p.id LIMIT 10";
 		$prepare = $this->dbh->prepare($stmt);
-		$prepare->bindParam(':shopId',$shopId,PDO::PARAM_STR);
+		// $prepare->bindParam(':shopId',$shopId,PDO::PARAM_STR);
 		//$prepare->bindParam(':search',$search,PDO::PARAM_STR);
 		$prepare->execute();
 		$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
 		return $result;		
 	}
+	
 	public function searchProductGroups($ownerId, $search) {
-		$stmt = "SELECT * FROM  `{$this->table}` WHERE owner_id=:owner_id and `group` LIKE '%".$search."%' LIMIT 10";
+		$stmt = "SELECT `group` FROM  `{$this->table}` WHERE owner_id=:owner_id and `group` LIKE '%".$search."%' group by `group` LIMIT 10";
+		$prepare = $this->dbh->prepare($stmt);
+		$prepare->bindParam(':owner_id',$ownerId,PDO::PARAM_STR);
+		//$prepare->bindParam(':search',$search,PDO::PARAM_STR);
+		$prepare->execute();
+		$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
+		return $result;		
+	}
+
+	public function searchProductAuthors($ownerId, $search) {
+		$stmt = "SELECT `author` FROM  `{$this->table}` WHERE owner_id=:owner_id and `author` LIKE '%".$search."%' group by `author` LIMIT 10";
+		$prepare = $this->dbh->prepare($stmt);
+		$prepare->bindParam(':owner_id',$ownerId,PDO::PARAM_STR);
+		//$prepare->bindParam(':search',$search,PDO::PARAM_STR);
+		$prepare->execute();
+		$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
+		return $result;		
+	}
+	
+	public function searchProductBoards($ownerId, $search) {
+		$stmt = "SELECT `board` FROM  `{$this->table}` WHERE owner_id=:owner_id and `board` LIKE '%".$search."%' group by `board` LIMIT 10";
 		$prepare = $this->dbh->prepare($stmt);
 		$prepare->bindParam(':owner_id',$ownerId,PDO::PARAM_STR);
 		//$prepare->bindParam(':search',$search,PDO::PARAM_STR);
@@ -92,7 +197,11 @@ class Products extends Connection
             $prepare->bindParam(':owner_id',$owner_id,PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $prepare->fetch(PDO::FETCH_ASSOC);
-			$result['codes'] = $this->getProductCodes($id);
+			if(!empty($result)) {
+				$programs = new Programs();
+				$result['codes'] = $this->getProductCodes($id);
+				$result['programs'] = $programs->getBookPrograms($id);
+			}
 			return $result;
 		} catch (PDOException $e) {
 		    die("Error!: " . $e->getMessage() . "<br/>");
@@ -159,21 +268,33 @@ class Products extends Connection
 
 	public function updateProduct($array) {
 		try {
-			$stmt = "UPDATE `{$this->table}` SET `full_name`=:full_name, `price`=:price, `pprice`=:pprice, `code`=:code, `description`=:description, `group`=:group, `image`=:image, `in_hand`=:in_hand, `min_qty`=:min_qty, `pack_size`=:pack_size, `pack_price`=:pack_price WHERE id=:id AND owner_id=:owner_id";
+			$stmt = "UPDATE `{$this->table}` SET `full_name`=:full_name, `price`=:price, `pprice`=:pprice, `code`=:code, `description`=:description, `group`=:group, `board`=:board, `author`=:author, `image`=:image, `publisher_id`=:publisher_id WHERE id=:id AND owner_id=:owner_id";
+			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':full_name',$array['full_name'],PDO::PARAM_STR);
+			$prepare->bindParam(':price',$array['price'],PDO::PARAM_STR);
+			$prepare->bindParam(':pprice',$array['pprice'],PDO::PARAM_STR);
+			$prepare->bindParam(':image',$array['image'],PDO::PARAM_STR);
+			$prepare->bindParam(':code',$array['code'],PDO::PARAM_STR);
+			$prepare->bindParam(':description',$array['description'],PDO::PARAM_STR);
+			$prepare->bindParam(':group',$array['group'],PDO::PARAM_STR);
+			$prepare->bindParam(':board',$array['board'],PDO::PARAM_STR);
+			$prepare->bindParam(':author',$array['author'],PDO::PARAM_STR);
+			$prepare->bindParam(':publisher_id',$array['publisher_id'],PDO::PARAM_STR);
+			$prepare->bindParam(':id',$array['id'],PDO::PARAM_INT);
+			$prepare->bindParam(':owner_id',$array['owner_id'],PDO::PARAM_INT);
+			$prepare->execute();
+			$result = $prepare->rowCount();
+			return $result;
+		} catch (PDOException $e) {
+		    die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
+	public function setBookmark($id, $pin) {
+		try {
+			$stmt = "UPDATE `{$this->table}` SET `pin`=:pin WHERE id=:id";
             $prepare = $this->dbh->prepare($stmt);
-            $prepare->bindParam(':full_name',$array['full_name'],PDO::PARAM_STR);
-            $prepare->bindParam(':price',$array['price'],PDO::PARAM_STR);
-            $prepare->bindParam(':pprice',$array['pprice'],PDO::PARAM_STR);
-            $prepare->bindParam(':image',$array['image'],PDO::PARAM_STR);
-            $prepare->bindParam(':code',$array['code'],PDO::PARAM_STR);
-            $prepare->bindParam(':description',$array['description'],PDO::PARAM_STR);
-            $prepare->bindParam(':group',$array['group'],PDO::PARAM_STR);
-            $prepare->bindParam(':in_hand',$array['in_hand'],PDO::PARAM_STR);
-            $prepare->bindParam(':min_qty',$array['min_qty'],PDO::PARAM_STR);
-            $prepare->bindParam(':pack_size',$array['pack_size'],PDO::PARAM_STR);
-            $prepare->bindParam(':pack_price',$array['pack_price'],PDO::PARAM_STR);
-            $prepare->bindParam(':id',$array['id'],PDO::PARAM_INT);
-            $prepare->bindParam(':owner_id',$array['owner_id'],PDO::PARAM_INT);
+            $prepare->bindParam(':pin', $pin,PDO::PARAM_INT);
+            $prepare->bindParam(':id',$id,PDO::PARAM_INT);
 			$prepare->execute();
 			$result = $prepare->rowCount();
 			return $result;
@@ -197,19 +318,12 @@ class Products extends Connection
 	
 	public function updateStoreProduct($array) {
 		try {
-			$stmt = "UPDATE `{$this->table_st}` SET `qty`=:qty, `stock_out`=:stock_out, `min_qty`=:min_qty, `sale_price`=:sale_price, `packet`=:packet, `packet_price`=:packet_price, `location`=:location, `product_id`=:product_id WHERE id=:id AND owner_id=:owner_id";
+			$stmt = "UPDATE `{$this->table_st}` SET `min_qty`=:min_qty, `location`=:location WHERE id=:id";
 
-            $prepare = $this->dbh->prepare($stmt);
-			$prepare->bindParam(':qty',$array['qty'],PDO::PARAM_STR);
-            $prepare->bindParam(':stock_out',$array['stock_out'],PDO::PARAM_STR);
-            $prepare->bindParam(':min_qty',$array['min_qty'],PDO::PARAM_STR);
-            $prepare->bindParam(':sale_price',$array['sale_price'],PDO::PARAM_STR);
-            $prepare->bindParam(':packet',$array['packet'],PDO::PARAM_STR);
-            $prepare->bindParam(':packet_price',$array['packet_price'],PDO::PARAM_INT);
-            $prepare->bindParam(':location',$array['location'],PDO::PARAM_INT);
-            $prepare->bindParam(':product_id',$array['product_id'],PDO::PARAM_INT);
-            $prepare->bindParam(':id',$array['id'],PDO::PARAM_INT);
-            $prepare->bindParam(':owner_id',$array['owner_id'],PDO::PARAM_INT);
+			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':min_qty',$array['min_qty'],PDO::PARAM_STR);
+			$prepare->bindParam(':location',$array['location'],PDO::PARAM_STR);
+			$prepare->bindParam(':id',$array['id'],PDO::PARAM_INT);
 			$prepare->execute();
 			$result = $prepare->rowCount();
 			return $result;
@@ -230,13 +344,14 @@ class Products extends Connection
 	}
 	public function assignProductToStore($array) {
 		try {
-			$stmt = "INSERT INTO `{$this->table_st}` (`qty`, `stock_out`, `product_id`, `shopId`, `owner_id`) VALUES (:qty, :stock_out, :product_id, :shopId, :owner_id)";
+			$stmt = "INSERT INTO `{$this->table_st}` (`qty`, `stock_out`, `product_id`, `shopId`, `owner_id`, `location`) VALUES (:qty, :stock_out, :product_id, :shopId, :owner_id, :location)";
             $prepare = $this->dbh->prepare($stmt);
             $prepare->bindParam(':qty',$array['qty'],PDO::PARAM_STR);
             $prepare->bindParam(':stock_out',$array['stock_out'],PDO::PARAM_STR);
             $prepare->bindParam(':product_id',$array['product_id'],PDO::PARAM_INT);
             $prepare->bindParam(':shopId',$array['shopId'],PDO::PARAM_INT);
             $prepare->bindParam(':owner_id',$array['owner_id'],PDO::PARAM_INT);
+            $prepare->bindParam(':location',$array['location'],PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $this->dbh->lastInsertId();
 			return $result;
@@ -260,12 +375,16 @@ class Products extends Connection
 		} catch (PDOException $e) {
 		    die("Error!: " . $e->getMessage() . "<br/>");
 		}
-		return 'update';
 	}
 	
-	public function subProductQty($id, $qty) {
+	public function addProductQty($id, $qty, $type = 1) {
 		try {
-			$stmt = "UPDATE `{$this->table}` SET `in_hand`=in_hand-:qty WHERE id=:id";
+			if($type == 1 || $type == 3) {
+				$stmt = "UPDATE `{$this->table}` SET `in_hand`=in_hand+:qty WHERE id=:id";
+			}
+			elseif ($type == 2) {
+				$stmt = "UPDATE `{$this->table}` SET `faulty_qty`=faulty_qty+:qty WHERE id=:id";
+			}
 			$prepare = $this->dbh->prepare($stmt);
             $prepare->bindParam(':id',$id,PDO::PARAM_INT);
             $prepare->bindParam(':qty',$qty,PDO::PARAM_INT);
@@ -275,26 +394,56 @@ class Products extends Connection
 		} catch (PDOException $e) {
 		    die("Error!: " . $e->getMessage() . "<br/>");
 		}
-		return 'update';
+	}
+	
+	public function addProductSupply($array) {
+		try {
+			$stmt = "UPDATE `{$this->table}` SET `in_hand`=in_hand+:qty, pprice=:pprice, price=:price, barcode=:barcode WHERE id=:id";
+			$prepare = $this->dbh->prepare($stmt);
+            $prepare->bindParam(':id',$array['id'],PDO::PARAM_INT);
+            $prepare->bindParam(':qty',$array['qty'],PDO::PARAM_INT);
+            $prepare->bindParam(':pprice',$array['pprice'],PDO::PARAM_INT);
+            $prepare->bindParam(':price',$array['price'],PDO::PARAM_INT);
+            $prepare->bindParam(':barcode',$array['barcode'],PDO::PARAM_STR);
+			$prepare->execute();
+			$result = $prepare->rowCount();
+			return $result;
+		} catch (PDOException $e) {
+		}
+	}
+
+	public function subProductQty($array) {
+		try {
+			$stmt = "UPDATE `{$this->table_st}` SET `stock_out`=stock_out+:stock_out WHERE shopId=:shopId and owner_id=:owner_id";
+			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':shopId',$array['shopId'],PDO::PARAM_STR);
+			$prepare->bindParam(':stock_out',$array['quantity'],PDO::PARAM_STR);
+			$prepare->bindParam(':owner_id',$array['owner_id'],PDO::PARAM_STR);
+			$prepare->execute();
+			$result = $prepare->rowCount();
+			return $result;
+		} catch (PDOException $e) {
+				die("Error!: " . $e->getMessage() . "<br/>");
+		}
 	}
 
 	public function createProduct($array) {
 		try {
-			$stmt = "INSERT INTO `{$this->table}` (`full_name`, `owner_id`, `user_id`, `price`, `pprice`, `image`, `code`, `description`, `group`, ` in_hand`, `min_qty`, `pack_size`, `pack_price`) VALUES (:full_name, :owner_id, :user_id, :price, :pprice, :image, :code, :description, :group, :in_hand, :min_qty, :pack_size, :pack_price)";
+			$stmt = "INSERT INTO `{$this->table}` (`full_name`, `owner_id`, `user_id`, `price`, `pprice`, `image`, `code`, `barcode`, `description`, `group`, `board`, `author`, `publisher_id`) VALUES (:full_name, :owner_id, :user_id, :price, :pprice, :image, :code, :barcode, :description, :group, :board, :author, :publisher_id)";
 			$prepare = $this->dbh->prepare($stmt);
-            $prepare->bindParam(':full_name',$array['full_name'],PDO::PARAM_STR);
-            $prepare->bindParam(':owner_id',$array['owner_id'],PDO::PARAM_INT);
-            $prepare->bindParam(':user_id',$array['user_id'],PDO::PARAM_INT);
-            $prepare->bindParam(':price',$array['price'],PDO::PARAM_INT);
-            $prepare->bindParam(':pprice',$array['pprice'],PDO::PARAM_INT);
-            $prepare->bindParam(':in_hand',$array['in_hand'],PDO::PARAM_INT);
-            $prepare->bindParam(':min_qty',$array['min_qty'],PDO::PARAM_INT);
-            $prepare->bindParam(':pack_size',$array['pack_size'],PDO::PARAM_INT);
-            $prepare->bindParam(':pack_price',$array['pack_price'],PDO::PARAM_INT);
-            $prepare->bindParam(':image',$array['image'],PDO::PARAM_STR);
-            $prepare->bindParam(':code',$array['code'],PDO::PARAM_STR);
-            $prepare->bindParam(':description',$array['description'],PDO::PARAM_STR);
-            $prepare->bindParam(':group',$array['group'],PDO::PARAM_STR);
+			$prepare->bindParam(':full_name',$array['full_name'],PDO::PARAM_STR);
+			$prepare->bindParam(':owner_id',$array['owner_id'],PDO::PARAM_INT);
+			$prepare->bindParam(':user_id',$array['user_id'],PDO::PARAM_INT);
+			$prepare->bindParam(':price',$array['price'],PDO::PARAM_INT);
+			$prepare->bindParam(':pprice',$array['pprice'],PDO::PARAM_INT);
+			$prepare->bindParam(':image',$array['image'],PDO::PARAM_STR);
+			$prepare->bindParam(':code',$array['code'],PDO::PARAM_STR);
+			$prepare->bindParam(':barcode',$array['barcode'],PDO::PARAM_STR);
+			$prepare->bindParam(':description',$array['description'],PDO::PARAM_STR);
+			$prepare->bindParam(':board',$array['board'],PDO::PARAM_STR);
+			$prepare->bindParam(':author',$array['author'],PDO::PARAM_STR);
+			$prepare->bindParam(':group',$array['group'],PDO::PARAM_STR);
+			$prepare->bindParam(':publisher_id',$array['publisher_id'],PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $this->dbh->lastInsertId();
 			return $result;

@@ -1,23 +1,17 @@
-<?php 
-print_r($_GET);
+<?php
 
 $id = !empty($_GET['id']) ? $_GET['id'] : null;
+$reason = !empty($_GET['reason']) ? $_GET['reason'] : null;
 
-if(!$id) {
-    echo 'invalid id';
+if(empty($id) || empty($reason)) {
+    echo json_encode(['success' => false, 'error' => 'Invalid order']);
 }
+
 include_once dirname(__FILE__).'/../../include/settings.php';
 
-if(isset($_POST['submitDelete'])) {
-    $reason = !empty($_POST['reason']) ? $_POST['reason'] : null;
+if(!empty($id) && !empty($reason)) {
     $orders = new Orders();
     $orders->changeOrderFlag(['id' => $id, 'reason' => $reason, 'flag' => 2]);
-    echo '<script>window.close()</script>';
+    echo json_encode(['success' => true, 'message' => "Successfully deleted!"]);
 }
-
 ?>
-<form method="POST">
-    <input name="id" type="hidden" value="<?php echo $id;?>">
-    <textarea name="reason" style="width: 100%" placeholder="Write a reason to delete..."></textarea>
-    <input type="submit" value="delete" name="submitDelete">
-</form>

@@ -4,8 +4,8 @@ $customers = new  Customers();
 $shopInfo = []; 
 $search = [];
 if(!empty($_SESSION['shopInfo'])) {
-    $shopInfo = $_SESSION['shopInfo'];
-    $search = $customers->searchCustomer($shopInfo['shopId'], $_GET['term']);
+    $shopInfo = $_SESSION['shop'];
+    $search = $customers->searchCustomer($shop['id'], $_GET['term']);
 };
 echo json_encode($search);
 ?>

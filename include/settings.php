@@ -1,10 +1,12 @@
 <?php
 session_start();
-define('SITE_URL', '/tea/');
+define('SITE_URL', '/azeem/');
 
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
+
+// error_reporting(0);
 
 if(empty($_SESSION) && $loginPage != true) {
     header('location: '.SITE_URL.'login.php');
@@ -12,6 +14,7 @@ if(empty($_SESSION) && $loginPage != true) {
 
 $userData = !empty($_SESSION['user_credentials']) ? $_SESSION['user_credentials'] : [];
 $shopData = !empty($_SESSION['shopInfo']) ? $_SESSION['shopInfo'] : [];
+$shop = !empty($_SESSION['shop']) ? $_SESSION['shop'] : [];
 include_once dirname(__FILE__).'/header.php';
 include_once dirname(__FILE__).'/footer.php';
 
@@ -38,8 +41,13 @@ spl_autoload_register(function ($class_name) {
 
 
 $statusArr = [
-    ['id' => 1, 'full_name'=> 'Active'],
-    ['id' => 2, 'full_name'=> 'In Active']
+    1 => 'Active',
+    2 => 'In Active'
+];
+
+$discountTypesArr = [
+    1=> 'Percentage',
+    2=> 'Fixed'
 ];
 
 $demandStatusArr = [
@@ -53,5 +61,47 @@ $orderStatusArr = [
     1 => ['id' => 1, 'full_name'=> 'Park'],
     2 => ['id' => 2, 'full_name'=> 'Paid'],
     3 => ['id' => 3, 'full_name'=> 'Cancelled'],
-    4 => ['id' => 4, 'full_name'=> 'Deleted']
+    4 => ['id' => 4, 'full_name'=> 'Deleted'],
+    5 => ['id' => 5, 'full_name'=> 'Return to Inventory'],
+    6 => ['id' => 6, 'full_name'=> 'Return to Faulty'],
+    7 => ['id' => 7, 'full_name'=> 'Return as Partial'],
+    8 => ['id' => 8, 'full_name'=> 'Partial Paid'],
+    9 => ['id' => 9, 'full_name'=> 'Not Paid']
 ];
+
+$reportsArray = [
+    1 => ['id' => 1, 'title'=> 'Sales Report'],
+    2 => ['id' => 2, 'title'=> 'Summery Product Wise'],
+    3 => ['id' => 3, 'title'=> 'Summery Date Wise'],
+    4 => ['id' => 4, 'title'=> 'Returns Report'],
+    5 => ['id' => 5, 'title'=> 'Return to Inventory'],
+    6 => ['id' => 6, 'title'=> 'Return to Faulty'],
+    7 => ['id' => 7, 'title'=> 'Return as Lahore'],
+    8 => ['id' => 8, 'title'=> 'Expense Report'],
+    9 => ['id' => 9, 'title'=> 'Expense Summery Report'],
+];
+
+$returnArray = [
+    1 => ['id' => 1, 'title'=> 'Return to Inventory'],
+    2 => ['id' => 2, 'title'=> 'Return to Faulty'],
+    3 => ['id' => 3, 'title'=> 'Return as Lahore'],
+];
+
+$catTypesArr = [
+    1 => 'Expense',
+    2 => 'Product',
+];
+
+
+function dateToSimple($date) {
+    if($date == '00-00-0000' || $date == '0000-00-00' || empty($date) || !$date || !isset($date)) {
+        return '';
+    }else {
+        $newDate = DateTime::createFromFormat('Y-m-d', $date);
+        if($newDate) {
+            return $newDate->format('d-m-Y');
+        }else {
+            return '';
+        }
+    }
+}  

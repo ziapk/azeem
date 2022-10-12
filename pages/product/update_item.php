@@ -14,23 +14,17 @@
     $error = "";
     $message = "";
     if(!empty($_POST) && isset($_POST['update'] )) {
-
         $error = "";
 
         
-        if(empty($_POST['product_id']) || empty($_POST['sale_price']) || empty($_POST['shopId'])) {
+        if(empty($_GET['id']) || empty($_POST['shopId'])) {
             $error = "Please fill all fields";
         }
         else {
 
             $data = [                
                 'id' => $_GET['id'],
-                'qty' => !empty($_POST['qty']) ? $_POST['qty'] : 0,
-                'stock_out' => !empty($_POST['stock_out']) ? $_POST['stock_out'] : 0,
                 'min_qty' => !empty($_POST['min_qty']) ? $_POST['min_qty'] : 0,
-                'sale_price' => !empty($_POST['sale_price']) ? $_POST['sale_price'] : 0,
-                'packet' => !empty($_POST['packet']) ? $_POST['packet'] : 0,
-                'packet_price' => !empty($_POST['packet_price']) ? $_POST['packet_price'] : 0,
                 'location' => !empty($_POST['location']) ? $_POST['location'] : "",
                 'product_id' => !empty($_POST['product_id']) ? $_POST['product_id'] : 0,
                 'shopId' => !empty($_POST['shopId']) ? $_POST['shopId'] : 0,
@@ -57,16 +51,16 @@
         header('location: '.SITE_URL.'');
     }
 
-    $categories = $categoryObj->getOwnerCategories($ownerId);
+    $categories = $categoryObj->getCategories($ownerId);
 
     echo mainHeader();
 
 
     echo mainHeader();  
-    $categories = $categoryObj->getOwnerCategories($ownerId);
-    $products = $productObj->getOwnerProducts($ownerId);
+    $categories = $categoryObj->getCategories($ownerId);
+    $productSingle = $productObj->getProduct($product['product_id'], $ownerId);
     $ownerStores = $stores->getOwnerStores($userData['id']);
-
+    
 ?>
 <div class="container">
     <h4>Update Product</h4>
@@ -76,29 +70,11 @@
         <?php if(!empty($error)) { ?><div class="alert alert-danger"><?php echo $error; ?></div><?php } ?>
         <div class="row">
             <div class="col-sm-3 form-group">
-                <select name="product_id" class="form-control">
-                    <?php foreach ($products as $type) {?>
-                        <option value="<?php echo $type['id'];?>" <?php if($product['product_id'] == $type['id']) {echo 'selected';}; ?>><?php echo $type['full_name'];?></option>
-                    <?php }?>
-                </select>
-            </div>
-            <div class="col-sm-3 form-group">
-                <input name="qty" type="number" class="form-control" placeholder="Stock In" value="<?php echo $product['qty']; ?>">
-            </div>
-            <div class="col-sm-3 form-group">
-                <input name="stock_out" type="number" class="form-control" placeholder="Stock Out" value="<?php echo $product['stock_out']; ?>">
+                <input type="hidden" name="product_id" value="<?php echo $product['product_id'];?>">
+                <span class="form-control"><?php echo $productSingle['full_name'];?></span>
             </div>
             <div class="col-sm-3 form-group">
                 <input name="min_qty" type="number" class="form-control" placeholder="Minimum Stock" value="<?php echo $product['min_qty']; ?>">
-            </div>
-            <div class="col-sm-3 form-group">
-                <input name="sale_price" type="number" class="form-control" placeholder="Sale Price" value="<?php echo $product['sale_price']; ?>">
-            </div>
-            <div class="col-sm-3 form-group">
-                <input name="packet" type="number" class="form-control" placeholder="Packet Size" value="<?php echo $product['packet']; ?>">
-            </div>
-            <div class="col-sm-3 form-group">
-                <input name="packet_price" type="number" class="form-control" placeholder="Packet Price" value="<?php echo $product['packet_price']; ?>">
             </div>
             <div class="col-sm-3 form-group">
                 <input name="location" type="text" class="form-control" placeholder="Placed In Store" value="<?php echo $product['location']; ?>">

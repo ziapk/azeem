@@ -5,7 +5,7 @@ class Categories extends Connection
     
     private $table = 'category';
 
-    public function getOwnerCategories($owner_id) {
+	public function getOwnerCategories($owner_id) {
 		try {
 			$stmt = "SELECT * FROM `{$this->table}` WHERE `owner_id`=:owner_id";
 			$prepare = $this->dbh->prepare($stmt);
@@ -17,29 +17,28 @@ class Categories extends Connection
 		    die("Error!: " . $e->getMessage() . "<br/>");
 		}
 	}
-	
-    public function updateCategory($array) {
+	public function getGroupNames ($owner_id) {
 		try {
-			$stmt = "UPDATE `{$this->table}` SET full_name=:full_name WHERE id=:id AND owner_id = :owner_id";
-            $prepare = $this->dbh->prepare($stmt);
-            $prepare->bindParam(':full_name',$array['full_name'],PDO::PARAM_STR);
-            $prepare->bindParam(':id',$array['id'],PDO::PARAM_STR);
-            $prepare->bindParam(':owner_id',$array['owner_id'],PDO::PARAM_STR);
+			$stmt = "SELECT DISTINCT groupName FROM `{$this->table}` WHERE `owner_id`=:owner_id";
+			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':owner_id',$owner_id,PDO::PARAM_STR);
 			$prepare->execute();
-			$result = $prepare->rowCount();
+			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
 			return $result;
 		} catch (PDOException $e) {
 		    die("Error!: " . $e->getMessage() . "<br/>");
 		}
 	}
-	public function createCategory($array) {
+	public function updateCategory($array) {
 		try {
-			$stmt = "INSERT INTO `{$this->table}` (`full_name`, `owner_id`) VALUES (:full_name, :owner_id)";
+			$stmt = "UPDATE `{$this->table}` SET full_name=:full_name, groupName=:groupName,  cat_type=:cat_type WHERE id=:id";
             $prepare = $this->dbh->prepare($stmt);
             $prepare->bindParam(':full_name',$array['full_name'],PDO::PARAM_STR);
-            $prepare->bindParam(':owner_id',$array['owner_id'],PDO::PARAM_STR);
-            $prepare->execute();
-			$result = $this->dbh->lastInsertId();
+            $prepare->bindParam(':id',$array['id'],PDO::PARAM_STR);
+            $prepare->bindParam(':cat_type',$array['cat_type'],PDO::PARAM_STR);
+            $prepare->bindParam(':groupName',$array['groupName'],PDO::PARAM_STR);
+			$prepare->execute();
+			$result = $prepare->rowCount();
 			return $result;
 		} catch (PDOException $e) {
 		    die("Error!: " . $e->getMessage() . "<br/>");
@@ -51,6 +50,70 @@ class Categories extends Connection
 			$prepare = $this->dbh->prepare($stmt);
             $prepare->bindParam(':id',$array['id'],PDO::PARAM_INT);
 			return $prepare->execute();
+		} catch (PDOException $e) {
+		    die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
+	
+	public function getCategoriesPagination($params) {
+		try {
+			
+			$stmt = "SELECT COUNT(id) as total FROM `{$this->table}` where `owner_id`=:owner_id";
+			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':owner_id',$params['owner_id'],PDO::PARAM_INT);
+			$prepare->execute();
+			$result = $prepare->fetch(PDO::FETCH_ASSOC);
+			
+			$no_of_records_per_page = $params['perPage'] ? $params['perPage'] : 10;
+			$total_rows = $result['total'];
+			$total_pages = ceil($total_rows / $no_of_records_per_page);
+			$currentPage = $total_pages >= $params['page'] ? $params['page'] : $total_pages;
+			$offset = (($currentPage-1) < 0 ? 0 : ($currentPage-1)) * $no_of_records_per_page;
+			$search = "(full_name LIKE '%".$params["search"]."%' or groupName LIKE '%".$params["search"]."%') ";
+			$stmt = "SELECT * FROM `{$this->table}` WHERE $search and `owner_id`=:owner_id LIMIT :offset, :perPage";
+			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':offset',$offset,PDO::PARAM_INT);
+			$prepare->bindParam(':owner_id',$params['owner_id'],PDO::PARAM_INT);
+			$prepare->bindParam(':perPage',$no_of_records_per_page,PDO::PARAM_INT);
+			$prepare->execute();
+			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
+			return ['page' => $currentPage, 'totalRecords'=> $total_rows, 'perPage' => $no_of_records_per_page, 'records' => $result];
+
+		} catch (PDOException $e) {
+		    die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
+
+    public function getCategories($type) {
+		try {
+			$where = "";
+			if($type == 'pro') {
+				$where = 'where cat_type = 1';
+			};
+			if($type == 'exp') {
+				$where = 'where cat_type = 2';
+			}
+			$stmt = "SELECT * FROM `{$this->table}` ".$where;
+			$prepare = $this->dbh->prepare($stmt);
+			$prepare->execute();
+			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
+			return $result;
+		} catch (PDOException $e) {
+		    die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
+	
+	public function createCategory($array) {
+		try {
+			$stmt = "INSERT INTO `{$this->table}` (`full_name`, `cat_type`, `groupName`, `owner_id`) VALUES (:full_name, :cat_type, :groupName, :owner_id)";
+            $prepare = $this->dbh->prepare($stmt);
+            $prepare->bindParam(':full_name',$array['full_name'],PDO::PARAM_STR);
+            $prepare->bindParam(':cat_type',$array['cat_type'],PDO::PARAM_STR);
+            $prepare->bindParam(':groupName',$array['groupName'],PDO::PARAM_STR);
+            $prepare->bindParam(':owner_id',$array['owner_id'],PDO::PARAM_STR);
+            $prepare->execute();
+			$result = $this->dbh->lastInsertId();
+			return $result;
 		} catch (PDOException $e) {
 		    die("Error!: " . $e->getMessage() . "<br/>");
 		}

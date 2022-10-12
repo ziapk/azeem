@@ -2,7 +2,7 @@
 
 $stores = new Store();
 $productsObj = new Products();
-$categoryObj = new Categories();
+$categoryObj = new Publishers();
 $demandsObj = new Demands();
 $storeTypesArr = $stores->getStoreTypes();
 
@@ -19,8 +19,6 @@ foreach ($storeTypesArr as $key => $value) {
 $ownerStores = $stores->getOwnerStores($userData['id']);
 $ownerStoreProducts = $productsObj->getStoreProducts($userData['id']);
 
-// print_r($ownerStoreProducts);exit;
-
 $currentStore = [];
 $storeList = [];
 foreach ($ownerStores as $store) {
@@ -36,10 +34,10 @@ foreach ($ownerStores as $store) {
 $products = $productsObj->getOwnerProducts($currentStore['owner_id']);
 $demands = $demandsObj->getOwnerDemands($currentStore['owner_id']);
 
-$categoryArr = $categoryObj->getOwnerCategories($currentStore['owner_id']);
-$categories = [];
-foreach ($categoryArr as $key => $value) {
-    $categories[$value['id']] = $value;
+$publishersArr = $categoryObj->getPublishers($currentStore['owner_id']);
+$publishers = [];
+foreach ($publishersArr as $key => $value) {
+    $publishers[$value['id']] = $value;
 }
 
 $productsList = [];
@@ -53,7 +51,7 @@ foreach ($products as $product) {
 
 <div class="container">
     <h4>My Shops <small>&lt;<?php echo $currentStore['full_name'];?>&gt;</small></h4>
-    <table class="table table-bordered">
+    <table class="table">
         <thead>
             <tr>
                 <th>Sr.#</th>
@@ -61,6 +59,7 @@ foreach ($products as $product) {
                 <th>Type</th>
                 <th>City</th>
                 <th>Location</th>
+                <th>Status</th>
                 <th></th>
             </tr>
         </thead>
@@ -72,13 +71,15 @@ foreach ($products as $product) {
                     <td><?php echo $storeTypes[$store['store_type']]['full_name']; ?></td>
                     <td><?php echo $store['city']; ?></td>
                     <td><?php echo $store['location']; ?></td>
-                    <th><a href="<?php echo SITE_URL."pages/store/update.php?id=".$store['id'];?>">Modify</a></th>
+                    <td><?php echo $statusArr[$store['status']]; ?></td>
+                    <td><a href="<?php echo SITE_URL."pages/store/update.php?id=".$store['id'];?>">Modify</a></td>
                 </tr>
             <?php $count++; } ?>
         </tbody>
     </table>
-    <h4>Hot Products</h4>
-    <table class="table table-bordered">
+    <!-- <h4>Hot Products</h4>
+    <table class="table">Products in stores
+
         <thead>
             <tr>
                 <th>Sr.#</th>
@@ -93,10 +94,10 @@ foreach ($products as $product) {
                 <td>20</td>
             </tr>
         </tbody>
-    </table>
-    <a href="<?php echo SITE_URL."pages/product/assign.php" ?>" class="btn btn-primary btn-xs pull-right">Assign Product</a>
+    </table> -->
+    <a href="<?php echo SITE_URL."pages/product/create.php" ?>" class="btn btn-primary btn-xs pull-right" style="margin-left: 12px">Create Product</a> <a href="<?php echo SITE_URL."pages/product/assign.php" ?>" class="btn btn-primary btn-xs pull-right">Assign Product</a>
     <h4>Products in stores </h4>
-    <table class="table table-bordered">
+    <table class="table">
         <thead>
             <tr>
                 <th>Sr.#</th>
@@ -108,8 +109,7 @@ foreach ($products as $product) {
                 <th>Out</th>
                 <th>In Hand</th>
                 <th>Min. Qty</th>
-                <th>Packet</th>
-                <th>Packet Price</th>
+                <th>Placement</th>
                 <th></th>
             </tr>
         </thead>
@@ -124,23 +124,22 @@ foreach ($products as $product) {
                     <td><?php echo $product['qty']; ?></td>
                     <td><?php echo $product['stock_out']; ?></td>
                     <td><?php echo $product['qty'] - $product['stock_out']; ?></td>
-                    <td><?php echo $product['min_qty'] ? $product['min_qty'] : 'NULL' ; ?></td>
-                    <td><?php echo $product['packet'] ? $product['packet'] : 'NULL' ; ?></td>
-                    <td><?php echo $product['packet_price'] ? $product['packet_price'] : 'NULL' ; ?></td>
-                    <th><a href="<?php echo SITE_URL."pages/product/update_item.php?id=".$product['id'];?>">Modify</a></th>
+                    <td><?php echo $product['min_qty'] ? $product['min_qty'] : '-' ; ?></td>
+                    <td><?php echo $product['location'] ? $product['location'] : '-' ; ?></td>
+                    <td><a href="<?php echo SITE_URL."pages/product/update_item.php?id=".$product['id'];?>">Modify</a></td>
                 </tr>
             <?php $count++; } ?>
         </tbody>
     </table>
 
-    <a href="<?php echo SITE_URL."pages/product/create.php" ?>" class="btn btn-primary btn-xs pull-right">Create Product</a>
-    <h4>Products All </h4>
-    <table class="table table-bordered">
+    
+    <!-- <h4>Products All </h4>
+    <table class="table">
         <thead>
             <tr>
                 <th>Sr.#</th>
                 <th>Title</th>
-                <th>Category</th>
+                <th>Publisher</th>
                 <th>Group</th>
                 <th>Code</th>
                 <th>BAR Code</th>
@@ -152,18 +151,18 @@ foreach ($products as $product) {
                 <tr>
                     <td><?php echo $count; ?></td>
                     <td><?php echo $product['full_name']; ?></td>
-                    <td><?php echo $categories[$product['cat_id']]['full_name']; ?></td>
+                    <td><?php echo !empty($product['publisher_id']) ? $publishers[$product['publisher_id']]['full_name'] : null; ?></td>
                     <td><?php echo $product['group']; ?></td>
                     <td><?php echo $product['code']; ?></td>
                     <td><?php echo $product['barcode'] ? $product['barcode'] : 'NULL' ; ?></td>
-                    <th><a href="<?php echo SITE_URL."pages/product/update.php?id=".$product['id'];?>">Modify</a></th>
+                    <td><a href="<?php echo SITE_URL."pages/product/update.php?id=".$product['id'];?>">Modify</a></td>
                 </tr>
             <?php $count++; } ?>
         </tbody>
-    </table>
+    </table> -->
     <a href="<?php echo SITE_URL."pages/demand/create.php" ?>" class="btn btn-primary btn-xs pull-right">Add Demand</a>
     <h4>Demand Stocks</h4>
-    <table class="table table-bordered">
+    <table class="table">
         <thead>
             <tr>
                 <th>Sr.#</th>
@@ -191,13 +190,13 @@ foreach ($products as $product) {
                     <td><?php echo $demand['assign_qty']; ?></td>
                     <td><?php echo $demand['assign_date'] ? $demand['assign_date'] : 'NULL' ; ?></td>
                     <td><?php echo $demandStatusArr[$demand['flag']]['full_name']; ?></td>
-                    <th><a href="<?php echo SITE_URL."pages/demand/assign.php?id=".$demand['id'];?>">Modify</a></th>
+                    <td><a href="<?php echo SITE_URL."pages/demand/assign.php?id=".$demand['id'];?>">Modify</a></td>
                 </tr>
             <?php $count++; } ?>
         </tbody>
     </table>
-    <h4>Pending Orders</h4>
-    <table class="table table-bordered">
+    <!-- <h4>Pending Orders</h4>
+    <table class="table">
         <thead>
             <tr>
                 <th>Sr.#</th>
@@ -225,7 +224,7 @@ foreach ($products as $product) {
         </tfoot>
     </table>
     <h4>Pending Bills</h4>
-    <table class="table table-bordered">
+    <table class="table">
         <thead>
             <tr>
                 <th>Sr.#</th>
@@ -251,5 +250,5 @@ foreach ($products as $product) {
                 <th>80000</th>
             </tr>
         </tfoot>
-    </table>
+    </table> -->
 </div>

@@ -27,9 +27,10 @@ echo mainHeader();
 ?>
 
 <div class="container">
+    <a href="<?php echo SITE_URL;?>pages/expenses/bulk.php" class="btn btn-danger btn-sm pull-right" style="margin-left: 10px">Add In Bulk</a>    
     <a href="javascript:void(0)" onclick="createCategory()" class="btn btn-success btn-sm pull-right">Add New</a>    
     <h3 style="margin-top: 0">Expenses</h3>
-    <form method="GET">
+    <form method="GET" action="">
         <h4><?php echo $dateLabel;?></h4>
         <div class="input-group">
         <input class="form-control datepicker" type="text" value="" readonly />
@@ -92,12 +93,12 @@ echo mainFooter();
 ?>
 <script type="text/javascript">
 function createCategory () {
-    window.open("http://localhost/tea/pages/expenses/create.php", "", "width=300,height=400"); 
+    window.open("<?php echo SITE_URL;?>pages/expenses/create.php", "", "width=300,height=400"); 
 }
 
 function deleteExpense(id) {
     if(confirm('Are you sure ?')) {
-        window.open("http://localhost/tea/pages/expenses/delete.php?id="+id, "", "width=300,height=400"); 
+        window.open("<?php echo SITE_URL;?>pages/expenses/delete.php?id="+id, "", "width=300,height=400"); 
         window.location.reload();
     }
 }

@@ -1,55 +1,92 @@
 <?php
-global $shopData;
+  global $shopData;
+  global $userData;
+  $productCls = new Products();
+  $ownerId = $userData['role'] == 'owner' ? $userData['id'] : $userData['created_by'];
+  $list = $productCls->getOwnerProducts($ownerId);
 ?>
-
-<div class="container">
-<h1><img width="60" src="<?php echo SITE_URL;?>assets/img/logo.png" alt="" /> Point of Sale <small><sub>v0.1</sub></small></h1>
-<nav class="navbar navbar-default">
-  <div class="container-fluid">
-    <!-- Brand and toggle get grouped for better mobile display -->
-    <div class="navbar-header">
-      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-        <span class="sr-only">Toggle navigation</span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-      </button>
-      <a class="navbar-brand" href="<?php echo SITE_URL; ?>"><?php echo $shopData['product_title'];?></a>
-    </div>
-
-    <!-- Collect the nav links, forms, and other content for toggling -->
-    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-      <ul class="nav navbar-nav">
-        <li class="active"><a href="#">Link <span class="sr-only">(current)</span></a></li>
-        <li><a href="#">Staff</a></li>
-        <li><a href="#">Customers</a></li>
-        <li><a href="#">Suppliers</a></li>
-        <li><a href="<?php echo SITE_URL; ?>pages/category/">Categories</a></li>
-        <li><a href="#">Groups</a></li>
-        <li class="dropdown">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Reports <span class="caret"></span></a>
+<div ng-controller="headerController">
+  <nav class="navbar navbar-fixed-top">
+    <div class="container-fluid">
+      <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="navbar-header">
+        <div class="logo pull-left">
+          <a href="<?php echo SITE_URL; ?>" title=""><?php if(!empty($shopData['image'])) { ?>
+            <span class="fa">&#xf260;</span> Smart Commerce
+          <?php } else { ?>
+            <img width="60" src="<?php echo SITE_URL; ?>assets/img/logo.png" alt="" />
+          <?php } ?></a>
+        </div>
+        <div class="pull-left welcome-header-section"><span>Welcome <strong><?php echo $userData['full_name'];?>!</strong></span></div>
+        
+      <ul class="list-inline navbar-right navbar-nav nav">
+        <li><a href="<?php echo SITE_URL; ?>pages/product/running.php"><img width="22" uib-tooltip="Running Products" tooltip-placement="bottom" height="22" src="<?php echo SITE_URL; ?>assets/img/svg/lightning-bolt.svg" alt="" /></a></li>
+        <li><a href="<?php echo SITE_URL; ?>pages/product/create.php"><img width="22" uib-tooltip="Add Product" tooltip-placement="bottom" height="22" src="<?php echo SITE_URL; ?>assets/img/svg/012-package-red.svg" alt="" /></a></li>
+        <li>
+          <a title="" href="javascript:void(0)" data-toggle="dropdown" tooltip-placement="bottom" uib-tooltip="Settings"><span class="fa fa-cog"></span> <span class="caret"></span></a>
           <ul class="dropdown-menu">
-            <li><a href="#">Action</a></li>
-            <li><a href="#">Another action</a></li>
-            <li><a href="#">Something else here</a></li>
-            <li role="separator" class="divider"></li>
-            <li><a href="#">Separated link</a></li>
-            <li role="separator" class="divider"></li>
-            <li><a href="#">One more separated link</a></li>
+            <li><a title="" href="<?php echo SITE_URL; ?>pages/profile">Profile</a></li>
+            <li class="divider"></li>
+            <li><a title="" href="<?php echo SITE_URL; ?>logout.php">Logout</a></li>
           </ul>
         </li>
       </ul>
-      <ul class="nav navbar-nav navbar-right">
-        <li class="dropdown">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><?php echo $_SESSION['user_credentials']['full_name'];?> <span class="caret"></span></a>
-          <ul class="dropdown-menu">
-            <li><a href="#">Account Settings</a></li>
-            <li role="separator" class="divider"></li>
-            <li><a href="<?php echo SITE_URL;?>logout.php">Logout</a></li>
-          </ul>
-        </li>
-      </ul>
-    </div><!-- /.navbar-collapse -->
-  </div><!-- /.container-fluid -->
-</nav>
+    </div><!-- /.container-fluid -->
+  </nav>
+  <div class="sidebar">
+    <ul class="nav">
+      <li class="<?php if($params['page'] == 'product') { echo 'active'; }?>"><a uib-tooltip="Products" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/product"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/004-storage.svg" alt="" /> <span class="nav-menu-text">Products</span></a></li>
+      <li class="<?php if($params['page'] == 'publisher') { echo 'active'; }?>"><a uib-tooltip="Publisher" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/publisher"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/018-application.svg" alt="" /><span class="nav-menu-text">Publisher</span></a></li>
+      <li class="<?php if($params['page'] == 'program') { echo 'active'; }?>"><a uib-tooltip="Programs" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/program"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/016-books-stack-of-three.svg" alt="" /> <span class="nav-menu-text">Programs</span></a></li>
+        <li class="<?php if($params['page'] == 'customers') { echo 'active'; }?>"><a uib-tooltip="Customers" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/customers/"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/014-group.svg" alt="" /><span class="nav-menu-text">Customers</span></a></li>
+        <li class="<?php if($params['page'] == 'suppliers') { echo 'active'; }?>"><a uib-tooltip="Suppliers" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/suppliers/"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/014-group.svg" alt="" /><span class="nav-menu-text">Suppliers</span></a></li>
+        <li class="<?php if($params['page'] == 'expense') { echo 'active'; }?>"><a uib-tooltip="Expenses" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/expenses"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/018-application.svg" alt="" /><span class="nav-menu-text">Expenses</span></a></li>
+        <li class="<?php if($params['page'] == 'category') { echo 'active'; }?>"><a uib-tooltip="Categories" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/category/"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/017-list.svg" alt="" /><span class="nav-menu-text">Categories</span></a></li>
+        <li class="<?php if($params['page'] == 'return') { echo 'active'; }?>"><a uib-tooltip="Return to Lahore" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/orders/faultyOrders.php"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/018-application.svg" alt="" /> <span class="nav-menu-text">Return to Lahore</span></a></li>
+        <li class="<?php if($params['page'] == 'reports') { echo 'active'; }?>"><a uib-tooltip="Reports" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/reports/"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/018-application.svg" alt="" /><span class="nav-menu-text">Reports</span></a></li>
+    </ul>
+    <a href="javascript:void(0)" ng-click="toggleSidebar()" class="toggle-sidebar"><img width="16" height="16" src="<?php echo SITE_URL; ?>assets/img/svg/left-arrow.svg" alt="" /></a>
+  </div>
 </div>
+<script>
+function createCustomer () {
+    window.open("<?php echo SITE_URL;?>pages/customers/create.php", "", "width=300,height=400"); 
+}
+
+app.controller('headerController', function($scope, $http, $httpParamSerializerJQLike, $filter, $window) {
+  $scope.list = <?php echo json_encode($list);?>;
+  $scope.refreshList = function() {
+    $scope.cart = JSON.parse($window.localStorage.getItem('shopping'));
+    $scope.totalPrice = 0;
+    $scope.finalList = [];
+    $scope.cart.map(row => {
+      const obj = $scope.list.find(r => r.id === row.id);
+      $scope.finalList.push({...obj, qty: row.qty})
+      $scope.totalPrice += row.qty * obj.price
+    })
+  }
+  $scope.increaseValue = row => {
+    const cart = JSON.parse($window.localStorage.getItem('shopping'))
+    cart.map(r => {
+      if(row.id == r.id) {
+        r.qty++
+      }
+    })
+    $window.localStorage.setItem('shopping', JSON.stringify(cart));
+    $scope.refreshList();
+  }
+  
+  $scope.decreaseValue = (row) => {
+    const cart = JSON.parse($window.localStorage.getItem('shopping'))
+    
+    cart.map(r => {
+      if(row.id == r.id) {
+        r.qty > 1 ? r.qty-- : r.qty
+      }
+    })
+    console.log(cart);
+    $window.localStorage.setItem('shopping', JSON.stringify(cart));
+    $scope.refreshList()
+  }
+});
+</script>

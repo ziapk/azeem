@@ -1,74 +1,61 @@
 <?php 
     include_once dirname(__FILE__).'/../../include/settings.php';
 
+    echo mainHeader(['page' => 'reports']);
 
-    $ordersObj = new Orders();
-
-
-    $dateLabel = "Sales for ";
-
-    
-    if(isset($_POST['report'])) {
-        $from = $_POST['from'];
-        $to = $_POST['to'];
-        $orders = $ordersObj->userOrders($userData['shopId'], $from, $to);
-        $dateLabel .= $from.' to '.$to;
-    }
-    else {        
-        $orders = $ordersObj->userOrders($userData['shopId'], date('Y-m-d'));
-        $dateLabel .= date('Y-m-d');
-    }
-    echo mainHeader();
+    $cat = new Categories();
+    $groupNames = $cat->getGroupNames($shop['owner_id']);
 ?>
 
-<div class="container">
-<form method="POST">
-    <h4><?php echo $dateLabel;?></h4>
+<div class="container" ng-controller="reportController">
+<form method="POST" action="print.php">
+    <h4>Reports</h4>
+    <div class="row datepicker-parent">
+        <div class="col-sm-4 form-group">
+            <label>Select Date/Range</label>
+            <input class="form-control datepicker" type="text" />
+            <input type="hidden" name="from" id="from">
+            <input type="hidden" name="to" id="to">
+        </div>
+        <div class="col-sm-4 form-group">
+            <label>Select Report</label>
+            <select class="form-control" name="reportType" ng-change="checkReport(reportType)" ng-model="reportType">
+                <option value="">Select a Report</option>
+                <?php foreach ($reportsArray as $value) { ?>
+                    <option value="<?php echo $value['id'];?>"><?php echo $value['title'];?></option>
+                <?php } ?>
+            </select>
+        </div>
+    </div>
+    <div class="row" ng-if="reportType == 8 || reportType == 9">
+        <?php foreach($groupNames as $group) {?>
+            <div class="col-md-3">
+                <label>
+                    <input type="checkbox" name="groupName[]" value="<?php echo $group['groupName'];?>">
+                    <?php echo $group['groupName'];?>
+                </label>
+            </div>
+        <?php }?>
+    </div>
     <div class="input-group">
-    <input class="form-control datepicker" type="text" readonly />
-    <div class="input-group-btn">
-        <input type="submit" value="Submit" name="report" class="btn btn-primary" />
+        <div class="input-group-btn">
+            <input type="submit" value="Submit" name="report" class="btn btn-primary" />
+        </div>
     </div>
-    </div>
-    
-    <input type="hidden" id="from" name="from">
-    <input type="hidden" id="to" name="to">
-
 </form>
-<table class="table">
-    <thead>
-        <tr>
-            <th>Sr.#</th>
-            <th>Order Number</th>
-            <th>Customer</th>
-            <th>Price</th>
-            <th>Status</th>
-            <th>Date/time</th>
-        </tr>
-    </thead>
-    <tbody>
-    <?php foreach ($orders as $key => $order) { ?>
-        <tr>
-            <td><?php echo $key + 1;?></td>
-            <td><?php echo $order['id'];?></td>
-            <td><?php echo $order['full_name'];?></td>
-            <td><?php echo $order['price'];?></td>
-            <td><?php echo $orderStatusArr[$order['status']]['full_name'];?></td>
-            <td><?php echo $order['order_date'];?></td>
-        </tr>
-    <?php }?>
-        
-    </tbody>
-</table>
 </div>
 <?php
 echo mainFooter();
 
 ?>
 <script type="text/javascript">
+    app.controller('reportController', function($scope, $http, $httpParamSerializerJQLike, $filter) {
+        
+    });
  $('.datepicker').daterangepicker({
-    minDate: moment().subtract(1, 'week'),
-    maxDate: moment()
+    minDate: moment().subtract(1, 'year'),
+    maxDate: moment(),
+    parentEl: '.datepicker-parent',
  },  function(start, end, label) {
      $('#from').val(moment(start).format('YYYY-MM-DD'));
      $('#to').val(moment(end).format('YYYY-MM-DD'));

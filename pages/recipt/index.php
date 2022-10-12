@@ -56,16 +56,13 @@
             </tr>
         </thead>
         <tbody>
-            <tr ng-repeat="cart in items track by $index">
+            <tr ng-repeat="cart in items track by $index" id="item-{{cart.id}}">
                 <td>{{$index + 1}}</td>
                 <td>{{cart.full_name}}</td>
                 <td>{{cart.price}}</td>
                 <td><button ng-click="subQty(cart)">-</button>
-                <input class="text-center" type="number" ng-model="qty" ng-value=" cart.qty | number : 2 " ng-change="directlyAdd(qty, cart)">
+                <input class="text-center input-qty" type="number" ng-model="qty" ng-value=" cart.qty | number : 2 " ng-change="directlyAdd(qty, cart)">
                 <button ng-click="addQty(cart)">+</button></td>
-                <td>
-                    <input class="text-center" type="number" ng-model="addprice" ng-change="directlyPrice(addprice, cart)">
-                </td>
                 <td>
                     {{cart.price * cart.qty}}
                     <a href="#" class="btn btn-xs btn-danger pull-right" ng-click="remove(cart)">Delete</a>
@@ -74,23 +71,23 @@
         </tbody>
         <tbody>
             <tr>
-                <th class="text-right" colspan="5">Sub Total</th>
+                <th class="text-right" colspan="4">Sub Total</th>
                 <th>{{subTotal}}</th>
             </tr>
             <tr>
-                <th class="text-right" colspan="5">Disc.</th>
+                <th class="text-right" colspan="4">Disc.</th>
                 <th width="200"><input type="number" ng-model="discount" class="form-control" ng-change="addDiscount(discount)"></th>
             </tr>
             <tr>
-                <th class="text-right" colspan="5">Grand Total</th>
+                <th class="text-right" colspan="4">Grand Total</th>
                 <th>{{grandTotal}}</th>
             </tr>
             <tr>
-                <th class="text-right" colspan="5">Pay Amount</th>
+                <th class="text-right" colspan="4">Pay Amount</th>
                 <th width="200"><input type="number" ng-model="payment_amount" class="form-control"></th>
             </tr>
             <tr>
-                <th class="text-right" colspan="5">Balance</th>
+                <th class="text-right" colspan="4">Balance</th>
                 <th width="200">{{grandTotal - payment_amount}}</th>
             </tr>
         </tbody>
@@ -110,7 +107,10 @@
 
 </div>
 <script type="text/javascript">
-app.controller('orderController', function($scope, $http, $httpParamSerializerJQLike, $filter) {
+app.run(['$anchorScroll', function($anchorScroll) {
+  $anchorScroll.yOffset = $('.navbar').height(true, true);   // always scroll by 50 extra pixels
+}])
+app.controller('orderController', function($scope, $http, $httpParamSerializerJQLike, $filter, $location, $anchorScroll) {
 
     $scope.list = [];
     $scope.priceList = [];
@@ -156,7 +156,7 @@ app.controller('orderController', function($scope, $http, $httpParamSerializerJQ
         $scope.items.map((pro) => {
             if(pro.id == p.id) {
                 exists = true;
-                pro.qty++;
+                // pro.qty++;
             }
         })
         $scope.product = ""
@@ -164,6 +164,14 @@ app.controller('orderController', function($scope, $http, $httpParamSerializerJQ
             $scope.items.push({...p, qty: 1});
         }
         $scope.calculateSum();
+
+        $location.hash('item-'+p.id);
+
+        // call $anchorScroll()
+        $anchorScroll();
+        setTimeout(() => {
+            $('#item-'+p.id).find('.input-qty').focus();
+        }, 100)
         
     }
     
@@ -221,7 +229,7 @@ app.controller('orderController', function($scope, $http, $httpParamSerializerJQ
 
         $http.post(<?php echo SITE_URL?>+"api/placeOrder.php", $httpParamSerializerJQLike($scope.form), {headers: {'Content-Type': 'application/x-www-form-urlencoded'} })
         .then(function(response) {
-            window.open("http://localhost/tea/print?id="+response.data.order.id, "", "width=300,height=300"); 
+            window.open("<?php echo SITE_URL;?>print?id="+response.data.order.id, "", "width=300,height=300"); 
             $scope.items = $scope.list = [];
             $scope.subTotal = $scope.discount = $scope.grandTotal = $scope.payment_amount = 0;
         });

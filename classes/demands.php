@@ -51,7 +51,7 @@ class Demands extends Connection
 		$owner_id = $array['owner_id'];
 
 		try {
-			$stmt = "SELECT * FROM `{$this->table}` WHERE id=:id AND owner_id = :owner_id AND flag = 0";
+			$stmt = "SELECT * FROM `{$this->table}` WHERE id=:id AND owner_id = :owner_id";
             $prepare = $this->dbh->prepare($stmt);
             $prepare->bindParam(':id',$id,PDO::PARAM_STR);
             $prepare->bindParam(':owner_id',$owner_id,PDO::PARAM_STR);
@@ -70,10 +70,6 @@ class Demands extends Connection
 
 		$checkDemandRequested = $this->checkDemandRequested($array);
 
-
-		
-
-
 		if(empty($checkDemandRequested)) {
 			$res['message'] = 'Invalid Values';
 			return $res;
@@ -87,16 +83,17 @@ class Demands extends Connection
 		$storeObj = new Store();
 		$store = $storeObj->getOwnerStore($array['warehouse_id'], $array['owner_id']);
 
+		
 		if(empty($store)) {
 			$res['message'] = 'Invalid Store';
 			return $res;
 		}
 
 
-		$prodcutObj = new Products();
-		$dropoffShop = $prodcutObj->getOwnerStoreProduct($checkDemandRequested['shopId'], $checkDemandRequested['product_id'], $array['owner_id']);
-		$pickupShop = $prodcutObj->getOwnerStoreProduct($array['warehouse_id'], $checkDemandRequested['product_id'], $array['owner_id']);
-
+		$productObj = new Products();
+		$dropoffShop = $productObj->getOwnerStoreProduct($checkDemandRequested['shopId'], $checkDemandRequested['product_id'], $checkDemandRequested['owner_id']);
+		$pickupShop = $productObj->getOwnerStoreProduct($array['warehouse_id'], $checkDemandRequested['product_id'], $checkDemandRequested['owner_id']);
+		
 		if(empty($pickupShop)) {
 
 			$res['message'] = 'Product not available at warehouse';
@@ -104,10 +101,17 @@ class Demands extends Connection
 		}
 
 		if(empty($dropoffShop)) {
-			$res['message'] = 'Invalid Product for select store';
-			return $res;
-		}
+			$data = [                
+					'qty' => 0,
+					'stock_out' => 0,
+					'product_id' => $checkDemandRequested['product_id'],
+					'shopId' => $checkDemandRequested['shopId'],
+					'owner_id' => $array['owner_id'],
+			];
 
+			$productObj->assignProduct($data);
+			$dropoffShop = $productObj->getOwnerStoreProduct($checkDemandRequested['shopId'], $checkDemandRequested['product_id'], $array['owner_id']);
+		}
 
 		$result = false;
 
@@ -125,16 +129,15 @@ class Demands extends Connection
 				'qty' => 0,
 				'stock_out' => $array['assign_qty']
 			];
-			$prodcutObj->updateProductToStore($pick, $pickupShop);
 
+			$productObj->updateProductToStore($pick, $pickupShop);
 
 			// pickup from stock
 			$drop = [
 				'qty' => $array['assign_qty'],
 				'stock_out' => 0,
 			];
-			$prodcutObj->updateProductToStore($drop, $dropoffShop);
-
+			$productObj->updateProductToStore($drop, $dropoffShop);
 			$result = $this->updateDemondData($array);
 		}
 		else if($array['flag'] == 2) {

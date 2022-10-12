@@ -1,8 +1,8 @@
 <?php 
 include_once dirname(__FILE__).'/../../include/settings.php';
 $category = new  Categories();
-$categoryData = $category->getOwnerCategories($userData['created_by']);
-echo mainHeader();
+$categoryData = $category->getCategories($userData['created_by']);
+echo mainHeader(['page'=> 'supplier']);
 ?>
 
 <div class="container" ng-controller="productController">
@@ -13,7 +13,7 @@ echo mainHeader();
     <div class="form-group">
         <input class="form-control" ng-change="searchSupplier()" ng-model="search" placeholder="Type here for search..." />
     </div>
-    <table class="table table-bordered">
+    <table class="table">
         <thead>
             <tr>
                 <th></th>
@@ -29,13 +29,15 @@ echo mainHeader();
                     <td>{{li.name}}</td>
                     <td>{{li.contact}}</td>
                     <td>{{li.wallet}}</td>
-                    <td><a class="btn btn-primary btn-xs" href="<?php echo SITE_URL."pages/suppliers/update.php?id="?>{{li.id}}">Modify</a></td>
+                    <td>
+                        <a class="btn btn-primary btn-xs" href="<?php echo SITE_URL."pages/suppliers/update.php?id="?>{{li.id}}">Edit</a>
+                        <a ng-if="li.wallet < 0 || li.wallet > 0 " class="btn btn-danger btn-xs" href="<?php echo SITE_URL."pages/suppliers/adjustment.php?id="?>{{li.id}}">Pay</a>
+                        <a class="btn btn-danger btn-xs" href="<?php echo SITE_URL."pages/suppliers/transactions.php?id="?>{{li.id}}">History</a>
+                    </td>
                 </tr>
         </tbody>
     </table>
-
-    
-    
+    <div style="display: flex; align-items: center; justify-content: space-between"><ul uib-pagination ng-if="data.perPage < data.totalRecords" items-per-page="data.perPage" total-items="data.totalRecords" ng-model="currentPage" ng-change="pageChanged(currentPage)"></ul> <span>Per Page <select ng-change="perPage()" ng-model="data.perPage"><option value="10">10</option><option value="25">25</option><option value="50">50</option><option value="100">100</option></select></span> <span>Total number of Records <strong>{{data.totalRecords}}</strong></span></div>
 </div>
 
 <script type="text/ng-template" id="addSupplier.html">
@@ -44,6 +46,7 @@ echo mainHeader();
             <h3 class="modal-title" id="modal-title">Add Supplier</h3>
         </div>
         <div class="modal-body" id="modal-body">
+            <div uib-alert ng-if="alert" ng-class="'alert-'+(alert.type || 'warning')" close="closeAlert()">{{alert.message}}</div>
             <div class="form-group">
                 <label for="sname">Name</label>
                 <input id="sname" type="text" ng-model="form.name" class="form-control" placeholder="Supplier's Name">
@@ -62,52 +65,24 @@ echo mainHeader();
             </div>
         </div>
         <div class="modal-footer">
-            <button class="btn btn-primary" type="submit" ng-click="ok()">OK</button>
-            <button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
-        </div>
-    </form>
-    </script>
-
-<script type="text/ng-template" id="addSupply.html">
-    <form ng-submit="ok()"> 
-        <div class="modal-header">
-            <h3 class="modal-title" id="modal-title">Add Supply Bill</h3>
-        </div>
-        <div class="modal-body" id="modal-body">
-            <div class="form-group">
-                <label for="sname">Name</label>
-                <input id="sname" type="text" ng-model="form.name" class="form-control" placeholder="Supplier's Name">
-            </div>
-            <div class="form-group">
-                <label for="scontact">Contact</label>
-                <input id="scontact" type="text" ng-model="form.contact" class="form-control" placeholder="Supplier's Contact">
-            </div>
-            <div class="form-group">
-                <label for="saddress">Address</label>
-                <input id="saddress" type="text" ng-model="form.address" class="form-control" placeholder="Supplier's Address">
-            </div>
-            <div class="form-group">
-                <label for="swallet">Balance</label>
-                <input id="swallet" type="text" ng-model="form.wallet" class="form-control" placeholder="Supplier's balance">
-            </div>
-        </div>
-        <div class="modal-footer">
-            <button class="btn btn-primary" type="submit" ng-click="ok()">OK</button>
-            <button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
+            <button class="btn btn-default" type="button" ng-click="cancel()">Close</button>
+            <button class="btn btn-primary" type="submit">Submit Form</button>
         </div>
     </form>
 </script>
 
+
 <script>
 app.controller('productController', function($scope, $http, $httpParamSerializerJQLike, $filter, $window, $document, $uibModal, $log) {
+    $scope.data = { perPage: "10" }; //$scope.data.records;
+    console.log($scope.data)
     $scope.currentPage = 1; 
-    $scope.data = {}; //$scope.data.records;
     $scope.list = []; //$scope.data.records;
     $scope.search = ""; //$scope.data.records;
     $scope.siteUrl = '<?php echo SITE_URL ?>';
     $scope.getSuppliers = (page) => {
         $scope.loading = true;
-        $http.get($scope.siteUrl+"api/getSuppliers.php", {params: {page: page || 1, search: $scope.search}})
+        $http.get($scope.siteUrl+"api/getSuppliers.php", {params: {page: page || 1, perPage: $scope.data.perPage, search: $scope.search}})
         .then(function(response) {
             $scope.loading = false;
             if(response.status === 200) {
@@ -116,14 +91,19 @@ app.controller('productController', function($scope, $http, $httpParamSerializer
             }
         })
     }
+
+    $scope.perPage = () => {
+        $scope.getSuppliers($scope.currentPage);
+    } 
     
     $scope.searchSupplier = () => {
         $scope.getSuppliers(1);
     }
 
     $scope.getSuppliers($scope.currentPage);
-    $scope.pageChanged = () => {
-        $scope.getSuppliers($scope.currentPage)
+    $scope.pageChanged = (page) => {
+        $scope.currentPage = page;
+        $scope.getSuppliers(page)
     }
     $scope.addToCard = function (id) {
         if($window.localStorage.getItem('shopping')) {
@@ -154,71 +134,52 @@ app.controller('productController', function($scope, $http, $httpParamSerializer
             ariaDescribedBy: 'modal-body',
             templateUrl: 'addSupplier.html',
             controller: 'ModalInstanceCtrl',
-            size: size
-        }).result.then(function (selectedItem) {
-            console.log(1)
-            
-            /* $http.post($scope.siteUrl+'api/createSupplier.php', $httpParamSerializerJQLike(selectedItem), {headers: {'Content-Type': 'application/x-www-form-urlencoded'} }).then(function() {
-                $scope.getSuppliers(1);
-            }); */
-        }, function () {
-            $log.info('Modal dismissed at: ' + new Date());
+            size: size,
+            resolve: {
+                siteUrl: function() {
+                    return $scope.siteUrl
+                }
+            }
+        }).closed.then(function (selectedItem) {
+            $scope.getSuppliers(1);
         });
     };
     
-    
-    $scope.addSupply = function (size, parentSelector) {
-    
-        $uibModal.open({
-            ariaLabelledBy: 'modal-title',
-            ariaDescribedBy: 'modal-body',
-            templateUrl: 'addSupply.html',
-            controller: 'SupplyModalInstanceCtrl',
-            size: size
-        }).result.then(function (selectedItem) {
-            console.log(2)
-            /* $http.post($scope.siteUrl+'api/createSupplier.php', $httpParamSerializerJQLike(selectedItem), {headers: {'Content-Type': 'application/x-www-form-urlencoded'} }).then(function() {
-                $scope.getSuppliers(1);
-            }); */
-        }, function () {
-            $log.info('Modal dismissed at: ' + new Date());
-        });
-    };
 });
 
 
 
-app.controller('ModalInstanceCtrl', function ($scope, $uibModalInstance) {
+app.controller('ModalInstanceCtrl', function ($scope, $uibModalInstance, $http, $httpParamSerializerJQLike, siteUrl) {
     $scope.form = {
         name: "",
         contact: "",
         address: "",
         wallet: 0
     }
+    $scope.alert = null;
+    $scope.siteUrl = siteUrl;
+
+    $scope.closeAlert = function(index) {
+        $scope.alert = null;
+    };
+    
     $scope.ok = function () {
-        $uibModalInstance.close($scope.form);
+        $http.post($scope.siteUrl+'api/createSupplier.php', $httpParamSerializerJQLike($scope.form), {headers: {'Content-Type': 'application/x-www-form-urlencoded'} }).then(function(res) {
+            if(res.data.success) {
+                $scope.alert = {type: 'success', message: res.data.message}
+            } else {
+                $scope.alert = {type: 'danger', message: res.data.message}
+            }
+            // $uibModalInstance.close($scope.form);
+        });
     };
 
-    $scope.cancel = function () {
-        $uibModalInstance.dismiss('cancel');
-    };
-});
-
-app.controller('SupplyModalInstanceCtrl', function ($scope, $uibModalInstance) {
-    $scope.form = {
-        name: "",
-        contact: "",
-        address: "",
-        wallet: 0
-    }
-    $scope.ok = function () {
-        $uibModalInstance.close($scope.form);
-    };
 
     $scope.cancel = function () {
         $uibModalInstance.dismiss('cancel');
     };
 });
 </script>
+
 <?php
 echo mainFooter();

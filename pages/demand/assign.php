@@ -88,24 +88,24 @@
         <h4>Demand From</h4>
         <div class="row">
             <div class="col-sm-3 form-group">
-                <select name="product_id" class="form-control" disabled>
+                <select name="product_id" class="form-control" readonly>
                     <?php foreach ($products as $type) {?>
                         <option value="<?php echo $type['id'];?>" <?php if($demand['product_id'] == $type['id']) {echo 'selected';}; ?>><?php echo $type['full_name'];?></option>
                     <?php }?>
                 </select>
             </div>
             <div class="col-sm-3 form-group">
-                <input name="demand_qty" type="number" class="form-control" placeholder="Stock In" value="<?php echo $demand['demand_qty']; ?>" disabled>
+                <input name="demand_qty" type="number" class="form-control" placeholder="Stock In" value="<?php echo $demand['demand_qty']; ?>" readonly>
             </div>
             <div class="col-sm-3 form-group">
-                <select name="shopId" class="form-control" disabled>
+                <select name="shopId" class="form-control" readonly>
                     <?php foreach ($ownerStores as $type) {?>
                         <option value="<?php echo $type['id'];?>" <?php if($demand['shopId'] == $type['id']) {echo 'selected';}; ?>><?php echo $type['full_name'];?></option>
                     <?php }?>
                 </select>
             </div>
             <div class="col-sm-3 form-group">
-            <input name="demand_date" type="text" class="form-control" placeholder="Demand Date (i.e: YYYY-MM-DD)" value="<?php echo $demand['demand_date']; ?>" disabled>
+            <input name="demand_date" type="text" class="form-control" placeholder="Demand Date (i.e: YYYY-MM-DD)" value="<?php echo $demand['demand_date']; ?>" readonly>
             </div>
         </div>
         <h4>Assign Product</h4>
@@ -138,13 +138,15 @@
             
             
         </div>
-        <?php if($demand['flag'] == 0) { ?>
+        <?php // if($demand['flag'] == 0) {
+        ?>
             <div class="row">
                 <div class="col-sm-3 form-group">
                     <input type="submit" name="create" value="Assign" class="btn btn-success">
                 </div>
             </div>
-        <?php } ?>
+        <?php // } 
+        ?>
 
     </form>
 </div>

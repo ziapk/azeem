@@ -7,18 +7,6 @@ echo mainHeader();
 ?>
 <div ng-controller="cartController">
 <div class="container">
-{{title}}
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Sr.#</th>
-                <th style="vertical-align: middle">Customer Name</th>
-                <th style="vertical-align: middle">Price</th>
-                <th style="vertical-align: middle">Status</th>
-            </tr>
-        </thead>
-    </table>
-    
     <table class="table">
         <thead>
             <tr>
@@ -60,15 +48,16 @@ echo mainHeader();
                 <th>Unit Price</th>
                 <th>Qty</th>
                 <th>Total</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
-            <tr ng-repeat="cart in items track by $index">
+            <tr ng-repeat="cart in items track by $index" id="item-{{cart.id}}">
                 <td>{{$index + 1}}</td>
                 <td>{{cart.full_name}}</td>
                 <td>{{cart.price}}</td>
                 <td><button ng-click="subQty(cart)">-</button>
-                <input class="text-center" type="number" ng-model="qty" ng-value=" cart.qty | number : 2 " ng-change="directlyAdd(qty, cart)">
+                <input class="text-center input-qty" type="number" ng-model="qty" ng-value=" cart.qty | number : 2 " ng-change="directlyAdd(qty, cart)">
                 <button ng-click="addQty(cart)">+</button></td>
                 <td>
                     <input class="text-center" type="number" ng-model="addprice" ng-change="directlyPrice(addprice, cart)">
@@ -81,34 +70,34 @@ echo mainHeader();
         </tbody>
         <tbody>
             <tr>
-                <th class="text-right" colspan="5">Sub Total</th>
-                <th>{{subTotal}}</th>
+                <td class="text-right" colspan="5">Sub Total</td>
+                <td>{{subTotal}}</td>
             </tr>
             <tr>
-                <th class="text-right" colspan="5">Disc.</th>
-                <th width="200"><input type="number" ng-model="discount" class="form-control" ng-change="addDiscount(discount)"></th>
+                <td class="text-right" colspan="5">Disc.</td>
+                <td width="200"><input type="number" ng-model="discount" class="form-control" ng-change="addDiscount(discount)"></td>
             </tr>
             <tr>
-                <th class="text-right" colspan="5">Grand Total</th>
-                <th>{{grandTotal}}</th>
+                <td class="text-right" colspan="5">Grand Total</td>
+                <td>{{grandTotal}}</td>
             </tr>
             <tr>
-                <th class="text-right" colspan="5">Pay Amount</th>
-                <th width="200"><input type="number" ng-model="payment_amount" class="form-control"></th>
+                <td class="text-right" colspan="5">Pay Amount</td>
+                <td width="200"><input type="number" ng-model="payment_amount" class="form-control"></td>
             </tr>
             <tr>
-                <th class="text-right" colspan="5">Balance</th>
-                <th width="200">{{grandTotal - payment_amount}}</th>
+                <td class="text-right" colspan="5">Balance</td>
+                <td width="200">{{grandTotal - payment_amount}}</td>
             </tr>
         </tbody>
         <tbody>
             <tr>
-                <th colspan="3">
+                <th colspan="4">
                     <!-- <a href="#" class="btn btn-info">Place</a> -->
                 </th>
                 <th class="text-right" colspan="2">
                     
-                    <a href="#" class="btn btn-success" ng-click="checkout()">Checkout</a>
+                    <a href="#" class="btn btn-primary" ng-click="checkout()"><img width="24" height="24" src="<?php echo SITE_URL; ?>assets/img/svg/001-checkout.svg" alt="" /> Checkout</a>
                 </th>
             </tr>
         </tbody>
@@ -117,13 +106,18 @@ echo mainHeader();
 
 </div>
 <script type="text/javascript">
-app.controller('cartController', function($scope, $http, $httpParamSerializerJQLike, $filter, $window, $timeout) {
+app.run(['$anchorScroll', function($anchorScroll) {
+  $anchorScroll.yOffset = $('.navbar').height(true, true);   // always scroll by 50 extra pixels
+}])
+app.controller('cartController', function($scope, $http, $httpParamSerializerJQLike, $filter, $window, $timeout, $location, $anchorScroll) {
     $scope.mainList = <?php echo json_encode($list);?>;
 
     $scope.list = [];
     $scope.priceList = [];
 
     $scope.customerData = {};
+    $scope.gst = 0;
+    $scope.service_charges = 0;
     $scope.subTotal = 0;
     $scope.grandTotal = 0;
     $scope.discount = 0;
@@ -142,6 +136,10 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
     }
     else {
         $scope.items = []
+    }
+
+    $scope.addTax = () => {
+        $scope.calculateSum();
     }
 
     $scope.addDiscount = function (val, obj) {
@@ -180,7 +178,7 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
         $scope.items.map((pro) => {
             if(pro.id == p.id) {
                 exists = true;
-                pro.qty++;
+                // pro.qty++;
             }
         })
         $scope.product = ""
@@ -188,6 +186,14 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
             $scope.items.push({...p, qty: 1});
         }
         $scope.calculateSum();
+
+        $location.hash('item-'+p.id);
+
+        // call $anchorScroll()
+        $anchorScroll();
+        $timeout(() => {
+            $('#item-'+p.id).find('.input-qty').focus();
+        }, 100);
         
     }
     $scope.selectCustomer = function (p) {
@@ -208,7 +214,7 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
     }
 
     $scope.searchProduct = function (term) {
-        return $http.get(<?php echo SITE_URL?>+"api/getStores.php", {params: {term}})
+        return $http.get("<?php echo SITE_URL?>api/getStores.php", {params: {term}})
         .then(function(response) {
             
             $scope.list = response.data;
@@ -217,7 +223,7 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
         });
     }
     $scope.searchCustomer = function () {
-        $http.get(<?php echo SITE_URL?>+"api/getCustomer.php?term="+$scope.customerName)
+        $http.get("<?php echo SITE_URL?>api/getCustomer.php?term="+$scope.customerName)
         .then(function(response) {
             $scope.customersList = response.data;
         });
@@ -237,15 +243,19 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
             subTotal: $scope.subTotal,
             discount: $scope.discount,
             items: $scope.items,
-            payment_amount: $scope.payment_amount
+            payment_amount: $scope.payment_amount,
+            gst: $scope.gst,
+            service_charges: $scope.service_charges
         }
 
 
-        $http.post(<?php echo SITE_URL?>+"api/placeOrder.php", $httpParamSerializerJQLike($scope.form), {headers: {'Content-Type': 'application/x-www-form-urlencoded'} })
+        $http.post("<?php echo SITE_URL?>api/placeOrder.php", $httpParamSerializerJQLike($scope.form), {headers: {'Content-Type': 'application/x-www-form-urlencoded'} })
         .then(function(response) {
-            //window.open("http://localhost/tea/print?id="+response.data.order.id, "", "width=300,height=300"); 
-            //$scope.items = $scope.list = [];
-            //$scope.subTotal = $scope.discount = $scope.grandTotal = $scope.payment_amount = 0;
+            window.open("<?php echo SITE_URL;?>print?id="+response.data.order.id, "", "width=300,height=300"); 
+            $scope.items = $scope.list = [];
+            $scope.subTotal = $scope.discount = $scope.grandTotal = $scope.payment_amount = 0;
+            $window.localStorage.setItem('shopping', JSON.stringify($scope.items))
+            $window.location.assign('<?php echo SITE_URL?>')
         });
     }    
 
@@ -255,7 +265,10 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
             subtotal += (product.price * product.qty);
         })
         $scope.subTotal = subtotal;
-        $scope.grandTotal = $scope.payment_amount = $scope.subTotal - $scope.discount;
+        $scope.payment_amount = $scope.subTotal - $scope.discount;
+        $scope.grandTotal = $scope.payment_amount = $scope.payment_amount + Math.round($scope.payment_amount * ($scope.gst / 100)) + Math.round($scope.payment_amount * ($scope.service_charges / 100));
+        $window.localStorage.setItem('shopping', JSON.stringify($scope.items));
+
     }
 
 })

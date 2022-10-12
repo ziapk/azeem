@@ -103,7 +103,7 @@
 echo mainFooter();
 ?>
 <script type="text/javascript">
-app.controller('reportController', function ($scope, $http, $window) {
+app.controller('reportController', function ($scope, $http, $window, $httpParamSerializerJQLike) {
     
     $scope.supplierName = "";
     $scope.supplierContact = "";
@@ -234,6 +234,7 @@ app.controller('reportController', function ($scope, $http, $window) {
     }
 
     $scope.checkout = function () {
+        console.log('yes');
         $scope.form = {
             customerId: $scope.customerData && $scope.customerData.id ? $scope.customerData.id : 1,
             subTotal: $scope.subTotal,
@@ -243,9 +244,9 @@ app.controller('reportController', function ($scope, $http, $window) {
         }
 
 
-        $http.post(<?php echo SITE_URL?>+"api/placeOrder.php", $httpParamSerializerJQLike($scope.form), {headers: {'Content-Type': 'application/x-www-form-urlencoded'} })
+        $http.post(<?php echo SITE_URL?>+"api/placeSupply.php", $httpParamSerializerJQLike($scope.form), {headers: {'Content-Type': 'application/x-www-form-urlencoded'} })
         .then(function(response) {
-            window.open("http://localhost/tea/print?id="+response.data.order.id, "", "width=300,height=300"); 
+            window.open("<?php echo SITE_URL;?>print?id="+response.data.order.id, "", "width=300,height=300"); 
             $scope.items = $scope.list = [];
             $scope.subTotal = $scope.discount = $scope.grandTotal = $scope.payment_amount = 0;
         });

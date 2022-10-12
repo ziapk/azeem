@@ -5,7 +5,7 @@ class Expenses extends Connection
     
     private $table = 'expenses';
 
-    public function getShopExpenses($shop_id, $date, $to = null) {
+	public function getShopExpenses($shop_id, $date, $to = null) {
 		try {
 			
 			$toCondition = "";
@@ -20,6 +20,57 @@ class Expenses extends Connection
 			$stmt = "SELECT * FROM `{$this->table}` WHERE `shop_id`=:shop_id $toCondition ";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':shop_id',$shop_id,PDO::PARAM_STR);
+			$prepare->execute();
+			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
+			return $result;
+		} catch (PDOException $e) {
+		    die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
+	public function getExpensesSummeryReport($groupName, $date, $to = null) {
+		try {
+			
+			$toCondition = "";
+			if(!empty($to)) {
+				$toCondition .= " AND e.exp_date>='".$date."' AND e.exp_date<='".$to."'";
+			}
+			else {
+				$toCondition .=" AND e.exp_date>='".$date."'";
+			}
+			$final = "'";
+
+			$final .= implode("','", $groupName);
+
+			$final .= "'";
+
+			$stmt = "SELECT c.groupName as details, exp_date, sum(e.price) as price, c.full_name as title FROM `{$this->table}` as e inner join `category` as c on c.id = e.cat_id WHERE c.groupName IN ($final) $toCondition group by DATE(exp_date), cat_id";
+			$prepare = $this->dbh->prepare($stmt);
+			$prepare->execute();
+			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
+			return $result;
+		} catch (PDOException $e) {
+		    die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
+	public function getExpensesForReport($groupName, $date, $to = null) {
+		try {
+			
+			$toCondition = "";
+			if(!empty($to)) {
+				$toCondition .= " AND e.exp_date>='".$date."' AND e.exp_date<='".$to."'";
+			}
+			else {
+				$toCondition .=" AND e.exp_date>='".$date."'";
+			}
+			$final = "'";
+
+			$final .= implode("','", $groupName);
+
+			$final .= "'";
+
+			$stmt = "SELECT e.* FROM `{$this->table}` as e inner join `category` as c on c.id = e.cat_id WHERE c.groupName IN ($final) $toCondition";
+			
+			$prepare = $this->dbh->prepare($stmt);
 			$prepare->execute();
 			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
 			return $result;

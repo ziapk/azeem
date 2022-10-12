@@ -9,21 +9,21 @@
         $from = $_GET['from'];
         $to = $_GET['to'];
         $orders = $ordersObj->userOrders($userData['shopId'], $from, $to);
-        $dateLabel .= $from.' to '.$to;
+        $dateLabel .= '<strong>'.$from.'</strong> to <strong>'.$to.'</strong>';
         $start = date('Y-m-d', strtotime($from));
         $end = date('Y-m-d', strtotime($to));
     }
     else {        
         $orders = $ordersObj->userOrders($userData['shopId'], date('Y-m-d'));
-        $dateLabel .= date('Y-m-d');
+        $dateLabel .= '<strong>'.date('Y-m-d').'</strong>';
         $start = date('Y-m-d');
         $end = date('Y-m-d');
     }
-    echo mainHeader();
+    echo mainHeader(['page' =>'order']);
 ?>
 
 <div class="container" ng-controller="reportController">
-<form method="GET" ng-submit="getReport()">
+<form method="GET" ng-submit="getReport()" class="form-group">
     <h4><?php echo $dateLabel;?></h4>
     <div class="input-group">
         <input date-range-picker class="form-control date-picker" type="text" ng-model="datePicker.date" options="{ locale: {format: 'DD/MM/YYYY'}}" />
@@ -53,9 +53,11 @@
             <td>{{statusArr[row.status].full_name}}</td>
             <td>{{row.order_date}}</td>
             <td align="right">
+                <a class="btn btn-xs btn-danger" ng-click="returnOrder(row.id)" href="javascript:void(0)">Return</a>
+                <a ng-if="row.status != 2" class="btn btn-xs btn-primary" href="adjustment.php?id={{row.id}}">Pay</a>
                 <a class="btn btn-xs btn-danger" ng-click="deleteRecipt(row.id)" href="javascript:void(0)">Delete</a>
                 <a class="btn btn-xs btn-info" ng-click="openRecipt(row.id)" href="javascript:void(0)">Print</a>
-                <a class="btn btn-xs btn-primary" ng-click="openRecipt(row.id, 'details')" href="javascript:void(0)">View</a>
+                <a class="btn btn-xs btn-default" ng-click="openRecipt(row.id, 'details')" href="javascript:void(0)">View</a>
             </td>
         </tr>
     </tbody>
@@ -82,13 +84,13 @@
 echo mainFooter();
 ?>
 <script type="text/javascript">
-app.controller('reportController', function ($scope, $http, $window) {
-    $scope.datePicker = { date: {startDate: null, endDate: null} };
+app.controller('reportController', function($scope, $http, $httpParamSerializerJQLike, $window, $document, $uibModal) {
+    $scope.datePicker = { date: {startDate: '<?php echo date('Y-m-d');?>', endDate: '<?php echo date('Y-m-d');?>'} };
 
     $scope.statusArr = <?php echo json_encode($orderStatusArr);?> 
 
     $scope.getReport = form => {
-        $http.get(<?php echo SITE_URL?>+"api/getSaleReport.php", {params: {from: moment($scope.datePicker.date.startDate).format('YYYY-MM-DD'), to: moment($scope.datePicker.date.endDate).format('YYYY-MM-DD')}})
+        $http.get("<?php echo SITE_URL?>api/getSaleReport.php", {params: {from: moment($scope.datePicker.date.startDate).format('YYYY-MM-DD'), to: moment($scope.datePicker.date.endDate).format('YYYY-MM-DD')}})
         .then(function(response) {
             $scope.loading = false;
             if(response.status === 200) {
@@ -96,6 +98,10 @@ app.controller('reportController', function ($scope, $http, $window) {
             }
         })
     }
+
+    $scope.getReport();
+
+
     $scope.openRecipt = (id, detail) => {
         if(detail) {
             detail = true
@@ -103,12 +109,42 @@ app.controller('reportController', function ($scope, $http, $window) {
         else {
             detail = false
         }
-        $window.open("http://localhost/tea/print?id="+id+"&detail="+detail, "", "width=300,height=300"); 
+        $window.open("<?php echo SITE_URL;?>print?id="+id+"&detail="+detail, "", "width=300,height=300"); 
     }
-    $scope.deleteRecipt = id => {
-        $window.open("http://localhost/tea/pages/orders/delete.php?id="+id, "", "width=300,height=300"); 
+    /* $scope.deleteRecipt = id => {
+        $window.open("<?php echo SITE_URL;?>pages/orders/delete.php?id="+id, "", "width=300,height=300"); 
+    } */
+
+    $scope.deleteRecipt = function (id) {
+        const reason = $window.prompt('Please Write a reason for delete this order')
+        if(reason) {
+            $http.get('delete.php?id='+id+'&reason='+reason).then(function(response) {
+                if(response && response.data && response.data.success) {
+                    $scope.getReport();
+                }
+                else {
+                    
+                }
+                //$scope.getPublishers(1);
+            });
+        }
+    }
+    
+    $scope.returnOrder = function (id) {
+        $window.location.assign('<?php echo SITE_URL;?>pages/orders/retrun.php?id='+id)
     }
 
 });
 
+</script>
+<script type="text/javascript">
+ $('.datepicker').daterangepicker({
+    minDate: moment().subtract(1, 'year'),
+    maxDate: moment(),
+    parentEl: '.datepicker-parent',
+ },  function(start, end, label) {
+     $('#from').val(moment(start).format('YYYY-MM-DD'));
+     $('#to').val(moment(end).format('YYYY-MM-DD'));
+
+ });
 </script>

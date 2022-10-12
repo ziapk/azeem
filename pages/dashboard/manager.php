@@ -20,7 +20,7 @@
                     <td width="50"><img ng-if="li.image" width="40" class="image" src={{"<?php echo SITE_URL;?>uploads/products/"+li.image}} /></td>
                     <td>{{li.full_name}}</td>
                     <td>{{li.price}}</td>
-                    <td>{{li.in_hand}}</td>
+                    <td>{{li.qty}}</td>
                     <td><a ng-click="addToCard(li.id)" class="btn btn-default btn-xs">Add to card</a> <a class="btn btn-primary btn-xs" href="<?php echo SITE_URL."pages/product/update.php?id="?>{{li.id}}">Modify</a></td>
                 </tr>
         </tbody>

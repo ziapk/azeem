@@ -28,6 +28,7 @@
                 'qty' => !empty($_POST['qty']) ? $_POST['qty'] : 0,
                 'stock_out' => !empty($_POST['stock_out']) ? $_POST['stock_out'] : 0,
                 'product_id' => !empty($_POST['product_id']) ? $_POST['product_id'] : 0,
+                'location' => !empty($_POST['location']) ? $_POST['location'] : null,
                 'shopId' => !empty($_POST['shopId']) ? $_POST['shopId'] : 0,
                 'owner_id' => $ownerId,
             ];
@@ -42,8 +43,8 @@
         }
     }
 
-    echo mainHeader();  
-    $categories = $categoryObj->getOwnerCategories($ownerId);
+    echo mainHeader(['page'=> 'product']);  
+    $categories = $categoryObj->getCategories($ownerId);
     $products = $productObj->getOwnerProducts($ownerId);
     $ownerStores = $stores->getOwnerStores($userData['id']);
 
@@ -62,11 +63,14 @@
                     <?php }?>
                 </select>
             </div>
-            <div class="col-sm-3 form-group">
+            <div class="col-sm-2 form-group">
                 <input name="qty" type="number" class="form-control" placeholder="Stock In">
             </div>
-            <div class="col-sm-3 form-group">
+            <div class="col-sm-2 form-group">
                 <input name="stock_out" type="number" class="form-control" placeholder="Stock Out">
+            </div>
+            <div class="col-sm-2 form-group">
+                <input name="location" type="text" class="form-control" placeholder="Place in store">
             </div>
             <div class="col-sm-3 form-group">
                 <select name="shopId" class="form-control">

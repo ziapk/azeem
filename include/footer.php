@@ -16,6 +16,7 @@ function mainFooter($params = null) {
         <script src="<?php echo SITE_URL;?>assets/vendors/daterangepicker/daterangepicker.js"></script>
         <script src="<?php echo SITE_URL;?>assets/vendors/angular-daterangepicker/daterangepicker.min.js"></script>
         <script src="<?php echo SITE_URL;?>assets/vendors/angular-daterangepicker/angular-daterangepicker.min.js"></script>
+        <script src="<?php echo SITE_URL;?>assets/vendors/angularjs-toaster/toaster.min.js"></script>
         </body>
     </html>
     <?php

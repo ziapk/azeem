@@ -7,7 +7,6 @@ if(!$id) {
 }
 
 include_once dirname(__FILE__).'/../../include/settings.php';
-print_r($_GET);
 $categoryObj = new Expenses();
 $categoryObj->deleteExpense($_GET);
 echo '<script>window.close()</script>';
