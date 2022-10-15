@@ -223,7 +223,7 @@ app.controller('orderController', function($scope, $http, $httpParamSerializerJQ
     }
 
     $scope.searchCustomer = function () {
-        $http.get(<?php echo SITE_URL?>+"api/getCustomer.php?term="+$scope.customerName)
+        $http.get("<?php echo SITE_URL?>api/getCustomer.php?term="+$scope.customerName)
         .then(function(response) {
             $scope.customersList = response.data;
         });
@@ -247,7 +247,7 @@ app.controller('orderController', function($scope, $http, $httpParamSerializerJQ
         }
 
 
-        $http.post(<?php echo SITE_URL?>+"api/placeOrder.php", $httpParamSerializerJQLike($scope.form), {headers: {'Content-Type': 'application/x-www-form-urlencoded'} })
+        $http.post("<?php echo SITE_URL?>api/placeOrder.php", $httpParamSerializerJQLike($scope.form), {headers: {'Content-Type': 'application/x-www-form-urlencoded'} })
         .then(function(response) {
             window.open("<?php echo SITE_URL;?>print?id="+response.data.order.id, "", "width=300,height=300"); 
             $scope.items = $scope.list = [];
