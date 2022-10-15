@@ -29,10 +29,10 @@
                     </div>
                 </div>
                 </th>
-                <th style="vertical-align: middle">Search Product</th>
+                <th style="vertical-align: middle"><label><span style="vertical-align: middle">Search Product</span> <span style="vertical-align: middle; margin-left: 4px"><input type="checkbox" name="focus" ng-model="focus"><span></label></th>
                 <th width="100">
                 <div class="dropdown-wrapper">
-                    <input type="text" class="form-control" ng-model="product" placeholder="Search Products" typeahead-on-select="selectProduct($item)" uib-typeahead="address as address.full_name for address in searchProduct($viewValue)" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="0">
+                    <input type="text" class="form-control" ng-model="product" id="searchProduct" placeholder="Search Products" typeahead-on-select="selectProduct($item)" uib-typeahead="address as address.full_name for address in searchProduct($viewValue)" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="0">
                     <!-- <div class="list-group recipt-search-dropdown">
                         <a ng-click="selectProduct(l)" class="list-group-item" ng-repeat="l in list">
                             <h4 class="list-group-item-heading">{{l.full_name}} <span>{{l.price}}</span></h4>
@@ -114,11 +114,19 @@ app.controller('orderController', function($scope, $http, $httpParamSerializerJQ
 
     $scope.list = [];
     $scope.priceList = [];
+    $scope.focus = true;
     $scope.items = [];
     $scope.customerData = {};
     $scope.subTotal = 0;
     $scope.grandTotal = 0;
     $scope.discount = 0;
+
+    setInterval(() => {
+        if($scope.focus === true && !$('#searchProduct').is(':focus')) {
+
+            $('#searchProduct').focus();
+        }
+    }, 1000);
 
     $scope.addDiscount = function (val, obj) {
         if(val > 0) {
@@ -156,7 +164,7 @@ app.controller('orderController', function($scope, $http, $httpParamSerializerJQ
         $scope.items.map((pro) => {
             if(pro.id == p.id) {
                 exists = true;
-                // pro.qty++;
+                pro.qty++;
             }
         })
         $scope.product = ""
@@ -193,11 +201,23 @@ app.controller('orderController', function($scope, $http, $httpParamSerializerJQ
     }
 
     $scope.searchProduct = function (term) {
-        return $http.get(<?php echo SITE_URL?>+"api/getStores.php", {params: {term}})
+        const params = {};
+        if($scope.focus === true && (term || "").endsWith('-AGP')) {
+            params.searchBy = 'id';
+            params.term = parseFloat(term);
+        }
+        else {
+            params.term = term;
+        }
+        return $http.get("<?php echo SITE_URL?>api/getStores.php", { params })
         .then(function(response) {
-            
+
+            if($scope.focus === true && (term || "").endsWith('-AGP')) {
+                response.data && response.data.length && $scope.selectProduct(response.data[0]);
+            }
             $scope.list = response.data;
             $scope.priceList = response.data;
+            
             return response.data
         });
     }

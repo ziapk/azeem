@@ -18,7 +18,10 @@ class Products extends Connection
 				$pin .= " AND p.pin > 0";
 			}
 			
-			if($params['searchBy'] == 'cource' && !empty($params["courceId"])) {
+			if($params['searchBy'] == 'id' && !empty($params["search"])) {
+				$searchQry = "AND p.id = ".$params["search"];	
+			}
+			else if($params['searchBy'] == 'cource' && !empty($params["courceId"])) {
 				$searchQry = "AND c.program_id = ".$params["courceId"];	
 			}
 			else if(!empty($params['searchBy']) && $params['searchBy'] == 'multi') {
@@ -104,7 +107,7 @@ class Products extends Connection
 
 			
 
-			$stmt = "SELECT p.* $column  FROM `{$this->table}` as p $innerJoin LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id LEFT JOIN program_books as c ON c.product_id = p.id  WHERE p.`owner_id`=:owner_id  $pin $searchQry  GROUP BY p.id $sortByQry LIMIT :offset, :perPage";
+			$stmt = "SELECT p.*, pub.discount_type, pub.discount_amount, CONVERT(case when (pub.discount_amount > 0) then (p.price * (1 - (pub.discount_amount / 100)) ) else p.price end, DECIMAL) as price $column  FROM `{$this->table}` as p $innerJoin LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id LEFT JOIN program_books as c ON c.product_id = p.id LEFT JOIN publishers as pub on p.publisher_id = pub.id  WHERE p.`owner_id`=:owner_id  $pin $searchQry  GROUP BY p.id $sortByQry LIMIT :offset, :perPage";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':owner_id',$owner_id,PDO::PARAM_STR);
 			$prepare->bindParam(':offset',$offset,PDO::PARAM_INT);
@@ -120,7 +123,7 @@ class Products extends Connection
 	
 	public function getOwnerProducts($owner_id) {
 		try {
-			$stmt = "SELECT * FROM `{$this->table}` WHERE `owner_id`=:owner_id";
+			$stmt = "SELECT p.*, pub.discount_type, pub.discount_amount, CONVERT(case when (pub.discount_amount > 0) then (p.price * (1 - (pub.discount_amount / 100)) ) else p.price end, DECIMAL) as price FROM `{$this->table}` as p left join publishers as pub on pub.id = p.publisher_id WHERE p.`owner_id`=:owner_id";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':owner_id',$owner_id,PDO::PARAM_STR);
 			$prepare->execute();
