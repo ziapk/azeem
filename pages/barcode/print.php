@@ -48,7 +48,7 @@ foreach ($_POST['full_name'] as $index => $full_name) {
     $bobj = $barcode->getBarcodeObj('C128', $code , -2, -20, 'black', array(0, 0, 0, 0));
     
     for($row = 0; $row < $qty; $row++) {
-        $examples .= '<table style="width: 100%; border: 0;page-break-before: always; margin-bottom: 20px" cellpadding="0" cellspacing="0"><tr><td><strong>'.$shop['full_name'].'</strong><br />'.$full_name.'</td><td><strong style="font-size: 20px">'.number_format($price, 2).'</strong></td></tr><tr><td colspan="2">'.$bobj->getSvgCode().'</td></tr></table>';
+        $examples .= '<table style="width: 100%; border: 0;page-break-before: always; margin-bottom: 20px" cellpadding="0" cellspacing="0"><tr><td><strong>'.$shop['full_name'].'</strong></td><td><strong>'.number_format($price, 2).'</strong></td></tr><tr><td colspan="2">'.$full_name.'<td></tr><tr><td colspan="2">'.$bobj->getSvgCode().'</td></tr></table>';
     }
 }
 echo $examples;
