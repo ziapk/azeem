@@ -45,10 +45,10 @@ foreach ($_POST['full_name'] as $index => $full_name) {
     $price = $_POST['price'][$index];
     $price = $_POST['price'][$index];
     $qty = $_POST['qty'][$index];
-    $bobj = $barcode->getBarcodeObj('QRCODE', $code , -5, -5, 'black', array(0, 0, 0, 0));
+    $bobj = $barcode->getBarcodeObj('C128', $code , -3, -30, 'black', array(0, 0, 0, 0));
     
     for($row = 0; $row < $qty; $row++) {
-        $examples .= '<table style="width: 100%; border: 0;page-break-before: always; margin-bottom: 20px" cellpadding="0" cellspacing="0"><tr><td><strong>'.$shop['full_name'].'</strong><br />'.$full_name.'<br /><strong style="font-size: 20px">'.number_format($price, 2).'</strong></td><td style="width: 105px">'.$bobj->getSvgCode().'</td></tr></table>';
+        $examples .= '<table style="width: 100%; border: 0;page-break-before: always; margin-bottom: 20px" cellpadding="0" cellspacing="0"><tr><td><strong>'.$shop['full_name'].'</strong><br />'.$full_name.'</td><td><strong style="font-size: 20px">'.number_format($price, 2).'</strong></td></tr><tr><td colspan="2">'.$bobj->getSvgCode().'</td></tr></table>';
     }
 }
 echo $examples;
