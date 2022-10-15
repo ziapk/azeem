@@ -62,7 +62,7 @@ td {
 }
 .tiny {
     font-size: 10px;
-    margin: 0.5em 0
+    margin: 0.5em 0 .5in
 }
 .mt-5 {
     margin-top: 5px;
