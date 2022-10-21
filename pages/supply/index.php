@@ -133,7 +133,7 @@ app.controller('reportController', function ($scope, $http, $window, $httpParamS
 
     $scope.searchSupplier = function (term) {
         $scope.supplierId = ""
-        return $http.get(<?php echo SITE_URL?>+"api/getSupplier.php", {params: {term}})
+        return $http.get("<?php echo SITE_URL?>api/getSupplier.php", {params: {term}})
         .then(function(response) {
             return response.data
         });
@@ -210,7 +210,7 @@ app.controller('reportController', function ($scope, $http, $window, $httpParamS
     }
 
     $scope.searchProduct = function (term) {
-        return $http.get(<?php echo SITE_URL?>+"api/getStores.php", {params: {term}})
+        return $http.get("<?php echo SITE_URL?>api/getStores.php", {params: {term}})
         .then(function(response) {
             $scope.list = response.data;
             $scope.priceList = response.data;
@@ -219,7 +219,7 @@ app.controller('reportController', function ($scope, $http, $window, $httpParamS
     }
 
     $scope.searchCustomer = function () {
-        $http.get(<?php echo SITE_URL?>+"api/getCustomer.php?term="+$scope.customerName)
+        $http.get("<?php echo SITE_URL?>api/getCustomer.php?term="+$scope.customerName)
         .then(function(response) {
             $scope.customersList = response.data;
         });
@@ -244,7 +244,7 @@ app.controller('reportController', function ($scope, $http, $window, $httpParamS
         }
 
 
-        $http.post(<?php echo SITE_URL?>+"api/placeSupply.php", $httpParamSerializerJQLike($scope.form), {headers: {'Content-Type': 'application/x-www-form-urlencoded'} })
+        $http.post("<?php echo SITE_URL?>api/placeSupply.php", $httpParamSerializerJQLike($scope.form), {headers: {'Content-Type': 'application/x-www-form-urlencoded'} })
         .then(function(response) {
             window.open("<?php echo SITE_URL;?>print?id="+response.data.order.id, "", "width=300,height=300"); 
             $scope.items = $scope.list = [];

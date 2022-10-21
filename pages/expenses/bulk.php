@@ -22,6 +22,7 @@ echo mainHeader(['page'=> 'expense']);
                     </th>
                     <th style="vertical-align: middle" width="250">
                         <select class="form-control" ng-model="form.group" ng-change="prepareExpense(form.group)">
+                            <option value="">All</option>
                             <option ng-repeat="li in mainList.groupNameList" ng-value="li">{{li}}</option>
                         </select>
                     </th>
@@ -29,7 +30,7 @@ echo mainHeader(['page'=> 'expense']);
                         Expense Date
                     </th>
                     <th style="vertical-align: middle; text-align: right; position: relative">
-                        <input type="text" class="form-control datepicker-single" />
+                        <input type="text" class="form-control datepicker-single" value="<?php echo date('Y-m-D');?>" />
                     </th>
                 </tr>
             </thead>
@@ -87,9 +88,18 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
     $scope.prepareExpense = (group) => {
         $scope.form.expenses = {};
         $scope.grandTotal = 0;
-        $scope.mainList.group[group].forEach(row => {
-            $scope.form.expenses[row.id] = {...row, amount: 0 };
-        })
+        if(group) {
+            $scope.mainList.group[group].forEach(row => {
+                $scope.form.expenses[row.id] = {...row, amount: 0 };
+            })
+        }
+        else {
+            Object.keys($scope.mainList.group).map(g => {
+                $scope.mainList.group[g].forEach(row => {
+                    $scope.form.expenses[row.id] = {...row, amount: 0 };
+                })
+            })
+        }
     };
 
     $scope.prepareExpense($scope.form.group);
@@ -108,7 +118,7 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
 
         console.log(form);
 
-        $http.post(<?php echo SITE_URL?>+"api/placeExpenses.php", $httpParamSerializerJQLike({ form }), {headers: {'Content-Type': 'application/x-www-form-urlencoded'} })
+        $http.post("<?php echo SITE_URL?>api/placeExpenses.php", $httpParamSerializerJQLike({ form }), {headers: {'Content-Type': 'application/x-www-form-urlencoded'} })
         .then(function(response) {
             // window.open("<?php echo SITE_URL;?>print?id="+response.data.order.id, "", "width=300,height=300"); 
             // $scope.form = $scope.list = [];

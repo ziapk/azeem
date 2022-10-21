@@ -35,7 +35,7 @@ app.controller('productController', function($scope, $http, $httpParamSerializer
     $scope.search = ""; //$scope.data.records;
     $scope.getProducts = (page) => {
         $scope.loading = true;
-        $http.get(<?php echo SITE_URL?>+"api/getProducts.php", {params: {page: page || 1, search: $scope.search}})
+        $http.get("<?php echo SITE_URL?>api/getProducts.php", {params: {page: page || 1, search: $scope.search}})
         .then(function(response) {
             $scope.loading = false;
             if(response.status === 200) {
