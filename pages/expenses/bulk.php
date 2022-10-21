@@ -145,6 +145,7 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
     }
         $('.datepicker-single').daterangepicker({
             autoApply: true,
+            minDate: moment().format('YYYY-MM-DD'),
             maxDate: moment().format('YYYY-MM-DD'),
             singleDatePicker: true,
             locale: {
