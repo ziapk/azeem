@@ -14,12 +14,14 @@ if(empty($_POST['full_name'])) {
     $error = "Please fill all fields";
 }
 else {
+    $ownerId = $userData['role'] == 'owner' ? $userData['id'] : $userData['created_by'];
 
     $data = [                
         'full_name' => $_POST['full_name'],
         'discount_type' => $_POST['discount_type'],
         'discount_amount' => $_POST['discount_amount'],
         'discount_status' => $_POST['discount_status'],
+        'owner_id' => $ownerId,
     ];
 
     $create = $publisherObj->createPublisher($data);

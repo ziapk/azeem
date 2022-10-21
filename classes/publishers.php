@@ -60,12 +60,13 @@ class Publishers extends Connection
 	}
 	public function createPublisher($array) {
 		try {
-			$stmt = "INSERT INTO `{$this->table}` (`full_name`, `discount_type`, `discount_amount`, `discount_status`) VALUES (:full_name, :discount_type, :discount_amount, :discount_status)";
+			$stmt = "INSERT INTO `{$this->table}` (`full_name`, `discount_type`, `discount_amount`, `discount_status`, `owner_id`) VALUES (:full_name, :discount_type, :discount_amount, :discount_status, :owner_id)";
             $prepare = $this->dbh->prepare($stmt);
             $prepare->bindParam(':full_name',$array['full_name'],PDO::PARAM_STR);
             $prepare->bindParam(':discount_type',$array['discount_type'],PDO::PARAM_STR);
             $prepare->bindParam(':discount_amount',$array['discount_amount'],PDO::PARAM_STR);
             $prepare->bindParam(':discount_status',$array['discount_status'],PDO::PARAM_STR);
+            $prepare->bindParam(':owner_id',$array['owner_id'],PDO::PARAM_STR);
             $prepare->execute();
 			$result = $this->dbh->lastInsertId();
 			return $result;
