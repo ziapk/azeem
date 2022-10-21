@@ -30,7 +30,7 @@ echo mainHeader(['page'=> 'expense']);
                         Expense Date
                     </th>
                     <th style="vertical-align: middle; text-align: right; position: relative">
-                        <input type="text" class="form-control datepicker-single" value="<?php echo date('Y-m-d');?>" />
+                        <input type="text" class="form-control datepicker-single"/>
                     </th>
                 </tr>
             </thead>
