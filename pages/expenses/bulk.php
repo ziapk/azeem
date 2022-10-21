@@ -30,7 +30,7 @@ echo mainHeader(['page'=> 'expense']);
                         Expense Date
                     </th>
                     <th style="vertical-align: middle; text-align: right; position: relative">
-                        <input type="text" class="form-control datepicker-single" value="<?php echo date('Y-m-d');?>" />
+                        <input type="text" class="form-control datepicker-single" />
                     </th>
                 </tr>
             </thead>
@@ -146,6 +146,7 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
         $('.datepicker-single').daterangepicker({
             autoApply: true,
             maxDate: new Date(),
+            defaultValue: new Date(),
             singleDatePicker: true,
         }, function(date) {
             $scope.form.exp_date = moment(date).format('YYYY-MM-DD');
