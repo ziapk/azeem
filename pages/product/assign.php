@@ -43,7 +43,7 @@
         }
     }
 
-    echo mainHeader(['page'=> 'product']);  
+    echo mainHeader(['page'=> 'assign']);  
     $categories = $categoryObj->getCategories($ownerId);
     $products = $productObj->getOwnerProducts($ownerId);
     $ownerStores = $stores->getOwnerStores($userData['id']);

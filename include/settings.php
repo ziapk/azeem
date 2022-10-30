@@ -17,6 +17,7 @@ $shopData = !empty($_SESSION['shopInfo']) ? $_SESSION['shopInfo'] : [];
 $shop = !empty($_SESSION['shop']) ? $_SESSION['shop'] : [];
 
 $pages = [
+    "assign" => "Assign Book",
     "recipt" => "Recipt",
     "dashboard" => "Dashboard",
     "product" => "Products",
@@ -88,6 +89,7 @@ $orderStatusArr = [
 ];
 
 $reportsArray = [
+    0 => ['id' => 0, 'title'=> 'Product List'],
     1 => ['id' => 1, 'title'=> 'Sales Report'],
     2 => ['id' => 2, 'title'=> 'Summery Product Wise'],
     3 => ['id' => 3, 'title'=> 'Summery Date Wise'],
