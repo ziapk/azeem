@@ -133,7 +133,7 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
             $scope.product = null;
             $('#searchProduct').focus();
         }
-    }, 5000);
+    }, 3000);
     if($window.localStorage.getItem('shopping')) {
         const shopCart = JSON.parse($window.localStorage.getItem('shopping'));
         
@@ -204,13 +204,8 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
 
         // call $anchorScroll()
         $anchorScroll();
-        $timeout(() => {
-            $('#item-'+p.id).find('.input-qty').focus();
-            $scope.product = null;
-            $timeout(() => {
-                $('#searchProduct').focus();
-            }, 500);
-        }, 100);
+        $('#item-'+p.id).find('.input-qty').focus();
+        $scope.product = null;
         
     }
     $scope.selectCustomer = function (p) {
