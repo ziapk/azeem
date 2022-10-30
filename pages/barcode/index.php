@@ -1,14 +1,41 @@
 <?php 
 include_once dirname(__FILE__).'/../../include/settings.php';
 echo mainHeader(['page' => 'barcode']);
+
+$all = false;
+$products = [];
+$productsObj = new Products();
+$storeObj = new Store();
+$ownerId = $userData['role'] == 'owner' ? $userData['id'] : $userData['owner_id'];
+$ownerStores = $storeObj->getOwnerStores($ownerId);
+
+if(!empty($_GET['all']) && $_GET['all'] == '1') {
+    $shopId = $_GET['shopId'];
+    $products = $productsObj->getOwnerProductsPagination($ownerId, ['page' => 1, 'perPage' => 100000], $shopId);
+}
+
 ?>
 
 <div class="container" ng-controller="categoryController">
+<form class="row" action="" method="GET">
+    <div class="col-sm-3 form-group">
+        <input type="hidden" class="form-control" name="all" value="1">
+        <select class="form-control" name="shopId">
+            <?php foreach ($ownerStores as $value) { ?>
+                <option value="<?php echo $value['id'];?>"><?php echo $value['full_name'];?></option>
+            <?php } ?>
+        </select>
+    </div>
+    <div class="col-sm-3 form-group">
+        <input type="submit" class="btn btn-primary" value="Fetch All Items" />
+    </div>
+</form>
 <h4>Products</h4>
 <div class="form-group">
 <input type="text" class="form-control" ng-model="product" placeholder="Search Products" typeahead-on-select="selectProduct($item)" uib-typeahead="address as address.full_name for address in searchProduct($viewValue)" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="0">
 </div>
-<form action="print.php" method="post">
+
+<form action="print.php" method="post" target="_blank">
 <table class="table">
     <thead>
         <tr>
@@ -38,8 +65,10 @@ app.controller('categoryController', function($scope, $http, $httpParamSerialize
     $scope.list = []; //$scope.data.records;
     $scope.siteUrl = '<?php echo SITE_URL ?>';
     
+    $scope.books = <?php echo json_encode($products);?>;
+
     $scope.list = [];
-    $scope.items = [];
+    $scope.items = $scope.books?.records || [];
 
     $scope.selectProduct = function (p) {
         let exists = false;
