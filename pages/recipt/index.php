@@ -205,6 +205,9 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
         // $anchorScroll();
         // $('#item-'+p.id).find('.input-qty').focus();
         // $scope.product = null;
+        $timeout(() => {
+            $scope.product = '';
+        }, 400);
         
     }
     $scope.selectCustomer = function (p) {
@@ -229,7 +232,6 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
         if($scope.focus === true && (term || "").endsWith('-AGP')) {
             params.searchBy = 'id';
             $scope.product = '';
-            console.log('empty');
             params.term = parseFloat(term.split('-')[0]);
             const list = localStorage.getItem('list') && JSON.parse(localStorage.getItem('list'));
             const item = list.find(r  => r.id == params.term);

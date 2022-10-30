@@ -200,12 +200,16 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
         }
         $scope.calculateSum();
 
-        $location.hash('item-'+p.id);
+        // $location.hash('item-'+p.id);
 
         // call $anchorScroll()
         // $anchorScroll();
         // $('#item-'+p.id).find('.input-qty').focus();
         // $scope.product = null;
+
+        $timeout(() => {
+            $scope.product = '';
+        }, 400);
         
     }
     $scope.selectCustomer = function (p) {
