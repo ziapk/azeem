@@ -98,7 +98,7 @@
         }
 
         $scope.searchBoard = function (term) {
-            return $http.get("<?php echo SITE_URL?>api/getProducts.php", {params: {term}})
+            return $http.get("<?php echo SITE_URL?>api/getProducts.php", { params: { search: term } })
             .then(function(response) {
                 return response.data.records
             });
