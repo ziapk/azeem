@@ -79,8 +79,12 @@ echo mainHeader();
                 <td>{{subTotal}}</td>
             </tr>
             <tr>
-                <td class="text-right" colspan="5">Disc.</td>
-                <td width="200"><input type="number" ng-model="discount" class="form-control" ng-change="addDiscount(discount)"></td>
+                <td class="text-right" colspan="5">Add Discount</td>
+                <td width="200"><input type="search" ng-model="discountAmount" class="form-control" on-enter-press="addDiscount(discountAmount)" placeholder="Press Enter to Add"></td>
+            </tr>
+            <tr>
+                <td class="text-right" colspan="5">Total Discount</td>
+                <td width="200"><strong>{{discount}}</strong></td>
             </tr>
             <tr>
                 <td class="text-right" colspan="5">Grand Total</td>
@@ -114,6 +118,18 @@ echo mainHeader();
 app.run(['$anchorScroll', function($anchorScroll) {
   $anchorScroll.yOffset = $('.navbar').height(true, true);   // always scroll by 50 extra pixels
 }])
+app.directive('onEnterPress', function () {
+    return function (scope, element, attrs) {
+        element.bind("keydown keypress", function (event) {
+            if(event.which === 13) {
+                scope.$apply(function (){
+                    scope.$eval(attrs.onEnterPress);
+                });
+                event.preventDefault();
+            }
+        });
+    };
+});
 app.controller('cartController', function($scope, $http, $httpParamSerializerJQLike, $filter, $window, $timeout, $location, $anchorScroll) {
     $scope.mainList = <?php echo json_encode($list);?>;
 
@@ -156,12 +172,12 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
 
     $scope.addDiscount = function (val, obj) {
         if(val > 0) {
-            $scope.discount = val;
-        } else {
-            $scope.discount = 0;
+            $scope.discount = (parseFloat($scope.discount) + parseFloat(val));
         }
         $scope.calculateSum();
+        $scope.discountAmount = '';
     }
+
     $scope.directlyAdd = function (val, obj) {
         if(val > 0) {
             obj.qty = val
