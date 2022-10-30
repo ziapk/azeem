@@ -205,7 +205,9 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
         $timeout(() => {
             $('#item-'+p.id).find('.input-qty').focus();
             $scope.product = null;
-            $('#searchProduct').focus();
+            $timeout(() => {
+                $('#searchProduct').focus();
+            }, 500);
         }, 100);
         
     }
