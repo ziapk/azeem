@@ -31,7 +31,7 @@ $list = $productCls->getOwnerProducts($ownerId);
                 <th style="vertical-align: middle"><label><span style="vertical-align: middle">Search Product</span> <span style="vertical-align: middle; margin-left: 4px"><input type="checkbox" name="focus" ng-model="focus"><span></label></th>
                 <th width="100">
                 <div class="dropdown-wrapper">
-                    <input type="text" class="form-control" id="searchProduct" ng-model="product" placeholder="Search Products" typeahead-on-select="selectProduct($item); product=''" uib-typeahead="address as address.full_name for address in searchProduct($viewValue)" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="1">
+                    <input type="text" class="form-control" id="searchProduct" ng-model="product" placeholder="Search Products" typeahead-on-select="selectProduct($item)" uib-typeahead="address as address.full_name for address in searchProduct($viewValue)" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="1">
                     <!-- <div class="list-group recipt-search-dropdown">
                         <a ng-click="selectProduct(l)" class="list-group-item" ng-repeat="l in list">
                             <h4 class="list-group-item-heading">{{l.full_name}} <span>{{l.price}}</span></h4>
@@ -129,7 +129,7 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
     const items = [];
     setInterval(() => {
         if($scope.focus === true && !$('#searchProduct').is(':focus')) {
-            $scope.product = "";
+            $scope.product = null
             $('#searchProduct').focus();
         }
     }, 1000);
@@ -185,6 +185,7 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
         }
     }
     $scope.selectProduct = function (p) {
+        $scope.product = null
         let exists = false;
         $scope.items.map((pro) => {
             if(pro.id == p.id) {
@@ -192,7 +193,6 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
                 pro.qty++;
             }
         })
-        $scope.product = ""
         if(!exists) {
             $scope.items.push({...p, qty: 1});
         }
@@ -253,7 +253,7 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
     }
 
     $scope.clearSearch = () => {
-        $scope.product = "";
+        $scope.product = null
         $scope.list = [];
     }
     $scope.clearCustomer = () => {
