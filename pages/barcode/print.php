@@ -55,7 +55,7 @@ foreach ($_POST['full_name'] as $index => $full_name) {
 <style>
     svg {
         max-width: 100%;
-        width: 100%:
+        width: 1.1in;
         height: auto;
     }
 </style>
