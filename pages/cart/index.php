@@ -32,7 +32,7 @@ echo mainHeader();
                 <th style="vertical-align: middle"><label><span style="vertical-align: middle">Search Product</span> <span style="vertical-align: middle; margin-left: 4px"><input type="checkbox" name="focus" ng-model="focus"><span></label></th>
                 <th width="100">
                 <div class="dropdown-wrapper">
-                    <input type="text" class="form-control" id="searchProduct" ng-model="product" placeholder="Search Products" typeahead-on-select="selectProduct($item)" uib-typeahead="address as address.full_name for address in searchProduct($viewValue)" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="1">
+                    <input type="text" class="form-control" id="searchProduct" ng-model="product" placeholder="Search Products" typeahead-on-select="selectProduct($item); product=null" uib-typeahead="address as address.full_name for address in searchProduct($viewValue)" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="1">
                     <!-- <div class="list-group recipt-search-dropdown">
                         <a ng-click="selectProduct(l)" class="list-group-item" ng-repeat="l in list">
                             <h4 class="list-group-item-heading">{{l.full_name}} <span>{{l.price}}</span></h4>
@@ -203,9 +203,9 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
         $location.hash('item-'+p.id);
 
         // call $anchorScroll()
-        $anchorScroll();
-        $('#item-'+p.id).find('.input-qty').focus();
-        $scope.product = null;
+        // $anchorScroll();
+        // $('#item-'+p.id).find('.input-qty').focus();
+        // $scope.product = null;
         
     }
     $scope.selectCustomer = function (p) {
@@ -232,6 +232,7 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
             params.term = parseFloat(term.split('-')[0]);
             const list = localStorage.getItem('list') && JSON.parse(localStorage.getItem('list'));
             const item = list.find(r  => r.id == params.term);
+            $scope.product = null;
             $scope.selectProduct(item);
             return [];
         }
