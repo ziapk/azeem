@@ -130,7 +130,7 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
     const items = [];
     setInterval(() => {
         if($scope.focus === true && !$('#searchProduct').is(':focus')) {
-
+            $scope.product = "";
             $('#searchProduct').focus();
         }
     }, 1000);
