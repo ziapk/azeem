@@ -15,6 +15,24 @@ if(empty($_SESSION) && $loginPage != true) {
 $userData = !empty($_SESSION['user_credentials']) ? $_SESSION['user_credentials'] : [];
 $shopData = !empty($_SESSION['shopInfo']) ? $_SESSION['shopInfo'] : [];
 $shop = !empty($_SESSION['shop']) ? $_SESSION['shop'] : [];
+
+$pages = [
+    "recipt" => "Recipt",
+    "dashboard" => "Dashboard",
+    "product" => "Products",
+    "supplier" => "Suppliers",
+    "customer" => "Customers",
+    "program" => "Programs",
+    "running" => "Running Items",
+    "category" => "Categories",
+    "publisher" => "Publishers",
+    "reports" => "Reports",
+    "barcode" => "Barcodes",
+    "order" => "Sales",
+    "return" => "Returns",
+    "expense" => "Expenses",
+];
+
 include_once dirname(__FILE__).'/header.php';
 include_once dirname(__FILE__).'/footer.php';
 

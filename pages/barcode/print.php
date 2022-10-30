@@ -45,10 +45,10 @@ foreach ($_POST['full_name'] as $index => $full_name) {
     $price = $_POST['price'][$index];
     $price = $_POST['price'][$index];
     $qty = $_POST['qty'][$index];
-    $bobj = $barcode->getBarcodeObj('C128', $code , -2, -20, 'black', array(0, 0, 0, 0));
+    $bobj = $barcode->getBarcodeObj('C128', $code , -1, -25, 'black', array(0, 0, 0, 0));
     
     for($row = 0; $row < $qty; $row++) {
-        $examples .= '<table style="width: 100%; border: 0;page-break-before: always; margin-bottom: 20px" cellpadding="0" cellspacing="0"><tr><td><strong>'.$shop['full_name'].'</strong></td><td><strong>'.number_format($price, 2).'</strong></td></tr><tr><td colspan="2">'.$full_name.'<td></tr><tr><td colspan="2">'.$bobj->getSvgCode().'</td></tr></table>';
+        $examples .= '<table style="width: 1.5in; border: 0;page-break-before: always; margin-bottom: 20px" cellpadding="0" cellspacing="0"><tr><td><strong>'.$shop['full_name'].'</strong></td></tr><tr><td><div style="white-space: nowrap">'.$full_name.'</div><td></tr><tr><td colspan="2">'.$bobj->getSvgCode().'</td></tr><tr><td><strong style="font-size: 14px;">'.number_format($price).'/-</strong><small style="font-size: 10px">'.$code.'</small></td></tr></table>';
     }
 }
 echo $examples;

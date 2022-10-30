@@ -4,9 +4,11 @@ include_once dirname(__FILE__).'/../../include/settings.php';
 $orders = [];
 $from = $_POST['from'];
 $to = $_POST['to'];
+$shopId = $_POST['shopId'];
 $reportType = $_POST['reportType'];
 
 $ordersObj = new Orders();
+$productObj = new Products();
 
 $columns = [];
 $columns = [];
@@ -40,6 +42,14 @@ h4 {
 <?php
 
 switch ($reportType) {
+    case '0':
+				$shopId = $userData['role'] == 'owner' ? $shopId : $userData['shopId'];
+				$ownerId = $userData['role'] == 'owner' ? $userData['id'] : $userData['owner_id'];
+        $orders = $productObj->getStoreProducts($ownerId, $shopId);
+				$stores = new Store();
+				$selectShop = $stores->getStore($shopId);
+        include_once dirname(__FILE__).'/shop_products.php';
+		exit;
     case '1':
         $orders = $ordersObj->ordersReport($userData['shopId'], $from, $to);
         include_once dirname(__FILE__).'/salesReport.php';

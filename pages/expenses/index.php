@@ -23,7 +23,7 @@ $expenseObj = new Expenses();
 
     }
 
-echo mainHeader();
+echo mainHeader(['page' => 'expense']);
 ?>
 
 <div class="container">

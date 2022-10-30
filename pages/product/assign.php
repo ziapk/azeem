@@ -49,7 +49,7 @@
     $ownerStores = $stores->getOwnerStores($userData['id']);
 
 ?>
-<div class="container">
+<div class="container" ng-controller="orderController">
     <h4>Assign Product</h4>
     
     <form method="POST" action="" autocomplete="off">
@@ -57,11 +57,8 @@
         <?php if(!empty($error)) { ?><div class="alert alert-danger"><?php echo $error; ?></div><?php } ?>
         <div class="row">
             <div class="col-sm-3 form-group">
-                <select name="product_id" class="form-control">
-                    <?php foreach ($products as $type) {?>
-                        <option value="<?php echo $type['id'];?>"><?php echo $type['full_name'];?></option>
-                    <?php }?>
-                </select>
+                <input type="search" name="board" ng-model="form.board" class="type-ahead-input form-control" typeahead-on-select="selectBoard($item)" uib-typeahead="address as address.full_name for address in searchBoard($viewValue)" typeahead-template-url="board.html" typeahead-show-hint="true" typeahead-min-length="0">
+                <input type="hidden" name="product_id" value="{{product_id}}">
             </div>
             <div class="col-sm-2 form-group">
                 <input name="qty" type="number" class="form-control" placeholder="Stock In">
@@ -85,6 +82,30 @@
         </div>
     </form>
 </div>
+<script type="text/ng-template" id="board.html">
+  <a style="display: block; min-width: 250px">
+      <small ng-bind-html="match.model.full_name | uibTypeaheadHighlight:query"></small>
+      <small class="pull-right">{{match.model.price}}</small>
+  </a>
+</script>
+<script type="text/javascript">
+    app.controller('orderController', function($scope, $http, $httpParamSerializerJQLike, $filter) {
+        
+        $scope.product_id = "";
+        
+        $scope.selectBoard = function (p) {
+            $scope.product_id = p.id
+        }
+
+        $scope.searchBoard = function (term) {
+            return $http.get("<?php echo SITE_URL?>api/getProducts.php", {params: {term}})
+            .then(function(response) {
+                return response.data.records
+            });
+        }
+    
+    });
+</script>
 
 <?php
 echo mainFooter();  

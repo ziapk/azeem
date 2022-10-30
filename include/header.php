@@ -1,7 +1,9 @@
 <?php 
 
 function mainHeader($params = null) {
-    ob_start();?>
+    ob_start();
+    global $pages;
+    ?>
 
     <!DOCTYPE html>
     <!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
@@ -11,7 +13,7 @@ function mainHeader($params = null) {
         <head>
             <meta charset="utf-8">
             <meta http-equiv="X-UA-Compatible" content="IE=edge">
-            <title>POINT OF SALE</title>
+            <title><?php echo $pages[$params['page']];?> | POINT OF SALE</title>
             <meta name="description" content="Recline Solution POS, POS, Point of Sale, Smart Commerce">
             <meta name="viewport" content="width=device-width, initial-scale=1">
             <link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/css/bootstrap.min.css">
