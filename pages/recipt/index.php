@@ -185,6 +185,7 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
         }
     }
     $scope.selectProduct = function (p) {
+        $scope.product = '';
         $scope.product = null
         let exists = false;
         $scope.items.map((pro) => {
