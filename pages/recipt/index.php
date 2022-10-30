@@ -230,7 +230,7 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
             params.term = parseFloat(term.split('-')[0]);
             const list = localStorage.getItem('list') && JSON.parse(localStorage.getItem('list'));
             const item = list.find(r  => r.id == params.term);
-            $scope.product = null;
+            $scope.product = '';
             $scope.selectProduct(item);
             return [];
         }
