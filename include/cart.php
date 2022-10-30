@@ -46,6 +46,7 @@
 <script>
 app.controller('headerController', function($scope, $http, $httpParamSerializerJQLike, $filter, $window) {
   $scope.list = <?php echo json_encode($list);?>;
+  localStorage.setItem('list', JSON.stringify($scope.list));
   $scope.refreshList = function() {
     $scope.cart = JSON.parse($window.localStorage.getItem('shopping'));
     $scope.totalPrice = 0;
