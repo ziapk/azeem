@@ -209,7 +209,7 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
 
         $timeout(() => {
             $scope.product = '';
-        }, 400);
+        }, 100);
         
     }
     $scope.selectCustomer = function (p) {

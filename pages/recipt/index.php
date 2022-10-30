@@ -207,7 +207,7 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
         // $scope.product = null;
         $timeout(() => {
             $scope.product = '';
-        }, 400);
+        }, 100);
         
     }
     $scope.selectCustomer = function (p) {
