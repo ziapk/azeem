@@ -5,6 +5,11 @@ $ownerId = $userData['role'] == 'owner' ? $userData['id'] : $userData['created_b
 $list = $productCls->getOwnerProducts($ownerId);
 echo mainHeader();
 ?>
+<style>
+    table {
+        font-family: Arial, sans-serif
+    }
+</style>
 <div ng-controller="cartController">
 <div class="container">
     <table class="table">
@@ -27,7 +32,7 @@ echo mainHeader();
                 <th style="vertical-align: middle"><label><span style="vertical-align: middle">Search Product</span> <span style="vertical-align: middle; margin-left: 4px"><input type="checkbox" name="focus" ng-model="focus"><span></label></th>
                 <th width="100">
                 <div class="dropdown-wrapper">
-                    <input type="text" class="form-control" id="searchProduct" ng-model="product" placeholder="Search Products" typeahead-on-select="selectProduct($item)" uib-typeahead="address as address.full_name for address in searchProduct($viewValue)" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="1">
+                    <input type="text" class="form-control" id="searchProduct" ng-model="product" placeholder="Search Products" typeahead-on-select="selectProduct($item); product=''" uib-typeahead="address as address.full_name for address in searchProduct($viewValue)" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="1">
                     <!-- <div class="list-group recipt-search-dropdown">
                         <a ng-click="selectProduct(l)" class="list-group-item" ng-repeat="l in list">
                             <h4 class="list-group-item-heading">{{l.full_name}} <span>{{l.price}}</span></h4>
@@ -57,7 +62,7 @@ echo mainHeader();
                 <td>{{cart.full_name}}</td>
                 <td>{{cart.price}}</td>
                 <td><button ng-click="subQty(cart)">-</button>
-                <input class="text-center input-qty" type="number" ng-model="qty" ng-value=" cart.qty | number : 2 " ng-change="directlyAdd(qty, cart)">
+                <input class="text-center input-qty" type="number" ng-model="qty" ng-value=" cart.qty | number " ng-change="directlyAdd(qty, cart)">
                 <button ng-click="addQty(cart)">+</button></td>
                 <td>
                     <input class="text-center" type="number" ng-model="addprice" ng-change="directlyPrice(addprice, cart)">
