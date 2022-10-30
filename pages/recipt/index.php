@@ -227,22 +227,23 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
         const params = {};
         if($scope.focus === true && (term || "").endsWith('-AGP')) {
             params.searchBy = 'id';
-            params.term = parseFloat(term);
+            params.term = parseFloat(term.split('-')[0]);
+            const list = localStorage.getItem('list') && JSON.parse(localStorage.getItem('list'));
+            const item = list.find(r  => r.id == params.term);
+            $scope.selectProduct(item);
+            return [];
         }
         else {
             params.term = term;
-        }
-        return $http.get("<?php echo SITE_URL?>api/getStores.php", { params })
-        .then(function(response) {
-
-            if($scope.focus === true && (term || "").endsWith('-AGP')) {
-                response.data && response.data.length && $scope.selectProduct(response.data[0]);
-            }
-            $scope.list = response.data;
-            $scope.priceList = response.data;
+            return $http.get("<?php echo SITE_URL?>api/getStores.php", { params })
+            .then(function(response) {
+  
+                $scope.list = response.data;
+                $scope.priceList = response.data;
+                return response.data
             
-            return response.data
-        });
+            });
+        }
     }
     $scope.searchCustomer = function () {
         $http.get("<?php echo SITE_URL?>api/getCustomer.php?term="+$scope.customerName)
