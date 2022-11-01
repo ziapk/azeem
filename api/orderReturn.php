@@ -19,6 +19,7 @@ if($action == 1 || $action == 2) {
     foreach($oitems as $row) {
         $data = [
             'order_id' => $row['order_id'],
+            'shopId' => $o['shopId'],
             'type' => $action,
             'user_id' => $userData['id'],
             'product_id' => $row['product_id'],

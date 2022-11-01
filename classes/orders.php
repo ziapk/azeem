@@ -63,9 +63,10 @@ class Orders extends Connection
     public function orderReturnAll($array, $action, $type = 1)
     {
         try {
-            $stmt = "INSERT INTO `{$this->table_rp}` (`user_id`, `order_id`, `product_id`, `quantity`, `type`) VALUES (:user_id, :order_id, :product_id, :quantity, :type)";
+            $stmt = "INSERT INTO `{$this->table_rp}` (`user_id`, `shopId`, `order_id`, `product_id`, `quantity`, `type`) VALUES (:user_id, :shopId, :order_id, :product_id, :quantity, :type)";
             $prepare = $this->dbh->prepare($stmt);        
             $prepare->bindParam(':user_id', $array['user_id'], PDO::PARAM_STR);
+            $prepare->bindParam(':shopId', $array['shopId'], PDO::PARAM_STR);
             $prepare->bindParam(':order_id', $array['order_id'], PDO::PARAM_STR);
             $prepare->bindParam(':product_id', $array['product_id'], PDO::PARAM_STR);
             $prepare->bindParam(':quantity', $array['quantity'], PDO::PARAM_STR);
@@ -73,7 +74,7 @@ class Orders extends Connection
             $prepare->execute();
             $result = $this->dbh->lastInsertId();
             $products = new Products();
-            $products->addProductQty($array['product_id'], $array['quantity'], $type);
+            $products->addProductQty($array['product_id'], $array['quantity'], $array['shopId'], $type);
             $this->orderReturn($array['order_id'], ($action+4));
             return $result;
         } catch (PDOException $e) {

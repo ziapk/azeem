@@ -49,7 +49,7 @@ foreach ($products as $product) {
 
 
 
-<div class="container">
+<div class="container" ng-controller="productController">
     <h4>My Shops <small>&lt;<?php echo $currentStore['full_name'];?>&gt;</small></h4>
     <table class="table">
         <thead>
@@ -127,6 +127,7 @@ foreach ($products as $product) {
                     <td><?php echo $product['min_qty'] ? $product['min_qty'] : '-' ; ?></td>
                     <td><?php echo $product['location'] ? $product['location'] : '-' ; ?></td>
                     <td><a href="<?php echo SITE_URL."pages/product/update_item.php?id=".$product['id'];?>">Modify</a></td>
+                    <td><a href="javascript:void(0)" ng-click="deleteStoreItem(<?php echo $product['id'];?>)">delete</a></td>
                 </tr>
             <?php $count++; } ?>
         </tbody>
@@ -252,3 +253,23 @@ foreach ($products as $product) {
         </tfoot>
     </table> -->
 </div>
+
+
+<script>
+app.controller('productController', function($scope, $http, $httpParamSerializerJQLike, $filter, $window) {
+    $scope.currentPage = 1; 
+    $scope.data = {}; //$scope.data.records;
+    $scope.list = []; //$scope.data.records;
+    $scope.url = "<?php echo SITE_URL;?>"; //$scope.data.records;
+    $scope.deleteStoreItem = (id) => {
+        if($window.confirm('Are you sure you want to delete this?')) {
+            $http.get("<?php echo SITE_URL?>pages/product/delete_item.php", {params: { id }})
+            .then(function(response) {
+                console.log(response);
+            }).catch(function(err) {
+                console.log(err);
+            })
+        }
+    }
+})
+</script>

@@ -83,7 +83,7 @@ class Products extends Connection
 
 			$innerJoin = "";
 			if(!empty($shopId)) {
-				$innerJoin .= " INNER JOIN {$this->table_st} as sp on sp.product_id = p.id and shopId=$shopId ";
+				$innerJoin .= " INNER JOIN {$this->table_st} as sp on sp.product_id = p.id and shopId=$shopId and sp.status = 1 ";
 			}
 
 			$column = "";
@@ -181,7 +181,7 @@ class Products extends Connection
 
 
 		try {
-			$stmt = "SELECT st.*, s.full_name, s.group FROM `{$this->table_st}` as st LEFT JOIN `{$this->table}` AS s ON s.id = st.product_id WHERE st.`owner_id`=:owner_id ".$shopCondition;
+			$stmt = "SELECT st.*, s.full_name, s.group FROM `{$this->table_st}` as st LEFT JOIN `{$this->table}` AS s ON s.id = st.product_id WHERE st.`owner_id`=:owner_id and st.status = 1 ".$shopCondition;
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':owner_id',$owner_id,PDO::PARAM_STR);
 			$prepare->execute();
@@ -226,7 +226,7 @@ class Products extends Connection
 
 	public function getStoreProduct($id, $owner_id) {
 		try {
-			$stmt = "SELECT * FROM `{$this->table_st}` WHERE id=:id AND owner_id = :owner_id";
+			$stmt = "SELECT * FROM `{$this->table_st}` WHERE id=:id and status = 1 AND owner_id = :owner_id";
             $prepare = $this->dbh->prepare($stmt);
             $prepare->bindParam(':id',$id,PDO::PARAM_STR);
             $prepare->bindParam(':owner_id',$owner_id,PDO::PARAM_STR);
@@ -240,7 +240,7 @@ class Products extends Connection
 	
 	public function getOwnerStoreProduct($shopId, $product_id, $owner_id) {
 		try {
-			$stmt = "SELECT * FROM `{$this->table_st}` WHERE product_id=:product_id AND shopId=:shopId AND owner_id = :owner_id";
+			$stmt = "SELECT * FROM `{$this->table_st}` WHERE product_id=:product_id and status = 1 AND shopId=:shopId AND owner_id = :owner_id";
             $prepare = $this->dbh->prepare($stmt);
             $prepare->bindParam(':product_id',$product_id,PDO::PARAM_STR);
             $prepare->bindParam(':shopId',$shopId,PDO::PARAM_STR);
@@ -257,7 +257,7 @@ class Products extends Connection
 		$product_id = $array['product_id'];
 		$shopId = $array['shopId'];
 		try {
-			$stmt = "SELECT * FROM `{$this->table_st}` WHERE shopId=:shopId AND product_id = :product_id";
+			$stmt = "SELECT * FROM `{$this->table_st}` WHERE status = 1 and shopId=:shopId AND product_id = :product_id";
             $prepare = $this->dbh->prepare($stmt);
             $prepare->bindParam(':shopId',$shopId,PDO::PARAM_STR);
             $prepare->bindParam(':product_id',$product_id,PDO::PARAM_STR);
@@ -321,11 +321,26 @@ class Products extends Connection
 	
 	public function updateStoreProduct($array) {
 		try {
-			$stmt = "UPDATE `{$this->table_st}` SET `min_qty`=:min_qty, `location`=:location WHERE id=:id";
+			$stmt = "UPDATE `{$this->table_st}` SET `min_qty`=:min_qty, `location`=:location, shopId=:shopId  WHERE id=:id";
 
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':min_qty',$array['min_qty'],PDO::PARAM_STR);
 			$prepare->bindParam(':location',$array['location'],PDO::PARAM_STR);
+			$prepare->bindParam(':shopId',$array['shopId'],PDO::PARAM_STR);
+			$prepare->bindParam(':id',$array['id'],PDO::PARAM_INT);
+			$prepare->execute();
+			$result = $prepare->rowCount();
+			return $result;
+		} catch (PDOException $e) {
+		    die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
+
+	public function deleteStoreProduct($array) {
+		try {
+			$stmt = "UPDATE `{$this->table_st}` SET `status`=2 WHERE id=:id";
+
+			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':id',$array['id'],PDO::PARAM_INT);
 			$prepare->execute();
 			$result = $prepare->rowCount();
@@ -380,17 +395,18 @@ class Products extends Connection
 		}
 	}
 	
-	public function addProductQty($id, $qty, $type = 1) {
+	public function addProductQty($id, $qty, $shopId, $type = 1) {
 		try {
 			if($type == 1 || $type == 3) {
-				$stmt = "UPDATE `{$this->table}` SET `in_hand`=in_hand+:qty WHERE id=:id";
+				$stmt = "UPDATE `{$this->table_st}` SET `qty`=qty+:qty WHERE product_id=:id and shopId = :shopId";
 			}
 			elseif ($type == 2) {
-				$stmt = "UPDATE `{$this->table}` SET `faulty_qty`=faulty_qty+:qty WHERE id=:id";
+				$stmt = "UPDATE `{$this->table_st}` SET `faulty_qty`=faulty_qty+:qty WHERE  product_id=:id and shopId = :shopId";
 			}
 			$prepare = $this->dbh->prepare($stmt);
             $prepare->bindParam(':id',$id,PDO::PARAM_INT);
             $prepare->bindParam(':qty',$qty,PDO::PARAM_INT);
+            $prepare->bindParam(':shopId',$shopId,PDO::PARAM_INT);
 			$prepare->execute();
 			$result = $prepare->rowCount();
 			return $result;
