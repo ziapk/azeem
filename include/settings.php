@@ -89,16 +89,16 @@ $orderStatusArr = [
 ];
 
 $reportsArray = [
-    0 => ['id' => 0, 'title'=> 'Product List'],
-    1 => ['id' => 1, 'title'=> 'Sales Report'],
-    2 => ['id' => 2, 'title'=> 'Summery Product Wise'],
-    3 => ['id' => 3, 'title'=> 'Summery Date Wise'],
-    4 => ['id' => 4, 'title'=> 'Returns Report'],
-    5 => ['id' => 5, 'title'=> 'Return to Inventory'],
-    6 => ['id' => 6, 'title'=> 'Return to Faulty'],
-    7 => ['id' => 7, 'title'=> 'Return as Lahore'],
-    8 => ['id' => 8, 'title'=> 'Expense Report'],
-    9 => ['id' => 9, 'title'=> 'Expense Summery Report'],
+    0 => ['id' => 0, 'title'=> 'Product List', 'access' => ['owner', 'manager']],
+    1 => ['id' => 1, 'title'=> 'Sales Report', 'access' => ['shopkeeper', 'owner', 'manager']],
+    2 => ['id' => 2, 'title'=> 'Summery Product Wise', 'access' => ['shopkeeper', 'owner', 'manager']],
+    3 => ['id' => 3, 'title'=> 'Summery Date Wise', 'access' => ['owner', 'manager']],
+    4 => ['id' => 4, 'title'=> 'Returns Report', 'access' => ['owner', 'manager']],
+    5 => ['id' => 5, 'title'=> 'Return to Inventory', 'access' => ['owner', 'manager']],
+    6 => ['id' => 6, 'title'=> 'Return to Faulty', 'access' => ['owner', 'manager']],
+    7 => ['id' => 7, 'title'=> 'Return as Lahore', 'access' => ['owner', 'manager']],
+    8 => ['id' => 8, 'title'=> 'Expense Report', 'access' => ['shopkeeper', 'owner', 'manager']],
+    9 => ['id' => 9, 'title'=> 'Expense Summery Report', 'access' => ['shopkeeper', 'owner', 'manager']],
 ];
 
 $returnArray = [

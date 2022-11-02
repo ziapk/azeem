@@ -36,9 +36,9 @@
             <label>Select Report</label>
             <select class="form-control" name="reportType" ng-change="checkReport(reportType)" ng-model="reportType">
                 <option value="">Select a Report</option>
-                <?php foreach ($reportsArray as $value) { ?>
+                <?php foreach ($reportsArray as $value) { if(in_array($userData['role'], $value['access'])) { ?>
                     <option value="<?php echo $value['id'];?>"><?php echo $value['title'];?></option>
-                <?php } ?>
+                <?php } } ?>
             </select>
         </div>
     </div>

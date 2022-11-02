@@ -3,12 +3,8 @@ include_once dirname(__FILE__).'/../../include/settings.php';
 $productCls = new Products();
 $ownerId = $userData['role'] == 'owner' ? $userData['id'] : $userData['created_by'];
 $list = $productCls->getOwnerProducts($ownerId);
+echo mainHeader(['page' => 'recipt']);
 ?>
-<style>
-    table {
-        font-family: Arial, sans-serif
-    }
-</style>
 <div ng-controller="cartController">
 <div class="container">
     <table class="table">
@@ -113,6 +109,10 @@ $list = $productCls->getOwnerProducts($ownerId);
 </div>
 
 </div>
+<?php
+echo mainFooter();
+?>
+
 <script type="text/javascript">
 app.run(['$anchorScroll', function($anchorScroll) {
   $anchorScroll.yOffset = $('.navbar').height(true, true);   // always scroll by 50 extra pixels
