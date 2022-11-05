@@ -65,7 +65,7 @@ echo mainHeader(['page' => 'expense']);
                 <td><?php echo $cust['title'];?></td>
                 <td><?php echo $cust['price'];?></td>
                 <td><?php echo date('d M Y', strtotime($cust['exp_date']));?></td>
-                <td><a onclick="deleteExpense(<?php echo $cust['id'];?>)" class="btn btn-primary btn-xs" href="javascript:void(0)">Delete</a></td>
+                <?php if($userData['role'] === 'owner') { ?><td><a onclick="deleteExpense(<?php echo $cust['id'];?>)" class="btn btn-primary btn-xs" href="javascript:void(0)">Delete</a></td><?php } else { ?><td></td><?php }?>
             </tr>
         <?php }?>
         </tbody>
