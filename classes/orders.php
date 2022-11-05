@@ -376,7 +376,7 @@ class Orders extends Connection
             $summery = $this->ordersReportSummery($shopId, $date, $to);
             
             $toCondition = " AND o.order_date>='".$date."' AND o.order_date<='".$to."'";
-			$stmt = "SELECT o.order_date, sum(o.price) AS price, sum(o.discount) AS discount, sum(o.paid_amount) AS paid_amount, sum(o.price - o.discount - o.paid_amount) AS balance FROM `{$this->table}` AS o WHERE o.shopId=:shopId ".$toCondition.' and o.flag = 1 GROUP BY o.order_date ORDER BY o.id desc';
+			$stmt = "SELECT o.order_date, sum(o.price) AS price, sum(o.discount) AS discount, sum(o.paid_amount) AS paid_amount, sum(o.price - o.discount - o.paid_amount) AS balance FROM `{$this->table}` AS o WHERE o.shopId=:shopId ".$toCondition.' and o.flag = 1 GROUP BY o.order_date ORDER BY o.id asc';
             $prepare = $this->dbh->prepare($stmt);
             $prepare->bindParam(':shopId',$shopId,PDO::PARAM_STR);
 			$prepare->execute();
