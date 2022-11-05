@@ -80,7 +80,7 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
     $scope.priceList = [];
 
     $scope.form = {
-        group: 'General',
+        group: '',
         expenses: {},
         exp_date: moment().format('YYYY-MM-DD')
     };
