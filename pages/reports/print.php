@@ -44,8 +44,8 @@ h4 {
 switch ($reportType) {
     case '0':
 				$shopId = $userData['role'] == 'owner' ? $shopId : $userData['shopId'];
-				$ownerId = $userData['role'] == 'owner' ? $userData['id'] : $userData['owner_id'];
-        $orders = $productObj->getStoreProducts($ownerId, $shopId);
+				$ownerId = $userData['role'] == 'owner' ? $userData['id'] : $userData['created_by'];
+				$orders = $productObj->getStoreProducts($ownerId, $shopId);
 				$stores = new Store();
 				$selectShop = $stores->getStore($shopId);
         include_once dirname(__FILE__).'/shop_products.php';

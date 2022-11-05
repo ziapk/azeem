@@ -179,9 +179,8 @@ class Products extends Connection
 			$shopCondition .= " AND st.shopId = $shopId";			
 		}
 
-
 		try {
-			$stmt = "SELECT st.*, s.full_name, s.group FROM `{$this->table_st}` as st LEFT JOIN `{$this->table}` AS s ON s.id = st.product_id WHERE st.`owner_id`=:owner_id and st.status = 1 ".$shopCondition;
+			$stmt = "SELECT st.*, s.full_name, s.group FROM `{$this->table_st}` as st LEFT JOIN `{$this->table}` AS s ON s.id = st.product_id WHERE st.`owner_id`=:owner_id and st.status = 1 ".$shopCondition." order by s.id";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':owner_id',$owner_id,PDO::PARAM_STR);
 			$prepare->execute();

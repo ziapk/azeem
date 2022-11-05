@@ -9,6 +9,7 @@
     <thead>
         <tr>
             <th>Sr.#</th>
+            <th>Product ID</th>
             <th>Product</th>
             <th>In Hand</th>
             <th>Price</th>
@@ -24,6 +25,7 @@
         ?>
         <tr>
             <td><?php echo $count;?></td>
+            <td><?php echo $s['product_id'];?></td>
             <td><?php echo $s['full_name'];?></td>
             <td><?php echo $in_hand;?></td>
             <td><?php echo $s['sale_price'];?></td>
