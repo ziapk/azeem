@@ -96,6 +96,12 @@ switch ($reportType) {
 			$expenses = $expensesObj->getExpensesSummeryReport($_POST['groupName'], $from, $to);
 			include_once dirname(__FILE__).'/expenseSummeryReport.php';
 		exit;
+		case '10':
+			$expensesObj = new Expenses();
+			$expenses = $expensesObj->getExpensesSummeryReport($_POST['groupName'], $from, $to);
+			$orders = $ordersObj->ordersReportDateWise($userData['shopId'], $from, $to);
+			include_once dirname(__FILE__).'/closingReport.php';
+		exit;
 	break;
     
     default:

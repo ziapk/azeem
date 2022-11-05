@@ -99,6 +99,7 @@ $reportsArray = [
     7 => ['id' => 7, 'title'=> 'Return as Lahore', 'access' => ['owner', 'manager']],
     8 => ['id' => 8, 'title'=> 'Expense Report', 'access' => ['shopkeeper', 'owner', 'manager']],
     9 => ['id' => 9, 'title'=> 'Expense Summery Report', 'access' => ['shopkeeper', 'owner', 'manager']],
+    10 => ['id' => 10, 'title'=> 'Closing Balance Report', 'access' => ['shopkeeper', 'owner', 'manager']],
 ];
 
 $returnArray = [

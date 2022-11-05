@@ -32,18 +32,23 @@ class Expenses extends Connection
 			
 			$toCondition = "";
 			if(!empty($to)) {
-				$toCondition .= " AND e.exp_date>='".$date."' AND e.exp_date<='".$to."'";
+				$toCondition .= " e.exp_date>='".$date."' AND e.exp_date<='".$to."'";
 			}
 			else {
-				$toCondition .=" AND e.exp_date>='".$date."'";
+				$toCondition .=" e.exp_date>='".$date."'";
 			}
-			$final = "'";
+			if(!empty($groupName)) {
+				$final = " AND c.groupName IN ('";
 
-			$final .= implode("','", $groupName);
+				$final .= implode("','", $groupName);
 
-			$final .= "'";
+				$final .= "')";
 
-			$stmt = "SELECT c.groupName as details, exp_date, sum(e.price) as price, c.full_name as title FROM `{$this->table}` as e inner join `category` as c on c.id = e.cat_id WHERE c.groupName IN ($final) $toCondition group by DATE(exp_date), cat_id";
+			} else {
+				$final = "";
+			}
+
+			$stmt = "SELECT c.groupName as details, exp_date, sum(e.price) as price, c.full_name as title FROM `{$this->table}` as e inner join `category` as c on c.id = e.cat_id WHERE $toCondition $final group by DATE(exp_date), cat_id";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->execute();
 			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
