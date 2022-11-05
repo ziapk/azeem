@@ -247,7 +247,7 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
 
     $scope.searchProduct = function (term) {
         const params = {};
-        if($scope.focus === true && (term || "").endsWith('-AGP')) {
+        if($scope.focus === true) {
             params.searchBy = 'id';
             params.term = parseFloat(term.split('-')[0]);
             const list = localStorage.getItem('list') && JSON.parse(localStorage.getItem('list'));
