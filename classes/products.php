@@ -432,11 +432,12 @@ class Products extends Connection
 
 	public function subProductQty($array) {
 		try {
-			$stmt = "UPDATE `{$this->table_st}` SET `stock_out`=stock_out+:stock_out WHERE shopId=:shopId and owner_id=:owner_id";
+			$stmt = "UPDATE `{$this->table_st}` SET `stock_out`=stock_out+:stock_out WHERE product_id=:product_id and shopId=:shopId and owner_id=:owner_id";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':shopId',$array['shopId'],PDO::PARAM_STR);
 			$prepare->bindParam(':stock_out',$array['quantity'],PDO::PARAM_STR);
 			$prepare->bindParam(':owner_id',$array['owner_id'],PDO::PARAM_STR);
+			$prepare->bindParam(':product_id',$array['product_id'],PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $prepare->rowCount();
 			return $result;
