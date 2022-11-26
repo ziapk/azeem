@@ -72,7 +72,9 @@ $discountTypesArr = [
 $demandStatusArr = [
     0 => ['id' => 0, 'full_name'=> 'Requested'],
     1 => ['id' => 1, 'full_name'=> 'Assiged'],
-    2 => ['id' => 2, 'full_name'=> 'Cancel']
+    2 => ['id' => 2, 'full_name'=> 'Rejected'],
+    3 => ['id' => 3, 'full_name'=> 'Withdrawal'],
+    4 => ['id' => 4, 'full_name'=> 'Deleted']
 ];
 
 

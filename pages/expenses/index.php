@@ -11,13 +11,13 @@ $expenseObj = new Expenses();
         $from = $_GET['from'];
         $to = $_GET['to'];
         $expenseData = $expenseObj->getShopExpenses($userData['shopId'], $from, $to);
-        $dateLabel .= $from.' to '.$to;
+        $dateLabel .= '<strong>'.$from.'</strong> to <strong>'.$to.'</strong>';
         $start = date('Y-m-d', strtotime($from));
         $end = date('Y-m-d', strtotime($to));
     }
     else {        
         $expenseData = $expenseObj->getShopExpenses($userData['shopId'], date('Y-m-d'));
-        $dateLabel .= date('Y-m-d');
+        $dateLabel .= '<strong>'.date('Y-m-d').'</strong>';
         $start = date('Y-m-d');
         $end = date('Y-m-d');
 

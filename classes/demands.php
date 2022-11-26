@@ -4,6 +4,8 @@ class Demands extends Connection
 {
     
     private $table = 'demands';
+    private $table_sub = 'demand_items';
+	private $table_pro = 'products';
 
     public function getOwnerDemands($owner_id) {
 		try {
@@ -18,12 +20,11 @@ class Demands extends Connection
 		}
 	}
 	
-	public function getStoreDemands($owner_id, $shopId) {
+	public function getStoreDemands($shop_id) {
 		try {
-			$stmt = "SELECT * FROM `{$this->table}` WHERE `shopId`=:shopId and `owner_id`=:owner_id";
+			$stmt = "SELECT * FROM `{$this->table}` WHERE `shop_id`=:shop_id and flag < 4";
 			$prepare = $this->dbh->prepare($stmt);
-			$prepare->bindParam(':owner_id',$owner_id,PDO::PARAM_STR);
-			$prepare->bindParam(':shopId',$shopId,PDO::PARAM_STR);
+			$prepare->bindParam(':shop_id',$shop_id,PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
 			return $result;
@@ -45,6 +46,36 @@ class Demands extends Connection
 		    die("Error!: " . $e->getMessage() . "<br/>");
 		}
 	}
+	
+	public function getDemandDetail($id, $owner_id) {
+		try {
+			$stmt = "SELECT * FROM `{$this->table}` WHERE id=:id AND owner_id = :owner_id";
+            $prepare = $this->dbh->prepare($stmt);
+            $prepare->bindParam(':id',$id,PDO::PARAM_STR);
+            $prepare->bindParam(':owner_id',$owner_id,PDO::PARAM_STR);
+			$prepare->execute();
+			$result = $prepare->fetch(PDO::FETCH_ASSOC);
+			$result['items'] = $this->getDemandItems($id);
+			return $result;
+		} catch (PDOException $e) {
+		    die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
+
+	public function getDemandItems($id) {
+		try {
+			$stmt = "SELECT a.*, b.full_name FROM `{$this->table_sub}` as a left join {$this->table_pro} as b on a.product_id=b.id WHERE demand_id = :demand_id";
+            $prepare = $this->dbh->prepare($stmt);
+            $prepare->bindParam(':demand_id',$id,PDO::PARAM_STR);
+			$prepare->execute();
+			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
+			return $result;
+		} catch (PDOException $e) {
+		    die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
+
+
 	public function checkDemandRequested($array) {
 		
 		$id = $array['id'];
@@ -63,113 +94,42 @@ class Demands extends Connection
 		}
 	}
 
-
-	public function assignDemand($array) {
-
-		$res = ['status' => 503];
-
-		$checkDemandRequested = $this->checkDemandRequested($array);
-
-		if(empty($checkDemandRequested)) {
-			$res['message'] = 'Invalid Values';
-			return $res;
-		}
-
-		if($checkDemandRequested['shopId'] == $array['warehouse_id']) {
-			$res['message'] = "Shop and warehouse should't be same";
-			return $res;
-		}
-
-		$storeObj = new Store();
-		$store = $storeObj->getOwnerStore($array['warehouse_id'], $array['owner_id']);
-
-		
-		if(empty($store)) {
-			$res['message'] = 'Invalid Store';
-			return $res;
-		}
-
+	public function assignStoreQty($array, $shop_id, $owner_id) {
 
 		$productObj = new Products();
-		$dropoffShop = $productObj->getOwnerStoreProduct($checkDemandRequested['shopId'], $checkDemandRequested['product_id'], $checkDemandRequested['owner_id']);
-		$pickupShop = $productObj->getOwnerStoreProduct($array['warehouse_id'], $checkDemandRequested['product_id'], $checkDemandRequested['owner_id']);
+		$dropoffShop = $productObj->getOwnerStoreProduct($shop_id, $array['product_id'], $owner_id);
 		
-		if(empty($pickupShop)) {
-
-			$res['message'] = 'Product not available at warehouse';
-			return $res;
-		}
-
 		if(empty($dropoffShop)) {
 			$data = [                
-					'qty' => 0,
-					'stock_out' => 0,
-					'product_id' => $checkDemandRequested['product_id'],
-					'shopId' => $checkDemandRequested['shopId'],
-					'owner_id' => $array['owner_id'],
+				'qty' => 0,
+				'stock_out' => 0,
+				'product_id' => $array['product_id'],
+				'shopId' => $shop_id,
+				'owner_id' => $owner_id,
 			];
 
 			$productObj->assignProduct($data);
-			$dropoffShop = $productObj->getOwnerStoreProduct($checkDemandRequested['shopId'], $checkDemandRequested['product_id'], $array['owner_id']);
+
+			$dropoffShop = $productObj->getOwnerStoreProduct($shop_id, $array['product_id'], $owner_id);
 		}
 
-		$result = false;
-
-		
-
-		// now decide about action
-
-		if($array['flag'] == 1) {
-			// assign
-
-			// prepare data
-
-			// pickup from stock
-			$pick = [
-				'qty' => 0,
-				'stock_out' => $array['assign_qty']
-			];
-
-			$productObj->updateProductToStore($pick, $pickupShop);
-
-			// pickup from stock
-			$drop = [
-				'qty' => $array['assign_qty'],
-				'stock_out' => 0,
-			];
-			$productObj->updateProductToStore($drop, $dropoffShop);
-			$result = $this->updateDemondData($array);
-		}
-		else if($array['flag'] == 2) {
-			$result = $this->updateDemondData($array);
-		}
-
-		if($result) {
-			$res['status'] = 200;
-			$res['message'] = 'Successfully Done!';
-		}
-		else {
-			$res['status'] = 200;
-			$res['message'] = 'Nothing changed!';
-		}
-
-		return $result;
+		// pickup from stock
+		$drop = [
+			'qty' => $array['product_assign_qty'],
+			'stock_out' => 0,
+		];
+		return $productObj->updateProductToStore($drop, $dropoffShop);
 
 	}
 
-	public function updateDemondData($array) {
+	public function cancelDemand($array) {
 		try {
-			$assign_qty = $array['assign_qty'];
 			$assign_date = $array['assign_date'];
-			$warehouse_id = $array['warehouse_id'];
 			$flag = $array['flag'];
 			$id = $array['id'];
-
-			$stmt = "UPDATE `{$this->table}` SET `assign_qty`=:assign_qty, `assign_date`=:assign_date, `warehouse_id`=:warehouse_id, `flag`=:flag WHERE id=:id";
+			$stmt = "UPDATE `{$this->table}` SET `assign_date`=:assign_date, `flag`=:flag WHERE id=:id";
             $prepare = $this->dbh->prepare($stmt);
-            $prepare->bindParam(':assign_qty',$assign_qty,PDO::PARAM_INT);
-            $prepare->bindParam(':assign_date',$assign_date,PDO::PARAM_INT);
-            $prepare->bindParam(':warehouse_id',$warehouse_id,PDO::PARAM_INT);
+            $prepare->bindParam(':assign_date',$assign_date,PDO::PARAM_STR);
             $prepare->bindParam(':flag',$flag,PDO::PARAM_INT);
             $prepare->bindParam(':id',$id,PDO::PARAM_INT);
 			$prepare->execute();
@@ -181,19 +141,119 @@ class Demands extends Connection
 		return 'update';
 	}
 
+	public function assignDemand($array) {
+		try {
+			$assign_date = $array['assign_date'];
+			$flag = $array['flag'];
+			$id = $array['id'];
+			$stmt = "UPDATE `{$this->table}` SET `assign_date`=:assign_date, `flag`=:flag WHERE id=:id";
+            $prepare = $this->dbh->prepare($stmt);
+            $prepare->bindParam(':assign_date',$assign_date,PDO::PARAM_STR);
+            $prepare->bindParam(':flag',$flag,PDO::PARAM_INT);
+            $prepare->bindParam(':id',$id,PDO::PARAM_INT);
+			$prepare->execute();
+			foreach($array['items'] as $item) {
+				$this->updateDemandItems($item, $array['shop_id'], $array['owner_id']);
+			}
+			$result = $prepare->rowCount();
+			return $result;
+		} catch (PDOException $e) {
+		    die("Error!: " . $e->getMessage() . "<br/>");
+		}
+		return 'update';
+	}
+
+	public function updateDemandItems($array, $shop_id, $owner_id) {
+		try {
+			$assign_qty = $array['assign_qty'];
+			$id = $array['id'];
+
+			$stmt = "UPDATE `{$this->table_sub}` SET `product_assign_qty`=:assign_qty WHERE id=:id";
+            $prepare = $this->dbh->prepare($stmt);
+            $prepare->bindParam(':assign_qty',$assign_qty,PDO::PARAM_INT);
+            $prepare->bindParam(':id',$id,PDO::PARAM_INT);
+			$prepare->execute();
+			$result = $prepare->rowCount();
+			$this->assignStoreQty($array, $shop_id, $owner_id);
+			return $result;
+		} catch (PDOException $e) {
+		    die("Error!: " . $e->getMessage() . "<br/>");
+		}
+		return 'update';
+	}
+
 	
 
+	public function modifyDemand($array) {
+		try {
+			$stmt = "UPDATE `{$this->table}` SET `title`=:title, `demand_date`=:demand_date WHERE id=:id";
+            $prepare = $this->dbh->prepare($stmt);
+            $prepare->bindParam(':title',$array['title'],PDO::PARAM_STR);
+            $prepare->bindParam(':demand_date',$array['demand_date'],PDO::PARAM_STR);
+            $prepare->bindParam(':id',$array['id'],PDO::PARAM_STR);
+			$prepare->execute();
+			$result = $prepare->rowCount();
+			$this->deleteDemandItems($array['id']);
+			foreach ($array['items'] as $value) {
+				$data = [
+					'product_id' => $value['id'],
+					'product_qty' => $value['qty'],
+					'demand_id' => $array['id']
+				];
+				$this->createDemandItems($data);
+			}
+			return $result;
+		} catch (PDOException $e) {
+		    die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
+	
 	public function createDemand($array) {
 		try {
-			$stmt = "INSERT INTO `{$this->table}` (`product_id`, `demand_date`, `shopId`, `owner_id`, `demand_qty`) VALUES (:product_id, :demand_date, :shopId, :owner_id, :demand_qty)";
+			$stmt = "INSERT INTO `{$this->table}` (`title`, `demand_date`, `shop_id`, `owner_id`) VALUES (:demand_title, :demand_date, :shop_id, :owner_id)";
             $prepare = $this->dbh->prepare($stmt);
-            $prepare->bindParam(':product_id',$array['product_id'],PDO::PARAM_STR);
+            $prepare->bindParam(':demand_title',$array['demand_title'],PDO::PARAM_STR);
             $prepare->bindParam(':demand_date',$array['demand_date'],PDO::PARAM_STR);
-            $prepare->bindParam(':shopId',$array['shopId'],PDO::PARAM_STR);
+            $prepare->bindParam(':shop_id',$array['shop_id'],PDO::PARAM_STR);
             $prepare->bindParam(':owner_id',$array['owner_id'],PDO::PARAM_STR);
-            $prepare->bindParam(':demand_qty',$array['demand_qty'],PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $this->dbh->lastInsertId();
+			if(!empty($result)) {
+				foreach ($array['items'] as $value) {
+					$data = [
+						'product_id' => $value['id'],
+						'product_qty' => $value['qty'],
+						'demand_id' => $result
+					];
+					$this->createDemandItems($data);
+				}
+			}
+			return $result;
+		} catch (PDOException $e) {
+		    die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
+	public function createDemandItems($array) {
+		try {
+			$stmt = "INSERT INTO `{$this->table_sub}` (`product_id`, `product_qty`, `demand_id`) VALUES (:product_id, :product_qty, :demand_id)";
+            $prepare = $this->dbh->prepare($stmt);
+            $prepare->bindParam(':product_id',$array['product_id'],PDO::PARAM_STR);
+            $prepare->bindParam(':product_qty',$array['product_qty'],PDO::PARAM_STR);
+            $prepare->bindParam(':demand_id',$array['demand_id'],PDO::PARAM_STR);
+			$prepare->execute();
+			$result = $this->dbh->lastInsertId();
+			return $result;
+		} catch (PDOException $e) {
+		    die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
+	public function deleteDemandItems($id) {
+		try {
+			$stmt = "DELETE FROM `{$this->table_sub}` WHERE demand_id=:demand_id";
+            $prepare = $this->dbh->prepare($stmt);
+            $prepare->bindParam(':demand_id', $id,PDO::PARAM_STR);
+			$prepare->execute();
+			$result = $prepare->rowCount();
 			return $result;
 		} catch (PDOException $e) {
 		    die("Error!: " . $e->getMessage() . "<br/>");

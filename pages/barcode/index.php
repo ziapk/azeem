@@ -93,7 +93,6 @@ app.controller('categoryController', function($scope, $http, $httpParamSerialize
         
     }
 
-
     $scope.searchProduct = function (term) {
         return $http.get("<?php echo SITE_URL?>api/getStores.php", {params: {term}})
         .then(function(response) {

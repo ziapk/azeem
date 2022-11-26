@@ -3,7 +3,6 @@
 $stores = new Store();
 $productsObj = new Products();
 $categoryObj = new Publishers();
-$demandsObj = new Demands();
 $storeTypesArr = $stores->getStoreTypes();
 
 
@@ -11,10 +10,6 @@ $storeTypes = [];
 foreach ($storeTypesArr as $key => $value) {
     $storeTypes[$value['id']] = $value;
 }
-
-
-
-
 
 $ownerStores = $stores->getOwnerStores($userData['id']);
 $ownerStoreProducts = $productsObj->getStoreProducts($userData['id']);
@@ -32,7 +27,6 @@ foreach ($ownerStores as $store) {
 
 
 $products = $productsObj->getOwnerProducts($currentStore['owner_id']);
-$demands = $demandsObj->getOwnerDemands($currentStore['owner_id']);
 
 $publishersArr = $categoryObj->getPublishers($currentStore['owner_id']);
 $publishers = [];
@@ -40,10 +34,6 @@ foreach ($publishersArr as $key => $value) {
     $publishers[$value['id']] = $value;
 }
 
-$productsList = [];
-foreach ($products as $product) {
-    $productsList[$product['id']] = $product;
-}
 ?>
 
 
@@ -161,41 +151,6 @@ foreach ($products as $product) {
             <?php $count++; } ?>
         </tbody>
     </table> -->
-    <a href="<?php echo SITE_URL."pages/demand/create.php" ?>" class="btn btn-primary btn-xs pull-right">Add Demand</a>
-    <h4>Demand Stocks</h4>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Sr.#</th>
-                <th>Shop</th>
-                <th>Warehouse</th>
-                <th>Product</th>
-                <th>Demand Qty</th>
-                <th>Demand Date</th>
-                <th>Assign Qty</th>
-                <th>Assign Date</th>
-                <th>Status</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-
-        <?php $count = 1; foreach ($demands as $demand) { ?>
-                <tr>
-                    <td><?php echo $count; ?></td>
-                    <td><?php echo $storeList[$demand['shopId']]['full_name']; ?></td>
-                    <td><?php echo $demand['warehouse_id'] ? $storeList[$demand['warehouse_id']]['full_name'] : null; ?></td>
-                    <td><?php echo $productsList[$demand['product_id']]['full_name']; ?></td>
-                    <td><?php echo $demand['demand_qty']; ?></td>
-                    <td><?php echo $demand['demand_date']; ?></td>
-                    <td><?php echo $demand['assign_qty']; ?></td>
-                    <td><?php echo $demand['assign_date'] ? $demand['assign_date'] : 'NULL' ; ?></td>
-                    <td><?php echo $demandStatusArr[$demand['flag']]['full_name']; ?></td>
-                    <td><a href="<?php echo SITE_URL."pages/demand/assign.php?id=".$demand['id'];?>">Modify</a></td>
-                </tr>
-            <?php $count++; } ?>
-        </tbody>
-    </table>
     <!-- <h4>Pending Orders</h4>
     <table class="table">
         <thead>
