@@ -59,8 +59,8 @@
                 <span class="form-control">{{li.full_name}}</span>
             </div>
             <div class="col-sm-3 form-group" ng-if="!li.id">
-                <label for="">Product</label>
-                <input type="text" class="form-control" ng-model="li.product" placeholder="Search Products" typeahead-on-select="selectProduct($item)" uib-typeahead="address as address.full_name for address in searchProduct($viewValue)" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="0">
+                <label for=""><input type="checkbox" ng-model="li.searchBy" style="vertical-align: top"> Search by code</label>
+                <input type="text" class="form-control" ng-model="li.product" placeholder="Search Products" typeahead-on-select="selectProduct($item)" uib-typeahead="address as address.full_name for address in searchProduct($viewValue, li.searchBy)" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="0">
             </div>
             <div class="col-sm-3 form-group">
                 <label for="">Demand Qty</label>
@@ -120,8 +120,12 @@ app.controller('categoryController', function($scope, $http, $httpParamSerialize
     $scope.items = $scope.books?.records || [];
 
 
-    $scope.searchProduct = function (term) {
-        return $http.get("<?php echo SITE_URL?>api/getStores.php", {params: {term}})
+    $scope.searchProduct = function (term, isCodeEnable) {
+        let searchBy;
+        if(isCodeEnable) {
+            searchBy = 'id';
+        }
+        return $http.get("<?php echo SITE_URL?>api/getStores.php", {params: {term, searchBy}})
         .then(function(response) {
             
             $scope.list = response.data;
