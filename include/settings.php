@@ -1,6 +1,6 @@
 <?php
 session_start();
-define('SITE_URL', '/pos-v2/');
+define('SITE_URL', '/');
 
 // ini_set('display_errors', 1);
 // ini_set('display_startup_errors', 1);
