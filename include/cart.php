@@ -4,8 +4,6 @@
   $productCls = new Products();
   $ownerId = $userData['role'] == 'owner' ? $userData['id'] : $userData['created_by'];
   $list = $productCls->getOwnerProducts($ownerId);
-  print_r($shopData);
-  echo count($list);
 ?>
 <li uib-dropdown auto-close="outsideClick" on-toggle="refreshList()">
 <a href="javascript:void(0)" uib-dropdown-toggle tooltip-placement="bottom" uib-tooltip="Shopping Cart"><img width="22" height="22" src="<?php echo SITE_URL; ?>assets/img/svg/010-shopping-bag-white.svg" alt="" /></a>
@@ -54,6 +52,7 @@
 
 <script>
 app.controller('headerController', function($scope, $http, $httpParamSerializerJQLike, $filter, $window) {
+  $scope.countttt = <?php echo count($list);?>;
   $scope.list = <?php echo json_encode($list);?>;
   $scope.test = 12222;
   localStorage.setItem('list', JSON.stringify($scope.list));
