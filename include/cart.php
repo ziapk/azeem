@@ -5,7 +5,7 @@
   $ownerId = $userData['role'] == 'owner' ? $userData['id'] : $userData['created_by'];
   $list = $productCls->getOwnerProducts($ownerId);
   print_r($shopData);
-  print_r($userData);
+  echo count($list);
 ?>
 <li uib-dropdown auto-close="outsideClick" on-toggle="refreshList()">
 <a href="javascript:void(0)" uib-dropdown-toggle tooltip-placement="bottom" uib-tooltip="Shopping Cart"><img width="22" height="22" src="<?php echo SITE_URL; ?>assets/img/svg/010-shopping-bag-white.svg" alt="" /></a>
