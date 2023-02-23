@@ -49,7 +49,11 @@
     </div>
     </div>
 </li>
-<div id="cccc" style="display: none"><?php echo json_encode($list);?></div>
+<div id="cccc" style="display: none"><?php 
+$json = json_encode($list);
+$error = json_last_error();
+var_dump($json, $error === JSON_ERROR_UTF8);
+?></div>
 
 <script>
 app.controller('headerController', function($scope, $http, $httpParamSerializerJQLike, $filter, $window) {
