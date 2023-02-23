@@ -56,7 +56,7 @@ function createCustomer () {
 }
 
 app.controller('headerController', function($scope, $http, $httpParamSerializerJQLike, $filter, $window) {
-  $scope.list = <?php echo json_encode($list);?>;
+  $scope.list = <?php echo safe_json_encode($list);?>;
   $scope.refreshList = function() {
     $scope.cart = JSON.parse($window.localStorage.getItem('shopping'));
     $scope.totalPrice = 0;
