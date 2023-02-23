@@ -52,7 +52,7 @@
 <div id="cccc" style="display: none"><?php 
 $json = json_encode($list);
 $error = json_last_error();
-var_dump($json, $error === JSON_ERROR_UTF8);
+var_dump($error);
 ?></div>
 
 <script>
