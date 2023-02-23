@@ -49,12 +49,11 @@
     </div>
     </div>
 </li>
+<div id="cccc" style="display: none"><?php echo json_encode($list);?></div>
 
 <script>
 app.controller('headerController', function($scope, $http, $httpParamSerializerJQLike, $filter, $window) {
-  $scope.countttt = <?php echo json_encode($list);?>;
-  $scope.list = <?php echo json_encode($list);?>;
-  $scope.test = 12222;
+  $scope.list = JSON.parse($('#cccc').html());
   localStorage.setItem('list', JSON.stringify($scope.list));
   $scope.refreshList = function() {
     $scope.cart = JSON.parse($window.localStorage.getItem('shopping'));
