@@ -19,7 +19,7 @@ class Products extends Connection
 			}
 			
 			if($params['searchBy'] == 'id' && !empty($params["search"])) {
-				$searchQry = "AND p.id = ".$params["search"];	
+				$searchQry = "AND (p.id = ".$params["search"]." OR p.code = ".$params["search"].")";	
 			}
 			else if($params['searchBy'] == 'cource' && !empty($params["courceId"])) {
 				$searchQry = "AND c.program_id = ".$params["courceId"];	
@@ -92,12 +92,11 @@ class Products extends Connection
 				$column = ", (sp.qty - sp.stock_out) as qty ";
 			}
 			
-			$stmt = "SELECT count(p.id) as count FROM `{$this->table}` as p $innerJoin LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id  LEFT JOIN program_books as c ON c.product_id = p.id WHERE p.owner_id=:owner_id $pin $searchQry GROUP by p.id";
+			$stmt = "SELECT count(p.id) as count FROM `{$this->table}` as p $innerJoin LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id  LEFT JOIN program_books as c ON c.product_id = p.id WHERE p.owner_id=:owner_id $pin $searchQry";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':owner_id',$owner_id,PDO::PARAM_STR);
 			$prepare->execute();
 			$total = $prepare->fetch(PDO::FETCH_ASSOC);
-			
 			$no_of_records_per_page = !empty($params['perPage']) ? $params['perPage'] : 10;
 			$total_rows = empty($total) ? 0 : $total['count'];
 			$total_pages = ceil($total_rows / $no_of_records_per_page);

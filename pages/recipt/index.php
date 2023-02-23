@@ -16,8 +16,8 @@ echo mainHeader(['page' => 'recipt']);
                     <input type="text" class="form-control" ng-model="customerName" ng-change="searchCustomer()">
                     <div class="list-group recipt-search-dropdown">
                         <a ng-click="selectCustomer(l)" class="list-group-item clearfix" ng-repeat="l in customersList">
-                            <h4 class="list-group-item-heading">{{l.full_name}} <span>{{l.barcode}}</span></h4>
-                            <span>{{l.group}}</span>  <span class="pull-right">{{l.code}}</span>
+                            <h4 class="list-group-item-heading"><strong>{{l.full_name}}</strong> <span class="text-danger"><strong>{{l.phoneNumber}}</strong></span></h4>
+                            <span style="font-weight: normal" ng-if="li.title != l.full_name">{{l.title}}</span><span class="pull-right">{{l.code}}</span>
                             
                         </a>
                         <a ng-if="customersList.length" ng-click="clearCustomer()" class="list-group-item">Close</a>
@@ -55,15 +55,19 @@ echo mainHeader(['page' => 'recipt']);
             <tr ng-repeat="cart in items track by $index" id="item-{{cart.id}}">
                 <td>{{$index + 1}}</td>
                 <td>{{cart.full_name}}</td>
-                <td>{{cart.price}}</td>
-                <td><button ng-click="subQty(cart)">-</button>
-                <input class="text-center input-qty" type="number" ng-model="qty" ng-value=" cart.qty | number " ng-change="directlyAdd(qty, cart)">
-                <button ng-click="addQty(cart)">+</button></td>
+                <td>{{cart.price | number: 2}}</td>
+                <td>
+                    <div class="quantity">
+                        <a href="#" class="quantity__minus" ng-click="subQty(cart)"><span>-</span></a>
+                        <input class="quantity__input" type="text" ng-model="qty" ng-value=" cart.qty | number " ng-change="directlyAdd(qty, cart)">
+                        <a href="#" class="quantity__plus" ng-click="addQty(cart)"><span>+</span></a>
+                    </div>
+                </td>
                 <td>
                     <input class="text-center" type="number" ng-model="addprice" ng-change="directlyPrice(addprice, cart)">
                 </td>
                 <td>
-                    {{cart.price * cart.qty}}
+                    {{cart.price * cart.qty | number: 2}}
                     <a href="#" class="btn btn-xs btn-danger pull-right" ng-click="remove(cart)">Delete</a>
                 </td>
             </tr>
@@ -71,7 +75,7 @@ echo mainHeader(['page' => 'recipt']);
         <tbody>
             <tr>
                 <td class="text-right" colspan="5">Sub Total</td>
-                <td>{{subTotal}}</td>
+                <td>{{subTotal | number: 2}}</td>
             </tr>
             <tr>
                 <td class="text-right" colspan="5">Add Discount</td>
@@ -79,11 +83,11 @@ echo mainHeader(['page' => 'recipt']);
             </tr>
             <tr>
                 <td class="text-right" colspan="5">Total Discount</td>
-                <td width="200"><strong>{{discount}}</strong></td>
+                <td width="200"><strong>{{discount | number: 2}}</strong></td>
             </tr>
             <tr>
                 <td class="text-right" colspan="5">Grand Total</td>
-                <td>{{grandTotal}}</td>
+                <td>{{grandTotal | number: 2}}</td>
             </tr>
             <tr>
                 <td class="text-right" colspan="5">Pay Amount</td>
@@ -91,7 +95,7 @@ echo mainHeader(['page' => 'recipt']);
             </tr>
             <tr>
                 <td class="text-right" colspan="5">Balance</td>
-                <td width="200">{{grandTotal - payment_amount}}</td>
+                <td width="200">{{grandTotal - payment_amount | number: 2}}</td>
             </tr>
         </tbody>
         <tbody>
@@ -133,7 +137,7 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
     $scope.mainList = <?php echo json_encode($list);?>;
 
     $scope.list = [];
-    $scope.priceList = [];
+    $scope.priceList = localStorage.getItem('list') && JSON.parse(localStorage.getItem('list'));;
     $scope.focus = true;
 
     $scope.customerData = {};
@@ -228,7 +232,7 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
     $scope.selectCustomer = function (p) {
         $scope.customerName = p.full_name;
         $scope.customerData = p;
-        
+        $scope.calculateSum(p);
     }
 
     $scope.addQty = function (row) {
@@ -303,10 +307,23 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
         });
     }    
 
-    $scope.calculateSum = () => {
+    $scope.calculateSum = (c) => {
+        const customerData = c || $scope.customerData;
         let subtotal = 0;
         $scope.items.map((product) => {
-            subtotal += (product.price * product.qty);
+            const prod = $scope.priceList.find(r => r.id == product.id);
+            let currentRow = null;
+            if(customerData.discount_array?.length && customerData.discount_array?.filter(r => r.publisher_id == product.publisher_id).length) {
+                const row = customerData.discount_array.find(r => r.publisher_id == prod.publisher_id);
+                const price = parseFloat(prod.price);
+                product.price = (price / (1 + ( parseFloat(row.discount_value) / 100 )));
+                subtotal += (price * product.qty);
+            }
+            else {
+                const price = parseFloat(prod.price);
+                product.price = price;
+                subtotal += (price * product.qty);
+            }
         })
         $scope.subTotal = subtotal;
         $scope.payment_amount = $scope.subTotal - $scope.discount;

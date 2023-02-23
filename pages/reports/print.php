@@ -4,7 +4,7 @@ include_once dirname(__FILE__).'/../../include/settings.php';
 $orders = [];
 $from = $_POST['from'];
 $to = $_POST['to'];
-$shopId = $_POST['shopId'];
+$shopId = !empty($_POST['shopId']) ? $_POST['shopId'] : $shop['id'];
 $reportType = $_POST['reportType'];
 
 $ordersObj = new Orders();
@@ -86,23 +86,31 @@ switch ($reportType) {
 		$orders = $ordersObj->inventoryReturnReport($userData['shopId'], $from, $to, 2);
         include_once dirname(__FILE__).'/inventoryReturnReport.php';
 		exit;
-		case '8':
-			$expensesObj = new Expenses();
-			$expenses = $expensesObj->getExpensesForReport($_POST['groupName'], $from, $to);
-			include_once dirname(__FILE__).'/expenseReport.php';
+	case '8':
+		$expensesObj = new Expenses();
+		$expenses = $expensesObj->getExpensesForReport($_POST['groupName'], $from, $to);
+		include_once dirname(__FILE__).'/expenseReport.php';
+	exit;
+	case '9':
+		$expensesObj = new Expenses();
+		$expenses = $expensesObj->getExpensesSummeryReport($_POST['groupName'], $from, $to);
+		include_once dirname(__FILE__).'/expenseSummeryReport.php';
+	exit;
+	case '10':
+		$expensesObj = new Expenses();
+		$expenses = $expensesObj->getExpensesSummeryReport($_POST['groupName'], $from, $to);
+		$orders = $ordersObj->ordersReportDateWise($userData['shopId'], $from, $to);
+		include_once dirname(__FILE__).'/closingReport.php';
 		exit;
-		case '9':
-			$expensesObj = new Expenses();
-			$expenses = $expensesObj->getExpensesSummeryReport($_POST['groupName'], $from, $to);
-			include_once dirname(__FILE__).'/expenseSummeryReport.php';
+		break;
+	case '11':
+		include_once dirname(__FILE__).'/accounting.php';
 		exit;
-		case '10':
-			$expensesObj = new Expenses();
-			$expenses = $expensesObj->getExpensesSummeryReport($_POST['groupName'], $from, $to);
-			$orders = $ordersObj->ordersReportDateWise($userData['shopId'], $from, $to);
-			include_once dirname(__FILE__).'/closingReport.php';
+		break;
+	case '12':
+		include_once dirname(__FILE__).'/accounting.php';
 		exit;
-	break;
+		break;
     
     default:
         # code...

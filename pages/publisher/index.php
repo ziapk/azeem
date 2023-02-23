@@ -99,8 +99,9 @@ app.controller('publisherController', function($scope, $http, $httpParamSerializ
     
 
     $scope.getPublishers($scope.currentPage);
-    $scope.pageChanged = () => {
-        $scope.getPublishers($scope.currentPage)
+    $scope.pageChanged = (currentPage) => {
+        $scope.currentPage = currentPage;
+        $scope.getPublishers(currentPage)
     }
 
 

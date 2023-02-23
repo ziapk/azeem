@@ -15,12 +15,14 @@ class Suppliers extends Connection
 	
 	public function createSupplier($array) {
 		try {
-			$stmt = "INSERT INTO `{$this->table}` (`name`, `contact`, `address`,`wallet`) VALUES (:name, :contact, :address, :wallet)";
+			$stmt = "INSERT INTO `{$this->table}` (`name`, `contact`, `address`,`wallet`, `company`, `title`) VALUES (:name, :contact, :address, :wallet, :company, :title)";
             $prepare = $this->dbh->prepare($stmt);
             $prepare->bindParam(':name',$array['name'],PDO::PARAM_STR);
             $prepare->bindParam(':contact',$array['contact'],PDO::PARAM_STR);
             $prepare->bindParam(':address',$array['address'],PDO::PARAM_STR);
             $prepare->bindParam(':wallet',$array['wallet'],PDO::PARAM_INT);
+            $prepare->bindParam(':company',$array['company'],PDO::PARAM_INT);
+            $prepare->bindParam(':title',$array['title'],PDO::PARAM_INT);
 			$prepare->execute();
 			$result = $this->dbh->lastInsertId();
 			return $result;
@@ -31,11 +33,13 @@ class Suppliers extends Connection
 
 	public function updateSupplier($array) {
 		try {
-			$stmt = "UPDATE `{$this->table}` SET name=:name, contact=:contact, address=:address WHERE id=:id";
+			$stmt = "UPDATE `{$this->table}` SET name=:name, contact=:contact, address=:address, company=:company, title=:title WHERE id=:id";
             $prepare = $this->dbh->prepare($stmt);
             $prepare->bindParam(':name',$array['name'],PDO::PARAM_STR);
             $prepare->bindParam(':contact',$array['contact'],PDO::PARAM_STR);
             $prepare->bindParam(':address',$array['address'],PDO::PARAM_STR);
+            $prepare->bindParam(':company',$array['company'],PDO::PARAM_STR);
+            $prepare->bindParam(':title',$array['title'],PDO::PARAM_STR);
             $prepare->bindParam(':id',$array['id'],PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $prepare->rowCount();

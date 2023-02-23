@@ -21,6 +21,8 @@
                 'id' => $_GET['id'],
                 'name' => $_POST['name'],
                 'contact' => $_POST['contact'],
+                'company' => $_POST['company'],
+                'title' => $_POST['title'],
                 'address' => $_POST['address']
             ];
 
@@ -61,6 +63,14 @@
             <div class="col-sm-4 form-group">
                 <label>Supplier Contact</label>
                 <input name="contact" type="text" class="form-control" placeholder="Contact" value="<?php echo $supplier['contact'];?>">
+            </div>
+            <div class="col-sm-4 form-group">
+                <label>Supplier title</label>
+                <input name="title" type="text" class="form-control" placeholder="title" value="<?php echo $supplier['title'];?>">
+            </div>
+            <div class="col-sm-4 form-group">
+                <label>Supplier Company</label>
+                <input name="company" type="text" class="form-control" placeholder="company" value="<?php echo $supplier['company'];?>">
             </div>
             <div class="col-sm-4 form-group">
                 <label>Supplier Address</label>

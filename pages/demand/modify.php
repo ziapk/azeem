@@ -1,7 +1,6 @@
 <?php 
     include_once dirname(__FILE__).'/../../include/settings.php';
 
-
     $id = $_GET['id'];
     $productObj = new Products();
     $demandObj = new Demands();
@@ -18,8 +17,6 @@
 
     $error = "";
     $message = "";
-
-
 
     echo mainHeader();  
     $categories = $categoryObj->getOwnerCategories($ownerId);
@@ -113,12 +110,12 @@ app.controller('categoryController', function($scope, $http, $httpParamSerialize
             alert(response.data.message);
         });
     }
+
     $scope.siteUrl = '<?php echo SITE_URL ?>';
     
     $scope.books = <?php echo json_encode($products);?>;
 
     $scope.items = $scope.books?.records || [];
-
 
     $scope.searchProduct = function (term, isCodeEnable) {
         let searchBy;

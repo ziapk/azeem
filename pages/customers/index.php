@@ -15,9 +15,8 @@ echo mainHeader(['page'=> 'customer']);
         <thead>
             <tr>
                 <th>Id</th>
-                <th>Name</th>
-                <th>Phone Number</th>
-                <th>Address</th>
+                <th>Contact</th>
+                <th>Title / Company / Address</th>
                 <th>Wallet</th>
                 <th></th>
             </tr>
@@ -25,14 +24,14 @@ echo mainHeader(['page'=> 'customer']);
         <tbody>
             <tr ng-repeat="li in list">
                 <td>{{li.id}}</td>
-                <td>{{li.full_name}}</td>
-                <td>{{li.phoneNumber}}</td>
-                <td>{{li.address}}</td>
+                <td><strong>{{li.full_name}}</strong> <br /> {{li.phoneNumber}}</td>
+                <td><strong>{{li.company}}</strong> - {{li.title}} <br />{{li.address}}</td>
                 <td>{{li.wallet}}</td>
                 <td>
                     <?php if($userData['role'] === 'manager') {?><a ng-click="deleteCustomer(li.id)" class="btn btn-primary btn-xs" href="javascript:void(0)">Delete</a><?php }?>
                     <?php if($userData['role'] === 'manager') {?><a class="btn btn-danger btn-xs" href="<?php echo SITE_URL;?>pages/orders/customerOrders.php?id={{li.id}}">View Orders</a><?php }?>
                     <?php if($userData['role'] === 'owner') {?><a class="btn btn-danger btn-xs" href="<?php echo SITE_URL;?>pages/customers/update.php?id={{li.id}}">Update</a><?php }?>
+                    <?php if($userData['role'] === 'owner' || $userData['role'] === 'manager') {?><a class="btn btn-default btn-xs" href="javascript:void(0)" ng-click="assignBooks(li)">Assign</a><?php } ?>
                 </td>
             </tr>
         </tbody>
@@ -50,7 +49,7 @@ function createCustomer () {
 }
 
 
-app.controller('customerController', function($scope, $http, $httpParamSerializerJQLike, $uibModal, $window) {
+app.controller('customerController', function($scope, $http, $httpParamSerializerJQLike, $uibModal, $window, $log) {
     $scope.currentPage = 1; 
     $scope.data = { perPage: "10" }; //$scope.data.records;
     $scope.list = []; //$scope.data.records;
@@ -104,6 +103,27 @@ app.controller('customerController', function($scope, $http, $httpParamSerialize
             $scope.getCustomers(1);
         });
     };
+
+    $scope.assignBooks = function (item) {
+        $uibModal.open({
+            ariaLabelledBy: 'modal-title',
+            ariaDescribedBy: 'modal-body',
+            templateUrl: 'assignBooks.html',
+            controller: 'AssignBooksModalInstanceCtrl',
+            resolve: {
+                parentData: function() {
+                    return item
+                }
+            }
+        }).result.then(function (response) {
+            console.log(response);
+            $http.post($scope.siteUrl+'api/assignDiscount.php', $httpParamSerializerJQLike(response), {headers: {'Content-Type': 'application/x-www-form-urlencoded'} }).then(function() {
+                //$scope.getPrograms(1);
+            });
+        }, function () {
+            $log.info('Modal dismissed at: ' + new Date());
+        });
+    };
 });
 
 app.controller('ModalInstanceCtrl', function ($scope, $uibModalInstance, $http, $httpParamSerializerJQLike) {
@@ -138,6 +158,60 @@ app.controller('ModalInstanceCtrl', function ($scope, $uibModalInstance, $http, 
     };
 });
 
+
+app.controller('AssignBooksModalInstanceCtrl', function ($scope, $http, $uibModalInstance, parentData) {
+    $scope.books = {}
+    $scope.final = []
+    $scope.parentInfo = parentData
+
+
+    $scope.remove = function (row) {
+        delete $scope.books[row.id];
+        $scope.final = Object.values($scope.books);
+    }
+    
+    $scope.getBooks = () => {
+        return $http.get("<?php echo SITE_URL?>api/getCustomerDiscounts.php", {params: {id: parentData.id}})
+        .then(function(response) {
+            console.log('response', response);
+            if(response.data && response.data.length) {
+                console.log('response.data', response.data);
+                $scope.books = {}
+                response.data.map(row => {
+                    $scope.books[row.id] = { ...row, discount_value: parseFloat(row.discount_value) };
+                    $scope.final = Object.values($scope.books);
+                })
+            }
+            return response.data
+        });
+    }
+
+    $scope.getBooks();
+
+    
+    $scope.searchProduct = function (search) {
+        return $http.get("<?php echo SITE_URL?>api/getPublishers.php", {params: {search}})
+        .then(function(response) {
+            return response.data.records
+        });
+    }
+
+    $scope.selectProduct = (item) => {
+        $scope.books[item.id] = { ...item, discount_value: parseFloat(item.discount_amount) }
+        $scope.final = Object.values($scope.books)
+        $scope.book = null
+    }
+
+    
+    
+    $scope.ok = function () {
+        $uibModalInstance.close({books: $scope.final, customer_id: parentData.id});
+    };
+
+    $scope.cancel = function () {
+        $uibModalInstance.dismiss('cancel');
+    };
+});
 </script>
 
 <script type="text/ng-template" id="addCustomer.html">
@@ -156,6 +230,14 @@ app.controller('ModalInstanceCtrl', function ($scope, $uibModalInstance, $http, 
                 <input id="scontact" type="text" ng-model="form.contact" class="form-control" placeholder="Customer's Contact">
             </div>
             <div class="form-group">
+                <label for="stitle">Title</label>
+                <input id="stitle" type="text" ng-model="form.title" class="form-control" placeholder="Customer's title">
+            </div>
+            <div class="form-group">
+                <label for="scompany">Company</label>
+                <input id="scompany" type="text" ng-model="form.company" class="form-control" placeholder="Customer's company">
+            </div>
+            <div class="form-group">
                 <label for="saddress">Address</label>
                 <input id="saddress" type="text" ng-model="form.address" class="form-control" placeholder="Customer's Address">
             </div>
@@ -166,6 +248,53 @@ app.controller('ModalInstanceCtrl', function ($scope, $uibModalInstance, $http, 
         <div class="modal-footer">
             <button class="btn btn-default" type="button" ng-click="cancel()">Close</button>
             <button class="btn btn-primary" type="submit">Submit Form</button>
+        </div>
+    </form>
+</script>
+
+<script type="text/ng-template" id="book.html">
+  <a>
+      <span ng-bind-html="match.model.full_name | uibTypeaheadHighlight:query"></span>
+  </a>
+</script>
+
+<script type="text/ng-template" id="assignBooks.html">
+    <form ng-submit="ok()" autocomplete="off"> 
+        <div class="modal-header">
+            <h3 class="modal-title" id="modal-title">{{parentInfo.full_name}} <small>{{parentInfo.phoneNumber}}</small></h3>
+        </div>
+        <div class="modal-body" id="modal-body">
+            <div class="form-group">
+                <label for="sname">Search Books</label>
+                <input id="sname" type="text" ng-model="book" placeholder="Search Book" typeahead-on-select="selectProduct($item)" uib-typeahead="address as address.full_name for address in searchProduct($viewValue)" typeahead-template-url="book.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="0">
+            </div>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Disc. Type</th>
+                        <th>Value</th>
+                        <th></th>
+                    </tr>
+                <thead>
+                <tbody>
+                    <tr ng-repeat="row in final">
+                        <td>{{row.full_name}}</td>
+                        <td>
+                            <select ng-model="row.discount_type">
+                                <option value="2">Fixed</option>
+                                <option value="1">Percent</option>
+                            </select>
+                        </td>
+                        <td><input type="number" min="0" max="100" onKeyPress="if(this.value.length==2) return false;" ng-model="row.discount_value" /> {{row.discount_type == 1 ? 'Percent': 'Fixed'}} </td>
+                        <td class="text-danger"><a href="javascript:void(0)" ng-click="remove(row)" class="btn btn-xs btn-danger"><span class="fa fa-remove"></span></a></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" type="submit" ng-click="ok()">Save</button>
+            <button class="btn btn-warning" type="button" ng-click="cancel()">Close</button>
         </div>
     </form>
 </script>

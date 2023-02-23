@@ -4,6 +4,8 @@ class Customers extends Connection
 {
     
     private $table = 'customers';
+    private $table_discount = 'customer_discount';
+    private $table_publisher = 'publishers';
     
 	public function searchCustomer($shopId, $search) {
 		$stmt = "SELECT * FROM `{$this->table}`  WHERE shopId=:shopId AND (full_name LIKE '".$search."%' OR code LIKE '".$search."%' OR phoneNumber LIKE '".$search."%') LIMIT 10";
@@ -12,15 +14,20 @@ class Customers extends Connection
 		//$prepare->bindParam(':search',$search,PDO::PARAM_STR);
 		$prepare->execute();
 		$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
+		foreach ($result as $key => $c) {
+			$result[$key]['discount_array'] = $this->getCustomerDiscounts(['customer_id'=> $c['id'], 'shopId'=> $c['shopId']]);
+		}
 		return $result;		
 	}
 	
 	public function createCustomer($array) {
 		try {
-			$stmt = "INSERT INTO `{$this->table}` (`full_name`, `address`,`type`,`phoneNumber`, `shopId`) VALUES (:full_name, :address, :type, :phoneNumber, :shopId)";
+			$stmt = "INSERT INTO `{$this->table}` (`full_name`, `address`,`type`, `company`, `title`, `phoneNumber`, `shopId`) VALUES (:full_name, :address, :type, :company, :title, :phoneNumber, :shopId)";
             $prepare = $this->dbh->prepare($stmt);
             $prepare->bindParam(':full_name',$array['full_name'],PDO::PARAM_STR);
             $prepare->bindParam(':phoneNumber',$array['phoneNumber'],PDO::PARAM_STR);
+            $prepare->bindParam(':company',$array['company'],PDO::PARAM_STR);
+            $prepare->bindParam(':title',$array['title'],PDO::PARAM_STR);
             $prepare->bindParam(':address',$array['address'],PDO::PARAM_STR);
             $prepare->bindParam(':type',$array['type'],PDO::PARAM_INT);
             $prepare->bindParam(':shopId',$array['shopId'],PDO::PARAM_INT);
@@ -34,12 +41,14 @@ class Customers extends Connection
 
 	public function updateCustomer($array) {
 		try {
-			$stmt = "UPDATE `{$this->table}` SET full_name=:full_name, address=:address, phoneNumber=:phoneNumber, code=:code WHERE id=:id";
+			$stmt = "UPDATE `{$this->table}` SET full_name=:full_name, address=:address, phoneNumber=:phoneNumber, company=:company, title=:title, code=:code WHERE id=:id";
             $prepare = $this->dbh->prepare($stmt);
             $prepare->bindParam(':full_name',$array['full_name'],PDO::PARAM_STR);
             $prepare->bindParam(':id',$array['id'],PDO::PARAM_STR);
             $prepare->bindParam(':code',$array['code'],PDO::PARAM_STR);
             $prepare->bindParam(':phoneNumber',$array['phoneNumber'],PDO::PARAM_STR);
+            $prepare->bindParam(':company',$array['company'],PDO::PARAM_STR);
+            $prepare->bindParam(':title',$array['title'],PDO::PARAM_STR);
             $prepare->bindParam(':address',$array['address'],PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $prepare->rowCount();
@@ -64,6 +73,52 @@ class Customers extends Connection
 			$stmt = "SELECT *  FROM `{$this->table}` WHERE `shopId`=:shopId";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':shopId',$shopId,PDO::PARAM_STR);
+			$prepare->execute();
+			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
+			return $result;
+		} catch (PDOException $e) {
+		    die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
+
+	public function deleteCustomerDiscounts($array) {
+		try {
+			$stmt = "DELETE FROM `{$this->table_discount}` WHERE customer_id=:customer_id and shopId=:shopId";
+			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':customer_id',$array['customer_id'],PDO::PARAM_INT);
+			$prepare->bindParam(':shopId',$array['shopId'],PDO::PARAM_INT);
+			return $prepare->execute();
+		} catch (PDOException $e) {
+		    die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
+
+	public function createCustomerDiscounts($array) {
+		try {
+			$stmt = "INSERT INTO `{$this->table_discount}` (`user_id`, `shopId`, `customer_id`, `publisher_id`, `discount_type`, `discount_value`) VALUES (:user_id, :shopId, :customer_id, :publisher_id, :discount_type, :discount_value)";
+            $prepare = $this->dbh->prepare($stmt);
+            $prepare->bindParam(':user_id',$array['user_id'],PDO::PARAM_STR);
+            $prepare->bindParam(':shopId',$array['shopId'],PDO::PARAM_STR);
+            $prepare->bindParam(':customer_id',$array['customer_id'],PDO::PARAM_STR);
+            $prepare->bindParam(':publisher_id',$array['publisher_id'],PDO::PARAM_STR);
+            $prepare->bindParam(':discount_type',$array['discount_type'],PDO::PARAM_STR);
+            $prepare->bindParam(':discount_value',$array['discount_value'],PDO::PARAM_STR);
+            $prepare->execute();
+			$result = $this->dbh->lastInsertId();
+			return $result;
+		} catch (PDOException $e) {
+		    die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
+
+	public function getCustomerDiscounts($arr) {
+		try {
+			$shopId = $arr['shopId'];
+			$customer_id = $arr['customer_id'];
+			$stmt = "SELECT d.*, p.full_name  FROM `{$this->table_discount}` as d left join `{$this->table_publisher}` as p on d.publisher_id=p.id WHERE customer_id=:customer_id and `shopId`=:shopId";
+			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':shopId',$shopId,PDO::PARAM_STR);
+			$prepare->bindParam(':customer_id',$customer_id,PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
 			return $result;

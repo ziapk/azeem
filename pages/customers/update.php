@@ -24,6 +24,8 @@
                 'id' => $_GET['id'],
                 'full_name' => $_POST['full_name'],
                 'code' => $_POST['code'],
+                'title' => $_POST['title'],
+                'company' => $_POST['company'],
                 'phoneNumber' => $_POST['phoneNumber'],
                 'address' => $_POST['address']
             ];
@@ -64,6 +66,12 @@
             </div>
             <div class="col-sm-4 form-group">
                 <input name="code" type="text" class="form-control" placeholder="code" value="<?php echo $store['code'];?>">
+            </div>
+            <div class="col-sm-4 form-group">
+                <input name="title" type="text" class="form-control" placeholder="title" value="<?php echo $store['title'];?>">
+            </div>
+            <div class="col-sm-4 form-group">
+                <input name="company" type="text" class="form-control" placeholder="company" value="<?php echo $store['company'];?>">
             </div>
             <div class="col-sm-4 form-group">
                 <input name="address" type="text" class="form-control" placeholder="address" value="<?php echo $store['address'];?>">

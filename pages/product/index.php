@@ -64,12 +64,14 @@
                 <a ng-if="li.pin != '1'" href="javascript:void(0)" ng-click="addBookmark(li)" class="btn-bookmark" uib-tooltip="Pin as running"><span class="fa fa-heart-o"></span></a>
                 <a ng-if="li.pin == '1'" href="javascript:void(0)" ng-click="removeBookmark(li)" class="btn-bookmark" uib-tooltip="Added in Running list"><span class="fa fa-heart"></span></a>
                 <span class="price">{{li.price}} <em>{{li.currency || 'PKR'}}</em> <?php if($userData['role'] === 'owner')  { ?><span style="color: #888; font-size: 0.75em">| {{li.pprice}} <em>{{li.currency || 'PKR'}}</em></span> <?php } ?></span>
+                
                 <span class="qty"><strong>{{li.qty < 0 ? 0 : li.qty}}</strong> Available</span>
             </div>
             <div class="product-content">
                 <span class="title">{{li.full_name}}</span>
                 <span class="group">{{li.group}}</span>
                 <span class="author" ng-if="li.author"><img width="12" height="12" src="<?php echo SITE_URL; ?>assets/img/svg/pen.svg" alt="" /> {{li.author}}</span>
+                <span><img class="fa" width="14" height="14" src="<?php echo SITE_URL; ?>assets/img/svg/qrcode.svg" alt="" /><code>{{li.code || li.id}}</code></span>
             </div>
         </li>
     </ul>

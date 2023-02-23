@@ -17,8 +17,8 @@ echo mainHeader(['page'=> 'supplier']);
         <thead>
             <tr>
                 <th></th>
-                <th>Name</th>
                 <th>Contact</th>
+                <th>Company / Title / Address</th>
                 <th>Wallet</th>
                 <th width="200"></th>
             </tr>
@@ -26,8 +26,8 @@ echo mainHeader(['page'=> 'supplier']);
         <tbody>
                 <tr ng-repeat="li in list">
                     <td width="50"><img ng-if="li.image" width="40" class="image" src={{"<?php echo SITE_URL;?>uploads/products/"+li.image}} /></td>
-                    <td>{{li.name}}</td>
-                    <td>{{li.contact}}</td>
+                    <td><strong>{{li.name}}</strong> <br /> {{li.contact}}</td>
+                    <td><strong>{{li.company}}</strong> - {{li.title}} <br />{{li.address}}</td>
                     <td>{{li.wallet}}</td>
                     <td>
                         <a class="btn btn-primary btn-xs" href="<?php echo SITE_URL."pages/suppliers/update.php?id="?>{{li.id}}">Edit</a>
@@ -54,6 +54,14 @@ echo mainHeader(['page'=> 'supplier']);
             <div class="form-group">
                 <label for="scontact">Contact</label>
                 <input id="scontact" type="text" ng-model="form.contact" class="form-control" placeholder="Supplier's Contact">
+            </div>
+            <div class="form-group">
+                <label for="stitle">Title</label>
+                <input id="stitle" type="text" ng-model="form.title" class="form-control" placeholder="Supplier's Title">
+            </div>
+            <div class="form-group">
+                <label for="scompany">Company</label>
+                <input id="scompany" type="text" ng-model="form.company" class="form-control" placeholder="Supplier's company">
             </div>
             <div class="form-group">
                 <label for="saddress">Address</label>

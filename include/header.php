@@ -21,10 +21,13 @@ function mainHeader($params = null) {
             <link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/vendors/angular-daterangepicker/daterangepicker.css">
             <link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/vendors/angularjs-toaster/toaster.min.css">
             <link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/css/style.css">
+            <link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/css/tree.css">
             <link rel="preconnect" href="https://fonts.gstatic.com">
             <link rel="stylesheet" async href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
             <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+            <script src="<?php echo SITE_URL; ?>assets/vendor/jquery/jquery.min.js"></script>
             <script src="<?php echo SITE_URL; ?>assets/js/jquery-3.4.1.slim.min.js"></script>
+            <script src="<?php echo SITE_URL;?>assets/vendors/daterangepicker/moment.min.js"></script>
             <script type="text/javascript" src="<?php echo SITE_URL?>assets/js/angular.min.js"></script>
             <script type="text/javascript" src="<?php echo SITE_URL;?>assets/js/ui-bootstrap-tpls-2.5.0.min.js"></script>
         </head>

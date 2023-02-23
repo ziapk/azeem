@@ -64,9 +64,9 @@
         <thead>
             <tr>
                 <th></th>
-                <th ng-click="sortBy('title')" ng-class="{active: sortByField === 'title'}">Title <em class="fa sort-icon fa-sort-amount-asc" ng-if="sortByOrder === 'asc'"></em> <em class="fa sort-icon fa-sort-amount-desc" ng-if="sortByOrder === 'desc'"></em></th>
-                <th ng-click="sortBy('group')" ng-class="{active: sortByField === 'group'}">Group  <em class="fa sort-icon fa-sort-amount-asc" ng-if="sortByOrder === 'asc'"></em> <em class="fa sort-icon fa-sort-amount-desc" ng-if="sortByOrder === 'desc'"></em></th>
-                <th ng-click="sortBy('author')" ng-class="{active: sortByField === 'author'}">Author <em class="fa sort-icon fa-sort-amount-asc" ng-if="sortByOrder === 'asc'"></em> <em class="fa sort-icon fa-sort-amount-desc" ng-if="sortByOrder === 'desc'"></em></th>
+                <th ng-click="sortBy('title')" ng-class="{active: sortByField === 'title'}">Title / Author - Group <em class="fa sort-icon fa-sort-amount-asc" ng-if="sortByOrder === 'asc'"></em> <em class="fa sort-icon fa-sort-amount-desc" ng-if="sortByOrder === 'desc'"></em></th>
+                <th>Description/Note</th>
+                <th>SKU/Code</th>
                 <th ng-click="sortBy('price')" ng-class="{active: sortByField === 'price'}">Price <em class="fa sort-icon fa-sort-amount-asc" ng-if="sortByOrder === 'asc'"></em> <em class="fa sort-icon fa-sort-amount-desc" ng-if="sortByOrder === 'desc'"></em></th>
                 <th ng-click="sortBy('stock')" ng-class="{active: sortByField === 'stock'}">In Stock <em class="fa sort-icon fa-sort-amount-asc" ng-if="sortByOrder === 'asc'"></em> <em class="fa sort-icon fa-sort-amount-desc" ng-if="sortByOrder === 'desc'"></em></th>
                 <th width="150"></th>
@@ -75,14 +75,14 @@
         <tbody>
                 <tr ng-repeat="li in list">
                     <td width="50"><img ng-if="li.image" width="40" class="image" src={{"<?php echo SITE_URL;?>uploads/products/"+li.image}} /></td>
-                    <td>{{li.full_name}}</td>
-                    <td>{{li.group}}</td>
-                    <td>{{li.author}}</td>
+                    <td><strong>{{li.full_name}}</strong> <br />{{li.author}} - {{li.group}}</td>
+                    <td>{{li.description}} <br /> {{li.note}}</td>
+                    <td><img class="fa" width="14" height="14" src="<?php echo SITE_URL; ?>assets/img/svg/qrcode.svg" alt="" /> {{li.code || li.id}}</td>
                     <td>{{li.price}}</td>
                     <td>{{li.in_hand < 0 ? 0 : li.in_hand}}</td>
                     <td>
-                    <a ng-if="li.pin == 0" href="javascript:void(0)" ng-click="addBookmark(li)" class="btn btn-bookmark" uib-tooltip="Pin as running items"><span class="fa fa-heart-o"></span></a>
-                    <a ng-if="li.pin != 0" href="javascript:void(0)" ng-click="removeBookmark(li)" class="btn btn-bookmark" uib-tooltip="Remove from Running items list"><span class="fa fa-heart"></span></a>
+                    <a ng-if="li.pin != 1" href="javascript:void(0)" ng-click="addBookmark(li)" class="btn btn-bookmark" uib-tooltip="Pin as running items"><span class="fa fa-heart-o"></span></a>
+                    <a ng-if="li.pin == 1" href="javascript:void(0)" ng-click="removeBookmark(li)" class="btn btn-bookmark" uib-tooltip="Remove from Running items list"><span class="fa fa-heart"></span></a>
                     <a uib-tooltip="Add to Cart" ng-click="addToCart(li)" class="btn btn-xs"><img width="18" height="18" src="<?php echo SITE_URL; ?>assets/img/svg/002-add-to-cart.svg" alt="" /></a>
                     <a class="btn btn-primary btn-xs" href="<?php echo SITE_URL."pages/product/update.php?id="?>{{li.id}}"><span class="fa fa-edit"></span></a> <a class="btn btn-danger btn-xs" href="<?php echo SITE_URL."pages/product/create.php?id="?>{{li.id}}"><span class="fa fa-copy"></span></a></td>
                 </tr>

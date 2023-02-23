@@ -1,6 +1,6 @@
 <?php
 session_start();
-define('SITE_URL', '/');
+define('SITE_URL', '/pos-v2/');
 
 // ini_set('display_errors', 1);
 // ini_set('display_startup_errors', 1);
@@ -57,7 +57,11 @@ spl_autoload_register(function ($class_name) {
         }            
     }
 });
-
+$accStatusArray = array(
+    '0' => 'In-Active',
+    '1' => 'Active',
+    '2' => 'Disable',
+);
 
 $statusArr = [
     1 => 'Active',
@@ -102,6 +106,8 @@ $reportsArray = [
     8 => ['id' => 8, 'title'=> 'Expense Report', 'access' => ['shopkeeper', 'owner', 'manager']],
     9 => ['id' => 9, 'title'=> 'Expense Summery Report', 'access' => ['shopkeeper', 'owner', 'manager']],
     10 => ['id' => 10, 'title'=> 'Closing Balance Report', 'access' => ['shopkeeper', 'owner', 'manager']],
+    11 => array('id' => 11, 'access' => ['owner', 'manager'], 'title' => 'Trial Balance' ),
+    12 => array('id' => 12, 'access' => ['owner', 'manager'], 'title' => 'Profit and Loss' )
 ];
 
 $returnArray = [
@@ -128,3 +134,68 @@ function dateToSimple($date) {
         }
     }
 }  
+
+function nestedDrawList($list, $menuClass=null, $subMenuClass = null) {
+    $html = "";
+    foreach ($list as $key => $m) {
+        $html	.= '<li data-tree-branch="'.$m['key'].'" data-tree-click="'.$m['key'].'"><svg xmlns="http://www.w3.org/2000/svg" width="41.14" height="41.138" viewBox="0 0 41.14 41.138"><path d="M3.741,33.658a.625.625,0,0,0-.624.624v2.492H.624A.622.622,0,0,0,0,37.4v3.117a.624.624,0,0,0,.624.624H40.516a.624.624,0,0,0,.623-.624V37.4a.622.622,0,0,0-.623-.623H38.022V34.282a.624.624,0,0,0-.623-.624H35.763V14.751H37.4a.624.624,0,0,0,.623-.624V11.634h2.494a.624.624,0,0,0,.288-1.177L20.857.072a.612.612,0,0,0-.575,0L.336,10.457a.624.624,0,0,0,.288,1.177H3.117v2.492a.625.625,0,0,0,.624.624H5.377V33.658Zm5.59-18.907h4.854V33.658H9.331Zm8.81,0H23V33.658H18.141Zm8.812,0h4.856V33.658H26.953Z"/></svg><span>['.$m['code'].']</span> '.$m['title'];
+        $html  .= '<a class="btn-link" onclick=\'fillModifyForm('.json_encode($m).')\' data-toggle="modal" href="#editCategory"> <span class="fa fa-pencil"></span></a><a class="btn-link" onclick=\'fillModifyForm2('.json_encode($m).')\' data-toggle="modal" href="#newAccount"> <span class="fa fa-plus"></span></a><a class="btn-link" onclick=\'deleteAccount('.json_encode($m).')\' href="javascript:void(0)"> <span class="fa fa-remove"></span></a>';
+        $html  .= '</li>';
+        if(count($m['children']) > 0) {
+            $html .= nestedDrawList($m['children']);
+        }
+    }
+    return $html;
+}
+
+function array_tree_expand_without_filter(array $array, $id = 'id', $parent = 'parent_id', $children = 'children') {
+    $r = array();
+    $after_filter_array = $array;
+    foreach ($after_filter_array as $v) {
+        $k = $v[$id];
+        $r[$k] = $v;
+        $r[$k][$children] = array();
+    }
+    $adopted = array();
+    foreach ($r as $k => $v) {
+        if (isset($r[$v[$parent]])) {
+            $v['key'] = $v['parent_id'].'-'.$v['id'];
+            $r[$v[$parent]][$children][] = &$r[$k];
+            $adopted[] = $k;
+        }
+    }
+    foreach ($adopted as $id) {
+        unset($r[$id]);
+    }
+    return $r;
+}
+
+function drawList($list, $menuClass='list-unstyled', $subMenuClass = null) {
+    global $page;
+    global $commonArray;
+    $assocList = [];
+    foreach ($list as $key => $value) {
+        $value['key'] = !empty($assocList[$value['parent_id']]) ? $assocList[$value['parent_id']]['key'].'-'.$value['id'] : $value['id'];
+        $assocList[$value['id']] = $value;
+    }
+    
+    
+    $mainMenu = array_tree_expand_without_filter($assocList);
+    
+    
+    $html = '<ul class="'.$menuClass.'" id="tree">';
+    $html	.= nestedDrawList($mainMenu);
+    $html .= '</ul>';
+    return $html;
+}
+
+
+function drawJs($array){
+    $commonArray = SITE_URL;
+    $JsArray = '';
+    foreach ($array as $value) {
+        $JsArray .= "<script src='".$commonArray.$value."' type='text/javascript'></script>\n";
+    }
+    print_r($JsArray);exit;
+    return $JsArray;
+}

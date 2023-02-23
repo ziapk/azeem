@@ -1,0 +1,66 @@
+#tree [data-tree-click] {
+    background-image: url("../img/folder.svg");
+    background-repeat: no-repeat;
+    padding-left: 26px;
+    background-size: 20px 20px;
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+    border-bottom: 1px dashed;
+    cursor: pointer;
+  }
+  
+  #tree [data-tree-click] .btn-link {
+    margin-left: 30px;
+  }
+  
+  #tree [data-tree-click] .btn-link + .btn-link {
+    margin-left: 10px;
+  }
+  
+  #tree [data-tree-click] svg {
+    display: none;
+  }
+  
+  #tree [data-tree-click].end {
+    position: relative;
+    background-image: none;
+  }
+  
+  #tree [data-tree-click].end svg {
+    display: block;
+    position: absolute;
+    left: 4px;
+    top: 4px;
+    width: 14px;
+    height: 14px;
+    fill: currentColor;
+  }
+  
+  #tree .open[data-tree-click] {
+    background-image: url("../img/opened-folder.svg");
+  }
+  
+  #tree .open[data-tree-click].end {
+    background-image: none;
+  }
+  
+  #tree .data-tree-level1 {
+    margin-left: 26px;
+  }
+  
+  #tree .data-tree-level2 {
+    margin-left: 52px;
+  }
+  
+  #tree .data-tree-level3 {
+    margin-left: 78px;
+  }
+  
+  #tree .data-tree-level4 {
+    margin-left: 104px;
+  }
+  
+  #tree .data-tree-level5 {
+    margin-left: 130px;
+  }
+  
