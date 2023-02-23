@@ -131,7 +131,7 @@ app.directive('onEnterPress', function () {
     };
 });
 app.controller('cartController', function($scope, $http, $httpParamSerializerJQLike, $filter, $window, $timeout, $location, $anchorScroll) {
-    $scope.mainList = <?php echo json_encode($list);?>;
+    $scope.mainList = <?php echo safe_json_encode($list);?>;
 
     $scope.list = [];
     $scope.priceList = [];

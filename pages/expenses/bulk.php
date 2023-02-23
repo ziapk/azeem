@@ -74,7 +74,7 @@ echo mainHeader(['page'=> 'expense']);
 <script type="text/javascript">
 
 app.controller('cartController', function($scope, $http, $httpParamSerializerJQLike, $filter, $window, $timeout) {
-    $scope.mainList = <?php echo json_encode($sortedList);?>;
+    $scope.mainList = <?php echo safe_json_encode($sortedList);?>;
     $scope.shopId = <?php echo $userData['shopId'];?>;
     $scope.list = [];
     $scope.priceList = [];
