@@ -52,7 +52,7 @@
 
 <script>
 app.controller('headerController', function($scope, $http, $httpParamSerializerJQLike, $filter, $window) {
-  $scope.countttt = <?php echo count($list);?>;
+  $scope.countttt = <?php echo json_encode($list);?>;
   $scope.list = <?php echo json_encode($list);?>;
   $scope.test = 12222;
   localStorage.setItem('list', JSON.stringify($scope.list));
