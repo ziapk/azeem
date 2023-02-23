@@ -1,11 +1,10 @@
 <?php
   global $shopData;
   global $userData;
-  print_r($shopData);
-  print_r($userData);
   $productCls = new Products();
   $ownerId = $userData['role'] == 'owner' ? $userData['id'] : $userData['created_by'];
   $list = $productCls->getOwnerProducts($ownerId);
+  print_r($list);
 ?>
 <div ng-controller="headerController">
   <nav class="navbar navbar-fixed-top">
