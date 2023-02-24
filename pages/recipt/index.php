@@ -323,7 +323,7 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
             if(customerData.discount_array?.length && customerData.discount_array?.filter(r => r.publisher_id == product.publisher_id).length) {
                 const row = customerData.discount_array.find(r => r.publisher_id == prod.publisher_id);
                 const price = parseFloat(prod.price);
-                product.price = (price / (1 + ( parseFloat(row.discount_value) / 100 )));
+                product.price = (price * (100 - parseFloat(row.discount_value)) / 100);
                 subtotal += (price * product.qty);
             }
             else {
