@@ -97,6 +97,27 @@ class Supply extends Connection
 		}
     }
 
+    public function getOrders($id) {
+        try {
+			$stmt = "SELECT * FROM `{$this->table}` WHERE supplier_id=:id";
+            $prepare = $this->dbh->prepare($stmt);
+            $prepare->bindParam(':id',$id,PDO::PARAM_STR);
+			$prepare->execute();
+            $result['orders'] = $prepare->fetchAll(PDO::FETCH_ASSOC);
+            foreach($result['orders'] as $key => $order) {
+                $stmt = "SELECT item.*, p.full_name AS product_title FROM `{$this->table_sub}` as item LEFT JOIN products as p ON item.product_id = p.id WHERE item.supply_id=:id";
+                $prepare = $this->dbh->prepare($stmt);
+                $prepare->bindParam(':id',$order['id'],PDO::PARAM_STR);
+                $prepare->execute();
+                $result['orders'][$key]['order_items'] = $prepare->fetchAll(PDO::FETCH_ASSOC);
+                $result['supplier'] = $this->getSupplierById($id);
+            }
+            return $result;
+		} catch (PDOException $e) {
+		    die("Error!: " . $e->getMessage() . "<br/>");
+		}
+    }
+
     public function getSupplierById($id) {
         try {
 			$stmt = "SELECT * FROM `{$this->table_suppliers}` WHERE id=:id";

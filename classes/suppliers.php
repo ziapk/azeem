@@ -5,8 +5,12 @@ class Suppliers extends Connection
     
     private $table = 'suppliers';
     
-	public function searchSupplier($search) {
-		$stmt = "SELECT * FROM `{$this->table}`  WHERE (name LIKE '".$search."%' OR contact LIKE '".$search."%' OR address LIKE '".$search."%') LIMIT 10";
+	public function searchSupplier($search, $shopId = null) {
+		$shopCondition = "";
+		if(!empty($shopId)) {
+			$shopCondition = " and shopId=$shopId";
+		}
+		$stmt = "SELECT * FROM `{$this->table}`  WHERE (name LIKE '".$search."%' OR contact LIKE '".$search."%' OR address LIKE '".$search."%') $shopCondition LIMIT 10";
 		$prepare = $this->dbh->prepare($stmt);
 		$prepare->execute();
 		$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
@@ -15,7 +19,7 @@ class Suppliers extends Connection
 	
 	public function createSupplier($array) {
 		try {
-			$stmt = "INSERT INTO `{$this->table}` (`name`, `contact`, `address`,`wallet`, `company`, `title`) VALUES (:name, :contact, :address, :wallet, :company, :title)";
+			$stmt = "INSERT INTO `{$this->table}` (`name`, `contact`, `address`,`wallet`, `company`, `title`, `shopId`) VALUES (:name, :contact, :address, :wallet, :company, :title, :shopId)";
             $prepare = $this->dbh->prepare($stmt);
             $prepare->bindParam(':name',$array['name'],PDO::PARAM_STR);
             $prepare->bindParam(':contact',$array['contact'],PDO::PARAM_STR);
@@ -23,6 +27,7 @@ class Suppliers extends Connection
             $prepare->bindParam(':wallet',$array['wallet'],PDO::PARAM_INT);
             $prepare->bindParam(':company',$array['company'],PDO::PARAM_INT);
             $prepare->bindParam(':title',$array['title'],PDO::PARAM_INT);
+            $prepare->bindParam(':shopId',$array['shopId'],PDO::PARAM_INT);
 			$prepare->execute();
 			$result = $this->dbh->lastInsertId();
 			return $result;
@@ -59,10 +64,11 @@ class Suppliers extends Connection
 		    die("Error!: " . $e->getMessage() . "<br/>");
 		}
 	}
-	public function getSuppliers($shopId = null) {
+	public function getSuppliers($array) {
 		try {
-			$stmt = "SELECT *  FROM `{$this->table}`";
+			$stmt = "SELECT *  FROM `{$this->table}`where shopId=:shopId";
 			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':shopId',$array['shopId'],PDO::PARAM_INT);
 			$prepare->execute();
 			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
 			return $result;
@@ -70,6 +76,20 @@ class Suppliers extends Connection
 		    die("Error!: " . $e->getMessage() . "<br/>");
 		}
 	}
+
+	public function getSupplierOrders($shopId, $id) {
+        try {
+			$stmt = "SELECT * FROM `{$this->table}` WHERE shopId=:shopId AND id=:id";
+            $prepare = $this->dbh->prepare($stmt);
+            $prepare->bindParam(':shopId',$shopId,PDO::PARAM_STR);
+            $prepare->bindParam(':id',$id,PDO::PARAM_STR);
+			$prepare->execute();
+			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
+			return $result;
+		} catch (PDOException $e) {
+		    die("Error!: " . $e->getMessage() . "<br/>");
+		}
+    }
 
 	public function getSupplier($id) {
 		try {
@@ -86,8 +106,9 @@ class Suppliers extends Connection
 	public function getSuppliersPagination($params) {
 		try {
 			
-			$stmt = "SELECT COUNT(id) as total FROM `{$this->table}`";
+			$stmt = "SELECT COUNT(id) as total FROM `{$this->table}` where shopId=:shopId";
 			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':shopId',$params['shopId'],PDO::PARAM_INT);
 			$prepare->execute();
 			$result = $prepare->fetch(PDO::FETCH_ASSOC);
 			
@@ -97,8 +118,9 @@ class Suppliers extends Connection
 			$currentPage = $total_pages >= $params['page'] ? $params['page'] : $total_pages;
 			$offset = (($currentPage-1) < 0 ? 0 : ($currentPage-1)) * $no_of_records_per_page;
 			$search = "(name LIKE '%".$params["search"]."%' OR contact LIKE '%".$params["search"]."%' OR address LIKE '%".$params["search"]."%' ) ";
-			$stmt = "SELECT * FROM `{$this->table}` WHERE $search LIMIT :offset, :perPage";
+			$stmt = "SELECT * FROM `{$this->table}` WHERE $search and shopId=:shopId LIMIT :offset, :perPage";
 			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':shopId',$params['shopId'],PDO::PARAM_INT);
 			$prepare->bindParam(':offset',$offset,PDO::PARAM_INT);
 			$prepare->bindParam(':perPage',$no_of_records_per_page,PDO::PARAM_INT);
 			$prepare->execute();

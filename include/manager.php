@@ -1,5 +1,6 @@
 <?php
   global $shopData;
+  global $shop;
   global $userData;
   $productCls = new Products();
   $ownerId = $userData['role'] == 'owner' ? $userData['id'] : $userData['created_by'];
@@ -20,6 +21,8 @@
         <div class="pull-left welcome-header-section"><span>Welcome <strong><?php echo $userData['full_name'];?>!</strong></span></div>
         
       <ul class="list-inline navbar-right navbar-nav nav">
+        <div class="pull-left welcome-header-section">Sale Date: <?php echo $shop['sale_date'];?><button class="btn btn-danger" ng-click="applyClosing()">Sale Close</button></div>
+        <li></li>
         <li><a href="<?php echo SITE_URL; ?>pages/product/running.php"><img width="22" uib-tooltip="Running Products" tooltip-placement="bottom" height="22" src="<?php echo SITE_URL; ?>assets/img/svg/lightning-bolt.svg" alt="" /></a></li>
         <li><a href="<?php echo SITE_URL; ?>pages/product/create.php"><img width="22" uib-tooltip="Add Product" tooltip-placement="bottom" height="22" src="<?php echo SITE_URL; ?>assets/img/svg/012-package-red.svg" alt="" /></a></li>
         <?php include_once dirname(__FILE__).'/cart.php';?>

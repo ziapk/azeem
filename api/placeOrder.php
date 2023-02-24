@@ -1,8 +1,9 @@
 <?php 
 include_once dirname(__FILE__).'/../include/settings.php';
-
+global $shop;
 $orders = new Orders();
-
+$storeObj = new Store();
+$storeDATA = $storeObj->getStore($shop['id']);
 $status = 9;
 if(!empty($_POST['payment_amount'])) {
     $gst = round($_POST['subTotal'] * ($_POST['gst'] / 100));
@@ -22,7 +23,7 @@ $data = [
     'gst' => $_POST['gst'],
     'service_charges' => $_POST['service_charges'],
     'shopId' => $userData['shopId'],
-    'order_date' => date('Y-m-d')
+    'order_date' => $storeDATA['sale_date']
 ];
 
 $order_id = $orders->createOrder($data);

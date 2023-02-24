@@ -33,6 +33,7 @@ echo mainHeader(['page'=> 'supplier']);
                         <a class="btn btn-primary btn-xs" href="<?php echo SITE_URL."pages/suppliers/update.php?id="?>{{li.id}}">Edit</a>
                         <a ng-if="li.wallet < 0 || li.wallet > 0 " class="btn btn-danger btn-xs" href="<?php echo SITE_URL."pages/suppliers/adjustment.php?id="?>{{li.id}}">Pay</a>
                         <a class="btn btn-danger btn-xs" href="<?php echo SITE_URL."pages/suppliers/transactions.php?id="?>{{li.id}}">History</a>
+                        <a class="btn btn-danger btn-xs" href="<?php echo SITE_URL."pages/suppliers/invoices.php?id="?>{{li.id}}">Bills</a>
                     </td>
                 </tr>
         </tbody>

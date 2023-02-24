@@ -94,6 +94,14 @@ app.controller('headerController', function($scope, $http, $httpParamSerializerJ
     })
     $window.localStorage.setItem('shopping', JSON.stringify(cart));
     $scope.refreshList()
+
+  }
+  $scope.applyClosing = () => {
+    if($window.confirm('Are you sure you want to close to sale for Today')) {
+      $http.post('<?php echo SITE_URL;?>api/closing.php').then((response) => {
+        $window.location.reload();
+      })
+    }
   }
 });
 </script>

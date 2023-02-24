@@ -144,16 +144,19 @@ app.controller('reportController', function ($scope, $http, $window, $httpParamS
         $window.open('<?php echo SITE_URL;?>pages/product/create.php?headers=1', '_blank', "menubar=0,resizable=1,width=600,height=600");
     }
 
-    $scope.searchSupplier = function (term) {
+    $scope.searchSupplier = function (term, init) {
         $scope.supplierId = ""
         return $http.get("<?php echo SITE_URL?>api/getSupplier.php", {params: {term}})
         .then(function(response) {
+            if(init) {
+                $scope.selectSupplier(response.data[0])
+            }
             return response.data
         });
     }
 
     $scope.selectSupplier = function (p) {
-        $scope.supplierId = p.name
+        $scope.supplierId = p.id
         $scope.supplierName = p.name
         $scope.supplierContact = p.contact
     }
@@ -231,12 +234,19 @@ app.controller('reportController', function ($scope, $http, $window, $httpParamS
         });
     }
 
-    $scope.searchCustomer = function () {
+    $scope.searchCustomer = function (init) {
         $http.get("<?php echo SITE_URL?>api/getCustomer.php?term="+$scope.customerName)
         .then(function(response) {
             $scope.customersList = response.data;
+
+            if(init) {
+                $scope.selectSupplier(response.data[0])
+            }
+            
         });
     }
+
+    $scope.searchSupplier('', true);
 
     $scope.clearSearch = () => {
         $scope.product = "";
@@ -249,7 +259,7 @@ app.controller('reportController', function ($scope, $http, $window, $httpParamS
     $scope.checkout = function () {
         console.log('yes');
         $scope.form = {
-            customerId: $scope.customerData && $scope.customerData.id ? $scope.customerData.id : 1,
+            supplierId: $scope.supplierId,
             subTotal: $scope.subTotal,
             discount: $scope.discount,
             items: $scope.items,

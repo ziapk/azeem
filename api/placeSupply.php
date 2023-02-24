@@ -23,6 +23,10 @@ if(empty($_POST['supplierId']) && !empty($_POST['supplierName'])) {
     $supplierId = $supplierObj->createSupplier($data);
 }
 
+else {
+    $supplierId = $_POST['supplierId'];
+}
+
 
 $products = new Products();
 
@@ -33,7 +37,8 @@ if(sizeof($_POST['items'])) {
     foreach($_POST['items'] as $item) {
         if(!empty($item['id'])) {
 
-            $items[] = [                
+            $items[] = [               
+                'pprice' => $item['pprice'], 
 				'qty' => $item['qty'],
 				'stock_out' => 0,
 				'product_id' => $item['id'],
@@ -106,7 +111,7 @@ if($supply_id) {
         foreach ($items as $item) {
             $d = [
                 'supply_id' => $supply_id,
-                'product_id' => $item['id'],
+                'product_id' => $item['product_id'],
                 'quantity' => $item['qty'],
                 'price' => $item['pprice'],  
             ];

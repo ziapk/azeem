@@ -65,6 +65,21 @@ class Store extends Connection
 		    die("Error!: " . $e->getMessage() . "<br/>");
 		}
 	}
+
+	public function closeStoreSale($array) {
+		try {
+			$stmt = "UPDATE `{$this->table}` SET sale_date=:sale_date WHERE id=:id";
+            $prepare = $this->dbh->prepare($stmt);
+            $prepare->bindParam(':sale_date',$array['sale_date'],PDO::PARAM_STR);
+            $prepare->bindParam(':id',$array['id'],PDO::PARAM_STR);
+			$prepare->execute();
+			$result = $prepare->rowCount();
+			return $result;
+		} catch (PDOException $e) {
+		    die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
+
     public function getStoreTypes() {
 		try {
 			$stmt = "SELECT * FROM `{$this->table_st}`";
