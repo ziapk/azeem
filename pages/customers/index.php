@@ -30,7 +30,7 @@ echo mainHeader(['page'=> 'customer']);
                 <td>
                     <?php if($userData['role'] === 'manager') {?><a ng-click="deleteCustomer(li.id)" class="btn btn-primary btn-xs" href="javascript:void(0)">Delete</a><?php }?>
                     <?php if($userData['role'] === 'manager') {?><a class="btn btn-danger btn-xs" href="<?php echo SITE_URL;?>pages/orders/customerOrders.php?id={{li.id}}">View Orders</a><?php }?>
-                    <?php if($userData['role'] === 'owner') {?><a class="btn btn-danger btn-xs" href="<?php echo SITE_URL;?>pages/customers/update.php?id={{li.id}}">Update</a><?php }?>
+                    <?php if($userData['role'] === 'owner' || $userData['role'] === 'manager') {?><a class="btn btn-danger btn-xs" href="<?php echo SITE_URL;?>pages/customers/update.php?id={{li.id}}">Update</a><?php }?>
                     <?php if($userData['role'] === 'owner' || $userData['role'] === 'manager') {?><a class="btn btn-default btn-xs" href="javascript:void(0)" ng-click="assignBooks(li)">Assign</a><?php } ?>
                 </td>
             </tr>
