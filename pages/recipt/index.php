@@ -324,7 +324,7 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
                 const row = customerData.discount_array.find(r => r.publisher_id == prod.publisher_id);
                 const price = parseFloat(prod.price);
                 product.price = (price * (100 - parseFloat(row.discount_value)) / 100);
-                subtotal += (price * product.qty);
+                subtotal += (product.price * product.qty);
             }
             else {
                 const price = parseFloat(prod.price);
