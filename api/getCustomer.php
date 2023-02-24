@@ -6,5 +6,6 @@ $search = [];
 if(!empty($_SESSION['shopInfo'])) {
     $search = $customers->searchCustomer($shop['id'], $_GET['term']);
 };
+print_r($shop);
 echo json_encode($search);
 ?>
