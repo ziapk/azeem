@@ -817,3 +817,12 @@ body.thumb-menu-screen {
 .fw-bold {
     font-weight: bold;
 }
+
+.sale-date {
+    font-family: Menlo,Monaco,Consolas,"Courier New",monospace;
+    font-size: 14px;
+    font-weight: bold;
+    .btn {
+        margin-left: 10px;
+    }
+}

@@ -791,4 +791,13 @@ body.thumb-menu-screen {
   font-weight: bold;
 }
 
+.sale-date {
+  font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+  font-size: 14px;
+  font-weight: bold;
+}
+.sale-date .btn {
+  margin-left: 10px;
+}
+
 /*# sourceMappingURL=style.css.map */
