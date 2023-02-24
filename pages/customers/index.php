@@ -1,7 +1,7 @@
 <?php 
 include_once dirname(__FILE__).'/../../include/settings.php';
 $customers = new  Customers();
-$customersData = $customers->getCustomers($userData['shopId']);
+$customersData = $customers->getCustomers($shop['id']);
 echo mainHeader(['page'=> 'customer']);
 ?>
 

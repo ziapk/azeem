@@ -7,7 +7,7 @@
     
     $ownerId = $userData['role'] == 'owner' ? $userData['id'] : $userData['created_by'];
     $userId = $userData['id'];
-    $shopId = $userData['shopId'];
+    $shopId = $shop['id'];
 
     if(empty($_POST['full_name'])) {
       echo json_encode(['success' => false, 'message' => 'Please fill all requried fields']);

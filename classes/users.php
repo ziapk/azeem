@@ -61,7 +61,7 @@ class Users extends Connection
 
 	public function checkContract($owner_id, $userInfo) {
 		try {
-			$stmt = "SELECT * FROM `{$this->table_clients	}` WHERE `end_date` >= CURDATE() AND `owner_id`=:owner_id";
+			$stmt = "SELECT * FROM `{$this->table_clients}` WHERE `end_date` >= CURDATE() AND `owner_id`=:owner_id";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':owner_id',$owner_id,PDO::PARAM_STR);
 			$prepare->execute();
