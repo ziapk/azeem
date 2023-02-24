@@ -96,8 +96,7 @@ class Customers extends Connection
 	public function createCustomerDiscounts($array) {
 		try {
 			$stmt = "INSERT INTO `{$this->table_discount}` (`user_id`, `shopId`, `customer_id`, `publisher_id`, `discount_type`, `discount_value`) VALUES (:user_id, :shopId, :customer_id, :publisher_id, :discount_type, :discount_value)";
-			print_r($array);
-            $prepare = $this->dbh->prepare($stmt);
+			$prepare = $this->dbh->prepare($stmt);
             $prepare->bindParam(':user_id',$array['user_id'],PDO::PARAM_STR);
             $prepare->bindParam(':shopId',$array['shopId'],PDO::PARAM_STR);
             $prepare->bindParam(':customer_id',$array['customer_id'],PDO::PARAM_STR);

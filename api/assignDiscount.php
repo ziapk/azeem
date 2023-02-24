@@ -1,7 +1,6 @@
 <?php 
 include_once dirname(__FILE__).'/../include/settings.php';
 global $shop;
-print_r($shop);
 $programs = new Customers();
 if(!empty($_POST['customer_id'])) {
     $programs->deleteCustomerDiscounts(['customer_id' => $_POST['customer_id'], 'shopId' => $shop['id'] ]);
