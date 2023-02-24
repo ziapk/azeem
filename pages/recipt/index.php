@@ -147,12 +147,12 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
     $scope.grandTotal = 0;
     $scope.discount = 0;
     const items = [];
-    setInterval(() => {
-        if($scope.focus === true && !$('#searchProduct').is(':focus')) {
-            $scope.product = null
-            $('#searchProduct').focus();
-        }
-    }, 3000);
+    // setInterval(() => {
+    //     if($scope.focus === true && !$('#searchProduct').is(':focus')) {
+    //         $scope.product = null
+    //         $('#searchProduct').focus();
+    //     }
+    // }, 3000);
     if($window.localStorage.getItem('shopping')) {
         const shopCart = JSON.parse($window.localStorage.getItem('shopping'));
         
