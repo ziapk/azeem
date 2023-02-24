@@ -12,16 +12,17 @@ echo mainHeader(['page' => 'recipt']);
             <tr>
                 <th style="vertical-align: middle">Customer Name</th>
                 <th>
-                <div class="dropdown-wrapper">
-                    <input type="text" class="form-control" ng-model="customerName" ng-change="searchCustomer()">
-                    <div class="list-group recipt-search-dropdown">
+                <div class="dropdown-wrapper" style="position: relative;">
+                    <input type="text" class="form-control" ng-model="customerName" placeholder="Search Customer" uib-typeahead="address as address.full_name for address in searchCustomer($viewValue)" typeahead-on-select="selectCustomer($item)" ng-model-options="{debounce: 100}" typeahead-template-url="customer.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="1">
+                    <!-- <input type="text" class="form-control" ng-model="customerName" ng-change=""> -->
+                    <!-- <div class="list-group recipt-search-dropdown">
                         <a ng-click="selectCustomer(l)" class="list-group-item clearfix" ng-repeat="l in customersList">
                             <h4 class="list-group-item-heading"><strong>{{l.full_name}}</strong> <span class="text-danger"><strong>{{l.phoneNumber}}</strong></span></h4>
                             <span style="font-weight: normal" ng-if="li.title != l.full_name">{{l.title}}</span><span class="pull-right">{{l.code}}</span>
                             
                         </a>
                         <a ng-if="customersList.length" ng-click="clearCustomer()" class="list-group-item">Close</a>
-                    </div>
+                    </div> -->
                 </div>
                 </th>
                 <th style="vertical-align: middle"><label><span style="vertical-align: middle">Search Product</span> <span style="vertical-align: middle; margin-left: 4px"><input type="checkbox" name="focus" ng-model="focus"><span></label></th>
@@ -138,7 +139,7 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
 
     $scope.list = [];
     $scope.priceList = localStorage.getItem('list') && JSON.parse(localStorage.getItem('list'));;
-    $scope.focus = true;
+    $scope.focus = false;
 
     $scope.customerData = {};
     $scope.gst = 0;
@@ -188,7 +189,6 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
     }
 
     $scope.directlyPrice = function (val, obj) {
-        console.log($scope.priceList);
         if(val > 0) {
             var v = val / obj.price;
             obj.qty = v;
@@ -263,19 +263,26 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
             return $http.get("<?php echo SITE_URL?>api/getStores.php", { params })
             .then(function(response) {
   
-                $scope.list = response.data;
-                $scope.priceList = response.data;
+                // $scope.list = response.data;
+                // $scope.priceList = response.data;
                 return response.data
             
             });
         }
     }
-    $scope.searchCustomer = function () {
-        $http.get("<?php echo SITE_URL?>api/getCustomer.php?term="+$scope.customerName)
+    $scope.searchCustomer = function (value, onloading) {
+        $scope.customerName = value;
+        return $http.get("<?php echo SITE_URL?>api/getCustomer.php?term="+value)
         .then(function(response) {
             $scope.customersList = response.data;
+            if(onloading) {
+                $scope.selectCustomer($scope.customersList[0]);
+            }
+            return response.data
         });
     }
+
+    $scope.searchCustomer('', true)
 
     $scope.clearSearch = () => {
         $scope.product = null
@@ -340,5 +347,11 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
   <a>
       <span ng-bind-html="match.model.full_name | uibTypeaheadHighlight:query"></span>
       <span class="pull-right">{{match.model.price}}</span>
+  </a>
+</script>
+<script type="text/ng-template" id="customer.html">
+  <a class="clearfix" style="border-bottom: 1px solid #ccc; display: block">
+      <span ng-bind-html="match.model.full_name | uibTypeaheadHighlight:query"></span><br />
+      <small><em>{{match.model.company}}</em></small>
   </a>
 </script>
