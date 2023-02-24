@@ -82,15 +82,27 @@ class Orders extends Connection
 		}
     }
 
+    public function addColumn() {
+        try {
+            $stmt = "ALTER TABLE `{$this->table_sub}` ADD COLUMN IF NOT EXISTS `discount` INT NOT NULL DEFAULT '0' AFTER `quantity`";
+            $prepare = $this->dbh->prepare($stmt);
+            $prepare->execute();
+        } catch (PDOException $e) {
+		    die("Error!: " . $e->getMessage() . "<br/>");
+		}
+    }
+
     public function createOrderDetails($array)
     {
         try {
-            $stmt = "INSERT INTO `{$this->table_sub}` (`order_id`, `product_id`, `quantity`, `price`) VALUES (:order_id, :product_id, :quantity, :price)";
+            $this->addColumn();
+            $stmt = "INSERT INTO `{$this->table_sub}` (`order_id`, `product_id`, `quantity`, `price`, `discount`) VALUES (:order_id, :product_id, :quantity, :price, :discount)";
             $prepare = $this->dbh->prepare($stmt);        
             $prepare->bindParam(':order_id', $array['order_id'], PDO::PARAM_STR);
             $prepare->bindParam(':product_id', $array['product_id'], PDO::PARAM_STR);
             $prepare->bindParam(':quantity', $array['quantity'], PDO::PARAM_STR);
             $prepare->bindParam(':price', $array['price'], PDO::PARAM_STR);
+            $prepare->bindParam(':discount', $array['discount'], PDO::PARAM_STR);
             $prepare->execute();
             $result = $this->dbh->lastInsertId();
             $prod = new Products();

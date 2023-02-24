@@ -39,6 +39,7 @@ if($order_id) {
                 'product_id' => $item['id'],
                 'order_id' => $order_id,
                 'quantity' => $item['qty'],
+                'discount' => $item['discount'],
                 'price' => $item['price'],
                 
             ];

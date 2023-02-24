@@ -27,19 +27,20 @@
                     </div>
                 </td>
                 <td class="cart-right">
-                    {{li.qty * li.price}}
+                    <del ng-if="li.discount" class="text-danger">{{li.qty * li.price}}</del>
+                    <span class="text-success">{{li.qty * (li.price - li.discount)}}</span>
                 </td>
             </tr>
             <tr class="cart-total-row" ng-if="finalList.length">
                 <td colspan="2" style="text-align: left">
-                    <a href="<?php echo SITE_URL; ?>pages/cart" class="btn btn-success btn-xs">Checkout</a>
+                    <a href="<?php echo SITE_URL; ?>pages/recipt" class="btn btn-success btn-xs">Checkout</a>
                     <a href="javascript:void(0)" class="btn btn-danger btn-xs" ng-click="clear()">Clear</a>
                 </td>
                 <td>
                     Total
                 </td>
-                <td class="cart-right">
-                    {{totalPrice}}
+                <td class="cart-right text-success">
+                    &nbsp;&nbsp;{{totalPrice}}
                 </td>
             </tr>
             <tr ng-if="!finalList.length">
@@ -59,10 +60,9 @@ app.controller('headerController', function($scope, $http, $httpParamSerializerJ
     $scope.totalPrice = 0;
     $scope.finalList = [];
     $scope.cart.map(row => {
-      console.log(row);
       const obj = $scope.list.find(r => r.id === row.id);
-      $scope.finalList.push({...obj, qty: row.qty})
-      $scope.totalPrice += row.qty * obj.price
+      $scope.finalList.push({...obj, price: row.price, discount: row.discount, qty: row.qty})
+      $scope.totalPrice += row.qty * (row.price - row.discount)
     })
   }
 

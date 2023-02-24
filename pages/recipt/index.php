@@ -56,7 +56,7 @@ echo mainHeader(['page' => 'recipt']);
             <tr ng-repeat="cart in items track by $index" id="item-{{cart.id}}">
                 <td>{{$index + 1}}</td>
                 <td>{{cart.full_name}}</td>
-                <td><span ng-if="cart.aprice"><del>{{cart.aprice | number: 2}}</del> / </span>{{cart.price | number: 2}}</td>
+                <td><span ng-if="cart.discount"><del class="text-danger">{{cart.price | number: 2}}</del> / </span><span class="text-success">{{(cart.price - cart.discount) | number: 2}}</span></td>
                 <td>
                     <div class="quantity">
                         <a href="#" class="quantity__minus" ng-click="subQty(cart)"><span>-</span></a>
@@ -68,7 +68,7 @@ echo mainHeader(['page' => 'recipt']);
                     <input class="text-center" type="number" ng-model="addprice" ng-change="directlyPrice(addprice, cart)">
                 </td>
                 <td>
-                    {{cart.price * cart.qty | number: 2}}
+                    {{(cart.price - cart.discount) * cart.qty | number: 2}}
                     <a href="#" class="btn btn-xs btn-danger pull-right" ng-click="remove(cart)">Delete</a>
                 </td>
             </tr>
@@ -88,10 +88,10 @@ echo mainHeader(['page' => 'recipt']);
             </tr>
             <tr>
                 <td class="text-right" colspan="5">Grand Total</td>
-                <td>{{grandTotal | number: 2}}</td>
+                <td class="text-success">{{grandTotal | number: 2}}</td>
             </tr>
             <tr>
-                <td class="text-right" colspan="5" style="color: green; front-weight: bold;">Pay Amount</td>
+                <td class="text-right text-success" colspan="5" style="front-weight: bold;">Pay Amount</td>
                 <td width="200"><input type="number" ng-model="payment_amount" class="form-control"></td>
             </tr>
             <tr>
@@ -318,24 +318,24 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
         const customerData = c || $scope.customerData;
         let subtotal = 0;
         $scope.items.map((product) => {
-            const prod = $scope.priceList.find(r => r.id == product.id);
+            // const prod = $scope.priceList.find(r => r.id == product.id);
             let currentRow = null;
             if(customerData.discount_array?.length && customerData.discount_array?.filter(r => r.publisher_id == product.publisher_id).length) {
-                const row = customerData.discount_array.find(r => r.publisher_id == prod.publisher_id);
-                const price = parseFloat(prod.price);
-                product.aprice = price;
-                product.price = (price * (100 - parseFloat(row.discount_value)) / 100);
-                subtotal += (product.price * product.qty);
+                const row = customerData.discount_array.find(r => r.publisher_id == product.publisher_id);
+                const price = parseFloat(product.price);
+                product.discount = price * (parseFloat(row.discount_value) / 100);
+                subtotal += ((product.price - product.discount) * product.qty);
             }
             else {
-                const price = parseFloat(prod.price);
-                product.price = price;
+                const price = parseFloat(product.price);
+                product.discount = 0;
                 subtotal += (price * product.qty);
             }
         })
         $scope.subTotal = subtotal;
         $scope.payment_amount = $scope.subTotal - $scope.discount;
         $scope.grandTotal = $scope.payment_amount = $scope.payment_amount + Math.round($scope.payment_amount * ($scope.gst / 100)) + Math.round($scope.payment_amount * ($scope.service_charges / 100));
+        console.log('$scope.items', $scope.items);
         $window.localStorage.setItem('shopping', JSON.stringify($scope.items));
 
     }
