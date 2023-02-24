@@ -213,7 +213,7 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
                 pro.qty++;
             }
         })
-        if(!exists) {
+        if(exists) {
             $scope.items.push({...p, qty: 1});
         }
         $scope.calculateSum();
@@ -225,8 +225,13 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
         // $('#item-'+p.id).find('.input-qty').focus();
         // $scope.product = null;
         $timeout(() => {
-            $scope.product = '';
-        }, 100);
+            if(exists) {
+                $scope.product = '';
+            } else {
+                alert('invalid id');
+            }
+            
+        }, 200);
         
     }
     $scope.selectCustomer = function (p) {
