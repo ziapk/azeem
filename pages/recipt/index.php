@@ -83,15 +83,15 @@ echo mainHeader(['page' => 'recipt']);
                 <td width="200"><input type="search" ng-model="discountAmount" class="form-control" on-enter-press="addDiscount(discountAmount)"></td>
             </tr>
             <tr>
-                <td class="text-right" colspan="5">Total Discount</td>
-                <td width="200"><strong>{{discount | number: 2}}</strong></td>
+                <td class="text-right" colspan="5" style="color: red; front-weight: bold;">Total Discount</td>
+                <td width="200" style="color: red; front-weight: bold;"><strong>{{discount | number: 2}}</strong></td>
             </tr>
             <tr>
                 <td class="text-right" colspan="5">Grand Total</td>
                 <td>{{grandTotal | number: 2}}</td>
             </tr>
             <tr>
-                <td class="text-right" colspan="5">Pay Amount</td>
+                <td class="text-right" colspan="5" style="color: green; front-weight: bold;">Pay Amount</td>
                 <td width="200"><input type="number" ng-model="payment_amount" class="form-control"></td>
             </tr>
             <tr>
@@ -225,12 +225,7 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
         // $('#item-'+p.id).find('.input-qty').focus();
         // $scope.product = null;
         $timeout(() => {
-            if(exists) {
-                $scope.product = '';
-            } else {
-                alert('invalid id');
-            }
-            
+            $scope.product = '';
         }, 200);
         
     }
