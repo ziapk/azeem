@@ -95,7 +95,7 @@ class Orders extends Connection
     public function createOrderDetails($array)
     {
         try {
-            $this->addColumn();
+            // $this->addColumn();
             $stmt = "INSERT INTO `{$this->table_sub}` (`order_id`, `product_id`, `quantity`, `price`, `discount`) VALUES (:order_id, :product_id, :quantity, :price, :discount)";
             $prepare = $this->dbh->prepare($stmt);        
             $prepare->bindParam(':order_id', $array['order_id'], PDO::PARAM_STR);
