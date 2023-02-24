@@ -55,10 +55,10 @@ class Products extends Connection
 				else if($name == 'subCategory') {
 					$searchQry = "AND p.sub_cat LIKE '%".$params["search"]."%'";	
 				}
-				else $searchQry = "AND (p.full_name LIKE '%".$params["search"]."%' OR p.code LIKE '%".$params["search"]."%' OR p.group LIKE '%".$params["search"]."%' OR p.description LIKE '%".$params["search"]."%' OR p.board LIKE '%".$params["search"]."%' OR p.author LIKE '%".$params["search"]."%' OR p.price LIKE '%".$params["search"]."%' OR pc.code LIKE '%".$params["search"]."%' ) ";
+				else $searchQry = "AND (p.id = '".$params["search"]."' OR p.code = '".$params["search"]."' OR p.full_name LIKE '%".$params["search"]."%' OR p.group LIKE '%".$params["search"]."%' OR p.description LIKE '%".$params["search"]."%' OR p.board LIKE '%".$params["search"]."%' OR p.author LIKE '%".$params["search"]."%' OR p.price LIKE '%".$params["search"]."%' OR pc.code LIKE '%".$params["search"]."%' ) ";
 			}
 			else {
-				$searchQry = "AND (p.full_name LIKE '%".$params["search"]."%' OR p.code LIKE '%".$params["search"]."%' OR p.group LIKE '%".$params["search"]."%' OR p.description LIKE '%".$params["search"]."%' OR p.board LIKE '%".$params["search"]."%' OR p.author LIKE '%".$params["search"]."%' OR p.price LIKE '%".$params["search"]."%' OR pc.code LIKE '%".$params["search"]."%' ) ";
+				$searchQry = "AND (p.id = '".$params["search"]."' OR p.code = '".$params["search"]."' OR p.full_name LIKE '%".$params["search"]."%' OR p.group LIKE '%".$params["search"]."%' OR p.description LIKE '%".$params["search"]."%' OR p.board LIKE '%".$params["search"]."%' OR p.author LIKE '%".$params["search"]."%' OR p.price LIKE '%".$params["search"]."%' OR pc.code LIKE '%".$params["search"]."%' ) ";
 			}
 
 			if(!empty($params['sortByField'])) {
