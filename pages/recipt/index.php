@@ -213,7 +213,7 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
                 pro.qty++;
             }
         })
-        if(exists) {
+        if(!exists) { // if already not exits in bucket
             $scope.items.push({...p, qty: 1});
         }
         $scope.calculateSum();
