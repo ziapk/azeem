@@ -87,42 +87,42 @@ foreach ($publishersArr as $key => $value) {
     </table> -->
     <a href="<?php echo SITE_URL."pages/product/create.php" ?>" class="btn btn-primary btn-xs pull-right" style="margin-left: 12px">Create Product</a> <a href="<?php echo SITE_URL."pages/product/assign.php" ?>" class="btn btn-primary btn-xs pull-right">Assign Product</a>
     <h4>Products in stores </h4>
+    <input class="form-control" ng-change="searchProducts(search)" ng-model="search" placeholder="Type here for search..." />
     <table class="table">
         <thead>
             <tr>
-                <th>Sr.#</th>
+                <th>Product ID - CODE</th>
                 <th>Branch</th>
-                <th>Title</th>
-                <th>Group</th>
+                <th>Title / Author - Group</th>
                 <th>Price</th>
                 <th>In</th>
                 <th>Out</th>
                 <th>In Hand</th>
                 <th>Min. Qty</th>
                 <th>Placement</th>
-                <th></th>
+                <th width="150"></th>
             </tr>
         </thead>
         <tbody>
-            <?php $count = 1; foreach ($ownerStoreProducts as $product) { ?>
-                <tr>
-                    <td><?php echo $count; ?></td>
-                    <td><?php echo $storeList[$product['shopId']]['full_name']; ?></td>
-                    <td><?php echo $product['full_name']; ?></td>
-                    <td><?php echo $product['group']; ?></td>
-                    <td><?php echo $product['sale_price']; ?></td>
-                    <td><?php echo $product['qty']; ?></td>
-                    <td><?php echo $product['stock_out']; ?></td>
-                    <td><?php echo $product['qty'] - $product['stock_out']; ?></td>
-                    <td><?php echo $product['min_qty'] ? $product['min_qty'] : '-' ; ?></td>
-                    <td><?php echo $product['location'] ? $product['location'] : '-' ; ?></td>
-                    <td><a href="<?php echo SITE_URL."pages/product/update_item.php?id=".$product['id'];?>">Modify</a></td>
-                    <td><a href="javascript:void(0)" ng-click="deleteStoreItem(<?php echo $product['id'];?>)">delete</a></td>
+                <tr ng-repeat="li in list track by $index">
+                <td>{{li.product_id}} / {{li.code}}</td>
+                <td>{{shopData[li.shopId].full_name}}</td>
+                <td><strong>{{li.full_name}}</strong> <br />{{li.author}} - {{li.group}}</td>
+                <td>{{li.sale_price}}</td>
+                <td>{{li.qty}}</td>
+                <td>{{li.stock_out}}</td>
+                <td>{{li.qty - li.stock_out}}</td>
+                <td>{{li.min_qty}}</td>
+                <td>{{li.location}}</td>
+                <td>
+                    <a class="btn btn-xs btn-primary" href="{{url + 'pages/product/update_item.php?id=' + li.id}}">Modify</a> | 
+                    <a class="btn btn-xs btn-danger" href="javascript:void(0)" ng-click="deleteStoreItem(li.id)">delete</a>
+                </td>
                 </tr>
-            <?php $count++; } ?>
         </tbody>
     </table>
-
+    <div style="display: flex; align-items: center; justify-content: space-between"><ul uib-pagination total-items="data.totalRecords" ng-model="currentPage" max-size="maxSize" class="pagination-sm" boundary-links="true" force-ellipses="true" ng-if="data.perPage < data.totalRecords" items-per-page="data.perPage"  ng-change="pageChanged(currentPage)"></ul> <span>Per Page <select ng-change="perPage()" ng-model="data.perPage"><option ng-value="10">10</option><option ng-value="25">25</option><option ng-value="50">50</option><option ng-value="100">100</option></select></span> <span>Total number of Records <strong>{{data.totalRecords}}</strong></span></div>
+    
     
     <!-- <h4>Products All </h4>
     <table class="table">
@@ -208,8 +208,68 @@ foreach ($publishersArr as $key => $value) {
         </tfoot>
     </table> -->
 </div>
+<script type="text/javascript">
+app.controller('productController', function($scope, $http, $httpParamSerializerJQLike, $filter, $window, toaster) {
+    $scope.currentPage = 1; 
+    $scope.shopData = <?php echo safe_json_encode($storeList);?>;
+    $scope.data = {perPage: 12}; //$scope.data.records;
+    $scope.list = []; //$scope.data.records;
+    $scope.searchBy = "";
+    $scope.search = ""; //$scope.data.records;
+    $scope.courceId = ""; //$scope.data.records;
+    $scope.full_name = "";
+    $scope.author = "";
+    $scope.group = "";
+    $scope.board = "";
+    $scope.maxSize = 5;
+    $scope.url = '<?php echo SITE_URL?>';
+    $scope.getProducts = (page) => {
+        $scope.loading = true;
+        $http.get("<?php echo SITE_URL?>api/getStoreProducts.php", {params: {page: page || 1, perPage: $scope.data.perPage, search: $scope.search, full_name: $scope.full_name, group: $scope.group, author: $scope.author, board: $scope.board, searchBy: $scope.searchBy, courceId: $scope.courceId}})
+        .then(function(response) {
+            $scope.loading = false;
+            if(response.status === 200) {
+                $scope.data = response.data;
+                $scope.data.perPage = parseInt(response.data.perPage);
+                $scope.data.totalRecords = parseInt(response.data.totalRecords);
+                $scope.list = response.data.records;
+                $scope.currentPage = response.data.page;
+            }
+        })
+    }
+    
+    $scope.searchProducts = (search, courceId, full_name, group, author, board) => {
+        $scope.currentPage = 1;
+        $scope.search = search;
+        $scope.full_name = full_name;
+        $scope.group = group;
+        $scope.author = author;
+        $scope.board = board;
+        $scope.courceId = courceId;
+        $scope.getProducts(1);
+    }
+    
+    $scope.perPage = () => {
+        $scope.getProducts($scope.currentPage);
+    }
 
-
+    $scope.getProducts(1);
+    $scope.pageChanged = (page) => {
+        $scope.getProducts(page)
+    }
+    $scope.deleteStoreItem = (id) => {
+        if($window.confirm('Are you sure you want to delete this?')) {
+            $http.get("<?php echo SITE_URL?>pages/product/delete_item.php", {params: { id }})
+            .then(function(response) {
+                console.log(response);
+            }).catch(function(err) {
+                console.log(err);
+            })
+        }
+    }
+})
+</script>
+<!-- 
 <script>
 app.controller('productController', function($scope, $http, $httpParamSerializerJQLike, $filter, $window) {
     $scope.currentPage = 1; 
@@ -227,4 +287,4 @@ app.controller('productController', function($scope, $http, $httpParamSerializer
         }
     }
 })
-</script>
+</script> -->

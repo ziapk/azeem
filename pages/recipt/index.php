@@ -253,7 +253,7 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
             $scope.product = '';
             params.term = parseFloat(term.split('-')[0]);
             const list = localStorage.getItem('list') && JSON.parse(localStorage.getItem('list'));
-            const item = list.find(r  => r.id == params.term);
+            const item = list.find(r  => r.id == params.term || r.code == params.term || r.barcode == params.term);
             $scope.product = '';
             $scope.selectProduct(item);
             return [];

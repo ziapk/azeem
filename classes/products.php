@@ -189,6 +189,46 @@ class Products extends Connection
 		    die("Error!: " . $e->getMessage() . "<br/>");
 		}
 	}
+
+	public function getStoreProductsPagination($owner_id, $params, $shopId = null) {
+		$shopCondition = "";
+		if($shopId) {
+			$shopCondition .= " AND st.shopId = $shopId";			
+		}
+
+		$searchQry = "";
+
+		if(!empty($params["search"])) {
+			$searchQry = "AND (p.id = '".$params["search"]."' OR p.code = '".$params["search"]."' OR p.full_name LIKE '%".$params["search"]."%' OR p.group LIKE '%".$params["search"]."%' OR p.description LIKE '%".$params["search"]."%' OR p.board LIKE '%".$params["search"]."%' OR p.author LIKE '%".$params["search"]."%' OR p.price LIKE '%".$params["search"]."%' OR pc.code LIKE '".$params["search"]."' ) ";
+		}
+
+
+		try {
+
+			$stmt1 = "SELECT count(st.id) as count FROM `{$this->table_st}` as st LEFT JOIN `{$this->table}` AS p ON p.id = st.product_id LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id WHERE st.`owner_id`=:owner_id and st.status = 1 $shopCondition $searchQry order by p.id";
+			$prepare = $this->dbh->prepare($stmt1);
+			$prepare->bindParam(':owner_id',$owner_id,PDO::PARAM_STR);
+			$prepare->execute();
+			$total = $prepare->fetch(PDO::FETCH_ASSOC);
+			$no_of_records_per_page = !empty($params['perPage']) ? $params['perPage'] : 10;
+			$total_rows = empty($total) ? 0 : $total['count'];
+			$total_pages = ceil($total_rows / $no_of_records_per_page);
+			$currentPage = $total_pages >= $params['page'] ? $params['page'] : $total_pages;
+			$offset =  ((!empty($currentPage) ? $currentPage : 1) -1) * $no_of_records_per_page;
+
+
+			$stmt = "SELECT st.*, p.code, p.id as product_id, p.full_name, p.group, p.author FROM `{$this->table_st}` as st LEFT JOIN `{$this->table}` AS p ON p.id = st.product_id LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id WHERE st.`owner_id`=:owner_id and st.status = 1 $shopCondition $searchQry order by p.id desc LIMIT :offset, :perPage";
+			$prepare2 = $this->dbh->prepare($stmt);
+			$prepare2->bindParam(':owner_id',$owner_id,PDO::PARAM_STR);
+			$prepare2->bindParam(':offset',$offset,PDO::PARAM_INT);
+			$prepare2->bindParam(':perPage',$no_of_records_per_page,PDO::PARAM_INT);
+			$prepare2->execute();
+			$result = $prepare2->fetchAll(PDO::FETCH_ASSOC);
+			return ['page' => $currentPage, 'totalRecords'=> $total_rows, 'perPage' => $no_of_records_per_page, 'records' => $result];
+		} catch (PDOException $e) {
+		    die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
 	
 	public function getProduct($id, $owner_id) {
 		try {
