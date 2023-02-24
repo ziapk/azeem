@@ -33,14 +33,13 @@ if(sizeof($_POST['items'])) {
     foreach($_POST['items'] as $item) {
         if(!empty($item['id'])) {
 
-            $items[] = [
-                'id' => $item['id'],
-                'pprice' => $item['pprice'],
-                'price' => $item['price'],
-                'barcode' => $item['barcode'],
-                'full_name' => $item['full_name'],
-                'qty' => $item['qty'],
-            ];
+            $items[] = [                
+				'qty' => $item['qty'],
+				'stock_out' => 0,
+				'product_id' => $item['id'],
+				'shopId' => $_POST['shopId'],
+				'owner_id' => $ownerId,
+			];
         }
         else {
             $id = $products->createProduct([
@@ -84,7 +83,7 @@ if(sizeof($_POST['items'])) {
 if(sizeof($items)) {
 
     foreach($items as $item) {
-        $products->addProductSupply($item);
+        $products->assignProduct($item);
     }
 }
 

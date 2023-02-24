@@ -86,8 +86,7 @@
         $product = $productObj->getProduct($_GET['id'], $ownerId);
     }
    
-
-    echo mainHeader(['page'=> 'product']);  
+    echo mainHeader(['page'=> 'product', 'hideheader' => $_GET['headers']]);  
     $categories = $categoryObj->getCategories('pro');
     
     

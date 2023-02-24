@@ -3,6 +3,10 @@
 function mainHeader($params = null) {
     ob_start();
     global $pages;
+
+    if(!empty($params['hideheader'])) {
+        $params['bodyClasses'][] = 'no-padding';
+    }
     ?>
 
     <!DOCTYPE html>
@@ -43,14 +47,16 @@ function mainHeader($params = null) {
                 <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.</p>
             <![endif]-->
 <?php 
-    if(!empty($_SESSION['user_credentials']) && $_SESSION['user_credentials']['role'] == 'owner') {
-        include_once dirname(__FILE__).'/owner.php';
-    }
-    if(!empty($_SESSION['user_credentials']) && $_SESSION['user_credentials']['role'] == 'manager') {
-        include_once dirname(__FILE__).'/manager.php';
-    }
-    if(!empty($_SESSION['user_credentials']) && $_SESSION['user_credentials']['role'] == 'shopkeeper') {
-        include_once dirname(__FILE__).'/shopkeeper.php';
+    if(empty($params['hideheader'])) {
+        if(!empty($_SESSION['user_credentials']) && $_SESSION['user_credentials']['role'] == 'owner') {
+            include_once dirname(__FILE__).'/owner.php';
+        }
+        if(!empty($_SESSION['user_credentials']) && $_SESSION['user_credentials']['role'] == 'manager') {
+            include_once dirname(__FILE__).'/manager.php';
+        }
+        if(!empty($_SESSION['user_credentials']) && $_SESSION['user_credentials']['role'] == 'shopkeeper') {
+            include_once dirname(__FILE__).'/shopkeeper.php';
+        }
     }
     ob_get_flush();
 }

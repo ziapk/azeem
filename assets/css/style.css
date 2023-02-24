@@ -783,4 +783,8 @@ body.thumb-menu-screen {
   color: #fff;
 }
 
+.no-padding {
+  padding: 20px 0;
+}
+
 /*# sourceMappingURL=style.css.map */

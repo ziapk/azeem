@@ -4,6 +4,8 @@
     $ordersObj = new Orders();
     $dateLabel = "Sales for ";
     $start = $end = date('Y-m-d');
+    $stores = new Store();
+    $ownerStores = $stores->getOwnerStores($userData['created_by']);
     
     if(isset($_GET['report'])) {
         $from = $_GET['from'];
@@ -24,18 +26,26 @@
 
 <div class="container" ng-controller="reportController">
     <div class="row">
-        <div class="col-sm-5">
+        <div class="col-sm-3 form-group">
             <label>Supplier's Name</label>
             <input type="hidden" class="form-control" ng-model="supplierId">
             <input type="text" class="form-control" ng-model="supplierName" placeholder="Supplier's Name" typeahead-on-select="selectSupplier($item)" uib-typeahead="address as address.name for address in searchSupplier($viewValue)" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="0">
         </div>
-        <div class="col-sm-5">
+        <div class="col-sm-3 form-group">
             <label>Supplier's Contact</label>
             <input type="text" class="form-control" ng-model="supplierContact" placeholder="Supplier's Contact" typeahead-on-select="selectSupplier($item)" uib-typeahead="address as address.contact for address in searchSupplier($viewValue)" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="0">
         </div>
-        <div class="col-sm-2">
+        <div class="col-sm-3 form-group">
+            <label>Shop Select</label>
+            <select class="form-control c-select" ng-model="shopId">
+                    <?php foreach ($ownerStores as $value) { ?>
+                        <option value="<?php echo $value['id'];?>"><?php echo $value['full_name'];?></option>
+                    <?php } ?>
+                </select>
+        </div>
+        <div class="col-sm-3">
             <label>&nbsp;</label><br />
-            <a href="javascript:void(0)" title="Add Fresh Product" ng-click="addFreshProduct()" class="btn btn-xs btn-danger">Add Fresh Product</a>
+            <a href="javascript:void(0)" title="Add Fresh Product" ng-click="addFreshProduct()" class="btn btn-danger">Add Fresh Product</a>
         </div>
     </div>
     
@@ -61,6 +71,7 @@
                 <td><input type="number" class="form-control" ng-change="calculateSum()" ng-model="row.pprice" /></td>
                 <td width="100"><input type="number" class="form-control" ng-model="row.price" /></td>
                 <td width="100"><input type="number" class="form-control" ng-change="calculateSum()" ng-model="row.qty" /></td>
+                <td width="100"><input type="number" class="form-control" ng-model="row.publisher_id" /></td>
                 <td width="60"><a href="#" class="btn btn-xs btn-danger pull-right" ng-click="remove(cart)">Delete</a></td>
             </tr>
         </tbody>
@@ -109,6 +120,7 @@ app.controller('reportController', function ($scope, $http, $window, $httpParamS
     $scope.supplierContact = "";
     $scope.supplierId = "";
     $scope.product = "";
+    $scope.shopId = '4';
     
     $scope.list = [];
     $scope.priceList = [];
@@ -128,7 +140,8 @@ app.controller('reportController', function ($scope, $http, $window, $httpParamS
     }
 
     $scope.addFreshProduct = function() {
-        $scope.items.push({...$scope.newData});
+        // $scope.items.push({...$scope.newData});
+        $window.open('<?php echo SITE_URL;?>pages/product/create.php?headers=1', '_blank', "menubar=0,resizable=1,width=600,height=600");
     }
 
     $scope.searchSupplier = function (term) {
@@ -240,6 +253,7 @@ app.controller('reportController', function ($scope, $http, $window, $httpParamS
             subTotal: $scope.subTotal,
             discount: $scope.discount,
             items: $scope.items,
+            shopId: $scope.shopId,
             payment_amount: $scope.payment_amount
         }
 
