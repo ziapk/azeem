@@ -1,10 +1,12 @@
 <?php
 function mainFooter($params = null) {
     ob_start();
+    global $shop;
     ?>
-        <div class="footer">
+        <div class="footer" ng-controller="headerController">
 
             <div class="container">
+            <div class="pull-left sale-date" style="padding: 10px 0;" ng-class="{'blink': getClass()}">Sale Date: <?php echo $shop['sale_date'];?></div>
                 <div style="border-top: 1px solid; padding: 10px 0; text-align: right;">
                 Power by: <strong>Zia ur Rehman <code>92-324-5120412</code></strong>
                 </div>

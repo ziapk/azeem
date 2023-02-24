@@ -72,6 +72,10 @@ app.controller('headerController', function($scope, $http, $httpParamSerializerJ
     $scope.finalList = [];
   }
 
+  $scope.toggleSidebar = () => {
+    $('body').toggleClass('thumb-menu-screen')
+  }
+
 
   $scope.increaseValue = row => {
     const cart = JSON.parse($window.localStorage.getItem('shopping'))
@@ -102,6 +106,10 @@ app.controller('headerController', function($scope, $http, $httpParamSerializerJ
         $window.location.reload();
       })
     }
+  }
+
+  $scope.getClass = () => {
+      return new Date().getHours() >= 20 && new Date().getHours() <= 22
   }
 });
 </script>
