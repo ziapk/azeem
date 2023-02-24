@@ -149,6 +149,7 @@ td {
         <tr>
             <th class="text-left thead">Desciption</th>
             <th width="45" class="thead">Price</th>
+            <th width="45" class="thead">Discount</th>
             <th width="20" class="thead">Qty</th>
             <th class="text-right thead" width="45">Total</th>
         </tr>
@@ -156,6 +157,7 @@ td {
         <tr>
             <td class="text-left"><?php echo $item['product_title']; ?></td>
             <td><?php echo $item['price']; ?></td>
+            <td><?php echo $item['discount']; ?></td>
             <td><?php echo number_format($item['quantity'], 1); ?></td>
             <td class="text-right"><?php echo number_format($item['quantity'] * $item['price'], 0); ?></td>
         </tr>
