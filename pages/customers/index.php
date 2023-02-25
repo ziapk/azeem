@@ -197,7 +197,7 @@ app.controller('AssignBooksModalInstanceCtrl', function ($scope, $http, $uibModa
     }
 
     $scope.selectProduct = (item) => {
-        $scope.books[item.id] = { ...item, discount_value: parseFloat(item.discount_amount) }
+        $scope.books[item.id] = { ...item, discount_value: parseFloat(item.discount_amount), discount_type: '1' }
         $scope.final = Object.values($scope.books)
         $scope.book = null
     }
@@ -283,8 +283,8 @@ app.controller('AssignBooksModalInstanceCtrl', function ($scope, $http, $uibModa
                         <td>{{row.full_name}}</td>
                         <td>
                             <select ng-model="row.discount_type">
-                                <option value="2">Fixed</option>
-                                <option value="1">Percent</option>
+                                <option ng-value="'2'">Fixed</option>
+                                <option ng-value="'1'">Percent</option>
                             </select>
                         </td>
                         <td><input type="number" min="0" max="100" onKeyPress="if(this.value.length==2) return false;" ng-model="row.discount_value" /> {{row.discount_type == 1 ? 'Percent': 'Fixed'}} </td>
