@@ -100,7 +100,10 @@ app.controller('productsController', function($scope, $http, $httpParamSerialize
     $scope.search = ""; 
     $scope.courceId = ""; 
     $scope.sortByField = ""; 
-    $scope.sortByOrder = ""; 
+    $scope.sortByOrder = "";
+    const search = $window.location.search;
+    const url = new URLSearchParams(search);
+    $scope.publisher_id = url.get('publisher_id') || '';
     $scope.maxSize = 5;
     
     $scope.sortBy = field => {
@@ -116,7 +119,7 @@ app.controller('productsController', function($scope, $http, $httpParamSerialize
     }; 
     $scope.getProducts = (page) => {
         $scope.loading = true;
-        $http.get("<?php echo SITE_URL?>api/getProducts.php", {params: {page: page || 1, sortByField: $scope.sortByField, sortByOrder: $scope.sortByOrder, perPage: $scope.data.perPage, search: $scope.search, searchBy: $scope.searchBy, courceId: $scope.courceId}})
+        $http.get("<?php echo SITE_URL?>api/getProducts.php", {params: {page: page || 1, sortByField: $scope.sortByField, sortByOrder: $scope.sortByOrder, perPage: $scope.data.perPage, search: $scope.search, searchBy: $scope.searchBy, courceId: $scope.courceId, publisher_id: $scope.publisher_id}})
         .then(function(response) {
             $scope.loading = false;
             if(response.status === 200) {

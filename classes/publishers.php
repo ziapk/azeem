@@ -5,23 +5,30 @@ class Publishers extends Connection
     
 	private $table = 'publishers';
 	private $table_products = 'products';
+	private $table_stproducts = 'store_products';
 	
 	public function getPublishersPagination($params) {
 		try {
 			
-			$stmt = "SELECT COUNT(id) as total FROM `{$this->table}`";
-			$prepare = $this->dbh->prepare($stmt);
-			$prepare->execute();
-			$result = $prepare->fetch(PDO::FETCH_ASSOC);
+			$search = "(pu.full_name LIKE '%".$params["search"]."%' ) ";
 			
-			$no_of_records_per_page = $params['perPage'] ? $params['perPage'] : 10;
-			$total_rows = $result['total'];
+			$stmt = "select count(total) as count from (SELECT count(p.id) as total, pu.* FROM `{$this->table}` as pu left join `{$this->table_products}` as p on p.publisher_id=pu.id left join `{$this->table_stproducts}` as st on  st.product_id = p.id WHERE $search and st.shopId = :shopId group by p.publisher_id, pu.full_name, pu.id, pu.discount_type, pu.discount_amount, pu.discount_status) as t";
+			// $stmt = "SELECT count(pu.id) FROM `{$this->table}` as pu left join `{$this->table_products}` as p on p.publisher_id=pu.id left join `{$this->table_stproducts}` as st on  st.product_id = p.id WHERE $search";
+			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':shopId',$params['shopId'],PDO::PARAM_INT);
+			$prepare->execute();
+			$total = $prepare->fetch(PDO::FETCH_ASSOC);
+			// print_r($total);
+			$no_of_records_per_page = !empty($params['perPage']) ? $params['perPage'] : 10;
+			$total_rows = empty($total) ? 0 : $total['count'];
 			$total_pages = ceil($total_rows / $no_of_records_per_page);
 			$currentPage = $total_pages >= $params['page'] ? $params['page'] : $total_pages;
-			$offset = (($currentPage-1) < 0 ? 0 : ($currentPage-1)) * $no_of_records_per_page;
-			$search = "(pu.full_name LIKE '%".$params["search"]."%' ) ";
-			$stmt = "SELECT count(p.id) as total, pu.* FROM `{$this->table}` as pu left join `{$this->table_products}` as p on p.publisher_id=pu.id WHERE $search group by p.publisher_id, pu.full_name, pu.id, pu.discount_type, pu.discount_amount, pu.discount_status  LIMIT :offset, :perPage";
+			$offset =  ((!empty($currentPage) ? $currentPage : 1) -1) * $no_of_records_per_page;
+			
+			
+			$stmt = "SELECT count(p.id) as total, pu.* FROM `{$this->table}` as pu left join `{$this->table_products}` as p on p.publisher_id=pu.id left join `{$this->table_stproducts}` as st on  st.product_id = p.id WHERE $search and st.shopId = :shopId group by p.publisher_id, pu.full_name, pu.id, pu.discount_type, pu.discount_amount, pu.discount_status LIMIT :offset, :perPage";
 			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':shopId',$params['shopId'],PDO::PARAM_INT);
 			$prepare->bindParam(':offset',$offset,PDO::PARAM_INT);
 			$prepare->bindParam(':perPage',$no_of_records_per_page,PDO::PARAM_INT);
 			$prepare->execute();

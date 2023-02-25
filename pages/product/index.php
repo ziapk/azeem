@@ -88,10 +88,13 @@ app.controller('productsController', function($scope, $http, $httpParamSerialize
     $scope.author = "";
     $scope.group = "";
     $scope.board = "";
+    const search = $window.location.search;
+    const url = new URLSearchParams(search);
+    $scope.publisher_id = url.get('publisher_id') || '';
     $scope.maxSize = 5;
     $scope.getProducts = (page) => {
         $scope.loading = true;
-        $http.get("<?php echo SITE_URL?>api/getProducts.php", {params: {page: page || 1, perPage: $scope.data.perPage, search: $scope.search, full_name: $scope.full_name, group: $scope.group, author: $scope.author, board: $scope.board, searchBy: $scope.searchBy, courceId: $scope.courceId}})
+        $http.get("<?php echo SITE_URL?>api/getProducts.php", {params: {page: page || 1, perPage: $scope.data.perPage, search: $scope.search, full_name: $scope.full_name, group: $scope.group, author: $scope.author, board: $scope.board, searchBy: $scope.searchBy, courceId: $scope.courceId, publisher_id: $scope.publisher_id}})
         .then(function(response) {
             $scope.loading = false;
             if(response.status === 200) {

@@ -30,6 +30,7 @@ echo mainHeader(['page' => 'publisher']);
                 <td>
                     <a class="btn btn-primary btn-xs" href="javascript:void(0)" ng-click="addPublisher(li)">Edit</a>
                     <?php if($userData['role'] === 'manager') {?><a class="btn btn-danger btn-xs" href="javascript:void(0)" ng-click="deletePublisher(li.id)">Delete</a><?php } ?>
+                    <?php if($userData['role'] === 'manager') {?><a ng-if="li.total > 0" class="btn btn-danger btn-xs" href="<?php echo SITE_URL;?>pages/product/?publisher_id={{li.id}}">View Books</a><?php } ?>
                 </td>
             </tr>
     </tbody>
