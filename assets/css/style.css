@@ -800,7 +800,7 @@ body.thumb-menu-screen {
   margin-left: 10px;
 }
 
-.hide-temp:not(.ng-show) {
+.hide-temp.ng-hide {
   display: none;
 }
 
