@@ -4,6 +4,7 @@ class Publishers extends Connection
 {
     
 	private $table = 'publishers';
+	private $table_products = 'products';
 	
 	public function getPublishersPagination($params) {
 		try {
@@ -18,8 +19,8 @@ class Publishers extends Connection
 			$total_pages = ceil($total_rows / $no_of_records_per_page);
 			$currentPage = $total_pages >= $params['page'] ? $params['page'] : $total_pages;
 			$offset = (($currentPage-1) < 0 ? 0 : ($currentPage-1)) * $no_of_records_per_page;
-			$search = "(full_name LIKE '%".$params["search"]."%' ) ";
-			$stmt = "SELECT * FROM `{$this->table}` WHERE $search LIMIT :offset, :perPage";
+			$search = "(pu.full_name LIKE '%".$params["search"]."%' ) ";
+			$stmt = "SELECT count(p.id) as total, pu.* FROM `{$this->table}` as pu left join `{$this->table_products}` as p on p.publisher_id=pu.id WHERE $search group by p.publisher_id, pu.full_name, pu.id, pu.discount_type, pu.discount_amount, pu.discount_status  LIMIT :offset, :perPage";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':offset',$offset,PDO::PARAM_INT);
 			$prepare->bindParam(':perPage',$no_of_records_per_page,PDO::PARAM_INT);

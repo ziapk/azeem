@@ -16,6 +16,7 @@ echo mainHeader(['page' => 'publisher']);
             <th>Discount Type</th>
             <th>Discount Amount</th>
             <th>Discount Allow</th>
+            <th>Assigned Books</th>
             <th width="200"></th>
         </tr>
     </thead>
@@ -25,6 +26,7 @@ echo mainHeader(['page' => 'publisher']);
                 <td>{{discountTypes[li.discount_type]}}</td>
                 <td>{{li.discount_amount}}</td>
                 <td>{{statusArr[li.discount_status]}}</td>
+                <td>{{li.total}}</td>
                 <td>
                     <a class="btn btn-primary btn-xs" href="javascript:void(0)" ng-click="addPublisher(li)">Edit</a>
                     <?php if($userData['role'] === 'manager') {?><a class="btn btn-danger btn-xs" href="javascript:void(0)" ng-click="deletePublisher(li.id)">Delete</a><?php } ?>
