@@ -254,7 +254,8 @@ app.controller('AssignBooksModalInstanceCtrl', function ($scope, $http, $uibModa
 
 <script type="text/ng-template" id="book.html">
   <a>
-      <span ng-bind-html="match.model.full_name | uibTypeaheadHighlight:query"></span>
+      <strong ng-bind-html="match.model.full_name | uibTypeaheadHighlight:query"></strong><br>
+      <span>Books: {{match.model.total}}</span>
   </a>
 </script>
 
@@ -265,8 +266,8 @@ app.controller('AssignBooksModalInstanceCtrl', function ($scope, $http, $uibModa
         </div>
         <div class="modal-body" id="modal-body">
             <div class="form-group">
-                <label for="sname">Search Books</label>
-                <input id="sname" type="text" ng-model="book" placeholder="Search Book" typeahead-on-select="selectProduct($item)" uib-typeahead="address as address.full_name for address in searchProduct($viewValue)" typeahead-template-url="book.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="0">
+                <label for="sname">Search Publisher</label>
+                <input id="sname" type="text" ng-model="book" placeholder="Search Publisher" typeahead-on-select="selectProduct($item)" uib-typeahead="address as address.full_name for address in searchProduct($viewValue)" typeahead-template-url="book.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="0">
             </div>
             <table class="table table-striped">
                 <thead>
