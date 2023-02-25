@@ -826,7 +826,12 @@ body.thumb-menu-screen {
         margin-left: 10px;
     }
 }
-
+.hide-temp {
+    display: none;
+}
+.hide-temp.ng-show {
+    display: block;
+}
 .blink {
     animation: 2s linear infinite condemned_blink_effect;
 }
