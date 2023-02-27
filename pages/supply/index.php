@@ -141,7 +141,7 @@ app.controller('reportController', function ($scope, $http, $window, $httpParamS
 
     $scope.addFreshProduct = function() {
         // $scope.items.push({...$scope.newData});
-        $window.open('<?php echo SITE_URL;?>pages/product/create.php?headers=1', '_blank', "menubar=0,resizable=1,width=600,height=600");
+        $window.open('<?php echo SITE_URL;?>pages/product/create.php?headers=1', '_blank', "menubar=0,resizable=1,width=800,height=400");
     }
 
     $scope.searchSupplier = function (term, init) {
@@ -270,9 +270,11 @@ app.controller('reportController', function ($scope, $http, $window, $httpParamS
 
         $http.post("<?php echo SITE_URL?>api/placeSupply.php", $httpParamSerializerJQLike($scope.form), {headers: {'Content-Type': 'application/x-www-form-urlencoded'} })
         .then(function(response) {
-            window.open("<?php echo SITE_URL;?>print?id="+response.data.order.id, "", "width=300,height=300"); 
-            $scope.items = $scope.list = [];
-            $scope.subTotal = $scope.discount = $scope.grandTotal = $scope.payment_amount = 0;
+            // window.open("<?php echo SITE_URL;?>print?id="+response.data.order.id, "", "width=300,height=300"); 
+            // $scope.items = $scope.list = [];
+            // $scope.subTotal = $scope.discount = $scope.grandTotal = $scope.payment_amount = 0;
+            alert(response.data.message);
+            $window.location.reload()
         });
     }    
 

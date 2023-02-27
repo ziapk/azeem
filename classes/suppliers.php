@@ -19,7 +19,7 @@ class Suppliers extends Connection
 	
 	public function createSupplier($array) {
 		try {
-			$stmt = "INSERT INTO `{$this->table}` (`name`, `contact`, `address`,`wallet`, `company`, `title`, `shopId`) VALUES (:name, :contact, :address, :wallet, :company, :title, :shopId)";
+			$stmt = "INSERT INTO `{$this->table}` (`name`, `contact`, `address`,`wallet`, `company`, `title`, `user_id`, `shopId`) VALUES (:name, :contact, :address, :wallet, :company, :title, :user_id, :shopId)";
             $prepare = $this->dbh->prepare($stmt);
             $prepare->bindParam(':name',$array['name'],PDO::PARAM_STR);
             $prepare->bindParam(':contact',$array['contact'],PDO::PARAM_STR);
@@ -27,6 +27,7 @@ class Suppliers extends Connection
             $prepare->bindParam(':wallet',$array['wallet'],PDO::PARAM_INT);
             $prepare->bindParam(':company',$array['company'],PDO::PARAM_INT);
             $prepare->bindParam(':title',$array['title'],PDO::PARAM_INT);
+            $prepare->bindParam(':user_id',$array['user_id'],PDO::PARAM_INT);
             $prepare->bindParam(':shopId',$array['shopId'],PDO::PARAM_INT);
 			$prepare->execute();
 			$result = $this->dbh->lastInsertId();

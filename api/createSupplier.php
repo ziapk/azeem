@@ -12,6 +12,11 @@ else {
         'name' => $_POST['name'],
         'address' => !empty($_POST['address']) ? $_POST['address'] : "",
         'contact' => !empty($_POST['contact']) ? $_POST['contact'] : "",
+        'wallet' => !empty($_POST['wallet']) ? $_POST['wallet'] : 0,
+        'company' => !empty($_POST['company']) ? $_POST['company'] : "",
+        'title' => !empty($_POST['title']) ? $_POST['title'] : "",
+        'user_id' => $userData['id'],
+        'shopId' => $shop['id'],
     ];
 
     $create = $suppliers->createSupplier($data);

@@ -52,26 +52,40 @@ echo mainHeader(['page'=> 'supplier']);
                 <label for="sname">Name</label>
                 <input id="sname" type="text" ng-model="form.name" class="form-control" placeholder="Supplier's Name">
             </div>
-            <div class="form-group">
-                <label for="scontact">Contact</label>
-                <input id="scontact" type="text" ng-model="form.contact" class="form-control" placeholder="Supplier's Contact">
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label for="scontact">Contact</label>
+                        <input id="scontact" type="text" ng-model="form.contact" class="form-control" placeholder="Supplier's Contact">
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label for="stitle">Title</label>
+                        <input id="stitle" type="text" ng-model="form.title" class="form-control" placeholder="Supplier's Title">
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label for="stitle">Title</label>
-                <input id="stitle" type="text" ng-model="form.title" class="form-control" placeholder="Supplier's Title">
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label for="scompany">Company</label>
+                        <input id="scompany" type="text" ng-model="form.company" class="form-control" placeholder="Supplier's company">
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label for="swallet">Balance</label>
+                        <input id="swallet" type="text" ng-model="form.wallet" class="form-control" placeholder="Supplier's balance">
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label for="scompany">Company</label>
-                <input id="scompany" type="text" ng-model="form.company" class="form-control" placeholder="Supplier's company">
-            </div>
+
             <div class="form-group">
                 <label for="saddress">Address</label>
                 <input id="saddress" type="text" ng-model="form.address" class="form-control" placeholder="Supplier's Address">
             </div>
-            <div class="form-group">
-                <label for="swallet">Balance</label>
-                <input id="swallet" type="text" ng-model="form.wallet" class="form-control" placeholder="Supplier's balance">
-            </div>
+            
         </div>
         <div class="modal-footer">
             <button class="btn btn-default" type="button" ng-click="cancel()">Close</button>
@@ -174,6 +188,7 @@ app.controller('ModalInstanceCtrl', function ($scope, $uibModalInstance, $http, 
     
     $scope.ok = function () {
         $http.post($scope.siteUrl+'api/createSupplier.php', $httpParamSerializerJQLike($scope.form), {headers: {'Content-Type': 'application/x-www-form-urlencoded'} }).then(function(res) {
+            console.log(res)
             if(res.data.success) {
                 $scope.alert = {type: 'success', message: res.data.message}
             } else {
