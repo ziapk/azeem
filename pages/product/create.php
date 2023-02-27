@@ -71,10 +71,20 @@
                 'expiry' => !empty($_POST['expiry']) ? $_POST['expiry'] : null,
                 'pprice' => !empty($_POST['pprice']) ? $_POST['pprice'] : null,
             ];
-            
             $create = $productObj->createProduct($data);
 
             if($create) {
+                $data = [                
+                    'qty' => !empty($_POST['in_hand']) ? $_POST['in_hand'] : 0,
+                    'stock_out' => 0,
+                    'product_id' => $create,
+                    'location' => !empty($_POST['location']) ? $_POST['location'] : null,
+                    'shopId' => $shop['id'],
+                    'owner_id' => $ownerId,
+                ];
+    
+                $assign = $productObj->assignProduct($data);
+
                 $message = "Successfully created!";
             } else {
                 $message = "Check form carefully!";
@@ -150,6 +160,16 @@
                         <?php foreach($publishers as $publisher) { echo "<option value='$publisher[id]'>$publisher[full_name]</option>";}?>
                     </select>
                 </div>
+                <div class="col-sm-3 form-group">
+                    <label>Stock In Hand</label>
+                    <input type="text" ng-model="form.in_hand" name="in_hand" placeholder="i.e 100, 150" class="form-control">
+                </div>
+                
+                <div class="col-sm-3 form-group">
+                    <label>Place in Store</label>
+                    <input type="text" ng-model="form.location" name="location" placeholder="i.e 100, 150" class="form-control">
+                </div>
+
                 <div class="col-sm-12 form-group text-right">
                     <input type="submit" name="create" value="Create Product" class="btn btn-primary btn-submit">
                 </div>
