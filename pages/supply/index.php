@@ -32,8 +32,8 @@
             <input type="text" class="form-control" ng-model="supplierName" placeholder="Supplier's Name" typeahead-on-select="selectSupplier($item)" uib-typeahead="address as address.name for address in searchSupplier($viewValue)" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="0">
         </div>
         <div class="col-sm-3 form-group">
-            <label>Supplier's Contact</label>
-            <input type="text" class="form-control" ng-model="supplierContact" placeholder="Supplier's Contact" typeahead-on-select="selectSupplier($item)" uib-typeahead="address as address.contact for address in searchSupplier($viewValue)" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="0">
+            <label>Ref. No</label>
+            <input type="text" class="form-control" ng-model="ref_no" placeholder="Ref. No">
         </div>
         <div class="col-sm-3 form-group">
             <label>Shop Select</label>
@@ -117,7 +117,7 @@ echo mainFooter();
 app.controller('reportController', function ($scope, $http, $window, $httpParamSerializerJQLike) {
     
     $scope.supplierName = "";
-    $scope.supplierContact = "";
+    $scope.ref_no = "";
     $scope.supplierId = "";
     $scope.product = "";
     $scope.shopId = '4';
@@ -158,7 +158,6 @@ app.controller('reportController', function ($scope, $http, $window, $httpParamS
     $scope.selectSupplier = function (p) {
         $scope.supplierId = p.id
         $scope.supplierName = p.name
-        $scope.supplierContact = p.contact
     }
 
     $scope.addDiscount = function (val, obj) {
@@ -260,6 +259,7 @@ app.controller('reportController', function ($scope, $http, $window, $httpParamS
         console.log('yes');
         $scope.form = {
             supplierId: $scope.supplierId,
+            ref_no: $scope.ref_no,
             subTotal: $scope.subTotal,
             discount: $scope.discount,
             items: $scope.items,

@@ -18,10 +18,21 @@ class Supply extends Connection
 		return $result;		
     }
 
+    public function addColumn() {
+        try {
+            $stmt = "ALTER TABLE `{$this->table}` ADD COLUMN IF NOT EXISTS `ref_no` varchar(20) NULL DEFAULT NULL AFTER `supply_date`";
+            $prepare = $this->dbh->prepare($stmt);
+            $prepare->execute();
+        } catch (PDOException $e) {
+		    die("Error!: " . $e->getMessage() . "<br/>");
+		}
+    }
+
     public function createSupply($array)
     {
         try {
-            $stmt = "INSERT INTO `{$this->table}` (`user_id`, `supplier_id`, `status`, `price`, `discount`, `shopId`, `supply_date`) VALUES (:user_id, :supplier_id, :status, :price, :discount, :shopId, :supply_date)";
+            $this->addColumn();
+            $stmt = "INSERT INTO `{$this->table}` (`user_id`, `supplier_id`, `status`, `price`, `discount`, `shopId`, `supply_date`, `ref_no`) VALUES (:user_id, :supplier_id, :status, :price, :discount, :shopId, :supply_date, :ref_no)";
             $prepare = $this->dbh->prepare($stmt);        
             $prepare->bindParam(':user_id', $array['user_id'], PDO::PARAM_STR);
             $prepare->bindParam(':supplier_id', $array['supplier_id'], PDO::PARAM_STR);
@@ -30,6 +41,7 @@ class Supply extends Connection
             $prepare->bindParam(':discount', $array['discount'], PDO::PARAM_STR);
             $prepare->bindParam(':shopId', $array['shopId'], PDO::PARAM_STR);
             $prepare->bindParam(':supply_date', $array['supply_date'], PDO::PARAM_STR);
+            $prepare->bindParam(':ref_no', $array['ref_no'], PDO::PARAM_STR);
             $prepare->execute();
             $result = $this->dbh->lastInsertId();
             return $result;

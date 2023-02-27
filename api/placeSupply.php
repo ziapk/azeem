@@ -97,6 +97,7 @@ $data = [
     'user_id' => $userData['id'],
     'supplier_id' => !empty($supplierId) ? $supplierId : 1,
     'status' => 2,
+    'ref_no' => $_POST['ref_no'],
     'price' => $_POST['subTotal'],
     'discount' => $_POST['discount'],
     'shopId' => $userData['shopId'],
