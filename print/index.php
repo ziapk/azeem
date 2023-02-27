@@ -38,7 +38,7 @@ $order = $ordersObj->getOrder($id);
     }
     $result = array_filter( $a, 'strlen' );
     $balance = $order['order']['paid_amount'] - $price - $order['order']['discount'];
-if($largeView) { $distTotal = 0; ?>
+if($largeView) { $distTotal = 0; $qty = 0;?>
     <style>
     body {
         margin: 0;
@@ -177,12 +177,14 @@ td {
             <td class="text-right"><?php 
             $aprice += $item['quantity'] * ($item['price']);
             $distTotal += $item['quantity'] * ($item['discount']);
+            $qty += $item['quantity'];
             echo number_format($item['quantity'] * ($item['price'] - $item['discount']), 2); ?></td>
             <td class="text-right"><?php echo number_format($item['quantity'] * ($item['price']), 2); ?></td>
         </tr>
         <?php } ?>
         <tr class="no-border">
-            <td rowspan="7" colspan="4"></td>
+            <td rowspan="7" style="line-height: 25px" valign="top" colspan="3">Total Qty</td>
+            <td rowspan="7" style="line-height: 25px" valign="top"><strong><?php echo number_format($qty, 1); ?></strong></td>
             <td class="text-right ref" colspan="3">Previous Balance</td>
             <th class="text-right ref"><?php echo number_format($foodpanda['wallet'] - $balance, 2);?></th>
         </tr>
