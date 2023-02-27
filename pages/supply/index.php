@@ -71,12 +71,12 @@
                 <td><input type="number" class="form-control" ng-change="calculateSum()" ng-model="row.pprice" /></td>
                 <td width="100"><input type="number" class="form-control" ng-model="row.price" /></td>
                 <td width="100"><input type="number" class="form-control" ng-change="calculateSum()" ng-model="row.qty" /></td>
-                <td width="100"><input type="number" class="form-control" ng-model="row.publisher_id" /></td>
                 <td width="60"><a href="#" class="btn btn-xs btn-danger pull-right" ng-click="remove(cart)">Delete</a></td>
             </tr>
         </tbody>
         <tbody>
             <tr>
+                <th rowspan="6"></th>
                 <th class="text-right" colspan="4">Sub Total</th>
                 <th>{{subTotal}}</th>
             </tr>
@@ -99,7 +99,7 @@
         </tbody>
         <tbody>
             <tr>
-                <th colspan="3">
+                <th colspan="4">
                     <!-- <a href="#" class="btn btn-info">Place</a> -->
                 </th>
                 <th class="text-right" colspan="2">

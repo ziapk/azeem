@@ -789,8 +789,9 @@ body.thumb-menu-screen {
   color: #fff;
 }
 
-.no-padding {
-  padding: 20px 0;
+body.no-padding {
+  padding: 20px 0 50px;
+  margin: 0;
 }
 
 .fw-bold {
