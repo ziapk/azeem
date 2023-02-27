@@ -40,7 +40,8 @@ class Orders extends Connection
     public function createOrder($array)
     {
         try {
-            $stmt = "INSERT INTO `{$this->table}` (`user_id`, `customer_id`, `status`, `price`, `paid_amount`, `discount`, `shopId`, `order_date`, `gst`, `service_charges`) VALUES (:user_id, :customer_id, :status, :price, :paid_amount, :discount, :shopId, :order_date, :gst, :service_charges)";
+            $this->addColumn();
+            $stmt = "INSERT INTO `{$this->table}` (`user_id`, `customer_id`, `status`, `price`, `paid_amount`, `discount`, `shopId`, `order_date`, `gst`, `service_charges`, `summery`) VALUES (:user_id, :customer_id, :status, :price, :paid_amount, :discount, :shopId, :order_date, :gst, :service_charges, :summery)";
             $prepare = $this->dbh->prepare($stmt);        
             $prepare->bindParam(':user_id', $array['user_id'], PDO::PARAM_STR);
             $prepare->bindParam(':customer_id', $array['customer_id'], PDO::PARAM_STR);
@@ -52,6 +53,7 @@ class Orders extends Connection
             $prepare->bindParam(':order_date', $array['order_date'], PDO::PARAM_STR);
             $prepare->bindParam(':gst', $array['gst'], PDO::PARAM_STR);
             $prepare->bindParam(':service_charges', $array['service_charges'], PDO::PARAM_STR);
+            $prepare->bindParam(':summery', $array['summery'], PDO::PARAM_STR);
             $prepare->execute();
             $result = $this->dbh->lastInsertId();
             return $result;
@@ -84,7 +86,7 @@ class Orders extends Connection
 
     public function addColumn() {
         try {
-            $stmt = "ALTER TABLE `{$this->table_sub}` ADD COLUMN IF NOT EXISTS `discount` INT NOT NULL DEFAULT '0' AFTER `quantity`";
+            $stmt = "ALTER TABLE `{$this->table}` ADD COLUMN IF NOT EXISTS `summery` TEXT NULL DEFAULT NULL AFTER `reason`";
             $prepare = $this->dbh->prepare($stmt);
             $prepare->execute();
         } catch (PDOException $e) {
@@ -95,7 +97,6 @@ class Orders extends Connection
     public function createOrderDetails($array)
     {
         try {
-            // $this->addColumn();
             $stmt = "INSERT INTO `{$this->table_sub}` (`order_id`, `product_id`, `quantity`, `price`, `discount`) VALUES (:order_id, :product_id, :quantity, :price, :discount)";
             $prepare = $this->dbh->prepare($stmt);        
             $prepare->bindParam(':order_id', $array['order_id'], PDO::PARAM_STR);

@@ -556,6 +556,12 @@ th {
     height: 44px;
     vertical-align: middle;
 }
+.recipt-table.table>tbody>tr>td,
+.recipt-table.table>tbody>tr>th {
+    font-size: inherit;
+}
+
+
 
 .text-mute {
     color: #666;

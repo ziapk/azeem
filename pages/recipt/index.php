@@ -41,7 +41,7 @@ echo mainHeader(['page' => 'recipt']);
         </thead>
     </table>
     
-    <table class="table">
+    <table class="table table-striped recipt-table">
         <thead>
             <tr>
                 <th>Sr.#</th>
@@ -75,27 +75,28 @@ echo mainHeader(['page' => 'recipt']);
         </tbody>
         <tbody>
             <tr>
-                <td class="text-right" colspan="5">Sub Total</td>
+                <td class="text-right" colspan="4" rowspan="6"><textarea class="form-control" rows="10" placeholder="Summery" ng-model="summery"></textarea></td>
+                <td class="text-right">Sub Total</td>
                 <td>{{subTotal | number: 2}}</td>
             </tr>
             <tr>
-                <td class="text-right" colspan="5">Add Discount</td>
+                <td class="text-right">Add Discount</td>
                 <td width="200"><input type="search" ng-model="discountAmount" class="form-control" on-enter-press="addDiscount(discountAmount)"></td>
             </tr>
             <tr>
-                <td class="text-right" colspan="5" style="color: red; front-weight: bold;">Total Discount</td>
+                <td class="text-right" style="color: red; front-weight: bold;">Total Discount</td>
                 <td width="200" style="color: red; front-weight: bold;"><strong>{{discount | number: 2}}</strong></td>
             </tr>
             <tr>
-                <td class="text-right" colspan="5">Grand Total</td>
+                <td class="text-right">Grand Total</td>
                 <td class="text-success">{{grandTotal | number: 2}}</td>
             </tr>
             <tr>
-                <td class="text-right text-success" colspan="5" style="front-weight: bold;">Pay Amount</td>
+                <td class="text-right text-success" style="front-weight: bold;">Pay Amount</td>
                 <td width="200"><input type="number" ng-model="payment_amount" class="form-control"></td>
             </tr>
             <tr>
-                <td class="text-right" colspan="5">Balance</td>
+                <td class="text-right">Balance</td>
                 <td width="200">{{grandTotal - payment_amount | number: 2}}</td>
             </tr>
         </tbody>
@@ -142,6 +143,7 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
     $scope.focus = false;
 
     $scope.customerData = {};
+    $scope.summery = '';
     $scope.gst = 0;
     $scope.service_charges = 0;
     $scope.subTotal = 0;
@@ -300,7 +302,8 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
             items: $scope.items,
             payment_amount: $scope.payment_amount,
             gst: $scope.gst,
-            service_charges: $scope.service_charges
+            service_charges: $scope.service_charges,
+            summery: $scope.summery,
         }
 
 

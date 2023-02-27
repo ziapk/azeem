@@ -23,7 +23,8 @@ $data = [
     'gst' => $_POST['gst'],
     'service_charges' => $_POST['service_charges'],
     'shopId' => $userData['shopId'],
-    'order_date' => $storeDATA['sale_date']
+    'order_date' => $storeDATA['sale_date'],
+    'summery' => $_POST['summery'],
 ];
 
 $order_id = $orders->createOrder($data);

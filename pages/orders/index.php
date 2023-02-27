@@ -58,6 +58,7 @@
                 <a class="btn btn-xs btn-danger" ng-click="deleteRecipt(row.id)" href="javascript:void(0)">Delete</a>
                 <a class="btn btn-xs btn-info" ng-click="openRecipt(row.id)" href="javascript:void(0)">Print</a>
                 <a class="btn btn-xs btn-default" ng-click="openRecipt(row.id, 'details')" href="javascript:void(0)">View</a>
+                <a class="btn btn-xs btn-default" ng-click="openRecipt(row.id, 'details', 'large')" href="javascript:void(0)">Large View</a>
             </td>
         </tr>
     </tbody>
@@ -102,14 +103,14 @@ app.controller('reportController', function($scope, $http, $httpParamSerializerJ
     $scope.getReport();
 
 
-    $scope.openRecipt = (id, detail) => {
+    $scope.openRecipt = (id, detail, largeView) => {
         if(detail) {
             detail = true
         }
         else {
             detail = false
         }
-        $window.open("<?php echo SITE_URL;?>print?id="+id+"&detail="+detail, "", "width=300,height=300"); 
+        $window.open("<?php echo SITE_URL;?>print?id="+id+"&detail="+detail+'&largeView='+largeView, "", (largeView ? "width=600,height=900" : "width=300,height=300")); 
     }
     /* $scope.deleteRecipt = id => {
         $window.open("<?php echo SITE_URL;?>pages/orders/delete.php?id="+id, "", "width=300,height=300"); 
