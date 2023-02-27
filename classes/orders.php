@@ -40,8 +40,8 @@ class Orders extends Connection
     public function createOrder($array)
     {
         try {
-            // $this->addColumn();
-            $stmt = "INSERT INTO `{$this->table}` (`user_id`, `customer_id`, `status`, `price`, `paid_amount`, `discount`, `shopId`, `order_date`, `gst`, `service_charges`, `summery`) VALUES (:user_id, :customer_id, :status, :price, :paid_amount, :discount, :shopId, :order_date, :gst, :service_charges, :summery)";
+            $this->addColumn();
+            $stmt = "INSERT INTO `{$this->table}` (`user_id`, `customer_id`, `status`, `price`, `paid_amount`, `discount`, `shopId`, `order_date`, `gst`, `service_charges`, `summery`, `ref_no`) VALUES (:user_id, :customer_id, :status, :price, :paid_amount, :discount, :shopId, :order_date, :gst, :service_charges, :summery, :ref_no)";
             $prepare = $this->dbh->prepare($stmt);        
             $prepare->bindParam(':user_id', $array['user_id'], PDO::PARAM_STR);
             $prepare->bindParam(':customer_id', $array['customer_id'], PDO::PARAM_STR);
@@ -54,6 +54,7 @@ class Orders extends Connection
             $prepare->bindParam(':gst', $array['gst'], PDO::PARAM_STR);
             $prepare->bindParam(':service_charges', $array['service_charges'], PDO::PARAM_STR);
             $prepare->bindParam(':summery', $array['summery'], PDO::PARAM_STR);
+            $prepare->bindParam(':ref_no', $array['ref_no'], PDO::PARAM_STR);
             $prepare->execute();
             $result = $this->dbh->lastInsertId();
             return $result;
@@ -86,7 +87,7 @@ class Orders extends Connection
 
     public function addColumn() {
         try {
-            $stmt = "ALTER TABLE `{$this->table}` ADD COLUMN IF NOT EXISTS `summery` TEXT NULL DEFAULT NULL AFTER `reason`";
+            $stmt = "ALTER TABLE `{$this->table}` ADD COLUMN IF NOT EXISTS `ref_no` varchar(20) NULL DEFAULT NULL AFTER `summery`";
             $prepare = $this->dbh->prepare($stmt);
             $prepare->execute();
         } catch (PDOException $e) {

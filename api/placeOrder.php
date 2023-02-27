@@ -25,6 +25,7 @@ $data = [
     'shopId' => $userData['shopId'],
     'order_date' => $storeDATA['sale_date'],
     'summery' => $_POST['summery'],
+    'ref_no' => $_POST['ref_no'],
 ];
 
 $order_id = $orders->createOrder($data);

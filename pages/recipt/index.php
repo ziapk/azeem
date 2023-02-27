@@ -64,18 +64,19 @@ echo mainHeader(['page' => 'recipt']);
                         <a href="#" class="quantity__plus" ng-click="addQty(cart)"><span>+</span></a>
                     </div>
                 </td>
-                <td>
-                    <input class="text-center" type="number" ng-model="addprice" ng-change="directlyPrice(addprice, cart)">
+                <td width="130">
+                    <input class="form-control text-center" type="number" ng-model="addprice" ng-change="directlyPrice(addprice, cart)">
                 </td>
                 <td>
                     {{(cart.price - cart.discount) * cart.qty | number: 2}}
                     <a href="#" class="btn btn-xs btn-danger pull-right" ng-click="remove(cart)">Delete</a>
                 </td>
             </tr>
-        </tbody>
-        <tbody>
             <tr>
-                <td class="text-right" colspan="4" rowspan="6"><textarea class="form-control" rows="10" placeholder="Summery" ng-model="summery"></textarea></td>
+                <td class="text-right" colspan="4" rowspan="6">
+                    <p><input class="form-control" placeholder="Reference No" ng-model="ref_no" /></p>
+                    <textarea class="form-control" rows="10" placeholder="Summery" ng-model="summery"></textarea>
+                </td>
                 <td class="text-right">Sub Total</td>
                 <td>{{subTotal | number: 2}}</td>
             </tr>
@@ -144,6 +145,7 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
 
     $scope.customerData = {};
     $scope.summery = '';
+    $scope.ref_no = '';
     $scope.gst = 0;
     $scope.service_charges = 0;
     $scope.subTotal = 0;
@@ -304,6 +306,7 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
             gst: $scope.gst,
             service_charges: $scope.service_charges,
             summery: $scope.summery,
+            ref_no: $scope.ref_no,
         }
 
 

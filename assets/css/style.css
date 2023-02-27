@@ -744,7 +744,7 @@ body.thumb-menu-screen {
   width: 22px;
   height: 23px;
   margin: 0;
-  background: #dee0ee;
+  background: #bcbec8;
   text-decoration: none;
   text-align: center;
   line-height: 23px;
@@ -775,12 +775,13 @@ body.thumb-menu-screen {
   border-left: 1px solid #dee0ee;
   border-right: 2px solid #dee0ee;
   background: #fff;
-  color: #8184a1;
+  border-color: #bcbec8;
+  color: #000;
 }
 
 .quantity__minus:link,
 .quantity__plus:link {
-  color: #8184a1;
+  color: #000;
 }
 
 .quantity__minus:visited,
@@ -823,6 +824,9 @@ body.thumb-menu-screen {
   100% {
     visibility: visible;
   }
+}
+.table-striped > tbody > tr:nth-of-type(odd) {
+  background-color: #ebebeb;
 }
 
 /*# sourceMappingURL=style.css.map */
