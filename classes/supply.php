@@ -31,7 +31,7 @@ class Supply extends Connection
     public function createSupply($array)
     {
         try {
-            $this->addColumn();
+            // $this->addColumn();
             $stmt = "INSERT INTO `{$this->table}` (`user_id`, `supplier_id`, `status`, `price`, `discount`, `shopId`, `supply_date`, `ref_no`) VALUES (:user_id, :supplier_id, :status, :price, :discount, :shopId, :supply_date, :ref_no)";
             $prepare = $this->dbh->prepare($stmt);        
             $prepare->bindParam(':user_id', $array['user_id'], PDO::PARAM_STR);
