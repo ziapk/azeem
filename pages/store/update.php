@@ -85,7 +85,7 @@
     $storeTypesArr = $storeObj->getStoreTypes();
 
 ?>
-<div class="container">
+<div class="container" ng-controller="accountingController">
     <h4>Update Store</h4>
     
     <form method="POST" action="" autocomplete="off" enctype="multipart/form-data">
@@ -129,15 +129,87 @@
                 <select name="status" class="form-control">
                     <?php foreach ($statusArr as $key => $type) {?>
                         <option value="<?php echo $key?>" <?php if($store['status'] == $key) {echo 'selected';};?> ><?php echo $type;?></option>
-                    <?php }?>
-                </select>
+                        <?php }?>
+                    </select>
             </div>
+            <div class="col-sm-12">
+                <p class="text-right">
+                    <input type="submit" name="update" value="Save Store" class="btn btn-success">
+                </p>
+                <h3 class="section-title">Accounts to automate process</h3>
+                <hr>
+            </div>
+            <div class="col-sm-4 form-group">
+                <label>Inventory</label>
+                <input type="text" class="type-ahead-input form-control" ng-model="account.assets" placeholder="Account Name" typeahead-on-select="selectAccount(account.assets, $item)" uib-typeahead="address as address.title for address in searchGroup($viewValue)" typeahead-template-url="row.html" typeahead-show-hint="true" typeahead-min-length="0">
+            </div>
+            <div class="col-sm-4 form-group">
+                <label>Cash/Sale</label>
+                <input type="text" class="type-ahead-input form-control" ng-model="account.cash" placeholder="Account Name" typeahead-on-select="selectAccount(account.cash, $item)" uib-typeahead="address as address.title for address in searchGroup($viewValue)" typeahead-template-url="row.html" typeahead-show-hint="true" typeahead-min-length="0">
+            </div>
+            <div class="col-sm-4 form-group">
+                <label>Expense</label>
+                <input type="text" class="type-ahead-input form-control" ng-model="account.expense" placeholder="Account Name" typeahead-on-select="selectAccount(account.expense, $item)" uib-typeahead="address as address.title for address in searchGroup($viewValue)" typeahead-template-url="row.html" typeahead-show-hint="true" typeahead-min-length="0">
+            </div>
+            <div class="col-sm-4 form-group">
+                <label>Receivable - for customer</label>
+                <input type="text" class="type-ahead-input form-control" ng-model="account.receivable" placeholder="Account Name" typeahead-on-select="selectAccount(account.receivable, $item)" uib-typeahead="address as address.title for address in searchGroup($viewValue)" typeahead-template-url="row.html" typeahead-show-hint="true" typeahead-min-length="0">
+            </div>
+            <div class="col-sm-4 form-group">
+                <label>Payable - for supplier</label>
+                <input type="text" class="type-ahead-input form-control" ng-model="account.payable" placeholder="Account Name" typeahead-on-select="selectAccount(account.payable, $item)" uib-typeahead="address as address.title for address in searchGroup($viewValue)" typeahead-template-url="row.html" typeahead-show-hint="true" typeahead-min-length="0">
+            </div>
+            <div class="col-sm-4 form-group">
+                <label>Sale - Discount</label>
+                <input type="text" class="type-ahead-input form-control" ng-model="account.sale_discount" placeholder="Account Name" typeahead-on-select="selectAccount(account.sale_discount, $item)" uib-typeahead="address as address.title for address in searchGroup($viewValue)" typeahead-template-url="row.html" typeahead-show-hint="true" typeahead-min-length="0">
+            </div>
+            <div class="col-sm-4 form-group">
+                <label>Purchase - Discount</label>
+                <input type="text" class="type-ahead-input form-control" ng-model="account.purchase_discount" placeholder="Account Name" typeahead-on-select="selectAccount(account, $item)" uib-typeahead="address as address.title for address in searchGroup($viewValue)" typeahead-template-url="row.html" typeahead-show-hint="true" typeahead-min-length="0">
+            </div>
+            <div class="col-sm-12 form-group">
+                <button type="button" class="btn btn-danger" ng-click="updateAccounts(account)">Update Accounts</button>
+            </div>
+            
         </div>
-        <p class="text-right">
-            <input type="submit" name="update" value="Save" class="btn btn-success">
-        </p>
+        
     </form>
 </div>
+
+
+<script type="text/javascript">
+
+app.controller('accountingController', function($scope, $http, $httpParamSerializerJQLike, $window){
+    $scope.account = {};
+    $scope.searchGroup = function (term) {
+        return $http.get("../chart-of-accounts/getAccounts.php", {params: {term, shopId: <?php echo $_GET['id'];?> }})
+        .then(function(response) {
+          console.log(response);
+            return response.data
+        });
+    }
+    $scope.selectAccount = function (item, data) {
+        $scope.account_id = data.account_id;
+    }
+
+    $scope.updateAccounts = (accounts) => {
+        return $http.post("../chart-of-accounts/updateAccounts.php", $httpParamSerializerJQLike({ cash: accounts.cash.id, payable: accounts.payable.id, receivable: accounts.receivable.id, expense: accounts.expense.id, sale_discount: accounts.sale_discount.id, purchase_discount: accounts.purchase_discount.id, assets: accounts.assets.id, shopId: <?php echo $_GET['id'];?> }), {headers: {'Content-Type': 'application/x-www-form-urlencoded'} })
+        .then(function(response) {
+          console.log(response);
+            return response.data
+        });
+    }
+
+});
+</script>
+<script type="text/ng-template" id="row.html">
+  <a href="javascript:void(0)" class="list-item">
+      <pre ng-bind-html="match.model.title | uibTypeaheadHighlight:query"></pre><br />
+      <pre ng-bind-html="match.model.code | uibTypeaheadHighlight:query"></pre>
+      <pre class="catName" ng-bind="(match.model.account_type == '1' ? 'ASSETS' : match.model.account_type == '2' ? 'LIABILITIES' : match.model.account_type == '3' ? 'EQUITY' : match.model.account_type == '4' ? 'INCOME' : 'EXPENSES' )"></pre>
+  </a>
+</script>
+  
 
 <?php
 echo mainFooter();  

@@ -6,11 +6,12 @@
 class DoubleEntry extends Connection
 {
 	private $table = 'accounts';
+	private $table_modes = 'payment_modes';
 	private $table_types = 'account_types';
 	private $table_units = 'units';
 	private $table_suppliers = 'suppliers';
-	private $table_transactions = 'transactions';
-	private $table_ledger_entries = 'ledger_entries';
+	private $table_transactions = 'account_transactions';
+	private $table_ledger_entries = 'account_ledger_entries';
 	private $table_balance = 'current_balance';
 	private $table_demands = 'demands';
 	private $table_demandItems = 'demand_items';
@@ -19,12 +20,40 @@ class DoubleEntry extends Connection
 
 	
 
-	public function getAccounts() {
+	public function getAccounts($shopId = null) {
 		try {
-			$stmt = "SELECT * from `$this->table` where status = 1 order by code asc";
+			$stmt = "SELECT * from `$this->table` where status = 1 and shopId=:shopId order by code asc";
 			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':shopId', $shopId, PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
+			return $result;
+			
+		} catch (PDOException $e) {
+		    die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
+	
+	public function searchAccounts($shopId, $search) {
+		try {
+			$stmt = "SELECT * FROM `$this->table` WHERE (title LIKE '%".$search."%' or code LIKE '%".$search."%') and status = 1 and shopId=:shopId LIMIT 10";
+			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':shopId', $shopId, PDO::PARAM_STR);
+			$prepare->execute();
+			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
+			return $result;
+			
+		} catch (PDOException $e) {
+		    die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
+	public function getAccount($id) {
+		try {
+			$stmt = "SELECT * from `$this->table` where status = 1 and id=:id";
+			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':id', $id, PDO::PARAM_INT);
+			$prepare->execute();
+			$result = $prepare->fetch(PDO::FETCH_ASSOC);
 			return $result;
 			
 		} catch (PDOException $e) {
@@ -44,9 +73,10 @@ class DoubleEntry extends Connection
 		}
 	}
 
-	public function getAccountLeafs() {
+	public function getAccountLeafs($shopId = null) {
 		try {
-			$stmt = "SELECT t1.id, t1.account_type, t1.code, t1.title FROM accounts AS t1 LEFT JOIN accounts as t2 ON t1.id = t2.parent_id WHERE t2.id IS NULL and t1.status = 1 LIMIT 10";
+			$shopIdCond = " and t1.shopId=$shopId ";
+			$stmt = "SELECT t1.id, t1.account_type, t1.code, t1.title FROM accounts AS t1 LEFT JOIN accounts as t2 ON t1.id = t2.parent_id WHERE t2.id IS NULL and t1.status = 1 $shopIdCond LIMIT 10";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->execute();
 			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
@@ -144,6 +174,39 @@ class DoubleEntry extends Connection
 		}
 	}
 
+	public function getLedgerByAccount($arr = []) {
+		try {
+			$where = "";
+			$account_id = $arr['account_id'];
+			if(!empty($arr['from']) && !empty($arr['to'])) {
+
+				$to = $arr['to'];
+				$from = $arr['from'];
+				$where .= "where t.transaction_date between '$from' AND '$to'";
+			}
+			
+			if(!empty($account_id)) {
+				$where .=" where a.account_id = $account_id";
+			}
+
+
+			$stmt = "SELECT SUM(CASE WHEN a.entry_type = 'D' THEN a.amount ELSE 0 END) AS debit, SUM(CASE WHEN a.entry_type = 'C' THEN a.amount ELSE 0 END) AS credit, count(a.id) as total from `$this->table_ledger_entries` as a $where";
+			$prepare = $this->dbh->prepare($stmt);
+			$prepare->execute();
+			$summery = $prepare->fetch(PDO::FETCH_ASSOC);
+
+
+			$stmt = "SELECT a.*, t.transaction_date, t.reference, a.description, t.description as v_description, m.title as payment_mode from `$this->table_ledger_entries` as a left join `$this->table_transactions` as t on t.id = a.transaction_id left join `$this->table_modes` as m on m.id = a.payment_mode $where order by id";
+			$prepare = $this->dbh->prepare($stmt);
+			$prepare->execute();
+			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
+			return ['rows' => $result, 'summery' => $summery];
+			
+		} catch (PDOException $e) {
+		    die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
+
 	public function getTrialBalanceReport($array) {
 		try {
 
@@ -231,12 +294,20 @@ class DoubleEntry extends Connection
 
 
 	
-	public function searchAccountLeafs($search) {
-		$stmt = "SELECT t1.id as account_id, t1.account_type, t1.code, t1.title FROM `$this->table` AS t1 LEFT JOIN `$this->table` as t2 ON t1.id = t2.parent_id WHERE t2.id IS NULL and (t1.title LIKE '%".$search."%' or t1.code LIKE '%".$search."%') and t1.status = 1 LIMIT 10";
-		$prepare = $this->dbh->prepare($stmt);
-		$prepare->execute();
-		$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
-		return $result;		
+	public function searchAccountLeafs($search, $shopId = null) {
+		try {
+			$shopIdCond = "";
+			if(!empty($shopId)) {
+				$shopIdCond = " and t1.shopId=$shopId ";
+			}
+			$stmt = "SELECT t1.id as account_id, t1.account_type, t1.code, t1.title FROM `$this->table` AS t1 LEFT JOIN `$this->table` as t2 ON t1.id = t2.parent_id WHERE t2.id IS NULL and (t1.title LIKE '%".$search."%' or t1.code LIKE '%".$search."%') and t1.status = 1 $shopIdCond LIMIT 10";
+			$prepare = $this->dbh->prepare($stmt);
+			$prepare->execute();
+			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
+			return $result;
+		} catch (PDOException $e) {
+		    die("Error!: " . $e->getMessage() . "<br/>");
+		}
 	}
 	
 	public function getBalanceSheet() {
@@ -290,6 +361,92 @@ class DoubleEntry extends Connection
 
 
 
+	// insert method
+
+	public function getPaymentModes($params) {
+		try {
+			
+			$stmt = "SELECT COUNT(id) as total FROM `{$this->table_modes}` where `shopId`=:shopId";
+			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':shopId',$params['shopId'],PDO::PARAM_INT);
+			$prepare->execute();
+			$result = $prepare->fetch(PDO::FETCH_ASSOC);
+			
+			$no_of_records_per_page = $params['perPage'] ? $params['perPage'] : 10;
+			$total_rows = $result['total'];
+			$total_pages = ceil($total_rows / $no_of_records_per_page);
+			$currentPage = $total_pages >= $params['page'] ? $params['page'] : $total_pages;
+			$offset = (($currentPage-1) < 0 ? 0 : ($currentPage-1)) * $no_of_records_per_page;
+			$search = "(title LIKE '%".$params["search"]."%' or code LIKE '%".$params["search"]."%') ";
+			$stmt = "SELECT * FROM `{$this->table_modes}` WHERE $search and `shopId`=:shopId order by id desc LIMIT :offset, :perPage";
+			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':offset',$offset,PDO::PARAM_INT);
+			$prepare->bindParam(':shopId',$params['shopId'],PDO::PARAM_INT);
+			$prepare->bindParam(':perPage',$no_of_records_per_page,PDO::PARAM_INT);
+			$prepare->execute();
+			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
+			return ['page' => $currentPage, 'totalRecords'=> $total_rows, 'perPage' => $no_of_records_per_page, 'records' => $result];
+
+		} catch (PDOException $e) {
+		    die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
+
+	public function createPaymentMode($array) {
+		$title = $array['title'];
+		$code = $array['code'];
+		$status = $array['status'];
+		$shopId = $array['shopId'];
+		$owner_id = $array['owner_id'];
+		try {
+			$stmt = "INSERT INTO `{$this->table_modes}` (`title`, `code`, `status`, `shopId`, `owner_id`) VALUES (:title, :code, :status, :shopId, :owner_id)";
+			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':title', $title, PDO::PARAM_STR);
+			$prepare->bindParam(':code', $code, PDO::PARAM_STR);
+			$prepare->bindParam(':status', $status, PDO::PARAM_STR);
+			$prepare->bindParam(':shopId', $shopId, PDO::PARAM_STR);
+			$prepare->bindParam(':owner_id', $owner_id, PDO::PARAM_STR);
+			$prepare->execute();
+			$result = $this->dbh->lastInsertId();
+			return $result;
+		} catch (PDOException $e) {
+		    die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
+
+	public function updatePaymentMode($array) {
+		$id = $array['id'];
+		$title = $array['title'];
+		$code = $array['code'];
+		$status = $array['status'];
+		try {
+			$stmt = "UPDATE `{$this->table_modes}` SET `title`=:title, `code`=:code, `status`=:status WHERE `id` = :id";
+			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':title', $title, PDO::PARAM_STR);
+			$prepare->bindParam(':code', $code, PDO::PARAM_STR);
+			$prepare->bindParam(':status', $status, PDO::PARAM_STR);
+			$prepare->bindParam(':id', $id, PDO::PARAM_INT);
+			$prepare->execute();
+			$result = $prepare->rowCount();
+			return $result;
+		} catch (PDOException $e) {
+		    die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
+	
+	public function deletePaymentMode($array) {
+		$id = $array['id'];
+		try {
+			$stmt = "UPDATE `{$this->table_modes}` SET `status`=3 WHERE `id` = :id";
+			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':id', $id, PDO::PARAM_INT);
+			$prepare->execute();
+			$result = $prepare->rowCount();
+			return $result;
+		} catch (PDOException $e) {
+		    die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
 	// insert method
 
 	public function insertUnit($array) {
@@ -476,8 +633,24 @@ class DoubleEntry extends Connection
 	// insert method
 
 	public function insertAccount($array) {
+
+		$getSiblings = $this->getAccountSiblings($array['parent_id']);
+		$count = $getSiblings['total'];
+		if(!empty($getSiblings) && $count > 0) {
+			if($count < 9) {
+				$array['code'] .= '-0' . ($count+1);
+			}
+			else {
+				$array['code'] .= '-' . ($count+1);
+			}
+		}
+		else {
+			$array['code'] = $array['code'] . '-01';
+		}
+
+		
 		try {
-			$stmt = "INSERT INTO `{$this->table}` (`title`, `code`, `account_type`, `group_id`, `status`, `parent_id`, `created_by`) VALUES (:title, :code, :account_type, :group_id, :status, :parent_id, :created_by)";
+			$stmt = "INSERT INTO `{$this->table}` (`title`, `code`, `account_type`, `group_id`, `status`, `parent_id`, `created_by`, `opening_balance`) VALUES (:title, :code, :account_type, :group_id, :status, :parent_id, :created_by, :opening_balance)";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':title', $array['title'], PDO::PARAM_STR);
 			$prepare->bindParam(':code', $array['code'], PDO::PARAM_STR);
@@ -486,6 +659,7 @@ class DoubleEntry extends Connection
 			$prepare->bindParam(':status', $array['status'], PDO::PARAM_STR);
 			$prepare->bindParam(':parent_id', $array['parent_id'], PDO::PARAM_STR);
 			$prepare->bindParam(':created_by', $array['created_by'], PDO::PARAM_STR);
+			$prepare->bindParam(':opening_balance', $array['opening_balance'], PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $this->dbh->lastInsertId();
 			return $result;
@@ -581,14 +755,30 @@ class DoubleEntry extends Connection
 		}
 	}
 
+	public function setOpeningBalance($id, $opening_balance) {
+		try {
+			$opening_balance = !empty($opening_balance) ? $opening_balance : 0;
+			$stmt = "UPDATE `{$this->table}` SET `opening_balance`=:opening_balance WHERE `id` = :id";
+			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':opening_balance', $opening_balance, PDO::PARAM_STR);
+			$prepare->bindParam(':id', $id, PDO::PARAM_INT);
+			$prepare->execute();
+			$result = $prepare->rowCount();
+			return $result;
+		} catch (PDOException $e) {
+		    die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
+
 	// insert method
 	public function makeTransaction($array) {
 		try {
-			$stmt = "INSERT INTO `{$this->table_transactions}` (`description`, `reference`, `transaction_date`, `created_by`) VALUES (:description, :reference, :transaction_date, :created_by)";
+			$stmt = "INSERT INTO `{$this->table_transactions}` (`description`, `reference`, `transaction_date`, `created_by`, `shopId`) VALUES (:description, :reference, :transaction_date, :created_by, :shopId)";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':description', $array['description'], PDO::PARAM_STR);
 			$prepare->bindParam(':reference', $array['reference'], PDO::PARAM_STR);
 			$prepare->bindParam(':transaction_date', $array['transaction_date'], PDO::PARAM_STR);
+			$prepare->bindParam(':shopId', $array['shopId'], PDO::PARAM_STR);
 			$prepare->bindParam(':created_by', $array['created_by'], PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $this->dbh->lastInsertId();
@@ -601,7 +791,8 @@ class DoubleEntry extends Connection
 	// insert method
 	public function makeEntry($array) {
 		try {
-			$stmt = "INSERT INTO `{$this->table_ledger_entries}` (`transaction_id`, `account_id`, `entry_type`, `amount`, `user_id`, `description`) VALUES (:transaction_id, :account_id, :entry_type, :amount, :user_id, :description)";
+			$paymentMode = !empty($array['payment_mode']) ? $array['payment_mode'] : 1;
+			$stmt = "INSERT INTO `{$this->table_ledger_entries}` (`transaction_id`, `account_id`, `entry_type`, `amount`, `user_id`, `description`, `payment_mode`) VALUES (:transaction_id, :account_id, :entry_type, :amount, :user_id, :description, :payment_mode)";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':transaction_id', $array['transaction_id'], PDO::PARAM_STR);
 			$prepare->bindParam(':account_id', $array['account_id'], PDO::PARAM_STR);
@@ -609,6 +800,7 @@ class DoubleEntry extends Connection
 			$prepare->bindParam(':amount', $array['amount'], PDO::PARAM_STR);
 			$prepare->bindParam(':user_id', $array['user_id'], PDO::PARAM_STR);
 			$prepare->bindParam(':description', $array['description'], PDO::PARAM_STR);
+			$prepare->bindParam(':payment_mode', $paymentMode, PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $this->dbh->lastInsertId();
 			return $result;

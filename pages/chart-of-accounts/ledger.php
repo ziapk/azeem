@@ -2,7 +2,7 @@
 include_once dirname(__FILE__).'/../../include/settings.php';
 $doubleEntryObj = new DoubleEntry();
 $accountTypes = $doubleEntryObj->getAccountTypes();
-$accounts = $doubleEntryObj->getAccountLeafs();
+$accounts = $doubleEntryObj->getAccountLeafs($shop['id']);
 
 echo mainHeader(['page'=> 'coa']);
 

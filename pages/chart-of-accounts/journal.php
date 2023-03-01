@@ -39,7 +39,7 @@ if(!empty($_POST)) {
             <div class="row">
                 <div class="col-sm-3">
                   <input type="hidden" name="account_id" value="{{account_id}}">
-                    <input type="text" class="type-ahead-input form-control" ng-model="account" placeholder="Account Name" typeahead-on-select="selectAccount(account, $item)" uib-typeahead="address as address.title for address in searchGroup($viewValue)" typeahead-template-url="templates/row.html" typeahead-show-hint="true" typeahead-min-length="0">
+                    <input type="text" class="type-ahead-input form-control" ng-model="account" placeholder="Account Name" typeahead-on-select="selectAccount(account, $item)" uib-typeahead="address as address.title for address in searchGroup($viewValue)" typeahead-template-url="row.html" typeahead-show-hint="true" typeahead-min-length="0">
                 </div>
                 <div class="col-sm-3">
                     <input type="text" required class="form-control datepicker" name="opening_date" placeholder="From">
@@ -249,4 +249,12 @@ app.controller('accountingController', function($scope, $http, $window){
 
 });
 </script>
+<script type="text/ng-template" id="row.html">
+  <a href="javascript:void(0)" class="list-item">
+      <pre ng-bind-html="match.model.title | uibTypeaheadHighlight:query"></pre><br />
+      <pre ng-bind-html="match.model.code | uibTypeaheadHighlight:query"></pre>
+      <pre class="catName" ng-bind="(match.model.account_type == '1' ? 'ASSETS' : match.model.account_type == '2' ? 'LIABILITIES' : match.model.account_type == '3' ? 'EQUITY' : match.model.account_type == '4' ? 'INCOME' : 'EXPENSES' )"></pre>
+  </a>
+</script>
+  
 <?php echo mainFooter(['page'=> 'coa']); ?>

@@ -28,10 +28,11 @@ echo mainHeader(['page'=> 'customer']);
                 <td><strong>{{li.company}}</strong> - {{li.title}} <br />{{li.address}}</td>
                 <td>{{li.wallet}}</td>
                 <td>
-                    <?php if($userData['role'] === 'manager') {?><a ng-click="deleteCustomer(li.id)" class="btn btn-primary btn-xs" href="javascript:void(0)">Delete</a><?php }?>
-                    <?php if($userData['role'] === 'manager') {?><a class="btn btn-danger btn-xs" href="<?php echo SITE_URL;?>pages/orders/customerOrders.php?id={{li.id}}">View Orders</a><?php }?>
-                    <?php if($userData['role'] === 'owner' || $userData['role'] === 'manager') {?><a class="btn btn-danger btn-xs" href="<?php echo SITE_URL;?>pages/customers/update.php?id={{li.id}}">Update</a><?php }?>
-                    <?php if($userData['role'] === 'owner' || $userData['role'] === 'manager') {?><a class="btn btn-default btn-xs" href="javascript:void(0)" ng-click="assignBooks(li)">Assign</a><?php } ?>
+                    <?php if($userData['role'] === 'manager') {?><a ng-click="deleteCustomer(li.id)" class="btn btn-default btn-xs" href="javascript:void(0)">Delete</a><?php }?>
+                    <?php if($userData['role'] === 'owner' || $userData['role'] === 'manager') {?><a class="btn btn-info btn-xs" href="javascript:void(0)" ng-click="assignBooks(li)">Assign</a><?php } ?>
+                    <?php if($userData['role'] === 'owner' || $userData['role'] === 'manager') {?><a class="btn btn-default btn-xs" href="../chart-of-accounts/summery.php?t=c&id={{li.account_id}}">Summery</a><?php } ?>
+                    <?php if($userData['role'] === 'manager') {?><a class="btn btn-danger btn-xs" href="<?php echo SITE_URL;?>pages/orders/customerOrders.php?id={{li.id}}">Orders</a><?php }?>
+                    <?php if($userData['role'] === 'owner' || $userData['role'] === 'manager') {?><a class="btn btn-default btn-xs" href="<?php echo SITE_URL;?>pages/customers/update.php?id={{li.id}}">Update</a><?php }?>
                 </td>
             </tr>
         </tbody>
@@ -116,7 +117,6 @@ app.controller('customerController', function($scope, $http, $httpParamSerialize
                 }
             }
         }).result.then(function (response) {
-            console.log(response);
             $http.post($scope.siteUrl+'api/assignDiscount.php', $httpParamSerializerJQLike(response), {headers: {'Content-Type': 'application/x-www-form-urlencoded'} }).then(function() {
                 //$scope.getPrograms(1);
             });
@@ -240,6 +240,10 @@ app.controller('AssignBooksModalInstanceCtrl', function ($scope, $http, $uibModa
             <div class="form-group">
                 <label for="saddress">Address</label>
                 <input id="saddress" type="text" ng-model="form.address" class="form-control" placeholder="Customer's Address">
+            </div>
+            <div class="form-group">
+                <label for="sopening_balance">Opening Balance</label>
+                <input id="sopening_balance" type="text" ng-model="form.opening_balance" class="form-control" placeholder="Customer's Opening Balance">
             </div>
             <div class="form-group">
             <label><small><input name="type" ng-model="form.type" type="checkbox"> Select this if you want your invoices to show this customer’s basic information</small></label>

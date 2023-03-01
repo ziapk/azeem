@@ -24,7 +24,6 @@ if(empty($_REQUEST['mcode'])) {
 	$data['code'] = $_REQUEST['mcode'];
 }
 
-
 $data['status'] = $_REQUEST['mstatus'];
 $data['created_by'] = $_SESSION['user_credentials']['id'];
 

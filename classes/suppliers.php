@@ -19,7 +19,7 @@ class Suppliers extends Connection
 	
 	public function createSupplier($array) {
 		try {
-			$stmt = "INSERT INTO `{$this->table}` (`name`, `contact`, `address`,`wallet`, `company`, `title`, `user_id`, `shopId`) VALUES (:name, :contact, :address, :wallet, :company, :title, :user_id, :shopId)";
+			$stmt = "INSERT INTO `{$this->table}` (`name`, `contact`, `address`,`wallet`, `company`, `title`, `user_id`, `shopId`, `account_id`) VALUES (:name, :contact, :address, :wallet, :company, :title, :user_id, :shopId, :account_id)";
             $prepare = $this->dbh->prepare($stmt);
             $prepare->bindParam(':name',$array['name'],PDO::PARAM_STR);
             $prepare->bindParam(':contact',$array['contact'],PDO::PARAM_STR);
@@ -29,8 +29,23 @@ class Suppliers extends Connection
             $prepare->bindParam(':title',$array['title'],PDO::PARAM_INT);
             $prepare->bindParam(':user_id',$array['user_id'],PDO::PARAM_INT);
             $prepare->bindParam(':shopId',$array['shopId'],PDO::PARAM_INT);
+            $prepare->bindParam(':account_id',$array['account_id'],PDO::PARAM_INT);
 			$prepare->execute();
 			$result = $this->dbh->lastInsertId();
+			return $result;
+		} catch (PDOException $e) {
+		    die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
+
+	public function linkAccountSupplier($array) {
+		try {
+			$stmt = "UPDATE `{$this->table}` SET account_id=:account_id WHERE id=:id";
+            $prepare = $this->dbh->prepare($stmt);
+            $prepare->bindParam(':id',$array['id'],PDO::PARAM_INT);
+            $prepare->bindParam(':account_id',$array['account_id'],PDO::PARAM_INT);
+			$prepare->execute();
+			$result = $prepare->rowCount();
 			return $result;
 		} catch (PDOException $e) {
 		    die("Error!: " . $e->getMessage() . "<br/>");
@@ -92,6 +107,22 @@ class Suppliers extends Connection
 		}
     }
 
+	public function getUserByAccount($id) {
+		try {
+			$stmt = "SELECT *, name as full_name  FROM `{$this->table}` WHERE `account_id`=:id";
+			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':id',$id,PDO::PARAM_STR);
+			$prepare->execute();
+			$result = $prepare->fetch(PDO::FETCH_ASSOC);
+			$de = new DoubleEntry();
+			if(!empty($result['account_id'])) {
+				$result['account']=$de->getAccount($result['account_id']);
+			}
+			return $result;
+		} catch (PDOException $e) {
+		    die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
 	public function getSupplier($id) {
 		try {
 			$stmt = "SELECT *  FROM `{$this->table}` WHERE `id`=:id";
@@ -99,6 +130,10 @@ class Suppliers extends Connection
 			$prepare->bindParam(':id',$id,PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $prepare->fetch(PDO::FETCH_ASSOC);
+			$de = new DoubleEntry();
+			if(!empty($result['account_id'])) {
+				$result['account']=$de->getAccount($result['account_id']);
+			}
 			return $result;
 		} catch (PDOException $e) {
 		    die("Error!: " . $e->getMessage() . "<br/>");

@@ -40,7 +40,6 @@ class Orders extends Connection
     public function createOrder($array)
     {
         try {
-            $this->addColumn();
             $stmt = "INSERT INTO `{$this->table}` (`user_id`, `customer_id`, `status`, `price`, `paid_amount`, `discount`, `shopId`, `order_date`, `gst`, `service_charges`, `summery`, `ref_no`) VALUES (:user_id, :customer_id, :status, :price, :paid_amount, :discount, :shopId, :order_date, :gst, :service_charges, :summery, :ref_no)";
             $prepare = $this->dbh->prepare($stmt);        
             $prepare->bindParam(':user_id', $array['user_id'], PDO::PARAM_STR);

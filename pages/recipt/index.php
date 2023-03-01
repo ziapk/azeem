@@ -103,16 +103,18 @@ echo mainHeader(['page' => 'recipt']);
         </tbody>
         <tbody>
             <tr>
-                <th colspan="4">
-                    <!-- <a href="#" class="btn btn-info">Place</a> -->
-                </th>
-                <th class="text-right" colspan="2">
-                    
+                <th colspan="6" class="text-right">
+                    <div class="btn-group">
+                        <label class="btn btn-default" ng-repeat="li in modes">
+                            <input type="radio" name="mode" ng-model="payment_mode" ng-value="li.id" ng-change="printValue(li)">
+                            {{li.title}}
+                        </label>
+                    </div>
                     <a href="#" class="btn btn-primary" ng-click="checkout()"><img width="24" height="24" src="<?php echo SITE_URL; ?>assets/img/svg/001-checkout.svg" alt="" /> Checkout</a>
                 </th>
             </tr>
         </tbody>
-    <table>
+    </table>
 </div>
 
 </div>
@@ -151,13 +153,19 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
     $scope.subTotal = 0;
     $scope.grandTotal = 0;
     $scope.discount = 0;
+    $scope.payment_mode = '1';
     const items = [];
+    $scope.modes = [];
     // setInterval(() => {
     //     if($scope.focus === true && !$('#searchProduct').is(':focus')) {
     //         $scope.product = null
     //         $('#searchProduct').focus();
     //     }
     // }, 3000);
+
+    $scope.printValue = o => {
+        $scope.payment_mode = o.id;
+    }
     if($window.localStorage.getItem('shopping')) {
         const shopCart = JSON.parse($window.localStorage.getItem('shopping'));
         
@@ -285,6 +293,15 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
             return response.data
         });
     }
+    $scope.searchMode = function () {
+        return $http.get("<?php echo SITE_URL?>api/getPaymentModes.php")
+        .then(function(response) {
+            $scope.modes = response.data.records;
+            return response.data
+        });
+    }
+
+    $scope.searchMode();
 
     $scope.searchCustomer('', true)
 
@@ -307,6 +324,7 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
             service_charges: $scope.service_charges,
             summery: $scope.summery,
             ref_no: $scope.ref_no,
+            payment_mode: $scope.payment_mode
         }
 
 

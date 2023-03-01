@@ -111,7 +111,7 @@ td {
     <span class="pull-right date"></span>
     <br>
     <br>
-    <ul ng-if="item.order.status == 2" class="list-unstyled">
+    <ul ng-if="item.order.status == 2 || item.order.status == 8 || item.order.status == 9" class="list-unstyled">
         <li ng-repeat="itm in item.order_items">
             <strong>{{itm.product_title}}</strong><br />
             {{itm.quantity}} x {{itm.price}} = 
@@ -123,7 +123,7 @@ td {
             <p><strong class="text-danger" ng-if="itm.error">invalid quantity</strong></p>
         </li>
     </ul>
-    <p class="text-right" ng-if="item.order.status == 2">
+    <p class="text-right" ng-if="item.order.status == 2 || item.order.status == 8 || item.order.status == 9">
         <a href="javascript:void(0)" ng-click="orderReturn()" class="btn btn-default">All to Inventory</a>
         <a href="javascript:void(0)" ng-click="orderFaulty()" class="btn btn-default">All to Faulty</a>
         <a href="javascript:void(0)" ng-click="orderPartial()" class="btn btn-primary">Submit as Filled</a>

@@ -19,6 +19,26 @@ else {
         'shopId' => $shop['id'],
     ];
 
+
+    $de = new DoubleEntry();
+
+    $payableAccount = $de->getAccount($shop['payable']);
+
+    $accountData = [
+        'title' => 'Supplier - '.$_POST['name'].' - '.$_POST['company'],
+        'code' => $payableAccount['code'],
+        'account_type' => $payableAccount['account_type'],
+        'group_id' => $payableAccount['group_id'],
+        'status' => $payableAccount['status'],
+        'parent_id' => $payableAccount['id'],
+        'created_by' => $userData['id'],
+        'opening_balance' => $_POST['opening_balance'],
+    ];
+
+    
+    $accountId = $de->insertAccount($accountData);
+    $data['account_id'] = $accountId;
+
     $create = $suppliers->createSupplier($data);
 
     if($create) {

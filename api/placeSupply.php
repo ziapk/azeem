@@ -12,13 +12,37 @@ $ownerId = $userData['role'] == 'owner' ? $userData['id'] : $userData['created_b
 
 $supplierId = 1;
 $supplierObj = new Suppliers();
+$storeObj = new Store();
+$storeDATA = $storeObj->getStore($shop['id']);
 if(empty($_POST['supplierId']) && !empty($_POST['supplierName'])) {
     $data = [
         'name' => $_POST['supplierName'],
         'contact' => !empty($_POST['supplierContact']) ? $_POST['supplierContact'] : "",
         'address' => "",
         'wallet' => 0,
+        'company' => "",
+        'title' => "",
+        'user_id' => $userData['id'],
+        'shopId' => $shop['id'],
     ];
+    
+    $de = new DoubleEntry();
+
+    $payableAccount = $de->getAccount($shop['payable']);
+
+    $accountData = [
+        'title' => 'Supplier - '.$_POST['supplierName'].' - '.$_POST['company'],
+        'code' => $payableAccount['code'],
+        'account_type' => $payableAccount['account_type'],
+        'group_id' => $payableAccount['group_id'],
+        'status' => $payableAccount['status'],
+        'parent_id' => $payableAccount['id'],
+        'created_by' => $userData['id'],
+        'opening_balance' => 0,
+    ];
+    
+    $accountId = $de->insertAccount($accountData);
+    $data['account_id'] = $accountId;
 
     $supplierId = $supplierObj->createSupplier($data);
 }
@@ -30,14 +54,16 @@ else {
 
 $products = new Products();
 
-
 $items = [];
 
+$purchaseValue = 0;
+$productsValue = 0;
 if(sizeof($_POST['items'])) {
     foreach($_POST['items'] as $item) {
         if(!empty($item['id'])) {
-
-            $items[] = [               
+            $purchaseValue+=($item['pprice'] * $item['qty']);
+            $productsValue+=($item['price'] * $item['qty']);
+            $items[] = [
                 'pprice' => $item['pprice'], 
 				'qty' => $item['qty'],
 				'stock_out' => 0,
@@ -46,40 +72,40 @@ if(sizeof($_POST['items'])) {
 				'owner_id' => $ownerId,
 			];
         }
-        else {
-            $id = $products->createProduct([
-                'full_name' => $item['full_name'],
-                'owner_id' => $ownerId,
-                'user_id' => $userData['id'],
-                'price' => $item['price'],
-                'pprice' => $item['pprice'],
-                'in_hand' => 0,
-                'min_qty' => 0,
-                'pack_size' => 0,
-                'pack_price' => 0,
-                'image' => null,
-                'code' => null,
-                'description' => "",
-                'group' => null,
-                'barcode' => !empty($item['barcode']) ? $item['barcode'] : null,
-            ]);
+        // else {
+        //     $id = $products->createProduct([
+        //         'full_name' => $item['full_name'],
+        //         'owner_id' => $ownerId,
+        //         'user_id' => $userData['id'],
+        //         'price' => $item['price'],
+        //         'pprice' => $item['pprice'],
+        //         'in_hand' => 0,
+        //         'min_qty' => 0,
+        //         'pack_size' => 0,
+        //         'pack_price' => 0,
+        //         'image' => null,
+        //         'code' => null,
+        //         'description' => "",
+        //         'group' => null,
+        //         'barcode' => !empty($item['barcode']) ? $item['barcode'] : null,
+        //     ]);
 
-            if(!empty($item['barcode'])) {
-                $products->createProductCode([
-                    'product_id' => $id,
-                    'code' => $item['barcode']
-                ]);
-            }
+        //     if(!empty($item['barcode'])) {
+        //         $products->createProductCode([
+        //             'product_id' => $id,
+        //             'code' => $item['barcode']
+        //         ]);
+        //     }
 
-            $items[] = [
-                'id' => $id,
-                'pprice' => $item['pprice'],
-                'price' => $item['price'],
-                'barcode' => !empty($item['barcode']) ? $item['barcode'] : null,
-                'full_name' => $item['full_name'],
-                'qty' => $item['qty'],
-            ];
-        }
+        //     $items[] = [
+        //         'id' => $id,
+        //         'pprice' => $item['pprice'],
+        //         'price' => $item['price'],
+        //         'barcode' => !empty($item['barcode']) ? $item['barcode'] : null,
+        //         'full_name' => $item['full_name'],
+        //         'qty' => $item['qty'],
+        //     ];
+        // }
     }
 }
 
@@ -126,27 +152,117 @@ if($supply_id) {
         }
     }
 
-    $transaction = [
-        'supplier_id' => !empty($supplierId) ? $supplierId : 1,
-        'user_id' => $userData['id'],
-        'amount' => !empty($_POST['payment_amount']) ? $_POST['payment_amount'] : 0,
-        'payment_date' => date('Y-m-d H:i:s'),
-        'transaction_type' => 1,        
-        'supply_id' => $supply_id,
-        'shopId' => $userData['shopId']
+    
+    
+    $supplier = $supplierObj->getSupplier($data['supplier_id']);
+    $doubleEntry = new DoubleEntry();
+
+    $makeTransaction = [
+        'description' => !empty($_POST['summery']) ? $_POST['summery'] : "Supplier Invoice: ".$supply_id." PLACED",
+        'transaction_date' => $storeDATA['sale_date'],
+        'reference' => $data['ref_no'],
+        'shopId' => $shop['id'],
+        'created_by' => $_SESSION['user_credentials']['id']
     ];
 
-    $transactionId = $supply->makeTransaction($transaction);
+    $makeTransactionId = $doubleEntry->makeTransaction($makeTransaction);
 
-    $amount = !empty($_POST['payment_amount']) ? $_POST['payment_amount'] : 0;
+    $totalDiscount = $productsValue - $purchaseValue;
 
-    $wallet = [
-        'id' => !empty($supplierId) ? $supplierId : 1,
-        'wallet' => $amount - ($_POST['subTotal'] - $_POST['discount'])
+    $assetPrice = $productsValue;
+    $cash = !empty($_POST['payment_amount']) ? $_POST['payment_amount'] : 0;
+    $purchaseDiscount = $totalDiscount;
+    $payableAmount = $purchaseValue;
+
+    // assets debit entry - debit
+    // liability payable entry - credit
+    // purchase discount entry - credit
+    $entry = [
+        'transaction_id' => $makeTransactionId,
+        'account_id' => $shop['assets'],
+        'entry_type' => 'D',
+        'description' => '',
+        'amount' => $assetPrice, // 2000
+        'payment_mode'=> $_POST['payment_mode'],
+        'user_id' => $_SESSION['user_credentials']['id'],
     ];
+
+    $a[] = $doubleEntry->makeEntry($entry);
+
+    // payable credit entry
+    $entry = [
+        'transaction_id' => $makeTransactionId,
+        'account_id' => $supplier['account_id'],
+        'entry_type' => 'C',
+        'description' => '',
+        'amount' => $payableAmount,
+        'payment_mode'=> $_POST['payment_mode'],
+        'user_id' => $_SESSION['user_credentials']['id'],
+    ];
+    $a[] = $doubleEntry->makeEntry($entry);
+
+    if(!empty($purchaseDiscount)) {
+        // saleDiscount credit entry
+        $entry = [
+            'transaction_id' => $makeTransactionId,
+            'account_id' => $shop['purchase_discount'],
+            'entry_type' => 'C',
+            'description' => '',
+            'amount' => $purchaseDiscount, // 200 @ 10%
+            'payment_mode'=> $_POST['payment_mode'],
+            'user_id' => $_SESSION['user_credentials']['id'],
+        ];
+        $a[] = $doubleEntry->makeEntry($entry);
+    }
+
+    if(!empty($cash)) {
+        $makeTransactionId = $doubleEntry->makeTransaction($makeTransaction);
+        // payable credit entry
+        $entry = [
+            'transaction_id' => $makeTransactionId,
+            'account_id' => $supplier['account_id'],
+            'entry_type' => 'D',
+            'description' => '',
+            'amount' => $cash,
+            'payment_mode'=> $_POST['payment_mode'],
+            'user_id' => $_SESSION['user_credentials']['id'],
+        ];
+        $a[] = $doubleEntry->makeEntry($entry);
+        // cash credit entry
+        $entry = [
+            'transaction_id' => $makeTransactionId,
+            'account_id' => $shop['cash'],
+            'entry_type' => 'C',
+            'description' => '',
+            'amount' => $cash, // 200 @ 10%
+            'payment_mode'=> $_POST['payment_mode'],
+            'user_id' => $_SESSION['user_credentials']['id'],
+        ];
+        $a[] = $doubleEntry->makeEntry($entry);
+        
+        
+    }
+    // $transaction = [
+    //     'supplier_id' => !empty($supplierId) ? $supplierId : 1,
+    //     'user_id' => $userData['id'],
+    //     'amount' => !empty($_POST['payment_amount']) ? $_POST['payment_amount'] : 0,
+    //     'payment_date' => date('Y-m-d H:i:s'),
+    //     'transaction_type' => 1,        
+    //     'supply_id' => $supply_id,
+    //     'shopId' => $userData['shopId']
+    // ];
+
+    // $transactionId = $supply->makeTransaction($transaction);
+
+    // $amount = !empty($_POST['payment_amount']) ? $_POST['payment_amount'] : 0;
+
+    // $wallet = [
+    //     'id' => !empty($supplierId) ? $supplierId : 1,
+    //     'wallet' => $amount - ($_POST['subTotal'] - $_POST['discount'])
+    // ];
 
     
-    $manageWallet = $supply->manageWallet($wallet);
+    // $manageWallet = $supply->manageWallet($wallet);
     /* $productUpdated = [];
     foreach ($items as $value) {
         $productUpdated[] = $products->assignProduct($value);

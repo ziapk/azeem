@@ -174,7 +174,7 @@ function nestedDrawList($list, $menuClass=null, $subMenuClass = null) {
     $html = "";
     foreach ($list as $key => $m) {
         $html	.= '<li data-tree-branch="'.$m['key'].'" data-tree-click="'.$m['key'].'"><svg xmlns="http://www.w3.org/2000/svg" width="41.14" height="41.138" viewBox="0 0 41.14 41.138"><path d="M3.741,33.658a.625.625,0,0,0-.624.624v2.492H.624A.622.622,0,0,0,0,37.4v3.117a.624.624,0,0,0,.624.624H40.516a.624.624,0,0,0,.623-.624V37.4a.622.622,0,0,0-.623-.623H38.022V34.282a.624.624,0,0,0-.623-.624H35.763V14.751H37.4a.624.624,0,0,0,.623-.624V11.634h2.494a.624.624,0,0,0,.288-1.177L20.857.072a.612.612,0,0,0-.575,0L.336,10.457a.624.624,0,0,0,.288,1.177H3.117v2.492a.625.625,0,0,0,.624.624H5.377V33.658Zm5.59-18.907h4.854V33.658H9.331Zm8.81,0H23V33.658H18.141Zm8.812,0h4.856V33.658H26.953Z"/></svg><span>['.$m['code'].']</span> '.$m['title'];
-        $html  .= '<a class="btn-link" onclick=\'fillModifyForm('.json_encode($m).')\' data-toggle="modal" href="#editCategory"> <span class="fa fa-pencil"></span></a><a class="btn-link" onclick=\'fillModifyForm2('.json_encode($m).')\' data-toggle="modal" href="#newAccount"> <span class="fa fa-plus"></span></a><a class="btn-link" onclick=\'deleteAccount('.json_encode($m).')\' href="javascript:void(0)"> <span class="fa fa-remove"></span></a>';
+        $html  .= '<a class="btn-link" onclick=\'fillModifyForm('.json_encode($m).')\' data-toggle="modal" href="#editCategory"> <span class="fa fa-pencil"></span></a><a class="btn-link" onclick=\'fillModifyForm2('.json_encode($m).')\' data-toggle="modal" href="#newAccount"> <span class="fa fa-plus"></span></a><a class="btn-link" ng-click=\'deleteAccount('.json_encode($m).')\' href="javascript:void(0)"> <span class="fa fa-remove"></span></a>';
         $html  .= '</li>';
         if(count($m['children']) > 0) {
             $html .= nestedDrawList($m['children']);
@@ -213,11 +213,9 @@ function drawList($list, $menuClass='list-unstyled', $subMenuClass = null) {
         $value['key'] = !empty($assocList[$value['parent_id']]) ? $assocList[$value['parent_id']]['key'].'-'.$value['id'] : $value['id'];
         $assocList[$value['id']] = $value;
     }
-    
-    
+
     $mainMenu = array_tree_expand_without_filter($assocList);
-    
-    
+
     $html = '<ul class="'.$menuClass.'" id="tree">';
     $html	.= nestedDrawList($mainMenu);
     $html .= '</ul>';

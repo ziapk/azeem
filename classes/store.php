@@ -66,6 +66,27 @@ class Store extends Connection
 		}
 	}
 
+    public function updateAccounts($id, $array) {
+		
+		try {
+			$stmt = "UPDATE `{$this->table}` SET cash=:cash, payable=:payable,receivable=:receivable, expense=:expense, sale_discount=:sale_discount, purchase_discount=:purchase_discount, assets=:assets WHERE id=:id";
+            $prepare = $this->dbh->prepare($stmt);
+            $prepare->bindParam(':cash',$array['cash'],PDO::PARAM_STR);
+            $prepare->bindParam(':payable',$array['payable'],PDO::PARAM_STR);
+            $prepare->bindParam(':receivable',$array['receivable'],PDO::PARAM_STR);
+            $prepare->bindParam(':expense',$array['expense'],PDO::PARAM_STR);
+            $prepare->bindParam(':sale_discount',$array['sale_discount'],PDO::PARAM_STR);
+            $prepare->bindParam(':purchase_discount',$array['purchase_discount'],PDO::PARAM_STR);
+            $prepare->bindParam(':assets',$array['assets'],PDO::PARAM_STR);
+            $prepare->bindParam(':id',$id,PDO::PARAM_STR);
+			$prepare->execute();
+			$result = $prepare->rowCount();
+			return $result;
+		} catch (PDOException $e) {
+		    die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
+
 	public function closeStoreSale($array) {
 		try {
 			$stmt = "UPDATE `{$this->table}` SET sale_date=:sale_date WHERE id=:id";

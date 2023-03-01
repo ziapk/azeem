@@ -16,6 +16,7 @@
 
         $data = [                
             'shopId' => $shopId,
+            'code' => '',
             'title' => $_POST['title'],
             'full_name' => $_POST['full_name'],
             'company' => $_POST['company'],
@@ -24,7 +25,26 @@
             'phoneNumber' => !empty($_POST['phoneNumber']) ? $_POST['phoneNumber'] : "",
         ];
 
+        $de = new DoubleEntry();
+
+        $receivableAccount = $de->getAccount($shop['receivable']);
+
+        $accountData = [
+            'title' => 'Customer - '.$_POST['full_name'].' - '.$_POST['company'],
+            'code' => $receivableAccount['code'],
+            'account_type' => $receivableAccount['account_type'],
+            'group_id' => $receivableAccount['group_id'],
+            'status' => $receivableAccount['status'],
+            'parent_id' => $receivableAccount['id'],
+            'opening_balance' => $_POST['opening_balance'],
+            'created_by' => $userId
+        ];
+
+        
+        $accountId = $de->insertAccount($accountData);
+        $data['account_id'] = $accountId;
         $create = $customerObj->createCustomer($data);
+
 
         if($create) {
             echo json_encode(["success" => true, "message" => "Successfully created!"]);

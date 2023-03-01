@@ -1,12 +1,9 @@
 <?php 
 include_once dirname(__FILE__).'/../../include/settings.php';
-
 $id = !empty($_GET['id']) ? $_GET['id'] : 0;
 $ordersObj = new Orders();
 $customers = new Customers();
-
 $order = $ordersObj->getOrder($id);
-
 echo mainHeader();
 ?>
     <div class="container" ng-controller="productController">

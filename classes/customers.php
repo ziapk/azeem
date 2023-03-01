@@ -22,7 +22,7 @@ class Customers extends Connection
 	
 	public function createCustomer($array) {
 		try {
-			$stmt = "INSERT INTO `{$this->table}` (`full_name`, `address`,`type`, `company`, `title`, `phoneNumber`, `shopId`) VALUES (:full_name, :address, :type, :company, :title, :phoneNumber, :shopId)";
+			$stmt = "INSERT INTO `{$this->table}` (`full_name`, `address`,`type`, `company`, `title`, `phoneNumber`, `shopId`, `account_id`, `code`) VALUES (:full_name, :address, :type, :company, :title, :phoneNumber, :shopId, :account_id, :code)";
             $prepare = $this->dbh->prepare($stmt);
             $prepare->bindParam(':full_name',$array['full_name'],PDO::PARAM_STR);
             $prepare->bindParam(':phoneNumber',$array['phoneNumber'],PDO::PARAM_STR);
@@ -31,6 +31,8 @@ class Customers extends Connection
             $prepare->bindParam(':address',$array['address'],PDO::PARAM_STR);
             $prepare->bindParam(':type',$array['type'],PDO::PARAM_INT);
             $prepare->bindParam(':shopId',$array['shopId'],PDO::PARAM_INT);
+            $prepare->bindParam(':account_id',$array['account_id'],PDO::PARAM_INT);
+            $prepare->bindParam(':code',$array['code'],PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $this->dbh->lastInsertId();
 			return $result;
@@ -39,6 +41,20 @@ class Customers extends Connection
 		}
 	}
 
+	public function linkAccountCustomer($array) {
+		try {
+			$stmt = "UPDATE `{$this->table}` SET account_id=:account_id WHERE id=:id";
+            $prepare = $this->dbh->prepare($stmt);
+            $prepare->bindParam(':id',$array['id'],PDO::PARAM_INT);
+            $prepare->bindParam(':account_id',$array['account_id'],PDO::PARAM_INT);
+			$prepare->execute();
+			$result = $prepare->rowCount();
+			return $result;
+		} catch (PDOException $e) {
+		    die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
+	
 	public function updateCustomer($array) {
 		try {
 			$stmt = "UPDATE `{$this->table}` SET full_name=:full_name, address=:address, phoneNumber=:phoneNumber, company=:company, title=:title, code=:code WHERE id=:id";
@@ -127,6 +143,22 @@ class Customers extends Connection
 		}
 	}
 
+	public function getUserByAccount($id) {
+		try {
+			$stmt = "SELECT *  FROM `{$this->table}` WHERE `account_id`=:id";
+			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':id',$id,PDO::PARAM_STR);
+			$prepare->execute();
+			$result = $prepare->fetch(PDO::FETCH_ASSOC);
+			$de = new DoubleEntry();
+			if(!empty($result['account_id'])) {
+				$result['account']=$de->getAccount($result['account_id']);
+			}
+			return $result;
+		} catch (PDOException $e) {
+		    die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
 	public function getCustomer($id) {
 		try {
 			$stmt = "SELECT *  FROM `{$this->table}` WHERE `id`=:id";
@@ -134,6 +166,10 @@ class Customers extends Connection
 			$prepare->bindParam(':id',$id,PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $prepare->fetch(PDO::FETCH_ASSOC);
+			$de = new DoubleEntry();
+			if(!empty($result['account_id'])) {
+				$result['account']=$de->getAccount($result['account_id']);
+			}
 			return $result;
 		} catch (PDOException $e) {
 		    die("Error!: " . $e->getMessage() . "<br/>");

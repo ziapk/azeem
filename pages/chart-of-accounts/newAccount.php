@@ -24,26 +24,13 @@ if(empty($_REQUEST['account_type'])) {
 	$data['account_type'] = $_REQUEST['account_type'];
 }
 
+$data['code'] = $_REQUEST['code'];
 $data['status'] = $_REQUEST['status'];
 $data['created_by'] = $_SESSION['user_credentials']['id'];
 
 if(!$errors) {
 	try {
 	$categories = new DoubleEntry();
-	$getSiblings = $categories->getAccountSiblings($data['parent_id']);
-	$count = $getSiblings['total'];
-	if(!empty($getSiblings) && $count > 0) {
-		$data['code'] = $_REQUEST['code'];
-		if($count < 9) {
-			$data['code'] .= '0'.($count+1);
-		}
-		else {
-			$data['code'] .= ($count+1);
-		}
-	}
-	else {
-		$data['code'] = $_REQUEST['code'].'01';
-	}
 	$category = $categories->insertAccount($data);
 	if($category) {
 		echo json_encode($category);

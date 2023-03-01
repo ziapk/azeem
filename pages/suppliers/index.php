@@ -32,6 +32,7 @@ echo mainHeader(['page'=> 'supplier']);
                     <td>
                         <a class="btn btn-primary btn-xs" href="<?php echo SITE_URL."pages/suppliers/update.php?id="?>{{li.id}}">Edit</a>
                         <a ng-if="li.wallet < 0 || li.wallet > 0 " class="btn btn-danger btn-xs" href="<?php echo SITE_URL."pages/suppliers/adjustment.php?id="?>{{li.id}}">Pay</a>
+                        <?php if($userData['role'] === 'owner' || $userData['role'] === 'manager') {?><a class="btn btn-default btn-xs" href="../chart-of-accounts/summery.php?t=s&id={{li.account_id}}">Summery</a><?php } ?>
                         <a class="btn btn-danger btn-xs" href="<?php echo SITE_URL."pages/suppliers/transactions.php?id="?>{{li.id}}">History</a>
                         <a class="btn btn-danger btn-xs" href="<?php echo SITE_URL."pages/suppliers/invoices.php?id="?>{{li.id}}">Bills</a>
                     </td>
@@ -75,8 +76,8 @@ echo mainHeader(['page'=> 'supplier']);
                 </div>
                 <div class="col-sm-6">
                     <div class="form-group">
-                        <label for="swallet">Balance</label>
-                        <input id="swallet" type="text" ng-model="form.wallet" class="form-control" placeholder="Supplier's balance">
+                        <label for="sopening_balance">Opening Balance</label>
+                        <input id="sopening_balance" type="text" ng-model="form.opening_balance" class="form-control" placeholder="Supplier's Opening Balance">
                     </div>
                 </div>
             </div>
