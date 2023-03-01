@@ -62,25 +62,6 @@ try {
             }
         }
 
-        // $transaction = [
-        //     'customer_id' => !empty($_POST['customerId']) ? $_POST['customerId'] : 1,
-        //     'user_id' => $userData['id'],
-        //     'amount' => !empty($_POST['payment_amount']) ? $_POST['payment_amount'] : 0,
-        //     'payment_date' => date('Y-m-d H:i:s'),
-        //     'order_id' => $order_id,
-        //     'shopId' => $userData['shopId']
-        // ];
-
-        // $transactionId = $orders->makeTransaction($transaction);
-
-        // $amount = !empty($_POST['payment_amount']) ? $_POST['payment_amount'] : 0;
-
-        // $wallet = [
-        //     'id' => !empty($_POST['customerId']) ? $_POST['customerId'] : 1,
-        //     'wallet' => $amount - ($_POST['subTotal'] - $_POST['discount']),
-        //     'shopId' => $userData['shopId']
-        // ];
-
         $customer = $customersObj->getCustomer($data['customer_id']);
         $doubleEntry = new DoubleEntry();
 
@@ -89,7 +70,10 @@ try {
             'transaction_date' => $storeDATA['sale_date'],
             'reference' => $_POST['ref_no'],
             'shopId' => $shop['id'],
-            'created_by' => $_SESSION['user_credentials']['id']
+            'created_by' => $_SESSION['user_credentials']['id'],
+            'order_ref' => $order_id,
+            'supply_ref' => null,
+            
         ];
 
         $makeTransactionId = $doubleEntry->makeTransaction($makeTransaction);

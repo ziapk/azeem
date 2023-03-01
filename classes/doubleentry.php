@@ -33,6 +33,16 @@ class DoubleEntry extends Connection
 		    die("Error!: " . $e->getMessage() . "<br/>");
 		}
 	}
+
+	public function addColumn($columnName, $table) {
+        try {
+            $stmt = "ALTER TABLE `{$table}` ADD COLUMN IF NOT EXISTS `{$columnName}` varchar(20) NULL DEFAULT NULL AFTER `reference`";
+            $prepare = $this->dbh->prepare($stmt);
+            $prepare->execute();
+        } catch (PDOException $e) {
+		    die("Error!: " . $e->getMessage() . "<br/>");
+		}
+    }
 	
 	public function searchAccounts($shopId, $search) {
 		try {
@@ -75,6 +85,8 @@ class DoubleEntry extends Connection
 
 	public function getAccountLeafs($shopId = null) {
 		try {
+			$this->addColumn('order_ref', $this->table_transactions);
+			$this->addColumn('supply_ref', $this->table_transactions);
 			$shopIdCond = " and t1.shopId=$shopId ";
 			$stmt = "SELECT t1.id, t1.account_type, t1.code, t1.title FROM accounts AS t1 LEFT JOIN accounts as t2 ON t1.id = t2.parent_id WHERE t2.id IS NULL and t1.status = 1 $shopIdCond LIMIT 10";
 			$prepare = $this->dbh->prepare($stmt);
@@ -773,13 +785,15 @@ class DoubleEntry extends Connection
 	// insert method
 	public function makeTransaction($array) {
 		try {
-			$stmt = "INSERT INTO `{$this->table_transactions}` (`description`, `reference`, `transaction_date`, `created_by`, `shopId`) VALUES (:description, :reference, :transaction_date, :created_by, :shopId)";
+			$stmt = "INSERT INTO `{$this->table_transactions}` (`description`, `reference`, `transaction_date`, `created_by`, `shopId`, `order_ref`,`supply_ref`) VALUES (:description, :reference, :transaction_date, :created_by, :shopId, :order_ref, :supply_ref)";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':description', $array['description'], PDO::PARAM_STR);
 			$prepare->bindParam(':reference', $array['reference'], PDO::PARAM_STR);
 			$prepare->bindParam(':transaction_date', $array['transaction_date'], PDO::PARAM_STR);
 			$prepare->bindParam(':shopId', $array['shopId'], PDO::PARAM_STR);
 			$prepare->bindParam(':created_by', $array['created_by'], PDO::PARAM_STR);
+			$prepare->bindParam(':order_ref', $array['order_ref'], PDO::PARAM_STR);
+			$prepare->bindParam(':supply_ref', $array['supply_ref'], PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $this->dbh->lastInsertId();
 			return $result;

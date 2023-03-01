@@ -28,11 +28,11 @@ echo mainHeader(['page'=> 'customer']);
                 <td><strong>{{li.company}}</strong> - {{li.title}} <br />{{li.address}}</td>
                 <td>{{li.wallet}}</td>
                 <td>
-                    <?php if($userData['role'] === 'manager') {?><a ng-click="deleteCustomer(li.id)" class="btn btn-default btn-xs" href="javascript:void(0)">Delete</a><?php }?>
-                    <?php if($userData['role'] === 'owner' || $userData['role'] === 'manager') {?><a class="btn btn-info btn-xs" href="javascript:void(0)" ng-click="assignBooks(li)">Assign</a><?php } ?>
-                    <?php if($userData['role'] === 'owner' || $userData['role'] === 'manager') {?><a class="btn btn-default btn-xs" href="../chart-of-accounts/summery.php?t=c&id={{li.account_id}}">Summery</a><?php } ?>
+                    <?php if($userData['role'] === 'owner' || $userData['role'] === 'manager') {?><a class="btn btn-info btn-xs" href="javascript:void(0)" ng-click="assignBooks(li)">Disc.</a><?php } ?>
+                    <?php if($userData['role'] === 'owner' || $userData['role'] === 'manager') {?><a class="btn btn-default btn-xs" href="../chart-of-accounts/summery.php?t=c&id={{li.account_id}}">Ledger</a><?php } ?>
                     <?php if($userData['role'] === 'manager') {?><a class="btn btn-danger btn-xs" href="<?php echo SITE_URL;?>pages/orders/customerOrders.php?id={{li.id}}">Orders</a><?php }?>
-                    <?php if($userData['role'] === 'owner' || $userData['role'] === 'manager') {?><a class="btn btn-default btn-xs" href="<?php echo SITE_URL;?>pages/customers/update.php?id={{li.id}}">Update</a><?php }?>
+                    <?php if($userData['role'] === 'owner' || $userData['role'] === 'manager') {?><a class="btn btn-default btn-xs" href="<?php echo SITE_URL;?>pages/customers/update.php?id={{li.id}}"><span class="fa fa-edit"><span></a><?php }?>
+                    <?php if($userData['role'] === 'manager') {?><a ng-click="deleteCustomer(li.id)" class="btn btn-danger btn-xs" href="javascript:void(0)"><span class="fa fa-remove"><span></a><?php }?>
                 </td>
             </tr>
         </tbody>

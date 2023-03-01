@@ -1,29 +1,62 @@
 <?php
 include_once dirname(__FILE__).'/../include/settings.php';
-
-
-$supply = new Supply();
+try {
 
 $supplierId = $_POST['id'];
+
+
 $amount = $_POST['amount'];
 
-$transaction = [
-    'supplier_id' => $supplierId,
-    'user_id' => $userData['id'],
+
+$storeObj = new Store();
+$storeDATA = $storeObj->getStore($shop['id']);
+
+
+
+$doubleEntry = new DoubleEntry();
+
+$makeTransaction = [
+    'description' => !empty($_POST['summery']) ? $_POST['summery'] : "SUPPLY PAYMENT",
+    'transaction_date' => $storeDATA['sale_date'],
+    'reference' => $_POST['ref_no'],
+    'shopId' => $shop['id'],
+    'created_by' => $_SESSION['user_credentials']['id'],
+    'order_ref' => null,
+    'supply_ref' => !empty($_POST['supply_ref']) ? $_POST['supply_ref'] : null
+];
+
+$supplierObj = new Suppliers();
+
+$supplier = $supplierObj->getSupplier($supplierId);
+$makeTransactionId = $doubleEntry->makeTransaction($makeTransaction);
+
+ // payable credit entry
+ $entry = [
+    'transaction_id' => $makeTransactionId,
+    'account_id' => $supplier['account_id'],
+    'entry_type' => 'D',
+    'description' => '',
     'amount' => $amount,
-    'payment_date' => date('Y-m-d H:i:s'),
-    'supply_id' => 0,
-    'transaction_type' => 2,
-    'shopId' => $userData['shopId']
+    'payment_mode'=> $_POST['payment_mode'],
+    'user_id' => $_SESSION['user_credentials']['id'],
+];
+$a[] = $doubleEntry->makeEntry($entry);
+
+
+ // payable credit entry
+ $entry = [
+    'transaction_id' => $makeTransactionId,
+    'account_id' => $storeDATA['cash'],
+    'entry_type' => 'C',
+    'description' => '',
+    'amount' => $amount,
+    'payment_mode'=> $_POST['payment_mode'],
+    'user_id' => $_SESSION['user_credentials']['id'],
 ];
 
-$transactionId = $supply->makeTransaction($transaction);
+$a[] = $doubleEntry->makeEntry($entry);
 
-$wallet = [
-    'id' => $supplierId,
-    'wallet' => $amount
-];
-
-$manageWallet = $supply->manageWallet($wallet);
-
-echo json_encode(['status' => 200, 'message' => 'successfully done', 'supply' => [ 'id'=> $transactionId ]]);
+echo json_encode(['status' => 200, 'message' => 'successfully done', 'supply' => [ 'id'=> $makeTransactionId ]]);
+} catch (PDOException $e) {
+    die("Error!: " . $e->getMessage() . "<br/>");
+}

@@ -7,7 +7,9 @@ $makeTransaction = [
     'description' => $_POST['description'],
     'transaction_date' => $_POST['date'],
     'reference' => $_POST['reference'],
-    'created_by' => $_SESSION['user_credentials']['id']
+    'created_by' => $_SESSION['user_credentials']['id'],
+    'order_ref' => null,
+    'supply_ref' => null,
 ];
 
 

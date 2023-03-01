@@ -30,14 +30,15 @@
     echo mainHeader();
     ?>
     <div class="container">
-    <table class="table">
+    <table class="table table-striped">
     <thead>
         <tr>
-            <th>Sr.#</th>
+            <th width="80">Sr.#</th>
             <th>Invoice ID</th>
             <th>Supplier</th>
             <th>Date/time</th>
             <th>Price</th>
+            <th>Action</th>
         </tr>
     </thead>
     <tbody>
@@ -48,24 +49,36 @@
                 <td class="fw-bold"><?php echo $customer['supplier']['name'];?></td>
                 <td class="fw-bold"><?php echo $value['supply_date'];?></td>
                 <td class="fw-bold"><?php echo $value['price'];?></td>
+                <td><a href="javascipt:void(0)" ng-click="order = <?php echo $value['id'];?>" class="fa fa-eye"></a></td>
             </tr>
-            <tr class="text-danger">
-                <th class="text-danger fw-bold">Supply Items</th>
+            <tr class="text-danger" ng-if="order == <?php echo $value['id'];?>">
+                <th class="text-danger fw-bold" style="text-align: right">Items <span class="fa fa-arrow-down"></span></th>
                 <th class="text-danger fw-bold">Sr.#</th>
                 <th class="text-danger fw-bold">ID</th>
                 <th class="text-danger fw-bold">Product</th>
+                <th class="text-danger fw-bold">Qty</th>
                 <th class="text-danger fw-bold">Price</th>
             </tr>
             <?php 
             foreach ($value['order_items'] as $k => $v) {?>
-                <tr>
-                    <td>-</td>
+                <tr ng-if="order == <?php echo $value['id'];?>">
+                    <td align="right"><span class="fa text-danger fa-arrow-right"></span></td>
                     <td><?php echo $k+1;?></td>
                     <td><?php echo $v['id'];?></td>
                     <td><?php echo $v['product_title'];?></td>
+                    <td><?php echo $v['quantity'];?></td>
                     <td><?php echo $v['price'];?></td>
                 </tr>
             <?php } ?>
+
+            <tr class="text-danger" ng-if="order == <?php echo $value['id'];?>">
+                <th class="text-danger fw-bold" style="text-align: right">Items <span class="fa fa-arrow-up"></span></th>
+                <th class="text-danger fw-bold">Sr.#</th>
+                <th class="text-danger fw-bold">ID</th>
+                <th class="text-danger fw-bold">Product</th>
+                <th class="text-danger fw-bold">Qty</th>
+                <th class="text-danger fw-bold">Price</th>
+            </tr>
             
         <?php } ?>
     </tbody>

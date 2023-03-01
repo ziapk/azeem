@@ -162,7 +162,9 @@ if($supply_id) {
         'transaction_date' => $storeDATA['sale_date'],
         'reference' => $data['ref_no'],
         'shopId' => $shop['id'],
-        'created_by' => $_SESSION['user_credentials']['id']
+        'created_by' => $_SESSION['user_credentials']['id'],
+        'order_ref' => null,
+        'supply_ref' => $supply_id,
     ];
 
     $makeTransactionId = $doubleEntry->makeTransaction($makeTransaction);
