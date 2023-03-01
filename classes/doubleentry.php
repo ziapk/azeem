@@ -85,8 +85,8 @@ class DoubleEntry extends Connection
 
 	public function getAccountLeafs($shopId = null) {
 		try {
-			$this->addColumn('order_ref', $this->table_transactions);
-			$this->addColumn('supply_ref', $this->table_transactions);
+			// $this->addColumn('order_ref', $this->table_transactions);
+			// $this->addColumn('supply_ref', $this->table_transactions);
 			$shopIdCond = " and t1.shopId=$shopId ";
 			$stmt = "SELECT t1.id, t1.account_type, t1.code, t1.title FROM accounts AS t1 LEFT JOIN accounts as t2 ON t1.id = t2.parent_id WHERE t2.id IS NULL and t1.status = 1 $shopIdCond LIMIT 10";
 			$prepare = $this->dbh->prepare($stmt);
