@@ -32,7 +32,7 @@ echo mainHeader(['page'=> 'supplier']);
                     <td>
                         <a class="btn btn-primary btn-xs" href="<?php echo SITE_URL."pages/suppliers/update.php?id="?>{{li.id}}">Edit</a>
                         <a ng-if="li.wallet < 0 || li.wallet > 0 " class="btn btn-danger btn-xs" href="<?php echo SITE_URL."pages/suppliers/adjustment.php?id="?>{{li.id}}">Pay</a>
-                        <?php if($userData['role'] === 'owner' || $userData['role'] === 'manager') {?><a class="btn btn-default btn-xs" href="../chart-of-accounts/summery.php?t=s&id={{li.account_id}}">Summery</a><?php } ?>
+                        <?php if($userData['role'] === 'owner' || $userData['role'] === 'manager') {?><a class="btn btn-default btn-xs" href="../chart-of-accounts/summery.php?t=s&id={{li.account_id}}">Ledger</a><?php } ?>
                         <a class="btn btn-danger btn-xs" href="<?php echo SITE_URL."pages/suppliers/invoices.php?id="?>{{li.id}}">Bills</a>
                     </td>
                 </tr>

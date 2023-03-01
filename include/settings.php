@@ -1,6 +1,6 @@
 <?php
 session_start();
-define('SITE_URL', '/');
+define('SITE_URL', '/pos-v2/');
 
 // ini_set('display_errors', 1);
 // ini_set('display_startup_errors', 1);
@@ -15,6 +15,14 @@ if(empty($_SESSION) && $loginPage != true) {
 $userData = !empty($_SESSION['user_credentials']) ? $_SESSION['user_credentials'] : [];
 $shopData = !empty($_SESSION['shopInfo']) ? $_SESSION['shopInfo'] : [];
 $shop = !empty($_SESSION['shop']) ? $_SESSION['shop'] : [];
+// todo query
+// => add column in customers = account_id
+// => add column in suppliers = account_id
+// => add table = payment_modes
+// => add table = account_transactions -> add column -> shopId
+// => add column in accounts = shopId, owner_id, opening_balance
+// => add table = account_ledger_entries -> add column -> payment_mode = default 1 cash
+// => ALTER TABLE `store` ADD `assets` INT NULL DEFAULT NULL AFTER `sale_date`, ADD `cash` INT NULL AFTER `assets`, ADD `expense` INT NULL AFTER `cash`, ADD `receivable` INT NULL AFTER `expense`, ADD `payable` INT NULL AFTER `receivable`, ADD `sale_discount` INT NULL AFTER `payable`, ADD `purchase_discount` INT NULL AFTER `sale_discount`;
 
 $pages = [
     "assign" => "Assign Book",
