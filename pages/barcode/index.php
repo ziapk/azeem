@@ -32,7 +32,7 @@ if(!empty($_GET['all']) && $_GET['all'] == '1') {
 </form>
 <h4>Products</h4>
 <div class="form-group">
-<input type="text" class="form-control" ng-model="product" placeholder="Search Products" typeahead-on-select="selectProduct($item)" uib-typeahead="address as address.full_name for address in searchProduct($viewValue)" typeahead-template-url="row.html" class="form-control" ng-model-options="{debounce: 500}" typeahead-show-hint="true" typeahead-min-length="0">
+<input type="text" class="form-control" ng-model="product" placeholder="Search Products" typeahead-on-select="selectProduct($item)" uib-typeahead="address as address.full_name for address in searchProduct($viewValue)" typeahead-template-url="row.html" class="form-control" ng-model-options="{debounce: 500}" typeahead-show-hint="true" typeahead-min-length="1">
 </div>
 
 <form action="print.php" method="post" target="_blank">

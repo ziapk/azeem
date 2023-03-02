@@ -152,6 +152,8 @@ body {
     width: $sidebarWidth;
     padding-top: 80px;
     z-index: 2;
+    overflow: auto;
+    
 }
 
 .sidebar .nav {
@@ -855,4 +857,11 @@ body.no-padding {
 
 .table-striped>tbody>tr:nth-of-type(odd) {
     background-color: #ebebeb;
+}
+
+.dropdown-wrapper.align-right {
+    .dropdown-menu {
+        left: auto !important;
+        right: 0;
+    }
 }
