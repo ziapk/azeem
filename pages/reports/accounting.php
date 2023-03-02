@@ -53,7 +53,7 @@ switch ($reportType) {
 		$exp = $store['sale_discount'];
 		$expHead = $store['expense'];
 		$count = 0;
-		$expenses = [];
+		$expenses = ['total' => 0, 'rows' => []];
 		$final = [];
 		// print_r($shop['expense']);
 		// print_r($reportDataRaw);
@@ -337,18 +337,24 @@ ob_start();
 	<?php }?>
 </table>
 <br>
+<?php 
+
+$tsale = empty($footer['finalCashSales']) ? 0 : $footer['finalCashSales'];
+$texpense = empty($expenses['total']) ? 0 : $expenses['total'];
+
+?>
 <table id="resultTable" style="border-collapse: collapse; width: 400px" border="1">
 		<tr>
 			<th align="left">Grand Sale</td>
-			<th align="left"><?php echo $footer['finalCashSales'];?></td>
+			<th align="left"><?php echo $tsale;?></td>
 		</tr>
 		<tr>
 			<th align="left">Total Expenses</td>
-			<th align="left"><?php echo $value['total'];?></td>
+			<th align="left"><?php echo $texpense;?></td>
 		</tr>
 		<tr>
 			<th align="left">Net Total</td>
-			<th align="left"><?php echo $footer['finalCashSales'] - $value['total'];?></th>
+			<th align="left"><?php echo $tsale  - $texpense;?></th>
 		</tr>
 </table>
 
