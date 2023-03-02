@@ -13,6 +13,12 @@ class Products extends Connection
 			$searchQry = "";
 			$sortByQry = "";
 
+			$prefix = "%";
+
+			if(!empty($params['correction'])) {
+				$prefix = "";
+			}
+
 			$pin = "";
 			if(!empty($params['pin'])) {
 				$pin .= " AND p.pin > 0";
@@ -29,39 +35,39 @@ class Products extends Connection
 			}
 			else if(!empty($params['searchBy']) && $params['searchBy'] == 'multi') {
 				if(!empty($params['full_name'])) {
-					$searchQry .= " AND p.full_name LIKE '%".$params["full_name"]."%'";	
+					$searchQry .= " AND p.full_name LIKE '".$prefix.$params["full_name"]."%'";	
 				}
 				if(!empty($params['author'])) {
-					$searchQry .= " AND p.author LIKE '%".$params["author"]."%'";	
+					$searchQry .= " AND p.author LIKE '".$prefix.$params["author"]."%'";	
 				}
 				if(!empty($params['board'])) {
-					$searchQry .= " AND p.board LIKE '%".$params["board"]."%'";	
+					$searchQry .= " AND p.board LIKE '".$prefix.$params["board"]."%'";	
 				}
 				if(!empty($params['group'])) {
-					$searchQry = " AND p.group LIKE '%".$params["group"]."%'";	
+					$searchQry = " AND p.group LIKE '".$prefix.$params["group"]."%'";	
 				}
 			}
 			else if(!empty($params['searchBy']) && !empty($params["search"]) ) {
 				$name = $params['searchBy'];
 				if($name == 'group') {
-					$searchQry = "AND p.group LIKE '%".$params["search"]."%'";	
+					$searchQry = "AND p.group LIKE '".$prefix.$params["search"]."%'";	
 				}
 				else if($name == 'author') {
-					$searchQry = "AND p.author LIKE '%".$params["search"]."%'";	
+					$searchQry = "AND p.author LIKE '".$prefix.$params["search"]."%'";	
 				}
 				else if($name == 'board') {
-					$searchQry = "AND p.board LIKE '%".$params["search"]."%'";	
+					$searchQry = "AND p.board LIKE '".$prefix.$params["search"]."%'";	
 				}
 				else if($name == 'category') {
-					$searchQry = "AND p.cat LIKE '%".$params["search"]."%'";	
+					$searchQry = "AND p.cat LIKE '".$prefix.$params["search"]."%'";	
 				}
 				else if($name == 'subCategory') {
-					$searchQry = "AND p.sub_cat LIKE '%".$params["search"]."%'";	
+					$searchQry = "AND p.sub_cat LIKE '".$prefix.$params["search"]."%'";	
 				}
-				else $searchQry = "AND (p.id = '".$params["search"]."' OR p.code = '".$params["search"]."' OR p.full_name LIKE '%".$params["search"]."%' OR p.group LIKE '%".$params["search"]."%' OR p.description LIKE '%".$params["search"]."%' OR p.board LIKE '%".$params["search"]."%' OR p.author LIKE '%".$params["search"]."%' OR p.price LIKE '%".$params["search"]."%' OR pc.code LIKE '%".$params["search"]."%' ) ";
+				else $searchQry = "AND (p.id = '".$params["search"]."' OR p.code = '".$params["search"]."' OR p.full_name LIKE '".$prefix.$params["search"]."%' OR p.group LIKE '".$prefix.$params["search"]."%' OR p.description LIKE '".$prefix.$params["search"]."%' OR p.board LIKE '".$prefix.$params["search"]."%' OR p.author LIKE '".$prefix.$params["search"]."%' OR p.price LIKE '".$prefix.$params["search"]."%' OR pc.code LIKE '".$prefix.$params["search"]."%' ) ";
 			}
 			else {
-				$searchQry = "AND (p.id = '".$params["search"]."' OR p.code = '".$params["search"]."' OR p.full_name LIKE '%".$params["search"]."%' OR p.group LIKE '%".$params["search"]."%' OR p.description LIKE '%".$params["search"]."%' OR p.board LIKE '%".$params["search"]."%' OR p.author LIKE '%".$params["search"]."%' OR p.price LIKE '%".$params["search"]."%' OR pc.code LIKE '%".$params["search"]."%' ) ";
+				$searchQry = "AND (p.id = '".$params["search"]."' OR p.code = '".$params["search"]."' OR p.full_name LIKE '".$prefix.$params["search"]."%' OR p.group LIKE '".$prefix.$params["search"]."%' OR p.description LIKE '".$prefix.$params["search"]."%' OR p.board LIKE '".$prefix.$params["search"]."%' OR p.author LIKE '".$prefix.$params["search"]."%' OR p.price LIKE '".$prefix.$params["search"]."%' OR pc.code LIKE '".$prefix.$params["search"]."%' ) ";
 			}
 
 			if(!empty($params['sortByField'])) {
@@ -114,6 +120,127 @@ class Products extends Connection
 			$prepare->bindParam(':owner_id',$owner_id,PDO::PARAM_STR);
 			$prepare->bindParam(':offset',$offset,PDO::PARAM_INT);
 			$prepare->bindParam(':perPage',$no_of_records_per_page,PDO::PARAM_INT);
+			$prepare->execute();
+			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
+			return ['page' => $currentPage, 'totalRecords'=> $total_rows, 'perPage' => $no_of_records_per_page, 'records' => $result];
+
+		} catch (PDOException $e) {
+		    die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
+
+	public function assignProductsPublisher($owner_id, $params, $shopId = null) {
+		try {
+
+			$searchQry = "";
+			$sortByQry = "";
+
+			$prefix = "%";
+
+			if(!empty($params['correction'])) {
+				$prefix = "";
+			}
+
+			$pin = "";
+			if(!empty($params['pin'])) {
+				$pin .= " AND p.pin > 0";
+			}
+			$publisher_query = "";
+			if(!empty($params['publisher_id'])) {
+				$publisher_query = " AND p.publisher_id = '".$params['publisher_id']."' ";
+			}
+			if($params['searchBy'] == 'id' && !empty($params["search"])) {
+				$searchQry = "AND (p.id = ".$params["search"]." OR p.code = ".$params["search"].")";	
+			}
+			else if($params['searchBy'] == 'cource' && !empty($params["courceId"])) {
+				$searchQry = "AND c.program_id = ".$params["courceId"];	
+			}
+			else if(!empty($params['searchBy']) && $params['searchBy'] == 'multi') {
+				if(!empty($params['full_name'])) {
+					$searchQry .= " AND p.full_name LIKE '".$prefix.$params["full_name"]."%'";	
+				}
+				if(!empty($params['author'])) {
+					$searchQry .= " AND p.author LIKE '".$prefix.$params["author"]."%'";	
+				}
+				if(!empty($params['board'])) {
+					$searchQry .= " AND p.board LIKE '".$prefix.$params["board"]."%'";	
+				}
+				if(!empty($params['group'])) {
+					$searchQry = " AND p.group LIKE '".$prefix.$params["group"]."%'";	
+				}
+			}
+			else if(!empty($params['searchBy']) && !empty($params["search"]) ) {
+				$name = $params['searchBy'];
+				if($name == 'group') {
+					$searchQry = "AND p.group LIKE '".$prefix.$params["search"]."%'";	
+				}
+				else if($name == 'author') {
+					$searchQry = "AND p.author LIKE '".$prefix.$params["search"]."%'";	
+				}
+				else if($name == 'board') {
+					$searchQry = "AND p.board LIKE '".$prefix.$params["search"]."%'";	
+				}
+				else if($name == 'category') {
+					$searchQry = "AND p.cat LIKE '".$prefix.$params["search"]."%'";	
+				}
+				else if($name == 'subCategory') {
+					$searchQry = "AND p.sub_cat LIKE '".$prefix.$params["search"]."%'";	
+				}
+				else $searchQry = "AND (p.id = '".$params["search"]."' OR p.code = '".$params["search"]."' OR p.full_name LIKE '".$prefix.$params["search"]."%' OR p.group LIKE '".$prefix.$params["search"]."%' OR p.description LIKE '".$prefix.$params["search"]."%' OR p.board LIKE '".$prefix.$params["search"]."%' OR p.author LIKE '".$prefix.$params["search"]."%' OR p.price LIKE '".$prefix.$params["search"]."%' OR pc.code LIKE '".$prefix.$params["search"]."%' ) ";
+			}
+			else {
+				$searchQry = "AND (p.id = '".$params["search"]."' OR p.code = '".$params["search"]."' OR p.full_name LIKE '".$prefix.$params["search"]."%' OR p.group LIKE '".$prefix.$params["search"]."%' OR p.description LIKE '".$prefix.$params["search"]."%' OR p.board LIKE '".$prefix.$params["search"]."%' OR p.author LIKE '".$prefix.$params["search"]."%' OR p.price LIKE '".$prefix.$params["search"]."%' OR pc.code LIKE '".$prefix.$params["search"]."%' ) ";
+			}
+
+			if(!empty($params['sortByField'])) {
+				$name = $params['sortByField'];
+				$order = $params['sortByOrder'];
+				if($name == 'title') {
+					$sortByQry= " ORDER BY p.full_name ".$params['sortByOrder'];
+				}
+				if($name == 'group') {
+					$sortByQry= " ORDER BY p.group ".$params['sortByOrder'];
+				}
+				if($name == 'author') {
+					$sortByQry= " ORDER BY p.author ".$params['sortByOrder'];
+				}
+				if($name == 'price') {
+					$sortByQry= " ORDER BY p.price ".$params['sortByOrder'];
+				}
+				if($name == 'stock') {
+					$sortByQry= " ORDER BY p.in_hand ".$params['sortByOrder'];
+				}
+			}
+
+			$innerJoin = "";
+			if(!empty($shopId)) {
+				$innerJoin .= " INNER JOIN {$this->table_st} as sp on sp.product_id = p.id and shopId=$shopId and sp.status = 1 ";
+			}
+
+			$column = "";
+
+			if(!empty($shopId)) {
+				$column = ", (sp.qty - sp.stock_out) as qty ";
+			}
+			
+			// $stmt = "SELECT count(p.id) as count FROM `{$this->table}` as p $innerJoin LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id  LEFT JOIN program_books as c ON c.product_id = p.id WHERE p.owner_id=:owner_id $publisher_query $pin $searchQry";
+			// $prepare = $this->dbh->prepare($stmt);
+			// $prepare->bindParam(':owner_id',$owner_id,PDO::PARAM_STR);
+			// $prepare->execute();
+			// $total = $prepare->fetch(PDO::FETCH_ASSOC);
+			// $no_of_records_per_page = !empty($params['perPage']) ? $params['perPage'] : 10;
+			// $total_rows = empty($total) ? 0 : $total['count'];
+			// $total_pages = ceil($total_rows / $no_of_records_per_page);
+			// $currentPage = $total_pages >= $params['page'] ? $params['page'] : $total_pages;
+			// $offset =  ((!empty($currentPage) ? $currentPage : 1) -1) * $no_of_records_per_page;
+			
+
+			
+
+			$stmt = "UPDATE `{$this->table}` as p  $innerJoin LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id LEFT JOIN program_books as c ON c.product_id = p.id LEFT JOIN publishers as pub on p.publisher_id = pub.id SET p.publisher_id=:publisher_id WHERE p.`owner_id`=:owner_id $publisher_query  $pin $searchQry";
+			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':owner_id',$owner_id,PDO::PARAM_STR);
+			$prepare->bindParam(':publisher_id',$params['selectedPublisherId'],PDO::PARAM_INT);
 			$prepare->execute();
 			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
 			return ['page' => $currentPage, 'totalRecords'=> $total_rows, 'perPage' => $no_of_records_per_page, 'records' => $result];
