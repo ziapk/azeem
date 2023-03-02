@@ -27,8 +27,8 @@ echo mainHeader(['page' => 'expense']);
 ?>
 
 <div class="container">
-    <a href="<?php echo SITE_URL;?>pages/expenses/bulk.php" class="btn btn-danger btn-sm pull-right" style="margin-left: 10px">Add In Bulk</a>    
-    <a href="javascript:void(0)" onclick="createCategory()" class="btn btn-success btn-sm pull-right">Add New</a>    
+    <a href="<?php echo SITE_URL;?>pages/expenses/bulk.php" class="btn btn-danger btn-sm pull-right" style="margin-left: 10px">Add Expenses</a>    
+    <!-- <a href="javascript:void(0)" onclick="createCategory()" class="btn btn-success btn-sm pull-right">Add New</a>     -->
     <h3 style="margin-top: 0">Expenses</h3>
     <form method="GET" action="">
         <h4><?php echo $dateLabel;?></h4>
@@ -53,7 +53,7 @@ echo mainHeader(['page' => 'expense']);
                 <th>Name</th>
                 <th width="150px">Price</th>
                 <th width="150px">Date</th>
-                <th width="100px"></th>
+                <th width="150px"></th>
             </tr>
         </thead>
         <tbody>
@@ -65,7 +65,9 @@ echo mainHeader(['page' => 'expense']);
                 <td><?php echo $cust['title'];?></td>
                 <td><?php echo $cust['price'];?></td>
                 <td><?php echo date('d M Y', strtotime($cust['exp_date']));?></td>
-                <?php if($userData['role'] === 'owner') { ?><td><a onclick="deleteExpense(<?php echo $cust['id'];?>)" class="btn btn-primary btn-xs" href="javascript:void(0)">Delete</a></td><?php } else { ?><td></td><?php }?>
+                <td>
+                    <?php if($userData['role'] === 'owner') { ?><a onclick="deleteExpense(<?php echo $cust['id'];?>)" class="btn btn-primary btn-xs" href="javascript:void(0)">Delete</a><?php } ?>
+                </td>
             </tr>
         <?php }?>
         </tbody>

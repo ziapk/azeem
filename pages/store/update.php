@@ -180,7 +180,7 @@
 <script type="text/javascript">
 
 app.controller('accountingController', function($scope, $http, $httpParamSerializerJQLike, $window){
-    $scope.account = {};
+    $scope.account = <?php echo json_encode($shop);?>;
     $scope.searchGroup = function (term) {
         return $http.get("../chart-of-accounts/getAccounts.php", {params: {term, shopId: <?php echo $_GET['id'];?> }})
         .then(function(response) {

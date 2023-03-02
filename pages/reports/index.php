@@ -16,7 +16,7 @@
     <form method="POST" action="print.php">
         <h4>Reports</h4>
         <div class="row datepicker-parent">
-            <div class="col-sm-3 form-group">
+            <div class="col-sm-4 col-md-3 form-group">
                 <label>Select Date/Range</label>
                 <input class="form-control datepicker" type="text" />
                 <input type="hidden" name="from" id="from">
@@ -25,7 +25,7 @@
             <?php 
 
             if($userData['role'] == 'owner') {?>
-            <div class="col-sm-3 form-group">
+            <div class="col-sm-4 col-md-3 form-group">
                 <label>Select Shop</label>
                 <select class="form-control c-select" name="shopId">
                     <?php foreach ($ownerStores as $value) { ?>
@@ -34,7 +34,7 @@
                 </select>
             </div>
             <?php } ?>
-            <div class="col-sm-3 form-group">
+            <div class="col-sm-4 col-md-3 form-group">
                 <label>Select Report</label>
                 <select class="form-control" name="reportType" ng-change="checkReport(reportType)" ng-model="reportType">
                     <option value="">Select a Report</option>

@@ -16,6 +16,7 @@ echo mainHeader(['page' => 'category']);
             <th>Name</th>
             <th>Group Name</th>
             <th>Type</th>
+            <th>Account</th>
             <th width="200"></th>
         </tr>
     </thead>
@@ -26,8 +27,13 @@ echo mainHeader(['page' => 'category']);
                 <td>{{li.groupName}}</td>
                 <td>{{catTypes[li.cat_type]}}</td>
                 <td>
+                    <a ng-if="!li.title" href="javascript:void(0)" ng-click="linkAccount(li)">Link and Account</a>
+                    <span ng-if="li.title">{{li.title}} ({{li.code}})</span>
+                </td>
+                <td>
                     <a class="btn btn-primary btn-xs" href="javascript:void(0)" ng-click="addCategory(li)">Edit</a>
                     <?php if($userData['role'] === 'manager') {?><a class="btn btn-danger btn-xs" href="javascript:void(0)" ng-click="deleteCategory(li.id)">Delete</a><?php } ?>
+                    <a class="btn btn-default btn-xs" href="../chart-of-accounts/summery.php?t=e&id={{li.account_id}}">Ledger</a>
                 </td>
             </tr>
     </tbody>
@@ -53,6 +59,15 @@ echo mainHeader(['page' => 'category']);
                 <select ng-model="form.cat_type" class="form-control">
                   <?php foreach($catTypesArr as $key => $value) {?><option ng-value="<?php echo $key;?>"><?php echo $value;?></option><?php } ?> 
                 </select>
+            </div>
+            <div class="clearfix"></div>
+            <div class="form-group" ng-if="form.account_id">
+                <label for="title">Account Linked</label>
+                <input id="title" name="form.title" type="text" class="form-control" placeholder="Title">
+            </div>
+            <div class="form-group" ng-if="form.account_id">
+                <label for="opening_balance">Opening Balance</label>
+                <input id="opening_balance" name="form.opening_balance" type="text" class="form-control" placeholder="Opening Balance">
             </div>
         </div>
         <div class="modal-footer">
@@ -97,10 +112,18 @@ app.controller('categoryController', function($scope, $http, $httpParamSerialize
             });
         }
     }
+
+    $scope.linkAccount = (category) => {;
+        $http.post('./linkAccount.php', $httpParamSerializerJQLike(category), {headers: {'Content-Type': 'application/x-www-form-urlencoded'} }).then(function(res) {
+            alert(res.data.message);
+            window.location.reload();
+        });
+    }
     
 
     $scope.getCategories($scope.currentPage);
-    $scope.pageChanged = () => {
+    $scope.pageChanged = (currentPage) => {
+        $scope.currentPage = currentPage;
         $scope.getCategories($scope.currentPage)
     }
 

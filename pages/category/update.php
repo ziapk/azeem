@@ -17,6 +17,11 @@
 
         $update = $categoryObj->updateCategory($data);
 
+        if(!empty($data['account_id'])) {
+            $de = new DoubleEntry();
+            $de->setOpeningBalance($data['account_id'], $data['opening_balance']);
+        }
+
         if($update) {
             $message = "Successfully Assigned!";
         } else {

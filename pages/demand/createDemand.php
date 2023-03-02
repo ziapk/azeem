@@ -14,8 +14,8 @@ else {
     $data['owner_id'] = $shop['owner_id'];
 
     $demandObj = new Demands();
-    
-    $create = $demandObj->createDemand($data);
+    $isOwner = $userData['role'] == 'owner' ? true : false;
+    $create = $demandObj->createDemand($data, $isOwner);
 
     if($create) {
         echo json_encode(['status' => 200, 'message' =>"Created Successfully!"]);

@@ -22,9 +22,12 @@ class DoubleEntry extends Connection
 
 	public function getAccounts($shopId = null) {
 		try {
-			$stmt = "SELECT * from `$this->table` where status = 1 and shopId=:shopId order by code asc";
+			$shopIdCond = '';
+			if(!empty($shopId)) {
+				$shopIdCond = "and shopId = $shopId";
+			}
+			$stmt = "SELECT * from `$this->table` where status = 1 $shopIdCond order by code asc";
 			$prepare = $this->dbh->prepare($stmt);
-			$prepare->bindParam(':shopId', $shopId, PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
 			return $result;
@@ -44,9 +47,15 @@ class DoubleEntry extends Connection
 		}
     }
 	
-	public function searchAccounts($shopId, $search) {
+	public function searchAccounts($shopId = null, $search) {
 		try {
-			$stmt = "SELECT * FROM `$this->table` WHERE (title LIKE '%".$search."%' or code LIKE '%".$search."%') and status = 1 and shopId=:shopId LIMIT 10";
+			$shopIdCond = '';
+			if(!empty($shopId)) {
+				$shopIdCond = " and shopId=$shopId ";
+
+			}
+
+			$stmt = "SELECT * FROM `$this->table` WHERE (title LIKE '%".$search."%' or code LIKE '%".$search."%') and status = 1 $shopIdCond LIMIT 10";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':shopId', $shopId, PDO::PARAM_STR);
 			$prepare->execute();
@@ -213,6 +222,40 @@ class DoubleEntry extends Connection
 			$prepare->execute();
 			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
 			return ['rows' => $result, 'summery' => $summery];
+			
+		} catch (PDOException $e) {
+		    die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
+
+	public function getClosingBalanceReport($array) {
+		try {
+
+			$fromDate = !empty($array['from']) ? $array['from']: '';
+			$toDate = !empty($array['toDate']) ? $array['toDate'] : '';
+			$shopId = !empty($array['shopId']) ? $array['shopId'] : '';
+			$parent_ids = !empty($array['parent_ids']) ? $array['parent_ids'] : [];
+			$account_ids = !empty($array['account_ids']) ? $array['account_ids'] : [];
+
+			$shopIdCondition = "";
+			$accountCondition = "";
+
+			if(!empty($shopId)) {
+				$shopIdCondition = "and t.shopId = $shopId";
+			}
+
+			if(!empty($account_ids)) {
+				$accountCondition = "and a.parent_id in (".implode(',', $parent_ids).") or a.id in (".implode(',', $account_ids).")";
+			}
+
+			$stmt = "SELECT e.transaction_id, a.parent_id, a.code, e.account_id, a.account_type, a.title, e.entry_type, t.transaction_date, amount FROM `$this->table_transactions` t LEFT JOIN `$this->table_ledger_entries` e ON e.transaction_id = t.id LEFT JOIN `$this->table` a ON a.id = e.account_id and a.status = 1 WHERE t.transaction_date >= :fromDate AND t.transaction_date <= :toDate $shopIdCondition $accountCondition";
+			// print_r($stmt);
+			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':fromDate', $fromDate, PDO::PARAM_STR);
+			$prepare->bindParam(':toDate', $toDate, PDO::PARAM_STR);
+			$prepare->execute();
+			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
+			return $result;
 			
 		} catch (PDOException $e) {
 		    die("Error!: " . $e->getMessage() . "<br/>");
@@ -824,5 +867,4 @@ class DoubleEntry extends Connection
 	}
 
 
-	
 }

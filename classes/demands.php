@@ -98,7 +98,7 @@ class Demands extends Connection
 
 		$productObj = new Products();
 		$dropoffShop = $productObj->getOwnerStoreProduct($shop_id, $array['product_id'], $owner_id);
-		
+
 		if(empty($dropoffShop)) {
 			$data = [                
 				'qty' => 0,
@@ -115,7 +115,7 @@ class Demands extends Connection
 
 		// pickup from stock
 		$drop = [
-			'qty' => $array['product_assign_qty'],
+			'qty' => $array['assign_qty'],
 			'stock_out' => 0,
 		];
 		return $productObj->updateProductToStore($drop, $dropoffShop);
@@ -152,10 +152,10 @@ class Demands extends Connection
             $prepare->bindParam(':flag',$flag,PDO::PARAM_INT);
             $prepare->bindParam(':id',$id,PDO::PARAM_INT);
 			$prepare->execute();
+			$result = $prepare->rowCount();
 			foreach($array['items'] as $item) {
 				$this->updateDemandItems($item, $array['shop_id'], $array['owner_id']);
 			}
-			$result = $prepare->rowCount();
 			return $result;
 		} catch (PDOException $e) {
 		    die("Error!: " . $e->getMessage() . "<br/>");
@@ -208,7 +208,7 @@ class Demands extends Connection
 		}
 	}
 	
-	public function createDemand($array) {
+	public function createDemand($array, $isOwner) {
 		try {
 			$stmt = "INSERT INTO `{$this->table}` (`title`, `demand_date`, `shop_id`, `owner_id`) VALUES (:demand_title, :demand_date, :shop_id, :owner_id)";
             $prepare = $this->dbh->prepare($stmt);
@@ -217,18 +217,25 @@ class Demands extends Connection
             $prepare->bindParam(':shop_id',$array['shop_id'],PDO::PARAM_STR);
             $prepare->bindParam(':owner_id',$array['owner_id'],PDO::PARAM_STR);
 			$prepare->execute();
-			$result = $this->dbh->lastInsertId();
+			$array['id'] = $result = $this->dbh->lastInsertId();
 			if(!empty($result)) {
-				foreach ($array['items'] as $value) {
+				foreach ($array['items'] as $k => $value) {
 					$data = [
 						'product_id' => $value['id'],
 						'product_qty' => $value['qty'],
+						'assign_qty' => $value['qty'],
 						'demand_id' => $result
 					];
-					$this->createDemandItems($data);
+					$array['items'][$k] = $data;
+					$array['items'][$k]['id'] = $this->createDemandItems($data);
 				}
 			}
-			return $result;
+			if(!empty($isOwner)) {
+				$array['assign_date'] = $array['demand_date'];
+				$array['flag'] = 1;
+				$updated = $this->assignDemand($array);
+			}
+			return $array;
 		} catch (PDOException $e) {
 		    die("Error!: " . $e->getMessage() . "<br/>");
 		}

@@ -40,17 +40,17 @@
         <?php if(!empty($error)) { ?><div class="alert alert-danger"><?php echo $error; ?></div><?php } ?>
         <h4>Demand From</h4>
         <div class="row">
-            <div class="col-sm-9 form-group">
+            <div class="col-sm-8 col-md-9 form-group">
                 <label for="">Demand Title</label>
                 <input id="demand_title" class="form-control" value="" />
             </div>
-            <div class="col-sm-3 form-group">
+            <div class="col-sm-4 col-md-3 form-group">
                 <label for="">Demand Date</label>
                 <input name="demand_date_piker" type="text" class="form-control datepicker-single" placeholder="YYYY-MM-DD">
                 <input id="demand_date" type="hidden" class="form-control datepicker-hidden">
             </div>
             <?php if($userData['role'] == 'owner') {?>
-                <div class="col-sm-3 form-group">
+                <div class="col-md-3 col-sm-4 form-group">
                     <label for="">Select Store</label>
                     <select id="shop_id" class="form-control">
                         <?php foreach ($ownerStores as $type) {?>
@@ -63,11 +63,11 @@
             <?php }?>
         </div>
         <div class="row" ng-repeat="li in formList track by $index">
-            <div class="col-sm-3 form-group">
+            <div class="col-md-3 col-sm-4 form-group">
                 <label for=""><input type="checkbox" ng-model="li.searchBy" style="vertical-align: top"> Search by code</label>
                 <input type="text" class="form-control" ng-model="li.product" placeholder="Search Products" typeahead-on-select="selectProduct($item)" uib-typeahead="address as address.full_name for address in searchProduct($viewValue, li.searchBy)" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="0">
             </div>
-            <div class="col-sm-3 form-group">
+            <div class="col-md-3 col-sm-4 form-group">
                 <label for="">Demand Qty</label>
                 <input name="demand_qty" type="number" ng-model="li.qty" class="form-control" placeholder="Qty">
             </div>
@@ -76,7 +76,7 @@
             <button type="button" ng-if="$index == 0" ng-click="addItem()" class="btn btn-warning btn-sm">Add more</button>
         </div>
         <div class="row">
-            <div class="col-sm-3 form-group">
+            <div class="col-md-3 col-sm-4 form-group">
                 <input type="submit" name="create" value="Demand Create" class="btn btn-primary">
             </div>
         </div>

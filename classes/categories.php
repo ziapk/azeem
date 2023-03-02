@@ -4,6 +4,7 @@ class Categories extends Connection
 {
     
     private $table = 'category';
+    private $table_accounts = 'accounts';
 
 	public function getOwnerCategories($owner_id) {
 		try {
@@ -54,6 +55,20 @@ class Categories extends Connection
 		    die("Error!: " . $e->getMessage() . "<br/>");
 		}
 	}
+
+	public function linkAccount($array) {
+		try {
+			$stmt = "UPDATE `{$this->table}` SET account_id=:account_id WHERE id=:id";
+            $prepare = $this->dbh->prepare($stmt);
+            $prepare->bindParam(':id',$array['id'],PDO::PARAM_INT);
+            $prepare->bindParam(':account_id',$array['account_id'],PDO::PARAM_INT);
+			$prepare->execute();
+			$result = $prepare->rowCount();
+			return $result;
+		} catch (PDOException $e) {
+		    die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
 	
 	public function getCategoriesPagination($params) {
 		try {
@@ -69,8 +84,8 @@ class Categories extends Connection
 			$total_pages = ceil($total_rows / $no_of_records_per_page);
 			$currentPage = $total_pages >= $params['page'] ? $params['page'] : $total_pages;
 			$offset = (($currentPage-1) < 0 ? 0 : ($currentPage-1)) * $no_of_records_per_page;
-			$search = "(full_name LIKE '%".$params["search"]."%' or groupName LIKE '%".$params["search"]."%') ";
-			$stmt = "SELECT * FROM `{$this->table}` WHERE $search and `owner_id`=:owner_id LIMIT :offset, :perPage";
+			$search = "(c.full_name LIKE '%".$params["search"]."%' or c.groupName LIKE '%".$params["search"]."%') ";
+			$stmt = "SELECT c.*, a.title, a.code, a.opening_balance FROM `{$this->table}` as c left join `{$this->table_accounts}` as a on c.`account_id`=a.id WHERE $search and  `owner_id`=:owner_id LIMIT :offset, :perPage";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':offset',$offset,PDO::PARAM_INT);
 			$prepare->bindParam(':owner_id',$params['owner_id'],PDO::PARAM_INT);
@@ -102,15 +117,41 @@ class Categories extends Connection
 		    die("Error!: " . $e->getMessage() . "<br/>");
 		}
 	}
-	
+    
+	public function getCategory($id) {
+		try {
+			
+			$stmt = "SELECT * FROM `{$this->table}` where id = :id";
+			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':id',$id,PDO::PARAM_STR);
+			$prepare->execute();
+			$result = $prepare->fetch(PDO::FETCH_ASSOC);
+			return $result;
+		} catch (PDOException $e) {
+		    die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
+	public function expenseByAccount($id) {
+		try {
+			$stmt = "SELECT * FROM `{$this->table}` where account_id=:id";
+            $prepare = $this->dbh->prepare($stmt);
+            $prepare->bindParam(':id',$id,PDO::PARAM_INT);
+			$prepare->execute();
+			$result = $prepare->fetch(PDO::FETCH_ASSOC);
+			return $result;
+		} catch (PDOException $e) {
+		    die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
 	public function createCategory($array) {
 		try {
-			$stmt = "INSERT INTO `{$this->table}` (`full_name`, `cat_type`, `groupName`, `owner_id`) VALUES (:full_name, :cat_type, :groupName, :owner_id)";
+			$stmt = "INSERT INTO `{$this->table}` (`full_name`, `cat_type`, `groupName`, `owner_id`, `account_id`) VALUES (:full_name, :cat_type, :groupName, :owner_id, :account_id)";
             $prepare = $this->dbh->prepare($stmt);
             $prepare->bindParam(':full_name',$array['full_name'],PDO::PARAM_STR);
             $prepare->bindParam(':cat_type',$array['cat_type'],PDO::PARAM_STR);
             $prepare->bindParam(':groupName',$array['groupName'],PDO::PARAM_STR);
             $prepare->bindParam(':owner_id',$array['owner_id'],PDO::PARAM_STR);
+            $prepare->bindParam(':account_id',$array['account_id'],PDO::PARAM_STR);
             $prepare->execute();
 			$result = $this->dbh->lastInsertId();
 			return $result;

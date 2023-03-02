@@ -24,6 +24,25 @@ else {
         'owner_id' => $ownerId
     ];
 
+    $de = new DoubleEntry();
+
+    $receivableAccount = $de->getAccount($shop['expense']);
+
+    $accountData = [
+        'title' => 'Expense - '.$_POST['full_name'].' - '.$data['groupName'],
+        'code' => $receivableAccount['code'],
+        'account_type' => $receivableAccount['account_type'],
+        'group_id' => $receivableAccount['group_id'],
+        'status' => $receivableAccount['status'],
+        'parent_id' => $receivableAccount['id'],
+        'opening_balance' => $_POST['opening_balance'],
+        'created_by' => $userId
+    ];
+
+    
+    $accountId = $de->insertAccount($accountData);
+    $data['account_id'] = $accountId;
+
     $create = $categoryObj->createCategory($data);
 
     if($create) {

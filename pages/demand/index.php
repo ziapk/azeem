@@ -28,7 +28,7 @@ foreach ($ownerStores as $store) {
 
 ?>
 <div class="container" ng-controller="categoryController">
-    <a href="<?php echo SITE_URL."pages/demand/create.php" ?>" class="btn btn-primary btn-xs pull-right">Add Demand</a>
+    <a href="<?php echo SITE_URL."pages/demand/create.php" ?>" class="btn btn-primary btn-xs pull-right">Create Demand</a>
     <h4>Demand Stocks</h4>
     <table class="table">
         <thead>
@@ -52,8 +52,8 @@ foreach ($ownerStores as $store) {
                     <td><?php echo $demandStatusArr[$demand['flag']]['full_name']; ?></td>
                     <td>
                         <?php 
-                        if($userData['role'] == 'owner') {
-                            if($demand['flag'] != 4 && $demand['flag'] != 2) {?>
+                            if($userData['role'] == 'owner') {
+                            if($demand['flag'] == 0) {?>
                                 <a class="btn btn-info btn-xs" href="#" ng-click="rejectDemand(<?php echo $demand['id'];?>)">Reject</a>
                                 <a class="btn btn-danger btn-xs" href="#" ng-click="deleteDemand(<?php echo $demand['id'];?>)">Delete</a>
                                 <a class="btn btn-success btn-xs" href="<?php echo SITE_URL."pages/demand/assign.php?id=".$demand['id'];?>">Assign</a>

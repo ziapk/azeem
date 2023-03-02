@@ -11,6 +11,11 @@ elseif($_GET['t'] == 's') {
     $suppliers = new Suppliers();
     $user = $suppliers->getUserByAccount($_GET['id']);
 }
+elseif($_GET['t'] == 'e') {
+    $expenses = new Categories();
+    $user = $expenses->expenseByAccount($_GET['id']);
+}
+
 $journel = $dentry->getLedgerByAccount(['account_id' => $_GET['id']]);
 $summery = $journel['summery'];
 

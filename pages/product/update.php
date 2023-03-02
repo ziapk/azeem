@@ -157,7 +157,7 @@
                 'full_name' => $_POST['full_name'],
                 'price' => $_POST['price'],
                 'code' => $_POST['code'],
-                'publisher_id' => $_POST['publisher_id'],
+                'publisher_id' => !empty($_POST['publisher_id']) ? $_POST['publisher_id'] : null,
                 'description' => $_POST['description'],
                 'group' => $_POST['group'],
                 'author' => $_POST['author'],
