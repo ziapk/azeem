@@ -4,7 +4,6 @@
 
     $storeObj = new Store();
 
-
     $error = "";
     $message = "";
     if(!empty($_POST) && isset($_POST['update'] )) {
@@ -77,8 +76,8 @@
         header('location: '.SITE_URL.'');
     }
 
-    $store = $storeObj->getStore($_GET['id']);
-    if(empty($store)) {
+    $storeData = $storeObj->getStore($_GET['id']);
+    if(empty($storeObj)) {
         header('location: '.SITE_URL.'');
     }
 
@@ -180,7 +179,7 @@
 <script type="text/javascript">
 
 app.controller('accountingController', function($scope, $http, $httpParamSerializerJQLike, $window){
-    $scope.account = <?php echo json_encode($shop);?>;
+    $scope.account = <?php echo json_encode($storeData);?>;
     $scope.searchGroup = function (term) {
         return $http.get("../chart-of-accounts/getAccounts.php", {params: {term, shopId: <?php echo $_GET['id'];?> }})
         .then(function(response) {
