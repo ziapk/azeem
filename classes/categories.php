@@ -8,7 +8,7 @@ class Categories extends Connection
 
 	public function getOwnerCategories($owner_id) {
 		try {
-			$stmt = "SELECT * FROM `{$this->table}` WHERE `owner_id`=:owner_id";
+			$stmt = "SELECT * FROM `{$this->table}` WHERE flag=1 and `owner_id`=:owner_id";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':owner_id',$owner_id,PDO::PARAM_STR);
 			$prepare->execute();
@@ -20,7 +20,7 @@ class Categories extends Connection
 	}
 	public function getGroupNames ($owner_id) {
 		try {
-			$stmt = "SELECT DISTINCT groupName FROM `{$this->table}` WHERE `owner_id`=:owner_id";
+			$stmt = "SELECT DISTINCT groupName FROM `{$this->table}` WHERE flag=1 and `owner_id`=:owner_id";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':owner_id',$owner_id,PDO::PARAM_STR);
 			$prepare->execute();
@@ -47,10 +47,12 @@ class Categories extends Connection
 	}
 	public function deleteCategory($array) {
 		try {
-			$stmt = "DELETE FROM `{$this->table}` WHERE id=:id";
+			$stmt = "UPDATE `{$this->table}` SET flag=0 where id=:id";
 			$prepare = $this->dbh->prepare($stmt);
             $prepare->bindParam(':id',$array['id'],PDO::PARAM_INT);
-			return $prepare->execute();
+			$prepare->execute();
+			$result = $prepare->rowCount();
+			return $result;
 		} catch (PDOException $e) {
 		    die("Error!: " . $e->getMessage() . "<br/>");
 		}
@@ -73,7 +75,7 @@ class Categories extends Connection
 	public function getCategoriesPagination($params) {
 		try {
 			
-			$stmt = "SELECT COUNT(id) as total FROM `{$this->table}` where `owner_id`=:owner_id";
+			$stmt = "SELECT COUNT(id) as total FROM `{$this->table}` where flag=1 and `owner_id`=:owner_id";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':owner_id',$params['owner_id'],PDO::PARAM_INT);
 			$prepare->execute();
@@ -85,7 +87,7 @@ class Categories extends Connection
 			$currentPage = $total_pages >= $params['page'] ? $params['page'] : $total_pages;
 			$offset = (($currentPage-1) < 0 ? 0 : ($currentPage-1)) * $no_of_records_per_page;
 			$search = "(c.full_name LIKE '%".$params["search"]."%' or c.groupName LIKE '%".$params["search"]."%') ";
-			$stmt = "SELECT c.*, a.title, a.code, a.opening_balance FROM `{$this->table}` as c left join `{$this->table_accounts}` as a on c.`account_id`=a.id WHERE $search and  `owner_id`=:owner_id LIMIT :offset, :perPage";
+			$stmt = "SELECT c.*, a.title, a.code, a.opening_balance FROM `{$this->table}` as c left join `{$this->table_accounts}` as a on c.`account_id`=a.id WHERE flag=1 and $search and `owner_id`=:owner_id LIMIT :offset, :perPage";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':offset',$offset,PDO::PARAM_INT);
 			$prepare->bindParam(':owner_id',$params['owner_id'],PDO::PARAM_INT);
@@ -103,10 +105,10 @@ class Categories extends Connection
 		try {
 			$where = "";
 			if($type == 'pro') {
-				$where = 'where cat_type = 1';
+				$where = 'where flag=1 and cat_type = 1';
 			};
 			if($type == 'exp') {
-				$where = 'where cat_type = 2';
+				$where = 'where flag=1 and cat_type = 2';
 			}
 			$stmt = "SELECT * FROM `{$this->table}` ".$where;
 			$prepare = $this->dbh->prepare($stmt);
@@ -121,7 +123,7 @@ class Categories extends Connection
 	public function getCategory($id) {
 		try {
 			
-			$stmt = "SELECT * FROM `{$this->table}` where id = :id";
+			$stmt = "SELECT * FROM `{$this->table}` where flag=1 and id = :id";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':id',$id,PDO::PARAM_STR);
 			$prepare->execute();
@@ -133,7 +135,7 @@ class Categories extends Connection
 	}
 	public function expenseByAccount($id) {
 		try {
-			$stmt = "SELECT * FROM `{$this->table}` where account_id=:id";
+			$stmt = "SELECT * FROM `{$this->table}` where flag=1 and account_id=:id";
             $prepare = $this->dbh->prepare($stmt);
             $prepare->bindParam(':id',$id,PDO::PARAM_INT);
 			$prepare->execute();

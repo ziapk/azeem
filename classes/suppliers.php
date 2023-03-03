@@ -10,7 +10,7 @@ class Suppliers extends Connection
 		if(!empty($shopId)) {
 			$shopCondition = " and shopId=$shopId";
 		}
-		$stmt = "SELECT * FROM `{$this->table}`  WHERE (name LIKE '".$search."%' OR contact LIKE '".$search."%' OR address LIKE '".$search."%') $shopCondition LIMIT 10";
+		$stmt = "SELECT * FROM `{$this->table}`  WHERE flag=1 and (name LIKE '".$search."%' OR contact LIKE '".$search."%' OR address LIKE '".$search."%') $shopCondition LIMIT 10";
 		$prepare = $this->dbh->prepare($stmt);
 		$prepare->execute();
 		$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
@@ -72,7 +72,7 @@ class Suppliers extends Connection
 
 	public function deleteSupplier($array) {
 		try {
-			$stmt = "DELETE FROM `{$this->table}` WHERE id=:id";
+			$stmt = "UPDATE `{$this->table}` SET flag=0 WHERE id=:id";
 			$prepare = $this->dbh->prepare($stmt);
             $prepare->bindParam(':id',$array['id'],PDO::PARAM_INT);
 			return $prepare->execute();
@@ -82,7 +82,7 @@ class Suppliers extends Connection
 	}
 	public function getSuppliers($array) {
 		try {
-			$stmt = "SELECT *  FROM `{$this->table}`where shopId=:shopId";
+			$stmt = "SELECT *  FROM `{$this->table}`where flag=1 and shopId=:shopId";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':shopId',$array['shopId'],PDO::PARAM_INT);
 			$prepare->execute();
@@ -95,7 +95,7 @@ class Suppliers extends Connection
 
 	public function getSupplierOrders($shopId, $id) {
         try {
-			$stmt = "SELECT * FROM `{$this->table}` WHERE shopId=:shopId AND id=:id";
+			$stmt = "SELECT * FROM `{$this->table}` WHERE flag=1 and shopId=:shopId AND id=:id";
             $prepare = $this->dbh->prepare($stmt);
             $prepare->bindParam(':shopId',$shopId,PDO::PARAM_STR);
             $prepare->bindParam(':id',$id,PDO::PARAM_STR);
@@ -109,7 +109,7 @@ class Suppliers extends Connection
 
 	public function getUserByAccount($id) {
 		try {
-			$stmt = "SELECT *, name as full_name  FROM `{$this->table}` WHERE `account_id`=:id";
+			$stmt = "SELECT *, name as full_name  FROM `{$this->table}` WHERE flag=1 and `account_id`=:id";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':id',$id,PDO::PARAM_STR);
 			$prepare->execute();
@@ -125,7 +125,7 @@ class Suppliers extends Connection
 	}
 	public function getSupplier($id) {
 		try {
-			$stmt = "SELECT *  FROM `{$this->table}` WHERE `id`=:id";
+			$stmt = "SELECT *  FROM `{$this->table}` WHERE flag=1 and `id`=:id";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':id',$id,PDO::PARAM_STR);
 			$prepare->execute();
@@ -142,7 +142,7 @@ class Suppliers extends Connection
 	public function getSuppliersPagination($params) {
 		try {
 			
-			$stmt = "SELECT COUNT(id) as total FROM `{$this->table}` where shopId=:shopId";
+			$stmt = "SELECT COUNT(id) as total FROM `{$this->table}` where flag=1 and shopId=:shopId";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':shopId',$params['shopId'],PDO::PARAM_INT);
 			$prepare->execute();
@@ -154,7 +154,7 @@ class Suppliers extends Connection
 			$currentPage = $total_pages >= $params['page'] ? $params['page'] : $total_pages;
 			$offset = (($currentPage-1) < 0 ? 0 : ($currentPage-1)) * $no_of_records_per_page;
 			$search = "(name LIKE '%".$params["search"]."%' OR contact LIKE '%".$params["search"]."%' OR address LIKE '%".$params["search"]."%' ) ";
-			$stmt = "SELECT * FROM `{$this->table}` WHERE $search and shopId=:shopId LIMIT :offset, :perPage";
+			$stmt = "SELECT * FROM `{$this->table}` WHERE $search and flag=1 and shopId=:shopId LIMIT :offset, :perPage";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':shopId',$params['shopId'],PDO::PARAM_INT);
 			$prepare->bindParam(':offset',$offset,PDO::PARAM_INT);

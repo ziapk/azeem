@@ -54,7 +54,6 @@
             <td>{{row.order_date}}</td>
             <td align="right">
                 <a class="btn btn-xs btn-danger" ng-click="returnOrder(row.id)" href="javascript:void(0)">Return</a>
-                <a ng-if="row.status != 2" class="btn btn-xs btn-primary" href="adjustment.php?id={{row.id}}">Pay</a>
                 <a class="btn btn-xs btn-danger" ng-click="deleteRecipt(row.id)" href="javascript:void(0)">Delete</a>
                 <a class="btn btn-xs btn-info" ng-click="openRecipt(row.id)" href="javascript:void(0)">Print</a>
                 <a class="btn btn-xs btn-default" ng-click="openRecipt(row.id, 'details')" href="javascript:void(0)">View</a>

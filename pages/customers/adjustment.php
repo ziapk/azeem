@@ -2,30 +2,27 @@
 include_once dirname(__FILE__).'/../../include/settings.php';
 $category = new  Categories();
 $categoryData = $category->getCategories($userData['created_by']);
-echo mainHeader(['page'=> 'supplier']);
+echo mainHeader(['page'=> 'customer']);
 
-$supplierObj = new Suppliers();
+$customerObj = new Customers();
 
 if(empty($_GET['id']) || !is_numeric($_GET['id']) ) {
     header('location: '.SITE_URL.'');
 }
 
-$user = $supplier = $supplierObj->getSupplier($_GET['id']);
-if(empty($supplier)) {
+$user = $customerObj->getUserByAccount($_GET['id']);
+if(empty($user)) {
     header('location: '.SITE_URL.'');
 }
 
 $dentry = new DoubleEntry();
-
-$journel = $dentry->getLedgerByAccount(['account_id' => $supplier['account_id']]);
+$journel = $dentry->getLedgerByAccount(['account_id' => $user['account_id']]);
 $summery = $journel['summery'];
 
+$summery['debit'] += $user['account']['opening_balance'];
 
-$summery['credit'] += $user['account']['opening_balance'];
-
-$paid = $summery['debit'];
-$amount = $summery['credit'];
-// $amount = ($user['account']['opening_balance'] + $amount);
+$paid = $summery['credit'];
+$amount = $summery['debit'];
 $balance = ($amount - $paid);
 
 $data = [
@@ -63,8 +60,8 @@ $data = [
                     </tr>
                     <tr>
                         <td>
-                        <h3 class="text-danger h3">Going to Pay = {{wallet}}</h3>
-                        <h4 class="text-success">REMAINING BALANCE = {{data.balance - wallet}}</h4>
+                        <h3 class="text-success h3">Receiving Amount = {{wallet}}</h3>
+                        <h4 class="text-danger">REMAINING BALANCE = {{data.balance - wallet}}</h4>
                         </td>
                     </tr>
                 </table>
@@ -79,25 +76,25 @@ $data = [
         </div>
         <div class="col-sm-2 form-group">
             <label>Bill No</label>
-            <input ng-model="supply_ref" value={{supply_ref}} class="form-control" />
+            <input ng-model="order_ref" value={{order_ref}} class="form-control" />
         </div>
         <div class="col-sm-5 form-group">
             <label>Description</label>
             <input ng-model="summery" value={{summery}} class="form-control" />
         </div>
         <div class="col-sm-3">
-            <label>Going to Pay</label>
+            <label>Receiving Amount</label>
             <input type="number" ng-model="wallet" value={{wallet}} ng-change="changeValue()" class="form-control" />
         </div>
         <div class="col-sm-12 text-right">
-            <strong class="text-danger h3">Going to Pay = {{wallet}}</strong> 
+            <strong class="text-success h3">Receiving Amount = {{wallet}}</strong> 
             <div class="btn-group">
                 <label class="btn btn-default" ng-repeat="li in modes">
                     <input type="radio" name="mode" ng-model="payment_mode" ng-value="li.id" ng-change="printValue(li)">
                     {{li.title}}
                 </label>
             </div>
-            <input type="button" ng-click="payToWallet()" value="Pay to Supplier" class="btn btn-primary" />
+            <input type="button" ng-click="payToWallet()" value="Generate Receiving" class="btn btn-danger" />
         </div>
     </div>
 </div>
@@ -113,10 +110,11 @@ app.controller('productController', function($scope, $http, $httpParamSerializer
 
     $scope.payToWallet = function () {
         
-        $http.post("<?php echo SITE_URL?>api/payToSupplier.php", $httpParamSerializerJQLike({amount: $scope.wallet, id: $scope.id, summery: $scope.summery, ref_no: $scope.reference, supply_ref: $scope.supply_ref}), {headers: {'Content-Type': 'application/x-www-form-urlencoded'} })
+        $http.post("<?php echo SITE_URL?>api/receivePayments.php", $httpParamSerializerJQLike({amount: $scope.wallet, id: $scope.id, summery: $scope.summery, ref_no: $scope.reference, order_ref: $scope.order_ref}), {headers: {'Content-Type': 'application/x-www-form-urlencoded'} })
         .then(function(response) {
-            alert('Amount Paid Successfully, transaction id is '+ response.data.supply.id);
-            $window.location.assign('<?php echo SITE_URL.'pages/suppliers'?>');
+            console.log(response)
+            alert('Amount Paid Successfully, transaction id is '+ response.data.transaction.id);
+            $window.location.assign('<?php echo SITE_URL.'pages/customers'?>');
         });
     }
 

@@ -37,6 +37,7 @@ $reportData = [];
 switch ($reportType) {
 	case '10':
 		$params['parent_ids'][] = $store['receivable'];
+		$params['parent_ids'][] = $store['payable'];
 		$params['account_ids'][] = $store['sale_discount'];
 		$params['parent_ids'][] = $store['expense'];
 		
@@ -54,27 +55,34 @@ switch ($reportType) {
 		$expHead = $store['expense'];
 		$count = 0;
 		$expenses = ['total' => 0, 'rows' => []];
+		$payments = 0;
 		$final = [];
 		// print_r($shop['expense']);
 		// print_r($reportDataRaw);
 		foreach ($reportDataRaw as $key => $value) {
-			if($value['account_id'] != $exp && $value['parent_id'] != $expHead) {
+			if($store['payable'] != $value['parent_id']) {
+				if($value['account_id'] != $exp && $value['parent_id'] != $expHead) {
+					if($value['entry_type'] == 'D') {
+						$rows[$value['transaction_date']][$value['transaction_id']]['row'] = $value;
+						$rows[$value['transaction_date']][$value['transaction_id']]['totalCredit'] += $value['amount'];
+					}
+					else {
+						$rows[$value['transaction_date']][$value['transaction_id']]['row'] = $value;
+						$rows[$value['transaction_date']][$value['transaction_id']]['totalPaid'] += $value['amount'];
+					}
+				}
+				else if($value['account_id'] == $exp) {
+					$rows[$value['transaction_date']][$value['transaction_id']]['discount'] += $value['amount'];
+				}
+				else if($value['parent_id'] == $expHead) {
+					$expenses['rows'][$value['transaction_date']]['row'][$value['account_id']] = $value;
+					$expenses['rows'][$value['transaction_date']]['total'] += $value['amount'];
+					$expenses['total'] += $value['amount'];
+				}
+			} else {
 				if($value['entry_type'] == 'D') {
-					$rows[$value['transaction_date']][$value['transaction_id']]['row'] = $value;
-					$rows[$value['transaction_date']][$value['transaction_id']]['totalCredit'] += $value['amount'];
+					$payments += $value['amount'];
 				}
-				else {
-					$rows[$value['transaction_date']][$value['transaction_id']]['row'] = $value;
-					$rows[$value['transaction_date']][$value['transaction_id']]['totalPaid'] += $value['amount'];
-				}
-			}
-			else if($value['account_id'] == $exp) {
-				$rows[$value['transaction_date']][$value['transaction_id']]['discount'] += $value['amount'];
-			}
-			else if($value['parent_id'] == $expHead) {
-				$expenses['rows'][$value['transaction_date']]['row'][$value['account_id']] = $value;
-				$expenses['rows'][$value['transaction_date']]['total'] += $value['amount'];
-				$expenses['total'] += $value['amount'];
 			}
 			
 			// $rows[$value['transaction_date']][$value['transaction_id']][$value['entry_type']]['total'] += $value['amount'];
@@ -108,17 +116,17 @@ switch ($reportType) {
 		$finalSummeryDateWise = [];
 		foreach ($reportData1 as $key => $value) {
 			$reportData[$count] = $value;
-			$reportData[$count]['grossCreditSales'] = number_format($value['grossCredit'] - $value['totalPaid'], 2);
-			$reportData[$count]['grossCashSales'] = number_format($value['totalPaid'] + $value['totalPaid'], 2);
-			$reportData[$count]['discount'] = number_format($value['totalDiscount'], 2);
-			$reportData[$count]['netCreditSales'] = number_format($value['totalCredit'] - $value['totalPaid'], 2);
-			$reportData[$count]['finalCreditSales'] = number_format($value['totalCredit'] - $value['totalPaid'], 2);
-			$reportData[$count]['netCashSales'] = number_format($value['totalPaid'], 2);
-			$reportData[$count]['finalCashSales'] = number_format($value['totalPaid'], 2);
+			$reportData[$count]['grossCreditSales'] = $value['grossCredit'] - $value['totalPaid'];
+			$reportData[$count]['grossCashSales'] = $value['totalPaid'] + $value['totalDiscount'];
+			$reportData[$count]['discount'] = $value['totalDiscount'];
+			$reportData[$count]['netCreditSales'] = $value['totalCredit'] - $value['totalPaid'];
+			$reportData[$count]['finalCreditSales'] = $value['totalCredit'] - $value['totalPaid'];
+			$reportData[$count]['netCashSales'] = $value['totalPaid'];
+			$reportData[$count]['finalCashSales'] = $value['totalPaid'];
 			
 
 			$footer['grossCreditSales'] += $value['grossCredit'] - $value['totalPaid'];
-			$footer['grossCashSales'] += $value['totalPaid'] + $value['totalPaid'];
+			$footer['grossCashSales'] += $value['totalPaid'] + $value['totalDiscount'];
 			$footer['discount'] += $value['totalDiscount'];
 			$footer['netCreditSales'] += $value['totalCredit'] - $value['totalPaid'];
 			$footer['finalCreditSales'] += $value['totalCredit'] - $value['totalPaid'];
@@ -135,12 +143,13 @@ switch ($reportType) {
 
 
         $subtitle = 'Closing Balance'.$subtitle;
-        $headers = ['Date', 'Account Code', 'Account Title', 'Gross Credit Sales','Gross Cash Sales', 'Discount', 'Net Credit Sales', 'Final Credit Sales','Net Cash Sales', 'Final Cash Sales'];
-		$columns = ['transaction_date','code', 'title', 'grossCreditSales','grossCashSales', 'discount', 'netCreditSales', 'finalCreditSales','netCashSales', 'finalCashSales'];
+        $headers = ['Date', 'Account Code', 'Account Title', 'Gross Credit Sales','Gross Cash Sales', 'Discount', 'Net Credit Sales', 'Net Cash Sales'];
+		$columns = ['transaction_date','code', 'title', 'grossCreditSales','grossCashSales', 'discount', 'netCreditSales', 'netCashSales'];
 
 		$hasFooter = true;
 		$footerCols = ['','Date', 'Account Code', 'Account Title'];
-		$footerVals = ['grossCreditSales','grossCashSales', 'discount', 'netCreditSales', 'finalCreditSales','netCashSales', 'finalCashSales'];
+		$summerCols = ['Gross Credit Sales','Gross Cash Sales', 'Discount', 'Net Credit Sales', 'Net Cash Sales'];
+		$footerVals = ['grossCreditSales','grossCashSales', 'discount', 'netCreditSales', 'netCashSales'];
 
 	break;
 	
@@ -292,7 +301,7 @@ ob_start();
 						<td><?php echo $val; ?></td>
 					<?php } else { ?>
 
-						<td><?php echo $val; ?></td>
+						<td <?php echo is_numeric($val) ? 'align="right"' : null;?>><?php echo is_numeric($val) ? number_format($val, 2) : $val; ?></td>
 
 					<?php } ?>
 
@@ -305,7 +314,7 @@ ob_start();
 					<th><?php echo $value; ?></th>
 				<?php } ?>
 				<?php foreach ($footerVals as $value){ ?>
-					<th align="left"><?php echo number_format($footer[$value], 2); ?></th>
+					<th align="right"><?php echo number_format($footer[$value], 2); ?></th>
 				<?php } ?>
 			</tr>
 		<?php }?>
@@ -329,11 +338,11 @@ ob_start();
 		<tr>
 			<td><?php echo $date;?></td>
 			<?php foreach ($value['row'] as $row) { $total+=$row['amount']?>
-				<td><?php echo $row['amount'];?></td>
+				<td align="right"><?php echo number_format($row['amount'], 2);?></td>
 			<?php };?>
-			<td><?php echo $total;?></td>
-			<td><?php echo $footer['finalCashSales'];?></td>
-			<td><?php echo $footer['finalCashSales'] - $total;?></td>
+			<th align="right"><?php echo number_format($total, 2);?></th>
+			<th align="right"><?php echo number_format($footer['finalCashSales'], 2);?></th>
+			<th align="right"><?php echo number_format($footer['finalCashSales'] - $total, 2);?></th>
 		</tr>
 	<?php }?>
 </table>
@@ -341,21 +350,24 @@ ob_start();
 <?php 
 
 $tsale = empty($footer['finalCashSales']) ? 0 : $footer['finalCashSales'];
+$creditsale = empty($footer['finalCreditSales']) ? 0 : $footer['finalCreditSales'];
 $texpense = empty($expenses['total']) ? 0 : $expenses['total'];
 
 ?>
 <table id="resultTable" style="border-collapse: collapse; width: 400px" border="1">
+	<?php foreach ($summerCols as $index => $value){ $key = $footerVals[$index]; ?>
 		<tr>
-			<th align="left">Grand Sale</td>
-			<th align="left"><?php echo $tsale;?></td>
+			<th align="left"><?php echo $value; ?></th>
+			<th align="right"><?php echo number_format($footer[$key], 2); ?></th>
+		</tr>
+		<?php } ?>
+		<tr>
+			<th align="left">Payments</td>
+			<th align="right"><?php echo number_format($payments, 2);?></td>
 		</tr>
 		<tr>
-			<th align="left">Total Expenses</td>
-			<th align="left"><?php echo $texpense;?></td>
-		</tr>
-		<tr>
-			<th align="left">Net Total</td>
-			<th align="left"><?php echo $tsale  - $texpense;?></th>
+			<th align="left">Expenses</td>
+			<th align="right"><?php echo number_format($texpense, 2); ?></td>
 		</tr>
 </table>
 

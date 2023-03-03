@@ -66,13 +66,8 @@
 <script type="text/javascript">
     app.controller('reportController', function($scope, $http, $httpParamSerializerJQLike, $filter) {
         console.log('abc')
-    });
-</script>
-<?php echo mainFooter(); ?>
 
-<script>
-    $(document).ready(function () {
-        $('.datepicker').daterangepicker({
+    const a = $('.datepicker').daterangepicker({
             minDate: moment().subtract(1, 'year'),
             maxDate: moment(),
             parentEl: '.datepicker-parent',
@@ -81,7 +76,8 @@
             $('#to').val(moment(end).format('YYYY-MM-DD'));
             
         });
+        $('#from').val(moment(a.data().daterangepicker.startDate).format('YYYY-MM-DD'));
+        $('#to').val(moment(a.data().daterangepicker.endDate).format('YYYY-MM-DD'));
     });
 </script>
-
-
+<?php echo mainFooter(); ?>

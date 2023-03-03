@@ -8,7 +8,7 @@ class Customers extends Connection
     private $table_publisher = 'publishers';
     
 	public function searchCustomer($shopId, $search) {
-		$stmt = "SELECT * FROM `{$this->table}`  WHERE shopId=:shopId AND (full_name LIKE '%".$search."%' OR title LIKE '%".$search."%' OR company LIKE '%".$search."%' OR code LIKE '".$search."%' OR phoneNumber LIKE '%".$search."%') LIMIT 10";
+		$stmt = "SELECT * FROM `{$this->table}`  WHERE flag=1 and shopId=:shopId AND (full_name LIKE '%".$search."%' OR title LIKE '%".$search."%' OR company LIKE '%".$search."%' OR code LIKE '".$search."%' OR phoneNumber LIKE '%".$search."%') LIMIT 10";
 		$prepare = $this->dbh->prepare($stmt);
 		$prepare->bindParam(':shopId',$shopId,PDO::PARAM_STR);
 		//$prepare->bindParam(':search',$search,PDO::PARAM_STR);
@@ -76,7 +76,7 @@ class Customers extends Connection
 
 	public function deleteCustomer($array) {
 		try {
-			$stmt = "DELETE FROM `{$this->table}` WHERE id=:id";
+			$stmt = "UPDATE `{$this->table}` SET flag=0 WHERE id=:id";
 			$prepare = $this->dbh->prepare($stmt);
             $prepare->bindParam(':id',$array['id'],PDO::PARAM_INT);
 			return $prepare->execute();
