@@ -37,7 +37,7 @@ $order = $ordersObj->getOrder($id);
         array_push($a, $shop['phoneNumber3']);
     }
     $result = array_filter( $a, 'strlen' );
-    $balance = $order['order']['paid_amount'] - $price - $order['order']['discount'];
+    $balance = ($price - $order['order']['discount']) - $order['order']['paid_amount'];
 if($largeView) { $distTotal = 0; $qty = 0;?>
     <style>
     body {
@@ -211,8 +211,8 @@ td {
                 <th class="text-right ref"><?php  echo number_format($order['order']['paid_amount'], 2);?></th>
             </tr>
             <tr class="no-border">
-                <td class="text-right ref" colspan="3">Balance</td>
-                <th class="text-right ref"><?php echo number_format( $price - $order['order']['paid_amount'] - $order['order']['discount'], 2);?></th>
+                <td class="text-right ref" colspan="3">Balance 1</td>
+                <th class="text-right ref"><?php echo number_format( $balance, 2);?></th>
             </tr>
         <?php } ?>
     </table>
@@ -350,7 +350,7 @@ td {
             </tr>
             <tr class="no-border">
                 <td class="text-right ref" colspan="3">Balance</td>
-                <th class="text-right ref"><?php echo number_format( $order['order']['paid_amount'] - $price - $order['order']['discount'], 0);?></th>
+                <th class="text-right ref"><?php echo number_format( $balance, 2);?></th>
             </tr>
         <?php } ?>
     </table>

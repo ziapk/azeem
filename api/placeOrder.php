@@ -8,6 +8,7 @@ try {
     $storeDATA = $storeObj->getStore($shop['id']);
     $status = 9;
     $totalDiscount = 0;
+    $additionalDiscount = 0;
     if(!empty($_POST['payment_amount'])) {
         $gst = round($_POST['subTotal'] * ($_POST['gst'] / 100));
         $service_charges = round($_POST['subTotal'] * ($_POST['service_charges'] / 100));
@@ -31,7 +32,7 @@ try {
         'ref_no' => $_POST['ref_no'],
     ];
 
-    $totalDiscount += $_POST['discount'];
+    $additionalDiscount += $_POST['discount'];
 
     $order_id = $orders->createOrder($data);
     
@@ -81,7 +82,7 @@ try {
 
         $assetPrice = $data['price'] + $totalDiscount;
         $cash = $data['paid_amount'];
-        $saleDiscount = $totalDiscount;
+        $saleDiscount = $totalDiscount + $additionalDiscount;
         $receivable = ($assetPrice - $saleDiscount);
 
         // assets debit entry - credit

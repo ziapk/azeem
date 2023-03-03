@@ -224,7 +224,8 @@ ob_start();
 
 </style>
 
-<h1 style="text-align: center;"><?php echo $reportTitle; ?></h1>
+<h1 style="text-align: center; margin-bottom: 10px"><?php echo $reportTitle; ?></h1>
+<h5 style="text-align: center; margin-top: 10px"><?php echo $subtitle; ?></h5>
 <table class="table" id="resultTable" width="100%" style="border-collapse: collapse" border="1">
 	<thead>
 		<tr>
