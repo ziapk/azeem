@@ -9,6 +9,8 @@ $accounts = [
 "expense" => !empty($_POST['expense']) ? $_POST['expense'] : '',
 "sale_discount" => !empty($_POST['sale_discount']) ? $_POST['sale_discount'] : '',
 "purchase_discount" => !empty($_POST['purchase_discount']) ? $_POST['purchase_discount'] : '',
+"sale_returns" => !empty($_POST['sale_returns']) ? $_POST['sale_returns'] : '',
+"purchase_returns" => !empty($_POST['purchase_returns']) ? $_POST['purchase_returns'] : '',
 "assets" => !empty($_POST['assets']) ? $_POST['assets'] : '',
 ];
 $shopId = !empty($_POST['shopId']) ? $_POST['shopId'] : "";

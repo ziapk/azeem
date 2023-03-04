@@ -10,7 +10,7 @@ class Suppliers extends Connection
 		if(!empty($shopId)) {
 			$shopCondition = " and shopId=$shopId";
 		}
-		$stmt = "SELECT * FROM `{$this->table}`  WHERE flag=1 and (name LIKE '".$search."%' OR contact LIKE '".$search."%' OR address LIKE '".$search."%') $shopCondition LIMIT 10";
+		$stmt = "SELECT *, name as full_name FROM `{$this->table}`  WHERE flag=1 and (name LIKE '".$search."%' OR contact LIKE '".$search."%' OR address LIKE '".$search."%') $shopCondition LIMIT 10";
 		$prepare = $this->dbh->prepare($stmt);
 		$prepare->execute();
 		$result = $prepare->fetchAll(PDO::FETCH_ASSOC);

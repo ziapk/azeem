@@ -128,6 +128,104 @@ class Products extends Connection
 		    die("Error!: " . $e->getMessage() . "<br/>");
 		}
 	}
+    
+	public function getOrderProductsPagination($owner_id, $customer_id, $params, $shopId) {
+		try {
+
+			// var_dump($params);
+
+			$searchQry = "";
+			$sortByQry = "";
+
+			$prefix = "%";
+		
+			$searchQry = "AND (p.id = '".$params["search"]."' OR p.code = '".$params["search"]."' OR p.full_name LIKE '".$prefix.$params["search"]."%' OR p.group LIKE '".$prefix.$params["search"]."%' OR p.description LIKE '".$prefix.$params["search"]."%' OR p.board LIKE '".$prefix.$params["search"]."%' OR p.author LIKE '".$prefix.$params["search"]."%' OR p.price LIKE '".$prefix.$params["search"]."%' ) ";
+
+			$innerJoin = "";
+			if(!empty($shopId)) {
+				$innerJoin .= "INNER JOIN order_items as oi on oi.product_id = p.id INNER JOIN orders as o on o.id = oi.order_id and o.status != 2";
+			}
+
+			$column = "";
+			
+			$stmt = "SELECT count(p.id) as count FROM `{$this->table}` as p $innerJoin WHERE p.owner_id=:owner_id and o.customer_id=:customer_id $searchQry  group by p.id, oi.price";
+			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':owner_id',$owner_id,PDO::PARAM_STR);
+			$prepare->bindParam(':customer_id',$customer_id,PDO::PARAM_STR);
+			$prepare->execute();
+			$total = $prepare->fetch(PDO::FETCH_ASSOC);
+			$no_of_records_per_page = !empty($params['perPage']) ? $params['perPage'] : 10;
+			$total_rows = empty($total) ? 0 : $total['count'];
+			$total_pages = ceil($total_rows / $no_of_records_per_page);
+			$currentPage = $total_pages >= $params['page'] ? $params['page'] : $total_pages;
+			$offset =  ((!empty($currentPage) ? $currentPage : 1) -1) * $no_of_records_per_page;
+			
+
+			
+
+			$stmt = "SELECT p.*, sum(oi.quantity) as maxQty, customer_id, (oi.price - oi.discount) as price, oi.discount, oi.order_id  FROM `{$this->table}` as p $innerJoin WHERE p.owner_id=:owner_id and o.customer_id=:customer_id $searchQry group by p.id, oi.price LIMIT :offset, :perPage";
+			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':owner_id',$owner_id,PDO::PARAM_STR);
+			$prepare->bindParam(':customer_id',$customer_id,PDO::PARAM_STR);
+			$prepare->bindParam(':offset',$offset,PDO::PARAM_INT);
+			$prepare->bindParam(':perPage',$no_of_records_per_page,PDO::PARAM_INT);
+			$prepare->execute();
+			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
+			return ['page' => $currentPage, 'totalRecords'=> $total_rows, 'perPage' => $no_of_records_per_page, 'records' => $result];
+
+		} catch (PDOException $e) {
+		    die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
+	
+	public function getSupplyProductsPagination($owner_id, $supplier_id, $params, $shopId) {
+		try {
+
+			// var_dump($params);
+
+			$searchQry = "";
+			$sortByQry = "";
+
+			$prefix = "%";
+		
+			$searchQry = "AND (p.id = '".$params["search"]."' OR p.code = '".$params["search"]."' OR p.full_name LIKE '".$prefix.$params["search"]."%' OR p.group LIKE '".$prefix.$params["search"]."%' OR p.description LIKE '".$prefix.$params["search"]."%' OR p.board LIKE '".$prefix.$params["search"]."%' OR p.author LIKE '".$prefix.$params["search"]."%' OR p.price LIKE '".$prefix.$params["search"]."%' ) ";
+
+			$innerJoin = "";
+			if(!empty($shopId)) {
+				$innerJoin .= "INNER JOIN supply_items as oi on oi.product_id = p.id INNER JOIN supply as o on o.id = oi.supply_id and o.status = 2";
+			}
+
+			$column = "";
+			
+			$stmt = "SELECT count(p.id) as count FROM `{$this->table}` as p $innerJoin WHERE p.owner_id=:owner_id and o.supplier_id=:supplier_id $searchQry  group by p.id, oi.price";
+			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':owner_id',$owner_id,PDO::PARAM_STR);
+			$prepare->bindParam(':supplier_id',$supplier_id,PDO::PARAM_STR);
+			$prepare->execute();
+			$total = $prepare->fetch(PDO::FETCH_ASSOC);
+			$no_of_records_per_page = !empty($params['perPage']) ? $params['perPage'] : 10;
+			$total_rows = empty($total) ? 0 : $total['count'];
+			$total_pages = ceil($total_rows / $no_of_records_per_page);
+			$currentPage = $total_pages >= $params['page'] ? $params['page'] : $total_pages;
+			$offset =  ((!empty($currentPage) ? $currentPage : 1) -1) * $no_of_records_per_page;
+			
+
+			
+
+			$stmt = "SELECT p.*, sum(oi.quantity) as maxQty, supplier_id, oi.price as price, 0 as discount, oi.supply_id, oi.id, oi.product_id  FROM `{$this->table}` as p $innerJoin WHERE p.owner_id=:owner_id and o.supplier_id=:supplier_id $searchQry group by p.id, oi.price LIMIT :offset, :perPage";
+			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':owner_id',$owner_id,PDO::PARAM_STR);
+			$prepare->bindParam(':supplier_id',$supplier_id,PDO::PARAM_STR);
+			$prepare->bindParam(':offset',$offset,PDO::PARAM_INT);
+			$prepare->bindParam(':perPage',$no_of_records_per_page,PDO::PARAM_INT);
+			$prepare->execute();
+			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
+			return ['page' => $currentPage, 'totalRecords'=> $total_rows, 'perPage' => $no_of_records_per_page, 'records' => $result];
+
+		} catch (PDOException $e) {
+		    die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
 
 	public function assignProductsPublisher($owner_id, $params, $shopId = null) {
 		try {

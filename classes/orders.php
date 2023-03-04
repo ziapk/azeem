@@ -77,16 +77,16 @@ class Orders extends Connection
             $result = $this->dbh->lastInsertId();
             $products = new Products();
             $products->addProductQty($array['product_id'], $array['quantity'], $array['shopId'], $type);
-            $this->orderReturn($array['order_id'], ($action+4));
+            // $this->orderReturn($array['order_id'], ($action+4));
             return $result;
         } catch (PDOException $e) {
 		    die("Error!: " . $e->getMessage() . "<br/>");
 		}
     }
 
-    public function addColumn() {
+    public function addColumn($columnName) {
         try {
-            $stmt = "ALTER TABLE `{$this->table}` ADD COLUMN IF NOT EXISTS `ref_no` varchar(20) NULL DEFAULT NULL AFTER `summery`";
+            $stmt = "ALTER TABLE `{$this->table}` ADD COLUMN IF NOT EXISTS `{$columnName}` varchar(20) NULL DEFAULT NULL AFTER `reference`";
             $prepare = $this->dbh->prepare($stmt);
             $prepare->execute();
         } catch (PDOException $e) {

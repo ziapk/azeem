@@ -14,9 +14,9 @@
 <div class="container" ng-controller="reportController">
     <div class="row">
         <div class="col-sm-3 form-group">
-            <label>Customer's Name</label>
+            <label>Supplier's Name</label>
             <input type="hidden" class="form-control" ng-model="supplierId">
-            <input type="text" class="form-control" ng-model="supplierName" placeholder="Customer's Name" typeahead-on-select="selectSupplier($item)" uib-typeahead="address as address.full_name for address in searchSupplier($viewValue)" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="0">
+            <input type="text" class="form-control" ng-model="supplierName" placeholder="Supplier's Name" typeahead-on-select="selectSupplier($item)" uib-typeahead="address as address.full_name for address in searchSupplier($viewValue)" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="0">
         </div>
         <div class="col-sm-3 form-group">
             <label>Ref. No</label>
@@ -41,8 +41,8 @@
             <tr>
                 <th width="200">Product Id</th>
                 <th>Product Name</th>
-                <th width="100">Sold. Price</th>
-                <th width="100">Sold Qty</th>
+                <th width="100">Purchased. Price</th>
+                <th width="100">Purchased Qty</th>
                 <th></th>
             </tr>
             <tr>
@@ -86,6 +86,9 @@
                 <th width="200"><input type="number" ng-model="payment_amount" ng-change="calcBalanc(payment_amount)" class="form-control"></th>
             </tr>
             <tr ng-if="grandTotal">
+                d{{discount}} | 
+                g{{grandTotal}} | 
+                p{{payment_amount}}
                 <th class="text-right" colspan="3">Closing Balance</th>
                 <th width="200">{{ payment_amount - grandTotal }}</th>
             </tr>
@@ -159,7 +162,7 @@ app.controller('reportController', function ($scope, $http, $window, $httpParamS
 
     $scope.searchSupplier = function (term, init) {
         $scope.supplierId = ""
-        return $http.get("<?php echo SITE_URL?>api/getCustomer.php", {params: {term, shopId: $scope.shopId, accountsOnly: true}})
+        return $http.get("<?php echo SITE_URL?>api/getSupplier.php", {params: {term, shopId: $scope.shopId, accountsOnly: true}})
         .then(function(response) {
             if(init) {
                 $scope.selectSupplier(response.data[0])
@@ -181,10 +184,10 @@ app.controller('reportController', function ($scope, $http, $window, $httpParamS
     $scope.selectSupplier = function (p) {
         $http.get("<?php echo SITE_URL?>api/getOpeningBalance.php", {params: {account_id: p.account_id}}).then(res => {
 
-            console.log(res, ((parseFloat(res.data.opening_balance || 0) + parseFloat(res.data.debitAmount || 0)) - parseFloat(res.data.creditAmount || 0)));
+            console.log(res, ((parseFloat(res.data.opening_balance || 0) + parseFloat(res.data.creditAmount || 0)) - parseFloat(res.data.debitAmount || 0)));
             $scope.supplierId = p.id
             $scope.supplierName = p.full_name
-            $scope.supplier = {...p, opening_balance: ((parseFloat(res.data.opening_balance || 0) + parseFloat(res.data.debitAmount || 0)) - parseFloat(res.data.creditAmount || 0))};
+            $scope.supplier = {...p, opening_balance: ((parseFloat(res.data.opening_balance || 0) + parseFloat(res.data.creditAmount || 0)) - parseFloat(res.data.debitAmount || 0))};
             $scope.shopId = p.shopId;
             $scope.items = [];
             $scope.calculateSum();
@@ -250,7 +253,7 @@ app.controller('reportController', function ($scope, $http, $window, $httpParamS
     }
 
     $scope.searchProduct = function (search) {
-        return $http.get("<?php echo SITE_URL?>api/getProductFromOrders.php", {params: { search, customerId: $scope.supplierId, shopId: $scope.shopId }})
+        return $http.get("<?php echo SITE_URL?>api/getProductFromSupply.php", {params: { search, supplierId: $scope.supplierId, shopId: $scope.shopId }})
         .then(function(response) {
             $scope.list = response.data.records;
             $scope.priceList = response.data.records;
@@ -294,7 +297,7 @@ app.controller('reportController', function ($scope, $http, $window, $httpParamS
         }
 
 
-        $http.post("<?php echo SITE_URL?>api/placeCustomerReturn.php", $httpParamSerializerJQLike($scope.form), {headers: {'Content-Type': 'application/x-www-form-urlencoded'} })
+        $http.post("<?php echo SITE_URL?>api/placeSupplierReturn.php", $httpParamSerializerJQLike($scope.form), {headers: {'Content-Type': 'application/x-www-form-urlencoded'} })
         .then(function(response) {
             // window.open("<?php echo SITE_URL;?>print?id="+response.data.order.id, "", "width=300,height=300"); 
             // $scope.items = $scope.list = [];

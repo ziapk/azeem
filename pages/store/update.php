@@ -90,15 +90,15 @@
     <form method="POST" action="" autocomplete="off" enctype="multipart/form-data">
         <?php if(!empty($message)) { ?><div class="alert alert-success"><?php echo $message; ?></div><?php } ?>
         <?php if(!empty($error)) { ?><div  class="alert alert-danger"><?php echo $error; ?></div><?php } ?>
-        <div class="product-image"><img src="<?php echo SITE_URL.'assets/clients/'.$store['image'];?>" alt="" /></div>
+        <div class="product-image"><img src="<?php echo SITE_URL.'assets/clients/'.$storeData['image'];?>" alt="" /></div>
         <div class="row">
             <div class="col-sm-4 form-group">
-                <input type="text" name="full_name" class="form-control" value="<?php echo $store['full_name'];?>">
+                <input type="text" name="full_name" class="form-control" value="<?php echo $storeData['full_name'];?>">
             </div>
             <div class="col-sm-4 form-group">
                 <select name="store_type" class="form-control">
                     <?php foreach ($storeTypesArr as $type) {?>
-                        <option value="<?php echo $type['id'];?>" <?php if($store['store_type'] == $type['id']) {echo 'selected';};?> ><?php echo $type['full_name'];?></option>
+                        <option value="<?php echo $type['id'];?>" <?php if($storeData['store_type'] == $type['id']) {echo 'selected';};?> ><?php echo $type['full_name'];?></option>
                     <?php }?>
                 </select>
             </div>
@@ -107,27 +107,27 @@
             </div>
             <div class="clearfix"></div>
             <div class="col-sm-4 form-group">
-                <input name="location" type="text" class="form-control" placeholder="Location" value="<?php echo $store['location'];?>">
+                <input name="location" type="text" class="form-control" placeholder="Location" value="<?php echo $storeData['location'];?>">
             </div>
             <div class="col-sm-4 form-group">
-                <input name="city" type="text" class="form-control" placeholder="City" value="<?php echo $store['city'];?>">
+                <input name="city" type="text" class="form-control" placeholder="City" value="<?php echo $storeData['city'];?>">
             </div>
             <div class="col-sm-4 form-group">
-                <input name="postalCode" type="text" class="form-control" placeholder="Postal code" value="<?php echo $store['postalCode'];?>">
+                <input name="postalCode" type="text" class="form-control" placeholder="Postal code" value="<?php echo $storeData['postalCode'];?>">
             </div>
             <div class="col-sm-4 form-group">
-                <input name="phoneNumber1" type="text" class="form-control" placeholder="Cell 1" value="<?php echo $store['phoneNumber1'];?>">
+                <input name="phoneNumber1" type="text" class="form-control" placeholder="Cell 1" value="<?php echo $storeData['phoneNumber1'];?>">
             </div>
             <div class="col-sm-4 form-group">
-                <input name="phoneNumber2" type="text" class="form-control" placeholder="Cell 2" value="<?php echo $store['phoneNumber2'];?>">
+                <input name="phoneNumber2" type="text" class="form-control" placeholder="Cell 2" value="<?php echo $storeData['phoneNumber2'];?>">
             </div>
             <div class="col-sm-4 form-group">
-                <input name="phoneNumber3" type="text" class="form-control" placeholder="Cell 3" value="<?php echo $store['phoneNumber3'];?>">
+                <input name="phoneNumber3" type="text" class="form-control" placeholder="Cell 3" value="<?php echo $storeData['phoneNumber3'];?>">
             </div>
             <div class="col-sm-4 form-group">
                 <select name="status" class="form-control">
                     <?php foreach ($statusArr as $key => $type) {?>
-                        <option value="<?php echo $key?>" <?php if($store['status'] == $key) {echo 'selected';};?> ><?php echo $type;?></option>
+                        <option value="<?php echo $key?>" <?php if($storeData['status'] == $key) {echo 'selected';};?> ><?php echo $type;?></option>
                         <?php }?>
                     </select>
             </div>
@@ -164,7 +164,15 @@
             </div>
             <div class="col-sm-4 form-group">
                 <label>Purchase - Discount</label>
-                <input type="text" class="type-ahead-input form-control" ng-model="account.purchase_discount" placeholder="Account Name" typeahead-on-select="selectAccount(account, $item)" uib-typeahead="address as address.title for address in searchGroup($viewValue)" typeahead-template-url="row.html" typeahead-show-hint="true" typeahead-min-length="0">
+                <input type="text" class="type-ahead-input form-control" ng-model="account.purchase_discount" placeholder="Account Name" typeahead-on-select="selectAccount(account.purchase_discount, $item)" uib-typeahead="address as address.title for address in searchGroup($viewValue)" typeahead-template-url="row.html" typeahead-show-hint="true" typeahead-min-length="0">
+            </div>
+            <div class="col-sm-4 form-group">
+                <label>Sale - Returns</label>
+                <input type="text" class="type-ahead-input form-control" ng-model="account.sale_returns" placeholder="Account Name" typeahead-on-select="selectAccount(account.sale_returns, $item)" uib-typeahead="address as address.title for address in searchGroup($viewValue)" typeahead-template-url="row.html" typeahead-show-hint="true" typeahead-min-length="0">
+            </div>
+            <div class="col-sm-4 form-group">
+                <label>Purchase - Returns</label>
+                <input type="text" class="type-ahead-input form-control" ng-model="account.purchase_returns" placeholder="Account Name" typeahead-on-select="selectAccount(account.purchase_returns, $item)" uib-typeahead="address as address.title for address in searchGroup($viewValue)" typeahead-template-url="row.html" typeahead-show-hint="true" typeahead-min-length="0">
             </div>
             <div class="col-sm-12 form-group">
                 <button type="button" class="btn btn-danger" ng-click="updateAccounts(account)">Update Accounts</button>
@@ -192,10 +200,9 @@ app.controller('accountingController', function($scope, $http, $httpParamSeriali
     }
 
     $scope.updateAccounts = (accounts) => {
-        return $http.post("../chart-of-accounts/updateAccounts.php", $httpParamSerializerJQLike({ cash: accounts.cash.id, payable: accounts.payable.id, receivable: accounts.receivable.id, expense: accounts.expense.id, sale_discount: accounts.sale_discount.id, purchase_discount: accounts.purchase_discount.id, assets: accounts.assets.id, shopId: <?php echo $_GET['id'];?> }), {headers: {'Content-Type': 'application/x-www-form-urlencoded'} })
+        return $http.post("../chart-of-accounts/updateAccounts.php", $httpParamSerializerJQLike({ cash: accounts.cash.id, payable: accounts.payable.id, receivable: accounts.receivable.id, expense: accounts.expense.id, sale_discount: accounts.sale_discount.id, purchase_discount: accounts.purchase_discount.id, sale_returns: accounts.sale_returns.id, purchase_returns: accounts.purchase_returns.id, assets: accounts.assets.id, shopId: <?php echo $_GET['id'];?> }), {headers: {'Content-Type': 'application/x-www-form-urlencoded'} })
         .then(function(response) {
-          console.log(response);
-            return response.data
+            alert('Updated Successfully!');
         });
     }
 

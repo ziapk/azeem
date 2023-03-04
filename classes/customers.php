@@ -7,8 +7,12 @@ class Customers extends Connection
     private $table_discount = 'customer_discount';
     private $table_publisher = 'publishers';
     
-	public function searchCustomer($shopId, $search) {
-		$stmt = "SELECT * FROM `{$this->table}`  WHERE flag=1 and shopId=:shopId AND (full_name LIKE '%".$search."%' OR title LIKE '%".$search."%' OR company LIKE '%".$search."%' OR code LIKE '".$search."%' OR phoneNumber LIKE '%".$search."%') LIMIT 10";
+	public function searchCustomer($shopId, $search, $accountsOnly = false) {
+		$accountCond = '';
+		if($accountsOnly) {
+			$accountCond = 'and account_id > 0';
+		}
+		$stmt = "SELECT * FROM `{$this->table}`  WHERE flag=1 $accountCond and shopId=:shopId AND (full_name LIKE '%".$search."%' OR title LIKE '%".$search."%' OR company LIKE '%".$search."%' OR code LIKE '".$search."%' OR phoneNumber LIKE '%".$search."%') LIMIT 10";
 		$prepare = $this->dbh->prepare($stmt);
 		$prepare->bindParam(':shopId',$shopId,PDO::PARAM_STR);
 		//$prepare->bindParam(':search',$search,PDO::PARAM_STR);

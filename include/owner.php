@@ -20,6 +20,8 @@
         <div class="pull-left welcome-header-section"><span>Welcome <strong><?php echo $userData['full_name'];?>!</strong></span></div>
         
       <ul class="list-inline navbar-right navbar-nav nav">
+      <li><a style="padding-left: 8px; padding-right: 8px" uib-tooltip="Purchase Return" tooltip-placement="bottom" title=""  href="<?php echo SITE_URL.'pages/supply/adjustment.php';?>"><small><small class="nav-menu-text text-small">Supply Return</small></small></a></li>
+        <li><a style="padding-left: 8px; padding-right: 8px" uib-tooltip="Sale Return" tooltip-placement="bottom" title=""  href="<?php echo SITE_URL.'pages/orders/adjustment.php';?>"><small><small class="nav-menu-text text-small">Sale Return</small></small></a></li>
         <li class="<?php if($params['page'] == 'supply') { echo 'active'; }?>"><a uib-tooltip="Add Supply" tooltip-placement="bottom" title=""  href="<?php echo SITE_URL.'pages/supply';?>"><small><small class="nav-menu-text text-small">Purchases</small></small></a></li>
         <li class="<?php if($params['page'] == 'demand') { echo 'active'; }?>"><a uib-tooltip="Demands" tooltip-placement="bottom" title="" href="<?php echo SITE_URL; ?>pages/demand/create.php"><small><small class="nav-menu-text text-small">Invoicing</small></small></a></li>
         <li><a href="<?php echo SITE_URL; ?>pages/product/running.php"><img width="22" uib-tooltip="Running Products" tooltip-placement="bottom" height="22" src="<?php echo SITE_URL; ?>assets/img/svg/lightning-bolt.svg" alt="" /></a></li>

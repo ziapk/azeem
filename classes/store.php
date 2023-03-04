@@ -69,7 +69,7 @@ class Store extends Connection
     public function updateAccounts($id, $array) {
 		
 		try {
-			$stmt = "UPDATE `{$this->table}` SET cash=:cash, payable=:payable,receivable=:receivable, expense=:expense, sale_discount=:sale_discount, purchase_discount=:purchase_discount, assets=:assets WHERE id=:id";
+			$stmt = "UPDATE `{$this->table}` SET cash=:cash, payable=:payable,receivable=:receivable, expense=:expense, sale_discount=:sale_discount, purchase_discount=:purchase_discount, sale_returns=:sale_returns, purchase_returns=:purchase_returns, assets=:assets WHERE id=:id";
             $prepare = $this->dbh->prepare($stmt);
             $prepare->bindParam(':cash',$array['cash'],PDO::PARAM_STR);
             $prepare->bindParam(':payable',$array['payable'],PDO::PARAM_STR);
@@ -77,6 +77,8 @@ class Store extends Connection
             $prepare->bindParam(':expense',$array['expense'],PDO::PARAM_STR);
             $prepare->bindParam(':sale_discount',$array['sale_discount'],PDO::PARAM_STR);
             $prepare->bindParam(':purchase_discount',$array['purchase_discount'],PDO::PARAM_STR);
+            $prepare->bindParam(':sale_returns',$array['sale_returns'],PDO::PARAM_STR);
+            $prepare->bindParam(':purchase_returns',$array['purchase_returns'],PDO::PARAM_STR);
             $prepare->bindParam(':assets',$array['assets'],PDO::PARAM_STR);
             $prepare->bindParam(':id',$id,PDO::PARAM_STR);
 			$prepare->execute();

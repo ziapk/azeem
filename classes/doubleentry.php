@@ -228,6 +228,21 @@ class DoubleEntry extends Connection
 		}
 	}
 
+	public function getOpeningBalance($account_id) {
+		try {
+
+			$stmt = "SELECT a.opening_balance, a.id, SUM(CASE WHEN e.entry_type = 'D' THEN e.amount ELSE 0 END) AS debitAmount, SUM(CASE WHEN e.entry_type = 'C' THEN e.amount ELSE 0 END) AS creditAmount FROM `$this->table_ledger_entries` as e LEFT JOIN `$this->table` as a ON a.id = e.account_id and a.status = 1 WHERE a.id = :account_id";
+			// print_r($stmt);
+			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':account_id', $account_id, PDO::PARAM_STR);
+			$prepare->execute();
+			$result = $prepare->fetch(PDO::FETCH_ASSOC);
+			return $result;
+			
+		} catch (PDOException $e) {
+		    die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
 	public function getClosingBalanceReport($array) {
 		try {
 

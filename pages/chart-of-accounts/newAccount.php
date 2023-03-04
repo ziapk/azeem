@@ -26,6 +26,7 @@ if(empty($_REQUEST['account_type'])) {
 
 $data['code'] = $_REQUEST['code'];
 $data['status'] = $_REQUEST['status'];
+$data['opening_balance'] = !empty($_REQUEST['opening_balance']) ? $_REQUEST['opening_balance'] : 0;
 $data['created_by'] = $_SESSION['user_credentials']['id'];
 
 if(!$errors) {
