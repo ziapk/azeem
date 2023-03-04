@@ -246,7 +246,7 @@ class DoubleEntry extends Connection
 	public function getClosingBalanceReport($array) {
 		try {
 
-			$fromDate = !empty($array['from']) ? $array['from']: '';
+			$fromDate = !empty($array['fromDate']) ? $array['fromDate']: '';
 			$toDate = !empty($array['toDate']) ? $array['toDate'] : '';
 			$shopId = !empty($array['shopId']) ? $array['shopId'] : '';
 			$parent_ids = !empty($array['parent_ids']) ? $array['parent_ids'] : [];
