@@ -171,14 +171,14 @@ class DoubleEntry extends Connection
 	
 	public function getJournals($arr = []) {
 		try {
-			$where = "";
+			$where = "where t.flag=1 ";
 			if(!empty($arr['from']) && !empty($arr['to'])) {
 
 				$to = $arr['to'];
 				$from = $arr['from'];
 				$account_id = $arr['account_id'];
 
-				$where .= "where t.transaction_date between '$from' AND '$to'";
+				$where .= " and t.transaction_date between '$from' AND '$to'";
 				if(!empty($account_id)) {
 					$where .=" AND a.transaction_id = (select transaction_id from `$this->table_ledger_entries` where account_id = $account_id and transaction_id = a.transaction_id)";
 				}
@@ -197,17 +197,17 @@ class DoubleEntry extends Connection
 
 	public function getLedgerByAccount($arr = []) {
 		try {
-			$where = "";
+			$where = "where t.flag=1 ";
 			$account_id = $arr['account_id'];
 			if(!empty($arr['from']) && !empty($arr['to'])) {
 
 				$to = $arr['to'];
 				$from = $arr['from'];
-				$where .= "where t.transaction_date between '$from' AND '$to'";
+				$where .= " and t.transaction_date between '$from' AND '$to'";
 			}
 			
 			if(!empty($account_id)) {
-				$where .=" where a.account_id = $account_id";
+				$where .=" and a.account_id = $account_id";
 			}
 
 
@@ -231,7 +231,7 @@ class DoubleEntry extends Connection
 	public function getOpeningBalance($account_id) {
 		try {
 
-			$stmt = "SELECT a.opening_balance, a.id, SUM(CASE WHEN e.entry_type = 'D' THEN e.amount ELSE 0 END) AS debitAmount, SUM(CASE WHEN e.entry_type = 'C' THEN e.amount ELSE 0 END) AS creditAmount FROM `$this->table_ledger_entries` as e LEFT JOIN `$this->table` as a ON a.id = e.account_id and a.status = 1 WHERE a.id = :account_id";
+			$stmt = "SELECT a.opening_balance, a.id, SUM(CASE WHEN e.entry_type = 'D' THEN e.amount ELSE 0 END) AS debitAmount, SUM(CASE WHEN e.entry_type = 'C' THEN e.amount ELSE 0 END) AS creditAmount FROM `$this->table_ledger_entries` as e LEFT JOIN `$this->table` as a ON a.id = e.account_id and a.status = 1 left join `{$this->table_transactions}` as t on t.id=e.transaction_id WHERE t.flag = 1 and a.id = :account_id";
 			// print_r($stmt);
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':account_id', $account_id, PDO::PARAM_STR);
@@ -245,7 +245,6 @@ class DoubleEntry extends Connection
 	}
 	public function getClosingBalanceReport($array) {
 		try {
-
 			$fromDate = !empty($array['fromDate']) ? $array['fromDate']: '';
 			$toDate = !empty($array['toDate']) ? $array['toDate'] : '';
 			$shopId = !empty($array['shopId']) ? $array['shopId'] : '';
@@ -260,10 +259,10 @@ class DoubleEntry extends Connection
 			}
 
 			if(!empty($account_ids)) {
-				$accountCondition = "and a.parent_id in (".implode(',', $parent_ids).") or a.id in (".implode(',', $account_ids).")";
+				$accountCondition = "and (a.parent_id in (".implode(',', $parent_ids).") or a.id in (".implode(',', $account_ids)."))";
 			}
 
-			$stmt = "SELECT e.transaction_id, a.parent_id, a.code, e.account_id, a.account_type, a.title, e.entry_type, t.transaction_date, amount FROM `$this->table_transactions` t LEFT JOIN `$this->table_ledger_entries` e ON e.transaction_id = t.id LEFT JOIN `$this->table` a ON a.id = e.account_id and a.status = 1 WHERE t.transaction_date >= :fromDate AND t.transaction_date <= :toDate $shopIdCondition $accountCondition";
+			$stmt = "SELECT e.transaction_id, a.parent_id, a.code, e.account_id, a.account_type, a.title, e.entry_type, t.transaction_date, amount FROM `$this->table_transactions` t LEFT JOIN `$this->table_ledger_entries` e ON e.transaction_id = t.id LEFT JOIN `$this->table` a ON a.id = e.account_id and a.status = 1 WHERE (t.flag=1 $shopIdCondition $accountCondition) and (t.transaction_date BETWEEN :fromDate AND :toDate)";
 			// print_r($stmt);
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':fromDate', $fromDate, PDO::PARAM_STR);
@@ -285,7 +284,7 @@ class DoubleEntry extends Connection
 
 			$stmt = "
 			
-			SELECT a.*, a.account_id, t.transaction_date, base.title as accountTitle, base.code as accountCode, t.reference, SUM(CASE a.entry_type WHEN 'D' THEN a.amount * -1 WHEN 'C' THEN a.amount * 1 ELSE 0 END) AS amount, SUM(CASE WHEN a.entry_type = 'D' THEN a.amount ELSE 0 END) AS debitAmount, SUM(CASE WHEN a.entry_type = 'C' THEN a.amount ELSE 0 END) AS creditAmount FROM `$this->table_ledger_entries` as a left join `$this->table_transactions` as t on t.id = a.transaction_id left join `$this->table` as base on base.id = a.account_id and base.status = 1 where t.transaction_date between :fromDate and :toDate GROUP BY a.account_id;
+			SELECT a.*, a.account_id, t.transaction_date, base.title as accountTitle, base.code as accountCode, t.reference, SUM(CASE a.entry_type WHEN 'D' THEN a.amount * -1 WHEN 'C' THEN a.amount * 1 ELSE 0 END) AS amount, SUM(CASE WHEN a.entry_type = 'D' THEN a.amount ELSE 0 END) AS debitAmount, SUM(CASE WHEN a.entry_type = 'C' THEN a.amount ELSE 0 END) AS creditAmount FROM `$this->table_ledger_entries` as a left join `$this->table_transactions` as t on t.id = a.transaction_id left join `$this->table` as base on base.id = a.account_id and base.status = 1 where t.flag=1 and t.transaction_date between :fromDate and :toDate GROUP BY a.account_id;
 			";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':fromDate', $fromDate, PDO::PARAM_STR);
@@ -305,7 +304,7 @@ class DoubleEntry extends Connection
 			$fromDate = !empty($array['fromDate']) ? Settings::dateForSql($array['fromDate']): '';
 			$toDate = !empty($array['toDate']) ? Settings::dateForSql($array['toDate']) : '';
 
-			$stmt = "SELECT SQL_NO_CACHE a.code, e.account_id, a.account_type, a.title, t.transaction_date, SUM(CASE WHEN e.entry_type='D' THEN e.amount ELSE 0 END) AS debitAmount, SUM(CASE WHEN e.entry_type='C' THEN e.amount ELSE 0 END) AS creditAmount FROM `$this->table_transactions` t LEFT JOIN `$this->table_ledger_entries` e ON e.transaction_id = t.id LEFT JOIN `$this->table` a ON a.id = e.account_id and a.status = 1 WHERE t.transaction_date >= :fromDate AND t.transaction_date <= :toDate and a.account_type in (4, 5) GROUP BY e.account_id";
+			$stmt = "SELECT SQL_NO_CACHE a.code, e.account_id, a.account_type, a.title, t.transaction_date, SUM(CASE WHEN e.entry_type='D' THEN e.amount ELSE 0 END) AS debitAmount, SUM(CASE WHEN e.entry_type='C' THEN e.amount ELSE 0 END) AS creditAmount FROM `$this->table_transactions` t LEFT JOIN `$this->table_ledger_entries` e ON e.transaction_id = t.id LEFT JOIN `$this->table` a ON a.id = e.account_id and a.status = 1 WHERE t.flag=1 and t.transaction_date >= :fromDate AND t.transaction_date <= :toDate and a.account_type in (4, 5) GROUP BY e.account_id";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':fromDate', $fromDate, PDO::PARAM_STR);
 			$prepare->bindParam(':toDate', $toDate, PDO::PARAM_STR);
@@ -381,7 +380,7 @@ class DoubleEntry extends Connection
 	}
 	
 	public function getBalanceSheet() {
-		$stmt = "SELECT * FROM `{$this->table_ledger_entries}`";
+		$stmt = "SELECT e.* FROM `{$this->table_ledger_entries}` as e left join `{$this->table_transactions}` as t on t.id = e.transaction_id where flag=1";
 		$prepare = $this->dbh->prepare($stmt);
 		$prepare->execute();
 		$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
@@ -835,6 +834,21 @@ class DoubleEntry extends Connection
 			$prepare->execute();
 			$result = $prepare->rowCount();
 			return $result;
+		} catch (PDOException $e) {
+		    die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
+
+	public function deleteTransaction($id) {
+		try {
+			$stmt = "UPDATE `{$this->table_transactions}` SET flag=2 where id=:id";
+			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':id', $id, PDO::PARAM_INT);
+			$prepare->execute();
+			$result = $prepare->rowCount();
+			echo $result;
+			return $result;
+			
 		} catch (PDOException $e) {
 		    die("Error!: " . $e->getMessage() . "<br/>");
 		}

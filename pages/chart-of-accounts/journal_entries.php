@@ -21,7 +21,7 @@
   echo mainHeader(['page'=> 'coa']);
 
 ?>
-<div class="container">
+<div class="container" ng-controller="coaController">
 	<div class="content-section">
     <a href="<?php echo $commonArray['site_url'].'journal.php';?>" class="btn btn-primary btn-sm pull-right">
     Create
@@ -63,6 +63,7 @@
                         </td>
                         <td colspan="6">
                          <?php echo $rows[0]['reference']; ?> [ <?php echo $rows['0']['v_description']; ?> ]
+                         <a href="javascript:void(0)" class="text-danger" ng-click="deleteTransaction(<?php echo $id;?>)">Delete Transaction</a>
                       </td>
                   </tr>			
                 <?php foreach ($rows as $key => $product){ ?>
@@ -80,8 +81,27 @@
             </tbody>
         </table>
 	</div>
-</div>	
-<?php echo mainFooter(); ?>
+</div>
+<script type="text/javascript">
+  app.controller('coaController', function ($scope, $http, $httpParamSerializerJQLike) {
+    var site_url = '<?php echo SITE_URL ?>';
+    $scope.deleteTransaction = (id) => {
+      var site_url = '<?php echo $commonArray["site_url"] ?>';
+      const params = 'id='+id;
+      console.log('id', id, params, site_url);
+      if(confirm('Are you sure you want to delete this transaction')) {
+        var url = './deleteTransaction.php';
+        $http.post(url, $httpParamSerializerJQLike({ id }), {headers: {'Content-Type': 'application/x-www-form-urlencoded'} })
+        .then(res => {
+          alert('Transaction Deleted!');
+          // window.location.href = window.location.href;
+        });
+      }
+    }
+  });
+
+</script>	
+<?php echo mainFooter(['page' => 'coa']); ?>
 <script type="text/javascript">
 	function fillModifyForm (obj) {
       // var id = $(element).parent().children('.category_id').val();

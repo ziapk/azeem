@@ -6,7 +6,7 @@ $all = false;
 $products = [];
 $productsObj = new Products();
 $storeObj = new Store();
-$ownerId = $userData['role'] == 'owner' ? $userData['id'] : $userData['owner_id'];
+$ownerId = $userData['role'] == 'owner' ? $userData['id'] : $userData['created_by'];
 $ownerStores = $storeObj->getOwnerStores($ownerId);
 
 if(!empty($_GET['all']) && $_GET['all'] == '1') {
@@ -20,7 +20,7 @@ if(!empty($_GET['all']) && $_GET['all'] == '1') {
 <form class="row" action="" method="GET">
     <div class="col-sm-3 form-group">
         <input type="hidden" class="form-control" name="all" value="1">
-        <select class="form-control" name="shopId">
+        <select class="form-control" name="shopId" ng-model="shopId">
             <?php foreach ($ownerStores as $value) { ?>
                 <option value="<?php echo $value['id'];?>"><?php echo $value['full_name'];?></option>
             <?php } ?>
@@ -51,7 +51,7 @@ if(!empty($_GET['all']) && $_GET['all'] == '1') {
                 <input type="hidden" value="{{li.price}}" name="price[]" />
                 <input type="hidden" value="{{li.full_name}}" name="full_name[]" />
             </td>
-            <td><input type="number" ng-model="li.qty" class="input-qty input-control" value="{{li.qty}}" name="qty[]"/></td>
+            <td><input type="number" ng-model="li.qty" class="input-qty input-control" name="qty[]"/></td>
             <td>
                 <a class="btn btn-danger btn-xs" href="javascript:void(0)" ng-click="deleteCategory(li.id)">Delete</a>
             </td>
@@ -68,13 +68,16 @@ app.controller('categoryController', function($scope, $http, $httpParamSerialize
     $scope.books = <?php echo json_encode($products);?>;
 
     $scope.list = [];
-    $scope.items = $scope.books?.records || [];
+    $scope.items = $scope.books?.records?.map(r => ({ ...r, qty: parseInt(r.qty) }))?.filter(r => r.qty) || [];
+    $scope.shopId = '<?php echo $_GET['shopId'];?>';
+    console.log($scope.shopId);
 
     $scope.selectProduct = function (p) {
         let exists = false;
         $scope.items.map((pro) => {
             if(pro.id == p.id) {
                 exists = true;
+                pro.qty = pro.qty || 0;
                 pro.qty++;
             }
         })

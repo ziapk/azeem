@@ -59,16 +59,13 @@ switch ($reportType) {
 		$payments = 0;
 		$receivings = 0;
 		$final = [];
-		// print_r($shop['expense']);
-		// print_r($reportDataRaw);
 		foreach ($reportDataRaw as $key => $value) {
-			if($store['receiving'] == $value['account_id']) {
-				if($value['entry_type'] == 'D') {
-					$receivings += $value['amount'];
-				}
-			} elseif($store['payable'] != $value['parent_id']) {
+			if($store['payable'] != $value['parent_id']) {
 				if($value['account_id'] != $exp && $value['parent_id'] != $expHead) {
 					if($value['entry_type'] == 'D') {
+						if($value['account_id'] == $shop['receiving']) {
+							$receivings += $value['amount'];
+						}
 						$rows[$value['transaction_date']][$value['transaction_id']]['row'] = $value;
 						$rows[$value['transaction_date']][$value['transaction_id']]['totalCredit'] += $value['amount'];
 					}
@@ -103,7 +100,7 @@ switch ($reportType) {
 				$final[$date][$transactions['row']['account_id']]['id'] = $transactions['row']['transaction_id'];
 				$final[$date][$transactions['row']['account_id']]['code'] = $transactions['row']['code'];
 				$final[$date][$transactions['row']['account_id']]['title'] = $transactions['row']['title'];
-				$final[$date][$transactions['row']['account_id']]['grossCredit'] += ($transactions['totalCredit'] + $transactions['discount']);
+				$final[$date][$transactions['row']['account_id']]['grossCredit'] += $transactions['totalCredit'];
 				$final[$date][$transactions['row']['account_id']]['totalCredit'] += $transactions['totalCredit'];
 				$final[$date][$transactions['row']['account_id']]['totalPaid'] += $transactions['totalPaid'];
 				$final[$date][$transactions['row']['account_id']]['totalDiscount'] += $transactions['discount'];
@@ -114,9 +111,6 @@ switch ($reportType) {
 
 		$reportData = [];
 
-		// echo '<pre>';
-		// print_r($reportData1);
-		// echo '</pre>';
 		$count = 0;
 		$footer = [];
 		$finalSummeryDateWise = [];
