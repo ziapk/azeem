@@ -62,7 +62,7 @@ switch ($reportType) {
 		// print_r($shop['expense']);
 		// print_r($reportDataRaw);
 		foreach ($reportDataRaw as $key => $value) {
-			if($store['receiving'] != $value['account_id']) {
+			if($store['receiving'] == $value['account_id']) {
 				if($value['entry_type'] == 'D') {
 					$receivings += $value['amount'];
 				}
