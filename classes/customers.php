@@ -135,7 +135,7 @@ class Customers extends Connection
 		try {
 			$shopId = $arr['shopId'];
 			$customer_id = $arr['customer_id'];
-			$stmt = "SELECT d.*, d.publisher_id as id, p.full_name  FROM `{$this->table_discount}` as d left join `{$this->table_publisher}` as p on d.publisher_id=p.id WHERE customer_id=:customer_id and flag=1 and `shopId`=:shopId";
+			$stmt = "SELECT d.*, d.publisher_id as id, p.full_name  FROM `{$this->table_discount}` as d left join `{$this->table_publisher}` as p on d.publisher_id=p.id WHERE customer_id=:customer_id and `shopId`=:shopId";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':shopId',$shopId,PDO::PARAM_STR);
 			$prepare->bindParam(':customer_id',$customer_id,PDO::PARAM_STR);
