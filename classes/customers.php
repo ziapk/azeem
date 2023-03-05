@@ -90,7 +90,7 @@ class Customers extends Connection
 	}
 	public function getCustomers($shopId = null) {
 		try {
-			$stmt = "SELECT *  FROM `{$this->table}` WHERE `shopId`=:shopId";
+			$stmt = "SELECT *  FROM `{$this->table}` WHERE `shopId`=:shopId and flag=1";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':shopId',$shopId,PDO::PARAM_STR);
 			$prepare->execute();
@@ -135,7 +135,7 @@ class Customers extends Connection
 		try {
 			$shopId = $arr['shopId'];
 			$customer_id = $arr['customer_id'];
-			$stmt = "SELECT d.*, d.publisher_id as id, p.full_name  FROM `{$this->table_discount}` as d left join `{$this->table_publisher}` as p on d.publisher_id=p.id WHERE customer_id=:customer_id and `shopId`=:shopId";
+			$stmt = "SELECT d.*, d.publisher_id as id, p.full_name  FROM `{$this->table_discount}` as d left join `{$this->table_publisher}` as p on d.publisher_id=p.id WHERE customer_id=:customer_id and flag=1 and `shopId`=:shopId";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':shopId',$shopId,PDO::PARAM_STR);
 			$prepare->bindParam(':customer_id',$customer_id,PDO::PARAM_STR);
@@ -149,7 +149,7 @@ class Customers extends Connection
 
 	public function getUserByAccount($id) {
 		try {
-			$stmt = "SELECT *  FROM `{$this->table}` WHERE `account_id`=:id";
+			$stmt = "SELECT *  FROM `{$this->table}` WHERE `account_id`=:id and flag=1";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':id',$id,PDO::PARAM_STR);
 			$prepare->execute();
@@ -165,7 +165,7 @@ class Customers extends Connection
 	}
 	public function getCustomer($id) {
 		try {
-			$stmt = "SELECT *  FROM `{$this->table}` WHERE `id`=:id";
+			$stmt = "SELECT *  FROM `{$this->table}` WHERE `id`=:id and flag=1";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':id',$id,PDO::PARAM_STR);
 			$prepare->execute();
@@ -183,7 +183,7 @@ class Customers extends Connection
 	public function getCustomersPagination($params) {
 		try {
 			
-			$stmt = "SELECT COUNT(id) as total FROM `{$this->table}`";
+			$stmt = "SELECT COUNT(id) as total FROM `{$this->table}` where flag=1";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->execute();
 			$result = $prepare->fetch(PDO::FETCH_ASSOC);
@@ -194,7 +194,7 @@ class Customers extends Connection
 			$currentPage = $total_pages >= $params['page'] ? $params['page'] : $total_pages;
 			$offset = (($currentPage-1) < 0 ? 0 : ($currentPage-1)) * $no_of_records_per_page;
 			$search = " AND (full_name LIKE '%".$params["search"]."%' OR phoneNumber LIKE '%".$params["search"]."%' OR address LIKE '%".$params["search"]."%' ) ";
-			$stmt = "SELECT * FROM `{$this->table}` WHERE shopId=:shopId $search LIMIT :offset, :perPage";
+			$stmt = "SELECT * FROM `{$this->table}` WHERE shopId=:shopId and flag=1 $search LIMIT :offset, :perPage";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':offset',$offset,PDO::PARAM_INT);
 			$prepare->bindParam(':perPage',$no_of_records_per_page,PDO::PARAM_INT);

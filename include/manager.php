@@ -21,13 +21,21 @@
         <div class="pull-left welcome-header-section"><span>Welcome <strong><?php echo $userData['full_name'];?>!</strong></span></div>
       <ul class="list-inline navbar-right navbar-nav nav">
         <div class="pull-left welcome-header-section sale-date hide-temp" ng-show="getClass()"><button class="btn btn-danger" ng-click="applyClosing()"><span ng-class="{'blink': getClass()}">Sale Close</span></button></div>
-        <li><a style="padding-left: 8px; padding-right: 8px" uib-tooltip="Purchase Return" tooltip-placement="bottom" title=""  href="<?php echo SITE_URL.'pages/supply/adjustment.php';?>"><small><small class="nav-menu-text text-small">Supply Return</small></small></a></li>
-        <li><a style="padding-left: 8px; padding-right: 8px" uib-tooltip="Sale Return" tooltip-placement="bottom" title=""  href="<?php echo SITE_URL.'pages/orders/adjustment.php';?>"><small><small class="nav-menu-text text-small">Sale Return</small></small></a></li>
-        <li><a style="padding-left: 8px; padding-right: 8px" uib-tooltip="Reports" tooltip-placement="bottom" title=""  href="<?php echo SITE_URL.'pages/reports';?>"><small><small class="nav-menu-text text-small">Reports</small></small></a></li>
-        <li><a style="padding-left: 8px; padding-right: 8px" uib-tooltip="Add Purchase" tooltip-placement="bottom" title=""  href="<?php echo SITE_URL.'pages/supply';?>"><small><small class="nav-menu-text text-small">Purchase</small></small></a></li>
-        <li><a style="padding-left: 8px; padding-right: 8px" uib-tooltip="Demands" tooltip-placement="bottom" title="" href="<?php echo SITE_URL; ?>pages/demand/create.php"><small><small class="nav-menu-text text-small">Demand</small></small></a></li>
+        <li class="dropdown">
+          <a class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+            Returns
+          </a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="<?php echo SITE_URL.'pages/supply/adjustment.php';?>">Supply Return</a></li>
+            <li><a class="dropdown-item" href="<?php echo SITE_URL.'pages/orders/adjustment.php';?>">Sale Return</a></li>
+          </ul>
+        </li>
+        
+        <li><a style="padding-left: 8px; padding-right: 8px" uib-tooltip="Add Purchase" tooltip-placement="bottom" title=""  href="<?php echo SITE_URL.'pages/supply';?>"><small><small class="nav-menu-text text-small">Supply Bill</small></small></a></li>
+        <li><a style="padding-left: 8px; padding-right: 8px" uib-tooltip="Reports" tooltip-placement="bottom" title=""  href="<?php echo SITE_URL.'pages/reports';?>"><small><small class="nav-menu-text text-small"><img class="fa" width="24" height="24" src="<?php echo SITE_URL; ?>assets/img/svg/reports.svg" alt="" /></small></small></a></li>
+        <li><a style="padding-left: 8px; padding-right: 8px" uib-tooltip="Demands" tooltip-placement="bottom" title="" href="<?php echo SITE_URL; ?>pages/demand/create.php"><small><small class="nav-menu-text text-small"><img class="fa" width="24" height="24" src="<?php echo SITE_URL; ?>assets/img/svg/justice-hammer.svg" alt="" /></small></small></a></li>
         <li><a href="<?php echo SITE_URL; ?>pages/product/running.php"><img width="22" uib-tooltip="Running Products" tooltip-placement="bottom" height="22" src="<?php echo SITE_URL; ?>assets/img/svg/lightning-bolt.svg" alt="" /></a></li>
-        <li><a href="<?php echo SITE_URL; ?>pages/product/create.php"><img width="22" uib-tooltip="Add Product" tooltip-placement="bottom" height="22" src="<?php echo SITE_URL; ?>assets/img/svg/book.svg" alt="" /></a></li>
+        <li><a href="<?php echo SITE_URL; ?>pages/recipt/"><img width="22" uib-tooltip="Add Bill" tooltip-placement="bottom" height="22" src="<?php echo SITE_URL; ?>assets/img/svg/book.svg" alt="" /></a></li>
         <?php include_once dirname(__FILE__).'/cart.php';?>
         <li>
           <a title="" href="javascript:void(0)" data-toggle="dropdown" tooltip-placement="bottom" uib-tooltip="Settings"><span class="fa fa-cog"></span> <span class="caret"></span></a>
