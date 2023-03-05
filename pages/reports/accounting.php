@@ -39,6 +39,7 @@ switch ($reportType) {
 		$params['parent_ids'][] = $store['receivable'];
 		$params['parent_ids'][] = $store['payable'];
 		$params['account_ids'][] = $store['sale_discount'];
+		$params['account_ids'][] = $store['receiving'];
 		$params['parent_ids'][] = $store['expense'];
 		
 		$reportDataRaw = $doubleEntry->getClosingBalanceReport($params);
@@ -56,11 +57,16 @@ switch ($reportType) {
 		$count = 0;
 		$expenses = ['total' => 0, 'rows' => []];
 		$payments = 0;
+		$receivings = 0;
 		$final = [];
 		// print_r($shop['expense']);
 		// print_r($reportDataRaw);
 		foreach ($reportDataRaw as $key => $value) {
-			if($store['payable'] != $value['parent_id']) {
+			if($store['receiving'] != $value['account_id']) {
+				if($value['entry_type'] == 'D') {
+					$receivings += $value['amount'];
+				}
+			} elseif($store['payable'] != $value['parent_id']) {
 				if($value['account_id'] != $exp && $value['parent_id'] != $expHead) {
 					if($value['entry_type'] == 'D') {
 						$rows[$value['transaction_date']][$value['transaction_id']]['row'] = $value;
@@ -123,7 +129,6 @@ switch ($reportType) {
 			$reportData[$count]['finalCreditSales'] = $value['totalCredit'] - $value['totalPaid'];
 			$reportData[$count]['netCashSales'] = $value['totalPaid'];
 			$reportData[$count]['finalCashSales'] = $value['totalPaid'];
-			
 
 			$footer['grossCreditSales'] += $value['grossCredit'] - $value['totalPaid'];
 			$footer['grossCashSales'] += $value['totalPaid'] + $value['totalDiscount'];
@@ -134,9 +139,6 @@ switch ($reportType) {
 			$footer['finalCashSales'] += $value['totalPaid'];
 
 			$finalSummeryDateWise[$value['transaction_date']] += $value['totalPaid'];
-
-			
-
 			$count++;
 		}
 
@@ -361,6 +363,10 @@ $texpense = empty($expenses['total']) ? 0 : $expenses['total'];
 			<th align="right"><?php echo number_format($footer[$key], 2); ?></th>
 		</tr>
 		<?php } ?>
+		<tr>
+			<th align="left">Receivings</td>
+			<th align="right"><?php echo number_format($receivings, 2);?></td>
+		</tr>
 		<tr>
 			<th align="left">Payments</td>
 			<th align="right"><?php echo number_format($payments, 2);?></td>

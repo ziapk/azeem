@@ -6,6 +6,7 @@ $accounts = [
 "cash" => !empty($_POST['cash']) ? $_POST['cash'] : '',
 "payable" => !empty($_POST['payable']) ? $_POST['payable'] : '',
 "receivable" => !empty($_POST['receivable']) ? $_POST['receivable'] : '',
+"receiving" => !empty($_POST['receiving']) ? $_POST['receiving'] : '',
 "expense" => !empty($_POST['expense']) ? $_POST['expense'] : '',
 "sale_discount" => !empty($_POST['sale_discount']) ? $_POST['sale_discount'] : '',
 "purchase_discount" => !empty($_POST['purchase_discount']) ? $_POST['purchase_discount'] : '',

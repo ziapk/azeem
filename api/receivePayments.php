@@ -30,31 +30,30 @@ $customerObj = new Customers();
 $customer = $customerObj->getUserByAccount($customerId);
 $makeTransactionId = $doubleEntry->makeTransaction($makeTransaction);
 
- // payable credit entry
- $entry = [
-    'transaction_id' => $makeTransactionId,
-    'account_id' => $customer['account_id'],
-    'entry_type' => 'C',
-    'description' => '',
-    'amount' => $amount,
-    'payment_mode'=> $_POST['payment_mode'],
-    'user_id' => $_SESSION['user_credentials']['id'],
-];
-$a[] = $doubleEntry->makeEntry($entry);
+    // payable credit entry
+    $entry = [
+        'transaction_id' => $makeTransactionId,
+        'account_id' => $storeDATA['receiving'],
+        'entry_type' => 'D',
+        'description' => '',
+        'amount' => $amount,
+        'payment_mode'=> $_POST['payment_mode'],
+        'user_id' => $_SESSION['user_credentials']['id'],
+    ];
+    $a[] = $doubleEntry->makeEntry($entry);
 
+    // payable credit entry
+    $entry = [
+        'transaction_id' => $makeTransactionId,
+        'account_id' => $customer['account_id'],
+        'entry_type' => 'C',
+        'description' => '',
+        'amount' => $amount,
+        'payment_mode'=> $_POST['payment_mode'],
+        'user_id' => $_SESSION['user_credentials']['id'],
+    ];
+    $a[] = $doubleEntry->makeEntry($entry);
 
- // payable credit entry
- $entry = [
-    'transaction_id' => $makeTransactionId,
-    'account_id' => $storeDATA['cash'],
-    'entry_type' => 'D',
-    'description' => '',
-    'amount' => $amount,
-    'payment_mode'=> $_POST['payment_mode'],
-    'user_id' => $_SESSION['user_credentials']['id'],
-];
-
-$a[] = $doubleEntry->makeEntry($entry);
 
 echo json_encode(['status' => 200, 'message' => 'Successfully Done', 'transaction' => [ 'id'=> $makeTransactionId ]]);
 } catch (PDOException $e) {

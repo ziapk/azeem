@@ -151,6 +151,10 @@
                 <input type="text" class="type-ahead-input form-control" ng-model="account.expense" placeholder="Account Name" typeahead-on-select="selectAccount(account.expense, $item)" uib-typeahead="address as address.title for address in searchGroup($viewValue)" typeahead-template-url="row.html" typeahead-show-hint="true" typeahead-min-length="0">
             </div>
             <div class="col-sm-4 form-group">
+                <label>Receivings Account</label>
+                <input type="text" class="type-ahead-input form-control" ng-model="account.receiving" placeholder="Account Name" typeahead-on-select="selectAccount(account.receiving, $item)" uib-typeahead="address as address.title for address in searchGroup($viewValue)" typeahead-template-url="row.html" typeahead-show-hint="true" typeahead-min-length="0">
+            </div>
+            <div class="col-sm-4 form-group">
                 <label>Receivable - for customer</label>
                 <input type="text" class="type-ahead-input form-control" ng-model="account.receivable" placeholder="Account Name" typeahead-on-select="selectAccount(account.receivable, $item)" uib-typeahead="address as address.title for address in searchGroup($viewValue)" typeahead-template-url="row.html" typeahead-show-hint="true" typeahead-min-length="0">
             </div>
@@ -200,7 +204,7 @@ app.controller('accountingController', function($scope, $http, $httpParamSeriali
     }
 
     $scope.updateAccounts = (accounts) => {
-        return $http.post("../chart-of-accounts/updateAccounts.php", $httpParamSerializerJQLike({ cash: accounts.cash.id, payable: accounts.payable.id, receivable: accounts.receivable.id, expense: accounts.expense.id, sale_discount: accounts.sale_discount.id, purchase_discount: accounts.purchase_discount.id, sale_returns: accounts.sale_returns.id, purchase_returns: accounts.purchase_returns.id, assets: accounts.assets.id, shopId: <?php echo $_GET['id'];?> }), {headers: {'Content-Type': 'application/x-www-form-urlencoded'} })
+        return $http.post("../chart-of-accounts/updateAccounts.php", $httpParamSerializerJQLike({ cash: accounts.cash.id, payable: accounts.payable.id, receiving: accounts.receiving.id, receivable: accounts.receivable.id, expense: accounts.expense.id, sale_discount: accounts.sale_discount.id, purchase_discount: accounts.purchase_discount.id, sale_returns: accounts.sale_returns.id, purchase_returns: accounts.purchase_returns.id, assets: accounts.assets.id, shopId: <?php echo $_GET['id'];?> }), {headers: {'Content-Type': 'application/x-www-form-urlencoded'} })
         .then(function(response) {
             alert('Updated Successfully!');
         });

@@ -69,10 +69,11 @@ class Store extends Connection
     public function updateAccounts($id, $array) {
 		
 		try {
-			$stmt = "UPDATE `{$this->table}` SET cash=:cash, payable=:payable,receivable=:receivable, expense=:expense, sale_discount=:sale_discount, purchase_discount=:purchase_discount, sale_returns=:sale_returns, purchase_returns=:purchase_returns, assets=:assets WHERE id=:id";
+			$stmt = "UPDATE `{$this->table}` SET cash=:cash, payable=:payable, receiving=:receiving, receivable=:receivable, expense=:expense, sale_discount=:sale_discount, purchase_discount=:purchase_discount, sale_returns=:sale_returns, purchase_returns=:purchase_returns, assets=:assets WHERE id=:id";
             $prepare = $this->dbh->prepare($stmt);
             $prepare->bindParam(':cash',$array['cash'],PDO::PARAM_STR);
             $prepare->bindParam(':payable',$array['payable'],PDO::PARAM_STR);
+            $prepare->bindParam(':receiving',$array['receiving'],PDO::PARAM_STR);
             $prepare->bindParam(':receivable',$array['receivable'],PDO::PARAM_STR);
             $prepare->bindParam(':expense',$array['expense'],PDO::PARAM_STR);
             $prepare->bindParam(':sale_discount',$array['sale_discount'],PDO::PARAM_STR);
