@@ -54,6 +54,7 @@
             <tr>
                 <th width="200">Product Id</th>
                 <th>Product Name</th>
+                <th width="100">Dist %</th>
                 <th width="100">P. Price</th>
                 <th width="100">S. Price</th>
                 <th width="100">Qty</th>
@@ -68,6 +69,7 @@
                 <td><input type="text" class="form-control" ng-model="row.barcode" /></td>
                 <td>
                 <input type="text" class="form-control" ng-model="row.full_name" placeholder="Product title" /></td>
+                <td>{{((1 - (row.pprice / row.price )) * 100) | number: 1}}%</td>
                 <td><input type="number" class="form-control" ng-change="calculateSum()" ng-model="row.pprice" /></td>
                 <td width="100"><input type="number" class="form-control" ng-model="row.price" /></td>
                 <td width="100"><input type="number" class="form-control" ng-change="calculateSum()" ng-model="row.qty" ng-keydown="initCheckKeypress($event)" /></td>

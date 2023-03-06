@@ -56,7 +56,12 @@ echo mainHeader(['page' => 'recipt']);
             <tr ng-repeat="cart in items track by $index" id="item-{{cart.id}}">
                 <td>{{$index + 1}}</td>
                 <td>{{cart.full_name}}</td>
-                <td><span ng-if="cart.discount"><del class="text-danger">{{cart.price | number: 2}}</del> / </span><span class="text-success">{{(cart.price - cart.discount) | number: 2}}</span></td>
+                <td>
+                    <span ng-if="cart.discount">
+                        {{cart.discount_percent ? cart.discount_percent : ''}}
+                        <del class="text-danger">{{cart.price | number: 2}}</del> / </span>
+                        <span class="text-success">{{(cart.price - cart.discount) | number: 2}}</span>
+                </td>
                 <td>
                     <div class="quantity">
                         <a href="#" class="quantity__minus" ng-click="subQty(cart)"><span>-</span></a>
@@ -371,11 +376,13 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
                 const row = customerData.discount_array.find(r => r.publisher_id == product.publisher_id);
                 const price = parseFloat(product.price);
                 product.discount = price * (parseFloat(row.discount_value) / 100);
+                product.discount_percent = row.discount_value + "%";
                 subtotal += ((product.price - product.discount) * product.qty);
             }
             else {
                 const price = parseFloat(product.price);
                 product.discount = 0;
+                product.discount_percent = '';
                 subtotal += (price * product.qty);
             }
         })

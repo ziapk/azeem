@@ -65,13 +65,18 @@ switch ($reportType) {
 					if($value['entry_type'] == 'D') {
 						if($value['account_id'] == $shop['receiving']) {
 							$receivings += $value['amount'];
+							$rows[$value['transaction_date']][$value['transaction_id']]['isReceving'] = true;
 						}
-						$rows[$value['transaction_date']][$value['transaction_id']]['row'] = $value;
-						$rows[$value['transaction_date']][$value['transaction_id']]['totalCredit'] += $value['amount'];
+						else {
+							$rows[$value['transaction_date']][$value['transaction_id']]['row'] = $value;
+							$rows[$value['transaction_date']][$value['transaction_id']]['totalCredit'] += $value['amount'];
+						}
 					}
 					else {
-						$rows[$value['transaction_date']][$value['transaction_id']]['row'] = $value;
-						$rows[$value['transaction_date']][$value['transaction_id']]['totalPaid'] += $value['amount'];
+						if(empty($rows[$value['transaction_date']][$value['transaction_id']]['isReceving'])) {
+							$rows[$value['transaction_date']][$value['transaction_id']]['row'] = $value;
+							$rows[$value['transaction_date']][$value['transaction_id']]['totalPaid'] += $value['amount'];
+						}
 					}
 				}
 				else if($value['account_id'] == $exp) {
@@ -91,49 +96,58 @@ switch ($reportType) {
 			// $rows[$value['transaction_date']][$value['transaction_id']][$value['entry_type']]['total'] += $value['amount'];
 			$count++;
 		}
+		
 		// $rows2 = [];
 		$totals = ['expense' => 0, 'gross' => 0, 'net' => 0];
 		$count = 0;
 		$reportData1 = [];
 		foreach ($rows as $date => $transactions) {
 			foreach ($transactions as $transactionId => $transactions) {
-				$final[$date][$transactions['row']['account_id']]['id'] = $transactions['row']['transaction_id'];
-				$final[$date][$transactions['row']['account_id']]['code'] = $transactions['row']['code'];
-				$final[$date][$transactions['row']['account_id']]['title'] = $transactions['row']['title'];
-				$final[$date][$transactions['row']['account_id']]['grossCredit'] += $transactions['totalCredit'];
-				$final[$date][$transactions['row']['account_id']]['totalCredit'] += $transactions['totalCredit'];
-				$final[$date][$transactions['row']['account_id']]['totalPaid'] += $transactions['totalPaid'];
-				$final[$date][$transactions['row']['account_id']]['totalDiscount'] += $transactions['discount'];
-				$final[$date][$transactions['row']['account_id']]['transaction_date'] = $date;
+				// if(empty($transactions['isReceiving'])) {
+					$final[$date][$transactions['row']['account_id']]['id'] = $transactions['row']['transaction_id'];
+					$final[$date][$transactions['row']['account_id']]['code'] = $transactions['row']['code'];
+					$final[$date][$transactions['row']['account_id']]['title'] = $transactions['row']['title'];
+					$final[$date][$transactions['row']['account_id']]['grossCredit'] += $transactions['totalCredit'];
+					$final[$date][$transactions['row']['account_id']]['totalCredit'] += $transactions['totalCredit'];
+					$final[$date][$transactions['row']['account_id']]['totalPaid'] += $transactions['totalPaid'];
+					$final[$date][$transactions['row']['account_id']]['totalDiscount'] += $transactions['discount'];
+					$final[$date][$transactions['row']['account_id']]['transaction_date'] = $date;
+				// }
 			}
-			$reportData1 = array_values($final[$date]);
+			if(!empty($final[$date])) {
+				$reportData1 = array_values($final[$date]);
+			}
 		}
-
 		$reportData = [];
 
 		$count = 0;
 		$footer = [];
 		$finalSummeryDateWise = [];
 		foreach ($reportData1 as $key => $value) {
-			$reportData[$count] = $value;
-			$reportData[$count]['grossCreditSales'] = $value['grossCredit'] - $value['totalPaid'];
-			$reportData[$count]['grossCashSales'] = $value['totalPaid'] + $value['totalDiscount'];
-			$reportData[$count]['discount'] = $value['totalDiscount'];
-			$reportData[$count]['netCreditSales'] = $value['totalCredit'] - $value['totalPaid'];
-			$reportData[$count]['finalCreditSales'] = $value['totalCredit'] - $value['totalPaid'];
-			$reportData[$count]['netCashSales'] = $value['totalPaid'];
-			$reportData[$count]['finalCashSales'] = $value['totalPaid'];
-
-			$footer['grossCreditSales'] += $value['grossCredit'] - $value['totalPaid'];
-			$footer['grossCashSales'] += $value['totalPaid'] + $value['totalDiscount'];
-			$footer['discount'] += $value['totalDiscount'];
-			$footer['netCreditSales'] += $value['totalCredit'] - $value['totalPaid'];
-			$footer['finalCreditSales'] += $value['totalCredit'] - $value['totalPaid'];
-			$footer['netCashSales'] += $value['totalPaid'];
-			$footer['finalCashSales'] += $value['totalPaid'];
-
-			$finalSummeryDateWise[$value['transaction_date']] += $value['totalPaid'];
-			$count++;
+			if(empty($value['title'])) {
+				unset($reportData1);
+			}
+			else {
+				$reportData[$count] = $value;
+				$reportData[$count]['grossCreditSales'] = $value['grossCredit'] - $value['totalPaid'];
+				$reportData[$count]['grossCashSales'] = $value['totalPaid'] + $value['totalDiscount'];
+				$reportData[$count]['discount'] = $value['totalDiscount'];
+				$reportData[$count]['netCreditSales'] = $value['totalCredit'] - $value['totalPaid'];
+				$reportData[$count]['finalCreditSales'] = $value['totalCredit'] - $value['totalPaid'];
+				$reportData[$count]['netCashSales'] = $value['totalPaid'];
+				$reportData[$count]['finalCashSales'] = $value['totalPaid'];
+	
+				$footer['grossCreditSales'] += $value['grossCredit'] - $value['totalPaid'];
+				$footer['grossCashSales'] += $value['totalPaid'] + $value['totalDiscount'];
+				$footer['discount'] += $value['totalDiscount'];
+				$footer['netCreditSales'] += $value['totalCredit'] - $value['totalPaid'];
+				$footer['finalCreditSales'] += $value['totalCredit'] - $value['totalPaid'];
+				$footer['netCashSales'] += $value['totalPaid'];
+				$footer['finalCashSales'] += $value['totalPaid'];
+	
+				$finalSummeryDateWise[$value['transaction_date']] += $value['totalPaid'];
+				$count++;
+			}
 		}
 
 
