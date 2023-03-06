@@ -211,7 +211,7 @@ class DoubleEntry extends Connection
 			}
 
 
-			$stmt = "SELECT SUM(CASE WHEN a.entry_type = 'D' THEN a.amount ELSE 0 END) AS debit, SUM(CASE WHEN a.entry_type = 'C' THEN a.amount ELSE 0 END) AS credit, count(a.id) as total from `$this->table_ledger_entries` as a $where";
+			$stmt = "SELECT SUM(CASE WHEN a.entry_type = 'D' THEN a.amount ELSE 0 END) AS debit, SUM(CASE WHEN a.entry_type = 'C' THEN a.amount ELSE 0 END) AS credit, count(a.id) as total from `$this->table_ledger_entries` as a left join `$this->table_transactions` as t on t.id = a.transaction_id $where";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->execute();
 			$summery = $prepare->fetch(PDO::FETCH_ASSOC);
