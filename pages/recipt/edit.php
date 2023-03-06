@@ -208,7 +208,7 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
         const shopCart = $scope.data.order_items;
         
         shopCart.map(function(row){
-            const obj = $scope.mainList.find(function (e) { return e.id == row.id});
+            const obj = $scope.mainList.find(function (e) { return e.id == row.product_id});
             items.push({...obj, qty: row.quantity})
         });
         $scope.items = items;
