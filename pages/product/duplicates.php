@@ -1,8 +1,7 @@
 <?php 
-    
     include_once dirname(__FILE__).'/../../include/settings.php';
     
-    echo mainHeader(['page'=> 'product']);
+    echo mainHeader(['page'=> 'dup']);
     $programObj = new Programs();
     $programs = $programObj->getPrograms();
 ?>
@@ -18,20 +17,7 @@
                     <?php } ?>
                 </select>
             </div>
-            <div class="col-sm-2 form-group">
-                <select class="form-control" ng-model="searchBy" ng-change="searchProducts(search, courceId, full_name, group, author, board)">
-                    <option value="">Search By Any</option>
-                    <option value="group">Search By Group</option>
-                    <option value="author">Search By Author</option>
-                    <option value="board">Search By Board</option>
-                    <option value="cource">Search By Cource</option>
-                    <option value="multi">Search By Multiple Colums</option>
-                </select>
-            </div>
-            <div class="col-sm-2" ng-if="searchBy == 'cource' && courceId && list.length">
-                <button ng-click="addToCart(list, 'list')"  class="btn btn-primary">All move to <img width="18" height="18" src="<?php echo SITE_URL; ?>assets/img/svg/010-shopping-bag-white.svg" alt="" /></button>
-            </div>
-            <div class="col-sm-4 text-right pull-right">
+            <div class="col-sm-6 text-right pull-right">
                 <div class="btn-group btn-group-sm">
                     <a href="<?php echo SITE_URL;?>pages/product" class="btn btn-danger active"><i class="fa fa-th" aria-hidden="true"></i></a>
                     <a href="<?php echo SITE_URL;?>pages/product/products.php" class="btn btn-danger"><i class="fa fa-bars" aria-hidden="true"></i></a>
@@ -60,13 +46,12 @@
                 <div ng-if="!li.image" class="image"></div>
                 <img ng-if="li.image" class="image" src={{'<?php echo SITE_URL;?>uploads/products/'+li.image}} />
                 <a href="update.php?id={{li.id}}" class="btn-edit" uib-tooltip="Edit"><img width="18" height="18" src="<?php echo SITE_URL; ?>assets/img/svg/edit.svg" alt="" /></a>
-                <a href="javascript:void(0)" ng-click="addToCart(li)" class="btn-cart" uib-tooltip="Add to cart"><img width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/002-add-to-cart-red.svg" alt="" /></a>
+                <a href="javascript:void(0)" ng-click="addToCard(li)" class="btn-cart" uib-tooltip="Add to cart"><img width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/002-add-to-cart-red.svg" alt="" /></a>
                 <a ng-if="li.dup == 0" href="javascript:void(0)" ng-click="addDuplicate(li)" class="btn btn-dup" uib-tooltip="Mark as duplicate"><span class="fa fa-copy text-mute"></span></a>
                 <a ng-if="li.dup == 1" href="javascript:void(0)" ng-click="removeDuplicate(li)" class="btn btn-dup" uib-tooltip="Remove from duplicate"><span class="fa fa-copy text-danger"></span></a>
                 <a ng-if="li.pin != '1'" href="javascript:void(0)" ng-click="addBookmark(li)" class="btn-bookmark" uib-tooltip="Pin as running"><span class="fa fa-heart-o"></span></a>
                 <a ng-if="li.pin == '1'" href="javascript:void(0)" ng-click="removeBookmark(li)" class="btn-bookmark" uib-tooltip="Added in Running list"><span class="fa fa-heart"></span></a>
-                <span class="price">{{li.price}} <em>{{li.currency || 'PKR'}}</em> <?php if($userData['role'] === 'owner')  { ?><span style="color: #888; font-size: 0.75em">| {{li.pprice}} <em>{{li.currency || 'PKR'}}</em></span> <?php } ?></span>
-                
+                <span class="price">{{li.price}}<em>{{li.currency || 'PKR'}}</em></span>
                 <span class="qty"><strong>{{li.qty < 0 ? 0 : li.qty}}</strong> Available</span>
             </div>
             <div class="product-content">
@@ -77,7 +62,7 @@
             </div>
         </li>
     </ul>
-    <div style="display: flex; align-items: center; justify-content: space-between"><ul uib-pagination total-items="data.totalRecords" ng-model="currentPage" max-size="maxSize" class="pagination-sm" boundary-links="true" force-ellipses="true" ng-if="data.perPage < data.totalRecords" items-per-page="data.perPage"  ng-change="pageChanged(currentPage)"></ul> <span>Per Page <select ng-change="perPage()" ng-model="data.perPage"><option ng-value="12">12</option><option ng-value="24">24</option><option ng-value="48">48</option><option ng-value="96">96</option></select></span> <span>Total number of Records <strong>{{data.totalRecords}}</strong></span></div>
+    <div style="display: flex; align-items: center; justify-content: space-between"><ul uib-pagination ng-if="data.perPage < data.totalRecords" items-per-page="data.perPage" total-items="data.totalRecords" ng-model="currentPage" ng-change="pageChanged(currentPage)"></ul> <span>Per Page <select ng-change="perPage()" ng-model="data.perPage"><option ng-value="12">12</option><option ng-value="24">24</option><option ng-value="48">48</option><option ng-value="96">96</option></select></span> <span>Total number of Records <strong>{{data.totalRecords}}</strong></span></div>
 </div>
 <script type="text/javascript">
 app.controller('productsController', function($scope, $http, $httpParamSerializerJQLike, $filter, $window, toaster) {
@@ -90,13 +75,9 @@ app.controller('productsController', function($scope, $http, $httpParamSerialize
     $scope.author = "";
     $scope.group = "";
     $scope.board = "";
-    const search = $window.location.search;
-    const url = new URLSearchParams(search);
-    $scope.publisher_id = url.get('publisher_id') || '';
-    $scope.maxSize = 5;
     $scope.getProducts = (page) => {
         $scope.loading = true;
-        $http.get("<?php echo SITE_URL?>api/getProducts.php", {params: {page: page || 1, perPage: $scope.data.perPage, search: $scope.search, full_name: $scope.full_name, group: $scope.group, author: $scope.author, board: $scope.board, searchBy: $scope.searchBy, courceId: $scope.courceId, publisher_id: $scope.publisher_id}})
+        $http.get("<?php echo SITE_URL?>api/getProducts.php", {params: {page: page || 1, perPage: $scope.data.perPage, search: $scope.search, full_name: $scope.full_name, group: $scope.group, author: $scope.author, board: $scope.board, searchBy: $scope.searchBy, courceId: $scope.courceId, dup: 1}})
         .then(function(response) {
             $scope.loading = false;
             if(response.status === 200) {
@@ -107,6 +88,48 @@ app.controller('productsController', function($scope, $http, $httpParamSerialize
                 $scope.currentPage = response.data.page;
             }
         })
+    }
+    
+    $scope.searchProducts = (search, courceId, full_name, group, author, board) => {
+        $scope.currentPage = 1;
+        $scope.search = search;
+        $scope.full_name = full_name;
+        $scope.group = group;
+        $scope.author = author;
+        $scope.board = board;
+        $scope.courceId = courceId;
+        $scope.getProducts(1);
+    }
+    
+    $scope.perPage = () => {
+        $scope.getProducts($scope.currentPage);
+    }
+
+    $scope.getProducts(1);
+    $scope.pageChanged = (page) => {
+        $scope.getProducts(page)
+    }
+    $scope.addToCard = function (item) {
+        if($window.localStorage.getItem('shopping')) {
+            const shopCart = JSON.parse($window.localStorage.getItem('shopping'));
+            let found = false;
+            shopCart.map(row => {
+                if(row.id == item.id) {
+                    found = true
+                    row.qty++;
+                    toaster.success({body: 'Book Added to Cart successfully!'});
+                }
+            });
+
+            if(!found) {
+                $window.localStorage.setItem('shopping', JSON.stringify([...shopCart, ...[{id: item.id, qty: 1}] ] ))
+            } else {
+                $window.localStorage.setItem('shopping', JSON.stringify([...shopCart]))
+            }
+        }
+        else {
+            $window.localStorage.setItem('shopping', JSON.stringify([{qty: 1, id: item.id}]))
+        }
     }
 
     $scope.addDuplicate = function (item) {
@@ -145,58 +168,6 @@ app.controller('productsController', function($scope, $http, $httpParamSerialize
                 $scope.getProducts();
             }
         })
-    }
-    
-    $scope.searchProducts = (search, courceId, full_name, group, author, board) => {
-        $scope.currentPage = 1;
-        $scope.search = search;
-        $scope.full_name = full_name;
-        $scope.group = group;
-        $scope.author = author;
-        $scope.board = board;
-        $scope.courceId = courceId;
-        $scope.getProducts(1);
-    }
-    
-    $scope.perPage = () => {
-        $scope.getProducts($scope.currentPage);
-    }
-
-    $scope.getProducts(1);
-    $scope.pageChanged = (page) => {
-        $scope.getProducts(page)
-    }
-    $scope.addToCart = function (item, type) {
-        if($window.localStorage.getItem('shopping')) {
-            const shopCart = JSON.parse($window.localStorage.getItem('shopping'));
-            let found = false;
-            shopCart.map(row => {
-                if(type && type == 'list') {
-                    item.map(l => {
-                        if(row.id == l.id) {
-                            found = true
-                            row.qty++;
-                        }
-                    })
-                }
-                else {
-                    if(row.id == item.id) {
-                        found = true
-                        row.qty++;
-                    }
-                }
-            });
-            
-            if(!found) {
-                $window.localStorage.setItem('shopping', JSON.stringify([...shopCart, ...(type && type=='list' ? item.map(r => ({...r, qty: 1})) : [{id: item.id, qty: 1}] )] ));
-            } else {
-                $window.localStorage.setItem('shopping', JSON.stringify([...shopCart]))
-            }
-        }
-        else {
-            $window.localStorage.setItem('shopping', JSON.stringify(type && type=='list' ? item.map(r => ({...r, qty: 1})) : [{id: item.id, qty: 1}]))
-        }
-        toaster.success({body: 'Book Added to Cart successfully!'});
     }
 })
 </script>

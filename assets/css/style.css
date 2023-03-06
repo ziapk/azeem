@@ -378,6 +378,7 @@ body {
   right: 0;
 }
 
+.feature-product .btn-dup,
 .feature-product .btn-bookmark,
 .feature-product .btn-edit,
 .feature-product .btn-cart {
@@ -393,12 +394,18 @@ body {
   right: 10px;
 }
 
+.feature-product .btn-dup,
 .feature-product .btn-bookmark {
   bottom: 50px;
   box-shadow: none;
   padding: 0;
   font-size: 20px;
   background: none;
+}
+
+.feature-product .btn-dup {
+  left: 10px;
+  right: auto;
 }
 
 .feature-product .btn-edit {

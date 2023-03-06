@@ -17,14 +17,15 @@ $sortByOrder = !empty($_GET['sortByOrder']) ? $_GET['sortByOrder'] : "";
 $correction = !empty($_GET['correction']) ? $_GET['correction'] : false;
 $selectedPublisherId = !empty($_GET['selectedPublisherId']) ? $_GET['selectedPublisherId'] : false;
 $pin = !empty($_GET['bookmark']) ? $_GET['bookmark'] : "";
+$dup = !empty($_GET['dup']) ? $_GET['dup'] : "";
 
 $shopId = $userData['role'] == 'owner' ? null : $userData['shopId'];
 if(!empty($_SESSION['shopInfo'])) {
     if(!empty($selectedPublisherId) && !empty($correction)) {
-        $search = $products->assignProductsPublisher($ownerId, ['page' => (int)$page, 'perPage' => (int)$perPage, 'search' => $search, 'searchBy' => $searchBy, 'courceId' => $courceId, 'group' => $group, 'board' => $board, 'full_name' => $full_name, 'author' => $author, 'sortByField' => $sortByField, 'sortByOrder' => $sortByOrder, 'pin' => $pin, 'publisher_id' => $publisher_id, 'correction' => $correction, 'selectedPublisherId' => $selectedPublisherId], $shopId);
+        $search = $products->assignProductsPublisher($ownerId, ['page' => (int)$page, 'perPage' => (int)$perPage, 'search' => $search, 'searchBy' => $searchBy, 'courceId' => $courceId, 'group' => $group, 'board' => $board, 'full_name' => $full_name, 'author' => $author, 'sortByField' => $sortByField, 'sortByOrder' => $sortByOrder, 'pin' => $pin, 'dup' => $dup, 'publisher_id' => $publisher_id, 'correction' => $correction, 'selectedPublisherId' => $selectedPublisherId], $shopId);
     }
     else {
-        $search = $products->getOwnerProductsPagination($ownerId, ['page' => (int)$page, 'perPage' => (int)$perPage, 'search' => $search, 'searchBy' => $searchBy, 'courceId' => $courceId, 'group' => $group, 'board' => $board, 'full_name' => $full_name, 'author' => $author, 'sortByField' => $sortByField, 'sortByOrder' => $sortByOrder, 'pin' => $pin, 'publisher_id' => $publisher_id, 'correction' => $correction], $shopId);
+        $search = $products->getOwnerProductsPagination($ownerId, ['page' => (int)$page, 'perPage' => (int)$perPage, 'search' => $search, 'searchBy' => $searchBy, 'courceId' => $courceId, 'group' => $group, 'board' => $board, 'full_name' => $full_name, 'author' => $author, 'sortByField' => $sortByField, 'sortByOrder' => $sortByOrder, 'pin' => $pin, 'dup' => $dup, 'publisher_id' => $publisher_id, 'correction' => $correction], $shopId);
     }
 };
 echo json_encode($search);

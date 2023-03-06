@@ -23,6 +23,10 @@ class Products extends Connection
 			if(!empty($params['pin'])) {
 				$pin .= " AND p.pin > 0";
 			}
+			$dup = "";
+			if(!empty($params['dup'])) {
+				$dup .= " AND p.dup > 0";
+			}
 			$publisher_query = "";
 			if(!empty($params['publisher_id'])) {
 				$publisher_query = " AND p.publisher_id = '".$params['publisher_id']."' ";
@@ -101,7 +105,7 @@ class Products extends Connection
 				$column = ", (sp.qty - sp.stock_out) as qty ";
 			}
 			
-			$stmt = "SELECT count(p.id) as count FROM `{$this->table}` as p $innerJoin LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id  LEFT JOIN program_books as c ON c.product_id = p.id WHERE p.owner_id=:owner_id $publisher_query $pin $searchQry";
+			$stmt = "SELECT count(p.id) as count FROM `{$this->table}` as p $innerJoin LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id  LEFT JOIN program_books as c ON c.product_id = p.id WHERE p.owner_id=:owner_id $publisher_query $dup $pin $searchQry";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':owner_id',$owner_id,PDO::PARAM_STR);
 			$prepare->execute();
@@ -115,7 +119,7 @@ class Products extends Connection
 
 			
 
-			$stmt = "SELECT p.*, pub.discount_type, pub.discount_amount, CONVERT(case when (pub.discount_amount > 0) then (p.price * (1 - (pub.discount_amount / 100)) ) else p.price end, DECIMAL) as price $column  FROM `{$this->table}` as p $innerJoin LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id LEFT JOIN program_books as c ON c.product_id = p.id LEFT JOIN publishers as pub on p.publisher_id = pub.id  WHERE p.`owner_id`=:owner_id $publisher_query  $pin $searchQry  GROUP BY p.id $sortByQry LIMIT :offset, :perPage";
+			$stmt = "SELECT p.*, pub.discount_type, pub.discount_amount, CONVERT(case when (pub.discount_amount > 0) then (p.price * (1 - (pub.discount_amount / 100)) ) else p.price end, DECIMAL) as price $column  FROM `{$this->table}` as p $innerJoin LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id LEFT JOIN program_books as c ON c.product_id = p.id LEFT JOIN publishers as pub on p.publisher_id = pub.id  WHERE p.`owner_id`=:owner_id $publisher_query $dup $pin $searchQry  GROUP BY p.id $sortByQry LIMIT :offset, :perPage";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':owner_id',$owner_id,PDO::PARAM_STR);
 			$prepare->bindParam(':offset',$offset,PDO::PARAM_INT);
@@ -561,6 +565,19 @@ class Products extends Connection
 	public function setBookmark($id, $pin) {
 		try {
 			$stmt = "UPDATE `{$this->table}` SET `pin`=:pin WHERE id=:id";
+            $prepare = $this->dbh->prepare($stmt);
+            $prepare->bindParam(':pin', $pin,PDO::PARAM_INT);
+            $prepare->bindParam(':id',$id,PDO::PARAM_INT);
+			$prepare->execute();
+			$result = $prepare->rowCount();
+			return $result;
+		} catch (PDOException $e) {
+		    die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
+	public function setDuplicate($id, $pin) {
+		try {
+			$stmt = "UPDATE `{$this->table}` SET `dup`=:pin WHERE id=:id";
             $prepare = $this->dbh->prepare($stmt);
             $prepare->bindParam(':pin', $pin,PDO::PARAM_INT);
             $prepare->bindParam(':id',$id,PDO::PARAM_INT);
