@@ -337,16 +337,18 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
 
         $http.post("<?php echo SITE_URL?>api/placeOrder.php", $httpParamSerializerJQLike($scope.form), {headers: {'Content-Type': 'application/x-www-form-urlencoded'} })
         .then(function(response) {
+            
             if(status == 1) {
                 alert(response.data.message);
             } else {
                 window.open("<?php echo SITE_URL;?>print?id="+response.data.order.id, "", "width=300,height=300"); 
-                $scope.items = $scope.list = [];
-                $scope.subTotal = $scope.discount = $scope.grandTotal = $scope.payment_amount = 0;
-                $window.localStorage.setItem('shopping', JSON.stringify($scope.items))
-                // $window.location.assign('<?php echo SITE_URL?>')
-                $scope.selectCustomer($scope.customersList[0]);
             }
+
+            $scope.items = $scope.list = [];
+            $scope.subTotal = $scope.discount = $scope.grandTotal = $scope.payment_amount = 0;
+            $window.localStorage.setItem('shopping', JSON.stringify($scope.items))
+            // $window.location.assign('<?php echo SITE_URL?>')
+            $scope.selectCustomer($scope.customersList[0]);
         });
     }
 
