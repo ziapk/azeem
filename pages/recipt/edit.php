@@ -67,7 +67,7 @@ $order = $orders->getOrder($_GET['id']);
                     </div>
                 </td>
                 <td width="130">
-                    <input class="form-control text-center" type="number" ng-model="addprice" ng-change="directlyPrice(addprice, cart)">
+                    <input class="form-control text-center" type="number" ng-model="addprice" ng-change="directlyPrice(addprice, cart)" ng-keydown="initCheckKeypress($event)">
                 </td>
                 <td>
                     {{(cart.price - cart.discount) * cart.qty | number: 2}}
@@ -190,6 +190,15 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
         $scope.grandTotal = $scope.payment_amount = $scope.payment_amount + Math.round($scope.payment_amount * ($scope.gst / 100)) + Math.round($scope.payment_amount * ($scope.service_charges / 100));
         // console.log('$scope.items', $scope.items);
         // $window.localStorage.setItem('shopping', JSON.stringify($scope.items));
+    }
+
+    $scope.initCheckKeypress = (evt) => {
+        var e = evt; // for trans-browser compatibility
+        var charCode = e.which || e.keyCode;
+        if (charCode === 9) {
+            $('#searchProduct').focus();
+            e.preventDefault();
+        }
     }
 
     $scope.printValue = o => {

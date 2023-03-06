@@ -46,7 +46,7 @@
                 <th></th>
             </tr>
             <tr>
-                <td colspan="7"><input type="text" class="form-control" ng-model="product" placeholder="Search Product to add" typeahead-on-select="selectProduct($item, row)" uib-typeahead="address as address.full_name for address in searchProduct($viewValue)" typeahead-template-url="row2.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="0" class="form-control" ng-model="row.product_name" /></td>
+                <td colspan="7"><input type="text" class="form-control" id="searchProduct" ng-model="product" placeholder="Search Product to add" typeahead-on-select="selectProduct($item, row)" uib-typeahead="address as address.full_name for address in searchProduct($viewValue)" typeahead-template-url="row2.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="0" class="form-control" ng-model="row.product_name" /></td>
             </tr>
         </thead>
         <tbody>
@@ -55,7 +55,7 @@
                 <td>
                 <input type="text" class="form-control" ng-model="row.full_name" placeholder="Product title" /></td>
                 <td width="100"><input type="number" class="form-control" ng-model="row.price" /></td>
-                <td width="100"><input type="number" class="form-control" ng-change="isValid(row,  calculateSum)" max="row.maxQty" ng-model="row.qty" /></td>
+                <td width="100"><input type="number" class="form-control" ng-change="isValid(row,  calculateSum)" max="row.maxQty" ng-model="row.qty"  ng-keydown="initCheckKeypress($event)" /></td>
                 <td width="60"><a href="#" class="btn btn-xs btn-danger pull-right" ng-click="remove(cart)">Delete</a></td>
             </tr>
         </tbody>
@@ -86,9 +86,6 @@
                 <th width="200"><input type="number" ng-model="payment_amount" ng-change="calcBalanc(payment_amount)" class="form-control"></th>
             </tr>
             <tr ng-if="grandTotal">
-                d{{discount}} | 
-                g{{grandTotal}} | 
-                p{{payment_amount}}
                 <th class="text-right" colspan="3">Closing Balance</th>
                 <th width="200">{{ payment_amount - grandTotal }}</th>
             </tr>
@@ -130,6 +127,14 @@ app.controller('reportController', function ($scope, $http, $window, $httpParamS
     $scope.payment_mode = '1';
     $scope.supplier = null;
 
+    $scope.initCheckKeypress = (evt) => {
+        var e = evt; // for trans-browser compatibility
+        var charCode = e.which || e.keyCode;
+        if (charCode === 9) {
+            $('#searchProduct').focus();
+            e.preventDefault();
+        }
+    }
 
     $scope.newData = {
         barcode: "",

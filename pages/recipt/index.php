@@ -65,7 +65,7 @@ echo mainHeader(['page' => 'recipt']);
                     </div>
                 </td>
                 <td width="130">
-                    <input class="form-control text-center" type="number" ng-model="addprice" ng-change="directlyPrice(addprice, cart)">
+                    <input class="form-control text-center" type="number" ng-model="addprice" ng-change="directlyPrice(addprice, cart)" ng-keydown="initCheckKeypress($event)">
                 </td>
                 <td>
                     {{(cart.price - cart.discount) * cart.qty | number: 2}}
@@ -348,7 +348,16 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
                 $scope.selectCustomer($scope.customersList[0]);
             }
         });
-    }    
+    }
+
+    $scope.initCheckKeypress = (evt) => {
+        var e = evt; // for trans-browser compatibility
+        var charCode = e.which || e.keyCode;
+        if (charCode === 9) {
+            $('#searchProduct').focus();
+            e.preventDefault();
+        }
+    }
 
     $scope.calculateSum = (c) => {
         const customerData = c || $scope.customerData;
