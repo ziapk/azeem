@@ -40,23 +40,44 @@ class Orders extends Connection
     public function createOrder($array)
     {
         try {
-            $stmt = "INSERT INTO `{$this->table}` (`user_id`, `customer_id`, `status`, `price`, `paid_amount`, `discount`, `shopId`, `order_date`, `gst`, `service_charges`, `summery`, `ref_no`) VALUES (:user_id, :customer_id, :status, :price, :paid_amount, :discount, :shopId, :order_date, :gst, :service_charges, :summery, :ref_no)";
-            $prepare = $this->dbh->prepare($stmt);        
-            $prepare->bindParam(':user_id', $array['user_id'], PDO::PARAM_STR);
-            $prepare->bindParam(':customer_id', $array['customer_id'], PDO::PARAM_STR);
-            $prepare->bindParam(':status', $array['status'], PDO::PARAM_STR);
-            $prepare->bindParam(':price', $array['price'], PDO::PARAM_STR);
-            $prepare->bindParam(':paid_amount', $array['paid_amount'], PDO::PARAM_STR);
-            $prepare->bindParam(':discount', $array['discount'], PDO::PARAM_STR);
-            $prepare->bindParam(':shopId', $array['shopId'], PDO::PARAM_STR);
-            $prepare->bindParam(':order_date', $array['order_date'], PDO::PARAM_STR);
-            $prepare->bindParam(':gst', $array['gst'], PDO::PARAM_STR);
-            $prepare->bindParam(':service_charges', $array['service_charges'], PDO::PARAM_STR);
-            $prepare->bindParam(':summery', $array['summery'], PDO::PARAM_STR);
-            $prepare->bindParam(':ref_no', $array['ref_no'], PDO::PARAM_STR);
-            $prepare->execute();
-            $result = $this->dbh->lastInsertId();
-            return $result;
+            if(!empty($array['id'])) {
+                $stmt = "UPDATE `{$this->table}` SET `user_id`=:user_id, `customer_id`=:customer_id, `status`=:status, `price`=:price, `paid_amount`=:paid_amount, `discount`=:discount, `shopId`=:shopId, `order_date`=:order_date, `gst`=:gst, `service_charges`=:service_charges, `summery`=:summery, `ref_no`=:ref_no WHERE id=:id";
+                $prepare = $this->dbh->prepare($stmt);        
+                $prepare->bindParam(':user_id', $array['user_id'], PDO::PARAM_STR);
+                $prepare->bindParam(':customer_id', $array['customer_id'], PDO::PARAM_STR);
+                $prepare->bindParam(':status', $array['status'], PDO::PARAM_STR);
+                $prepare->bindParam(':price', $array['price'], PDO::PARAM_STR);
+                $prepare->bindParam(':paid_amount', $array['paid_amount'], PDO::PARAM_STR);
+                $prepare->bindParam(':discount', $array['discount'], PDO::PARAM_STR);
+                $prepare->bindParam(':shopId', $array['shopId'], PDO::PARAM_STR);
+                $prepare->bindParam(':order_date', $array['order_date'], PDO::PARAM_STR);
+                $prepare->bindParam(':gst', $array['gst'], PDO::PARAM_STR);
+                $prepare->bindParam(':service_charges', $array['service_charges'], PDO::PARAM_STR);
+                $prepare->bindParam(':summery', $array['summery'], PDO::PARAM_STR);
+                $prepare->bindParam(':ref_no', $array['ref_no'], PDO::PARAM_STR);
+                $prepare->bindParam(':id', $array['id'], PDO::PARAM_STR);
+                $prepare->execute();
+                $result = $prepare->rowCount();
+                return $result;
+            } else {
+                $stmt = "INSERT INTO `{$this->table}` (`user_id`, `customer_id`, `status`, `price`, `paid_amount`, `discount`, `shopId`, `order_date`, `gst`, `service_charges`, `summery`, `ref_no`) VALUES (:user_id, :customer_id, :status, :price, :paid_amount, :discount, :shopId, :order_date, :gst, :service_charges, :summery, :ref_no)";
+                $prepare = $this->dbh->prepare($stmt);        
+                $prepare->bindParam(':user_id', $array['user_id'], PDO::PARAM_STR);
+                $prepare->bindParam(':customer_id', $array['customer_id'], PDO::PARAM_STR);
+                $prepare->bindParam(':status', $array['status'], PDO::PARAM_STR);
+                $prepare->bindParam(':price', $array['price'], PDO::PARAM_STR);
+                $prepare->bindParam(':paid_amount', $array['paid_amount'], PDO::PARAM_STR);
+                $prepare->bindParam(':discount', $array['discount'], PDO::PARAM_STR);
+                $prepare->bindParam(':shopId', $array['shopId'], PDO::PARAM_STR);
+                $prepare->bindParam(':order_date', $array['order_date'], PDO::PARAM_STR);
+                $prepare->bindParam(':gst', $array['gst'], PDO::PARAM_STR);
+                $prepare->bindParam(':service_charges', $array['service_charges'], PDO::PARAM_STR);
+                $prepare->bindParam(':summery', $array['summery'], PDO::PARAM_STR);
+                $prepare->bindParam(':ref_no', $array['ref_no'], PDO::PARAM_STR);
+                $prepare->execute();
+                $result = $this->dbh->lastInsertId();
+                return $result;
+            }
         } catch (PDOException $e) {
 		    die("Error!: " . $e->getMessage() . "<br/>");
 		}
@@ -94,6 +115,20 @@ class Orders extends Connection
 		}
     }
 
+    public function deleteOrderItems($order_id)
+    {
+        try {
+            $stmt = "DELETE FROM `{$this->table_sub}` where `order_id` = :order_id";
+            $prepare = $this->dbh->prepare($stmt);        
+            $prepare->bindParam(':order_id', $order_id, PDO::PARAM_STR);
+            $prepare->execute();
+            $result = $prepare->rowCount();
+            return $result;
+        } catch (PDOException $e) {
+		    die("Error!: " . $e->getMessage() . "<br/>");
+		}
+    }
+
     public function createOrderDetails($array)
     {
         try {
@@ -106,8 +141,10 @@ class Orders extends Connection
             $prepare->bindParam(':discount', $array['discount'], PDO::PARAM_STR);
             $prepare->execute();
             $result = $this->dbh->lastInsertId();
-            $prod = new Products();
-            $prod->subProductQty($array);
+            if($array['status'] != 1) {
+                $prod = new Products();
+                $prod->subProductQty($array);
+            }
             return $result;
         } catch (PDOException $e) {
 		    die("Error!: " . $e->getMessage() . "<br/>");

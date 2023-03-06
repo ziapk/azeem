@@ -4,6 +4,8 @@ $productCls = new Products();
 $ownerId = $userData['role'] == 'owner' ? $userData['id'] : $userData['created_by'];
 $list = $productCls->getOwnerProducts($ownerId);
 echo mainHeader(['page' => 'recipt']);
+$orders = new Orders();
+$order = $orders->getOrder($_GET['id']);
 ?>
 <div ng-controller="cartController">
 <div class="container">
@@ -13,7 +15,7 @@ echo mainHeader(['page' => 'recipt']);
                 <th style="vertical-align: middle">Customer Name</th>
                 <th>
                 <div class="dropdown-wrapper" style="position: relative;">
-                    <input type="text" class="form-control" ng-model="customerName" placeholder="Search Customer" uib-typeahead="address as address.full_name for address in searchCustomer($viewValue)" typeahead-on-select="selectCustomer($item)" ng-model-options="{debounce: 100}" typeahead-template-url="customer.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="1">
+                    <input disabled type="text" class="form-control" ng-model="customerName" placeholder="Search Customer" uib-typeahead="address as address.full_name for address in searchCustomer($viewValue)" typeahead-on-select="selectCustomer($item)" ng-model-options="{debounce: 100}" typeahead-template-url="customer.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="1">
                     <!-- <input type="text" class="form-control" ng-model="customerName" ng-change=""> -->
                     <!-- <div class="list-group recipt-search-dropdown">
                         <a ng-click="selectCustomer(l)" class="list-group-item clearfix" ng-repeat="l in customersList">
@@ -146,14 +148,15 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
     $scope.priceList = localStorage.getItem('list') && JSON.parse(localStorage.getItem('list'));;
     $scope.focus = false;
 
+    $scope.data = <?php echo json_encode($order);?>;
     $scope.customerData = {};
-    $scope.summery = '';
-    $scope.ref_no = '';
-    $scope.gst = 0;
-    $scope.service_charges = 0;
-    $scope.subTotal = 0;
-    $scope.grandTotal = 0;
-    $scope.discount = 0;
+    $scope.summery = $scope.data.order.summery;
+    $scope.ref_no = $scope.data.order.ref_no;
+    $scope.gst = $scope.data.order.gst;
+    $scope.service_charges = $scope.data.order.service_charges;
+    $scope.subTotal =$scope.data.order.price;
+    $scope.grandTotal = $scope.data.order.price + $scope.data.order.discount;
+    $scope.discount = $scope.data.order.discount;
     $scope.payment_mode = '1';
     const items = [];
     $scope.modes = [];
@@ -164,24 +167,50 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
     //     }
     // }, 3000);
 
+    $scope.calculateSum = (c) => {
+        const customerData = c || $scope.customerData;
+        let subtotal = 0;
+        $scope.items.map((product) => {
+            // const prod = $scope.priceList.find(r => r.id == product.id);
+            let currentRow = null;
+            if(customerData.discount_array?.length && customerData.discount_array?.filter(r => r.publisher_id == product.publisher_id).length) {
+                const row = customerData.discount_array.find(r => r.publisher_id == product.publisher_id);
+                const price = parseFloat(product.price);
+                product.discount = price * (parseFloat(row.discount_value) / 100);
+                subtotal += ((product.price - product.discount) * product.qty);
+            }
+            else {
+                const price = parseFloat(product.price);
+                product.discount = 0;
+                subtotal += (price * product.qty);
+            }
+        })
+        $scope.subTotal = subtotal;
+        $scope.payment_amount = $scope.subTotal - $scope.discount;
+        $scope.grandTotal = $scope.payment_amount = $scope.payment_amount + Math.round($scope.payment_amount * ($scope.gst / 100)) + Math.round($scope.payment_amount * ($scope.service_charges / 100));
+        // console.log('$scope.items', $scope.items);
+        // $window.localStorage.setItem('shopping', JSON.stringify($scope.items));
+    }
+
     $scope.printValue = o => {
         $scope.payment_mode = o.id;
     }
-    if($window.localStorage.getItem('shopping')) {
-        const shopCart = JSON.parse($window.localStorage.getItem('shopping'));
+    // if($window.localStorage.getItem('shopping')) {
+        const shopCart = $scope.data.order_items;
         
         shopCart.map(function(row){
             const obj = $scope.mainList.find(function (e) { return e.id == row.id});
-            items.push({...obj, qty: row.qty})
+            items.push({...obj, qty: row.quantity})
         });
         $scope.items = items;
-        $timeout(() => {
-            $scope.calculateSum()
-        });
-    }
-    else {
-        $scope.items = []
-    }
+        // console.log('items', items);
+        // $timeout(() => {
+        //     $scope.calculateSum()
+        // });
+    // }
+    // else {
+    //     $scope.items = []
+    // }
 
     $scope.addTax = () => {
         $scope.calculateSum();
@@ -242,12 +271,7 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
         }, 200);
         
     }
-    $scope.selectCustomer = function (p) {
-        $scope.customerName = p.full_name;
-        $scope.customerData = p;
-        $scope.calculateSum(p);
-    }
-
+    
     $scope.addQty = function (row) {
         row.qty++;
         $scope.calculateSum();
@@ -283,17 +307,7 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
             });
         }
     }
-    $scope.searchCustomer = function (value, onloading) {
-        $scope.customerName = value;
-        return $http.get("<?php echo SITE_URL?>api/getCustomer.php?term="+value)
-        .then(function(response) {
-            $scope.customersList = response.data;
-            if(onloading) {
-                $scope.selectCustomer($scope.customersList[0]);
-            }
-            return response.data
-        });
-    }
+    
     $scope.searchMode = function () {
         return $http.get("<?php echo SITE_URL?>api/getPaymentModes.php")
         .then(function(response) {
@@ -304,15 +318,19 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
 
     $scope.searchMode();
 
-    $scope.searchCustomer('', true)
-
     $scope.clearSearch = () => {
         $scope.product = null
         $scope.list = [];
     }
-    $scope.clearCustomer = () => {
-        $scope.customersList = [];
+
+    $scope.selectCustomer = (p) => {
+        $scope.customerName = p.full_name;
+        $scope.customerData = p;
+        console.log('p', p, $scope.calculateSum);
+        $scope.calculateSum(p);
     }
+
+    $scope.selectCustomer($scope.data.customer);
 
     $scope.park = () => {
         $scope.checkout(1);
@@ -329,7 +347,7 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
             service_charges: $scope.service_charges,
             summery: $scope.summery,
             ref_no: $scope.ref_no,
-            id: $scope.id,
+            id: $scope.data.order.id,
             payment_mode: $scope.payment_mode,
             status: status || 2
         }
@@ -343,38 +361,12 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
                 window.open("<?php echo SITE_URL;?>print?id="+response.data.order.id, "", "width=300,height=300"); 
                 $scope.items = $scope.list = [];
                 $scope.subTotal = $scope.discount = $scope.grandTotal = $scope.payment_amount = 0;
-                $window.localStorage.setItem('shopping', JSON.stringify($scope.items))
+                // $window.localStorage.setItem('shopping', JSON.stringify($scope.items))
                 // $window.location.assign('<?php echo SITE_URL?>')
                 $scope.selectCustomer($scope.customersList[0]);
             }
         });
     }    
-
-    $scope.calculateSum = (c) => {
-        const customerData = c || $scope.customerData;
-        let subtotal = 0;
-        $scope.items.map((product) => {
-            // const prod = $scope.priceList.find(r => r.id == product.id);
-            let currentRow = null;
-            if(customerData.discount_array?.length && customerData.discount_array?.filter(r => r.publisher_id == product.publisher_id).length) {
-                const row = customerData.discount_array.find(r => r.publisher_id == product.publisher_id);
-                const price = parseFloat(product.price);
-                product.discount = price * (parseFloat(row.discount_value) / 100);
-                subtotal += ((product.price - product.discount) * product.qty);
-            }
-            else {
-                const price = parseFloat(product.price);
-                product.discount = 0;
-                subtotal += (price * product.qty);
-            }
-        })
-        $scope.subTotal = subtotal;
-        $scope.payment_amount = $scope.subTotal - $scope.discount;
-        $scope.grandTotal = $scope.payment_amount = $scope.payment_amount + Math.round($scope.payment_amount * ($scope.gst / 100)) + Math.round($scope.payment_amount * ($scope.service_charges / 100));
-        console.log('$scope.items', $scope.items);
-        $window.localStorage.setItem('shopping', JSON.stringify($scope.items));
-
-    }
 
 })
 </script>

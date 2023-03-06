@@ -174,6 +174,7 @@ class Customers extends Connection
 			if(!empty($result['account_id'])) {
 				$result['account']=$de->getAccount($result['account_id']);
 			}
+			$result['discount_array'] = $this->getCustomerDiscounts(['customer_id'=> $id, 'shopId'=> $result['shopId']]);
 			return $result;
 		} catch (PDOException $e) {
 		    die("Error!: " . $e->getMessage() . "<br/>");

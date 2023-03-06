@@ -3,7 +3,7 @@
 
     $ordersObj = new Orders();
     $dateLabel = "Sales for ";
-    $start = $end = date('Y-m-d');
+    $start = $end = $shop['sale_date'];
     
     if(isset($_GET['report'])) {
         $from = $_GET['from'];
@@ -14,10 +14,10 @@
         $end = date('Y-m-d', strtotime($to));
     }
     else {        
-        $orders = $ordersObj->userOrders($userData['shopId'], date('Y-m-d'));
-        $dateLabel .= '<strong>'.date('Y-m-d').'</strong>';
-        $start = date('Y-m-d');
-        $end = date('Y-m-d');
+        $orders = $ordersObj->userOrders($stop['id'], $shop['sale_date']);
+        $dateLabel .= '<strong>'.$shop['sale_date'].'</strong>';
+        $start = $shop['sale_date'];
+        $end = $shop['sale_date'];
     }
     echo mainHeader(['page' =>'order']);
 ?>
@@ -53,7 +53,7 @@
             <td>{{statusArr[row.status].full_name}}</td>
             <td>{{row.order_date}}</td>
             <td align="right">
-                <a class="btn btn-xs btn-danger" ng-click="returnOrder(row.id)" href="javascript:void(0)">Return</a>
+                <a class="btn btn-xs btn-default" ng-click="editRecipt(row.id)" href="javascript:void(0)">Edit</a>
                 <a class="btn btn-xs btn-danger" ng-click="deleteRecipt(row.id)" href="javascript:void(0)">Delete</a>
                 <a class="btn btn-xs btn-info" ng-click="openRecipt(row.id)" href="javascript:void(0)">Print</a>
                 <a class="btn btn-xs btn-default" ng-click="openRecipt(row.id, 'details')" href="javascript:void(0)">View</a>
@@ -85,7 +85,7 @@ echo mainFooter();
 ?>
 <script type="text/javascript">
 app.controller('reportController', function($scope, $http, $httpParamSerializerJQLike, $window, $document, $uibModal) {
-    $scope.datePicker = { date: {startDate: '<?php echo date('Y-m-d');?>', endDate: '<?php echo date('Y-m-d');?>'} };
+    $scope.datePicker = { date: {startDate: '<?php echo $shop['sale_date'];?>', endDate: '<?php echo $shop['sale_date'];?>'} };
 
     $scope.statusArr = <?php echo json_encode($orderStatusArr);?> 
 
@@ -111,9 +111,9 @@ app.controller('reportController', function($scope, $http, $httpParamSerializerJ
         }
         $window.open("<?php echo SITE_URL;?>print?id="+id+"&detail="+detail+'&largeView='+largeView, "", (largeView ? "width=600,height=900" : "width=300,height=300")); 
     }
-    /* $scope.deleteRecipt = id => {
-        $window.open("<?php echo SITE_URL;?>pages/orders/delete.php?id="+id, "", "width=300,height=300"); 
-    } */
+    $scope.editRecipt = id => {
+        $window.location.assign("<?php echo SITE_URL;?>pages/recipt/edit.php?id="+id); 
+    }
 
     $scope.deleteRecipt = function (id) {
         const reason = $window.prompt('Please Write a reason for delete this order')
