@@ -19,7 +19,7 @@ echo mainHeader(['page'=> 'supplier']);
                 <th></th>
                 <th>Contact</th>
                 <th>Company / Title / Address</th>
-                <th width="200"></th>
+                <th width="300"></th>
             </tr>
         </thead>
         <tbody>
