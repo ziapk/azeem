@@ -33,17 +33,87 @@ $productsForReturn = [];
 $storeDATA = $storeObj->getStore($shopId);
 
 
-if(sizeof($_POST['items'])) {
-    foreach($_POST['items'] as $item) {
-        $data = [
-            'order_id' => $item['order_id'],
-            'shopId' => $shopId,
-            'type' => 3,
-            'user_id' => $userData['id'],
-            'product_id' => $item['id'],
-            'quantity' => $item['qty'],
-        ];
-        $orders->orderReturnAll($data, 1, 3);
+$productIds = [];
+foreach ($_POST['items'] as $key => $value) {
+    $productIds[$value['id']] = $value['qty'];
+}
+
+$orderDetails = $orders->getOrderItemsByProductIds(array_keys($productIds), $supplierId);
+$or = [];
+$oi = [];
+foreach ($productIds as $id => $qty) {
+    $remaining = $qty;
+    foreach ($orderDetails as $key => $value) {
+        if(!empty($remaining)) {
+            $oi[$value['order_id']]['total'] += 1;
+            if(!empty($remaining) && $value['product_id'] == $id && $value['quantity'] <= $remaining) { // full return products
+                $remaining -= $value['quantity'];
+                $oi[$value['order_id']]['full']+=1;
+                $oi[$value['order_id']]['full_items'][$id]= ['quantity' => $value['quantity'], 'price' => $value['price']];
+            }
+            elseif(!empty($remaining) &&  $value['product_id'] == $id && $value['quantity'] > $remaining) { // partial return products
+                // $diff = $value['quantity'] - $remaining;
+                $oi[$value['order_id']]['partial'] +=1;
+                $oi[$value['order_id']]['partial_items'][$id] =['quantity' => $remaining, 'price' => $value['price']];;
+                $remaining = 0;
+            }
+        }
+    }
+}
+$res = [];
+foreach ($oi as $id => $row) {
+    $t = $row['total'];
+    $t -= $row['full'];
+
+    if($t == 0) {
+        echo 'full';
+        if(!empty($row['full_items'])) {
+            foreach ($row['full_items'] as $product_id => $value) {
+                $data = [
+                    'order_id' => $id,
+                    'shopId' => $shopId,
+                    'type' => 1, // back to inventory
+                    'user_id' => $userData['id'],
+                    'product_id' => $product_id,
+                    'quantity' => $value['quantity'],
+                    'price' => $value['price'],
+                ];
+                $res[$product_id][] = $orders->orderReturnAll($data, 1, 3, true);
+            }
+        }
+        // full return here
+    } else {
+        echo 'partial';
+        // partial
+        if(!empty($row['partial_items'])) {
+            foreach ($row['partial_items'] as $product_id => $value) {
+                $data = [
+                    'order_id' => $id,
+                    'shopId' => $shopId,
+                    'type' => 1, // back to inventory
+                    'user_id' => $userData['id'],
+                    'product_id' => $product_id,
+                    'quantity' => $value['quantity'],
+                    'price' => $value['price'],
+                ];
+                $res[$product_id][] =$orders->orderReturnAll($data, 1, 3);
+            }
+        }
+
+        if(!empty($row['full_items'])) {
+            foreach ($row['full_items'] as $product_id => $value) {
+                $data = [
+                    'order_id' => $id,
+                    'shopId' => $shopId,
+                    'type' => 1, // back to inventory
+                    'user_id' => $userData['id'],
+                    'product_id' => $product_id,
+                    'quantity' => $value['quantity'],
+                    'price' => $value['price'],
+                ];
+                $res[$product_id][] =$orders->orderReturnAll($data, 1, 3);
+            }
+        }
     }
 }
 // echo 'Opening Balance';

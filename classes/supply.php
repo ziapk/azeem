@@ -5,6 +5,7 @@ class Supply extends Connection
     
     private $table = 'supply';
     private $table_sub = 'supply_items';
+    private $table_rs = 'supply_returns';
     private $table_transaction = 'supply_transaction';
     private $table_suppliers = 'suppliers';
     
@@ -235,6 +236,48 @@ class Supply extends Connection
 		    die("Error!: " . $e->getMessage() . "<br/>");
 		}
 	}
-    
 
+    public function getSupplyItemsByProductIds($productIds, $supplier_id)
+    {
+        try {
+            $products = [];
+            $price = [];
+            foreach ($productIds as $value) {
+                $arr = explode('_', $value);
+                $products[] = $arr[0];
+                $price[] = $arr[1];
+            }
+            $stmt = "SELECT sp.supplier_id, s.* FROM `{$this->table_sub}` as s left join `{$this->table}` as sp on sp.id = s.supply_id where s.product_id IN (".implode(', ', $products).") and s.price IN (".implode(', ', $price).") and sp.supplier_id=:supplier_id";
+            $prepare = $this->dbh->prepare($stmt);      
+            $prepare->bindParam(':supplier_id', $supplier_id, PDO::PARAM_INT);  
+            $prepare->execute();
+            $result = $prepare->fetchAll(PDO::FETCH_ASSOC);
+            return $result;
+        } catch (PDOException $e) {
+		    die("Error!: " . $e->getMessage() . "<br/>");
+		}
+    }
+
+    public function orderReturnAll($array, $action, $type = 1)
+    {
+        try {
+            $stmt = "INSERT INTO `{$this->table_rs}` (`user_id`, `shopId`, `supply_id`, `product_id`, `quantity`, `price`, `type`) VALUES (:user_id, :shopId, :supply_id, :product_id, :quantity, :price, :type)";
+            $prepare = $this->dbh->prepare($stmt);        
+            $prepare->bindParam(':user_id', $array['user_id'], PDO::PARAM_STR);
+            $prepare->bindParam(':shopId', $array['shopId'], PDO::PARAM_STR);
+            $prepare->bindParam(':supply_id', $array['supply_id'], PDO::PARAM_STR);
+            $prepare->bindParam(':product_id', $array['product_id'], PDO::PARAM_STR);
+            $prepare->bindParam(':quantity', $array['quantity'], PDO::PARAM_STR);
+            $prepare->bindParam(':price', $array['price'], PDO::PARAM_STR);
+            $prepare->bindParam(':type', $array['type'], PDO::PARAM_STR);
+            $prepare->execute();
+            $result = $this->dbh->lastInsertId();
+            $products = new Products();
+            $array['quantity'] = (-1 * $array['quantity']) ;
+            $products->addProductQty($array['product_id'], $array['quantity'], $array['shopId'], $type);
+            return $result;
+        } catch (PDOException $e) {
+		    die("Error!: " . $e->getMessage() . "<br/>");
+		}
+    }
 }

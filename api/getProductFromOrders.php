@@ -3,7 +3,7 @@ include_once dirname(__FILE__).'/../include/settings.php';
 $ownerId = $userData['role'] == 'owner' ? $userData['id'] : $userData['created_by'];
 $products = new  Products();
 $page = !empty($_GET['page']) ? $_GET['page'] : 1;
-$perPage = !empty($_GET['perPage']) ? $_GET['perPage'] : 0;
+$perPage = !empty($_GET['perPage']) ? $_GET['perPage'] : 10;
 $search = !empty($_GET['search']) ? $_GET['search'] : "";
 $searchBy = !empty($_GET['searchBy']) ? $_GET['searchBy'] : "";
 $full_name = !empty($_GET['full_name']) ? $_GET['full_name'] : "";

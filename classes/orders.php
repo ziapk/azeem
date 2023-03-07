@@ -83,31 +83,38 @@ class Orders extends Connection
 		}
     }
     
-    public function orderReturnAll($array, $action, $type = 1)
+    public function orderReturnAll($array, $action, $type = 1, $delete = false)
     {
         try {
-            $stmt = "INSERT INTO `{$this->table_rp}` (`user_id`, `shopId`, `order_id`, `product_id`, `quantity`, `type`) VALUES (:user_id, :shopId, :order_id, :product_id, :quantity, :type)";
+            $stmt = "INSERT INTO `{$this->table_rp}` (`user_id`, `shopId`, `order_id`, `product_id`, `quantity`, `price`, `type`) VALUES (:user_id, :shopId, :order_id, :product_id, :quantity, :price, :type)";
             $prepare = $this->dbh->prepare($stmt);        
             $prepare->bindParam(':user_id', $array['user_id'], PDO::PARAM_STR);
             $prepare->bindParam(':shopId', $array['shopId'], PDO::PARAM_STR);
             $prepare->bindParam(':order_id', $array['order_id'], PDO::PARAM_STR);
             $prepare->bindParam(':product_id', $array['product_id'], PDO::PARAM_STR);
             $prepare->bindParam(':quantity', $array['quantity'], PDO::PARAM_STR);
+            $prepare->bindParam(':price', $array['price'], PDO::PARAM_STR);
             $prepare->bindParam(':type', $array['type'], PDO::PARAM_STR);
             $prepare->execute();
             $result = $this->dbh->lastInsertId();
             $products = new Products();
             $products->addProductQty($array['product_id'], $array['quantity'], $array['shopId'], $type);
-            // $this->orderReturn($array['order_id'], ($action+4));
+            $this->orderReturn($array['order_id'], ($action+4));
+            // if(!empty($delete)) {
+            //     $this->deleteOrderItem($array['order_id'], $array['product_id']);
+            // }
+            // else {
+            //     $this->updateOrderItem($array['order_id'], $array['product_id'], $array['quantity']);
+            // }
             return $result;
         } catch (PDOException $e) {
 		    die("Error!: " . $e->getMessage() . "<br/>");
 		}
     }
 
-    public function addColumn($columnName) {
+    public function addColumn($columnName, $after, $table) {
         try {
-            $stmt = "ALTER TABLE `{$this->table}` ADD COLUMN IF NOT EXISTS `{$columnName}` varchar(20) NULL DEFAULT NULL AFTER `reference`";
+            $stmt = "ALTER TABLE `{$table}` ADD COLUMN IF NOT EXISTS `{$columnName}` int(11) NULL DEFAULT NULL AFTER `{$after}`";
             $prepare = $this->dbh->prepare($stmt);
             $prepare->execute();
         } catch (PDOException $e) {
@@ -115,6 +122,37 @@ class Orders extends Connection
 		}
     }
 
+    public function deleteOrderItem($order_id, $product_id)
+    {
+        try {
+            $stmt = "DELETE FROM `{$this->table_sub}` where `order_id` = :order_id and `product_id` = :product_id";
+            $prepare = $this->dbh->prepare($stmt);        
+            $prepare->bindParam(':order_id', $order_id, PDO::PARAM_STR);
+            $prepare->bindParam(':product_id', $product_id, PDO::PARAM_STR);
+            $prepare->execute();
+            $result = $prepare->rowCount();
+            return $result;
+        } catch (PDOException $e) {
+		    die("Error!: " . $e->getMessage() . "<br/>");
+		}
+    }
+    
+    public function updateOrderItem($order_id, $product_id, $qty)
+    {
+        try {
+            $stmt = "UPDATE `{$this->table_sub}` SET quantity=quantity-:qty where `order_id` = :order_id and `product_id` = :product_id";
+            $prepare = $this->dbh->prepare($stmt);        
+            $prepare->bindParam(':product_id', $product_id, PDO::PARAM_STR);
+            $prepare->bindParam(':qty', $qty, PDO::PARAM_STR);
+            $prepare->bindParam(':order_id', $order_id, PDO::PARAM_STR);
+            $prepare->execute();
+            $result = $prepare->rowCount();
+            return $result;
+        } catch (PDOException $e) {
+		    die("Error!: " . $e->getMessage() . "<br/>");
+		}
+    }
+    
     public function deleteOrderItems($order_id)
     {
         try {
@@ -123,6 +161,20 @@ class Orders extends Connection
             $prepare->bindParam(':order_id', $order_id, PDO::PARAM_STR);
             $prepare->execute();
             $result = $prepare->rowCount();
+            return $result;
+        } catch (PDOException $e) {
+		    die("Error!: " . $e->getMessage() . "<br/>");
+		}
+    }
+    
+    public function getOrderItemsByProductIds($productIds, $customer_id)
+    {
+        try {
+            $stmt = "SELECT i.* FROM `{$this->table_sub}` as i left join `{$this->table}` as o on o.id=i.order_id where o.status IN (2, 5, 6, 7, 8, 9) and o.customer_id = :custoemr_id and i.product_id IN (".implode(', ', $productIds).")";
+            $prepare = $this->dbh->prepare($stmt);
+            $prepare->bindParam(':customer_id', $customer_id, PDO::PARAM_STR);
+            $prepare->execute();
+            $result = $prepare->fetchAll(PDO::FETCH_ASSOC);
             return $result;
         } catch (PDOException $e) {
 		    die("Error!: " . $e->getMessage() . "<br/>");
@@ -262,8 +314,8 @@ class Orders extends Connection
     
     public function inventoryReturnReport($shopId, $date, $to, $type) {
         try {
-            $toCondition = " AND rp.datetime>='".$date."' AND rp.datetime<='".$to."'";
-			$stmt = "SELECT sum(rp.quantity) AS quantity, sum(rp.quantity * oi.price) AS total, p.full_name AS product_name, oi.price FROM `{$this->table}` AS o LEFT JOIN `{$this->table_rp}` AS rp on rp.order_id = o.id LEFT JOIN `{$this->table_pro}` AS p on rp.product_id = p.id LEFT JOIN `{$this->table_sub}` AS oi on oi.order_id = o.id  WHERE o.shopId=:shopId and oi.product_id=rp.product_id ".$toCondition.' and o.flag = 2 and rp.type =:type group by rp.product_id ORDER BY rp.id desc';
+            $toCondition = " AND DATE(rp.datetime)>='".$date."' AND DATE(rp.datetime)<='".$to."'";
+			$stmt = "SELECT sum(rp.quantity) AS quantity, sum(rp.quantity * rp.price) AS total, p.full_name AS product_name, rp.price FROM `{$this->table_rp}` AS rp LEFT JOIN `{$this->table_pro}` AS p on rp.product_id = p.id WHERE rp.shopId=:shopId ".$toCondition.' and rp.type =:type group by rp.product_id ORDER BY rp.id desc';
             $prepare = $this->dbh->prepare($stmt);
             $prepare->bindParam(':shopId',$shopId,PDO::PARAM_STR);
             $prepare->bindParam(':type',$type,PDO::PARAM_STR);
