@@ -133,7 +133,6 @@ switch ($reportType) {
 				$reportData[$count]['grossCashSales'] = $value['totalPaid'] + $value['totalDiscount'];
 				$reportData[$count]['discount'] = $value['totalDiscount'];
 				$reportData[$count]['netCreditSales'] = $value['totalCredit'] - $value['totalPaid'];
-				$reportData[$count]['finalCreditSales'] = $value['totalCredit'] - $value['totalPaid'];
 				$reportData[$count]['netCashSales'] = $value['totalPaid'];
 				$reportData[$count]['finalCashSales'] = $value['totalPaid'];
 	
@@ -141,7 +140,6 @@ switch ($reportType) {
 				$footer['grossCashSales'] += $value['totalPaid'] + $value['totalDiscount'];
 				$footer['discount'] += $value['totalDiscount'];
 				$footer['netCreditSales'] += $value['totalCredit'] - $value['totalPaid'];
-				$footer['finalCreditSales'] += $value['totalCredit'] - $value['totalPaid'];
 				$footer['netCashSales'] += $value['totalPaid'];
 				$footer['finalCashSales'] += $value['totalPaid'];
 	
@@ -359,10 +357,10 @@ ob_start();
 <br>
 <?php 
 
-$tsale = empty($footer['finalCashSales']) ? 0 : $footer['finalCashSales'];
-$creditsale = empty($footer['finalCreditSales']) ? 0 : $footer['finalCreditSales'];
+$tsale = empty($footer['netCashSales']) ? 0 : $footer['netCashSales'];
+$creditsale = empty($footer['netCreditSales']) ? 0 : $footer['netCreditSales'];
 $texpense = empty($expenses['total']) ? 0 : $expenses['total'];
-
+$netCash = ($tsale + $receivings) - ($texpense - $payments);
 ?>
 <table id="resultTable" style="border-collapse: collapse; width: 400px" border="1">
 	<?php foreach ($summerCols as $index => $value){ $key = $footerVals[$index]; ?>
@@ -382,6 +380,10 @@ $texpense = empty($expenses['total']) ? 0 : $expenses['total'];
 		<tr>
 			<th align="left">Expenses</td>
 			<th align="right"><?php echo number_format($texpense, 2); ?></td>
+		</tr>
+		<tr>
+			<th align="left">Net Cash</td>
+			<th align="right"><?php echo number_format($netCash, 2); ?></td>
 		</tr>
 </table>
 

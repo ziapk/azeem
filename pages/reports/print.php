@@ -40,10 +40,8 @@ h4 {
     
 </style>
 <?php
-
 switch ($reportType) {
     case '0':
-				$shopId = $userData['role'] == 'owner' ? $shopId : $userData['shopId'];
 				$ownerId = $userData['role'] == 'owner' ? $userData['id'] : $userData['created_by'];
 				$orders = $productObj->getStoreProducts($ownerId, $shopId);
 				$stores = new Store();
@@ -51,7 +49,7 @@ switch ($reportType) {
         include_once dirname(__FILE__).'/shop_products.php';
 		exit;
     case '1':
-        $orders = $ordersObj->ordersReport($userData['shopId'], $from, $to);
+        $orders = $ordersObj->ordersReport($shopId, $from, $to);
         include_once dirname(__FILE__).'/salesReport.php';
 		exit;
 		// $headers = ['Order #', 'Date', 'Customer Name', 'Price', 'Discount.', 'Paid', 'Status'];
@@ -60,31 +58,36 @@ switch ($reportType) {
 		
 	break;
 	case '2':
-		$orders = $ordersObj->ordersReportProductWise($userData['shopId'], $from, $to);
+		$orders = $ordersObj->ordersReportProductWise($shopId, $from, $to);
         include_once dirname(__FILE__).'/salesReportProductWise.php';
 		exit;
 	break;
     
 	case '3':
-		$orders = $ordersObj->ordersReportDateWise($userData['shopId'], $from, $to);
+		$orders = $ordersObj->ordersReportDateWise($shopId, $from, $to);
         include_once dirname(__FILE__).'/salesReportDateWise.php';
 		exit;
 	break;
 	case '4':
-		$orders = $ordersObj->returnReportProductWise($userData['shopId'], $from, $to);
-        include_once dirname(__FILE__).'/returnReportProductWise.php';
+		$orders = $ordersObj->returnReportProductWise($shopId, $from, $to);
+		include_once dirname(__FILE__).'/returnReportProductWise.php';
 		exit;
 	break;
 	case '5':
         $inventoryReport = true;
-		$orders = $ordersObj->inventoryReturnReport($userData['shopId'], $from, $to, 1);
+		$orders = $ordersObj->inventoryReturnReport($shopId, $from, $to, 1);
         include_once dirname(__FILE__).'/inventoryReturnReport.php';
 		exit;
     break;
     case '6':
         $faultyReport = true;
-		$orders = $ordersObj->inventoryReturnReport($userData['shopId'], $from, $to, 2);
+		$orders = $ordersObj->inventoryReturnReport($shopId, $from, $to, 2);
         include_once dirname(__FILE__).'/inventoryReturnReport.php';
+		exit;
+    case '7':
+        $lahoreReport = true;
+		$orders = $ordersObj->inventoryReturnReport($shopId, $from, $to, 3);
+		include_once dirname(__FILE__).'/inventoryReturnReport.php';
 		exit;
 	case '8':
 		$expensesObj = new Expenses();

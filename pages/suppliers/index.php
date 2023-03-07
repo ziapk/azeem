@@ -19,7 +19,6 @@ echo mainHeader(['page'=> 'supplier']);
                 <th></th>
                 <th>Contact</th>
                 <th>Company / Title / Address</th>
-                <th>Wallet</th>
                 <th width="200"></th>
             </tr>
         </thead>
@@ -28,12 +27,12 @@ echo mainHeader(['page'=> 'supplier']);
                     <td width="50"><img ng-if="li.image" width="40" class="image" src={{"<?php echo SITE_URL;?>uploads/products/"+li.image}} /></td>
                     <td><strong>{{li.name}}</strong> <br /> {{li.contact}}</td>
                     <td><strong>{{li.company}}</strong> - {{li.title}} <br />{{li.address}}</td>
-                    <td>{{li.wallet}}</td>
+                    <!-- <td>{{li.wallet}}</td> -->
                     <td>
                         <a class="btn btn-primary btn-xs" href="<?php echo SITE_URL."pages/suppliers/update.php?id="?>{{li.id}}">Edit</a>
-                        <a ng-if="li.wallet < 0 || li.wallet > 0 " class="btn btn-danger btn-xs" href="<?php echo SITE_URL."pages/suppliers/adjustment.php?id="?>{{li.id}}">Pay</a>
                         <?php if($userData['role'] === 'owner' || $userData['role'] === 'manager') {?><a class="btn btn-default btn-xs" href="../chart-of-accounts/summery.php?t=s&id={{li.account_id}}">Ledger</a><?php } ?>
                         <a class="btn btn-danger btn-xs" href="<?php echo SITE_URL."pages/suppliers/invoices.php?id="?>{{li.id}}">Bills</a>
+                        <a ng-if="li.wallet < 0 || li.wallet > 0 " class="btn btn-danger btn-xs" href="<?php echo SITE_URL."pages/suppliers/adjustment.php?id="?>{{li.id}}">Payment</a>
                     </td>
                 </tr>
         </tbody>

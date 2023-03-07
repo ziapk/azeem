@@ -6,6 +6,9 @@ $totals = ['price' => 0, 'qty' => 0];
     <h2>Return to Inventory Products</h2>
 <?php } elseif(!empty($faultyReport)) { ?>
     <h2>Return as Faulty Products</h2>
+<?php }
+elseif(!empty($lahoreReport)) { ?>
+    <h2>Returned to Lahore Products</h2>
 <?php }?>
 <h4>Between <?php echo $from;?> and <?php echo $to;?></h4>
 </center>

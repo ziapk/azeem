@@ -147,7 +147,7 @@ class Products extends Connection
 
 			$innerJoin = "";
 			if(!empty($shopId)) {
-				$innerJoin .= "INNER JOIN order_items as oi on oi.product_id = p.id INNER JOIN orders as o on o.id = oi.order_id and o.status != 2";
+				$innerJoin .= "INNER JOIN order_items as oi on oi.product_id = p.id INNER JOIN orders as o on o.id = oi.order_id and o.status IN (2, 5, 6, 7, 8, 9)";
 			}
 
 			$column = "";

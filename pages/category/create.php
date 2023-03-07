@@ -11,6 +11,9 @@ $error = "";
 
 $ownerId = $userData['role'] == 'owner' ? $userData['id'] : $userData['created_by'];
     
+
+$userId = $userData['id'];
+
 if(empty($_POST['full_name'])) {
 
     $error = "Please fill all fields";
@@ -21,7 +24,8 @@ else {
         'full_name' => $_POST['full_name'],
         'cat_type' => $_POST['cat_type'],
         'groupName' => !empty($_POST['groupName']) ? $_POST['groupName'] : 'General',
-        'owner_id' => $ownerId
+        'owner_id' => $ownerId,
+        'created_by' => $userId
     ];
 
     $de = new DoubleEntry();
@@ -35,7 +39,7 @@ else {
         'group_id' => $receivableAccount['group_id'],
         'status' => $receivableAccount['status'],
         'parent_id' => $receivableAccount['id'],
-        'opening_balance' => $_POST['opening_balance'],
+        'opening_balance' => empty($_POST['opening_balance']) ? 0 : $_POST['opening_balance'],
         'created_by' => $userId
     ];
 
