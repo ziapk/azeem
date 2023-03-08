@@ -184,8 +184,9 @@ class Customers extends Connection
 	public function getCustomersPagination($params) {
 		try {
 			
-			$stmt = "SELECT COUNT(id) as total FROM `{$this->table}` where flag=1";
+			$stmt = "SELECT COUNT(id) as total FROM `{$this->table}` where shopId=:shopId and flag=1";
 			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':shopId',$params['shopId'],PDO::PARAM_INT);
 			$prepare->execute();
 			$result = $prepare->fetch(PDO::FETCH_ASSOC);
 			
