@@ -96,7 +96,7 @@
         $product = $productObj->getProduct($_GET['id'], $ownerId);
     }
    
-    echo mainHeader(['page'=> 'product', 'hideheader' => $_GET['headers']]);  
+    echo mainHeader(['page'=> 'product-create', 'hideheader' => $_GET['headers']]);  
     $categories = $categoryObj->getCategories('pro');
     
     

@@ -20,12 +20,28 @@
         <div class="pull-left welcome-header-section"><span>Welcome <strong><?php echo $userData['full_name'];?>!</strong></span></div>
         
       <ul class="list-inline navbar-right navbar-nav nav">
-      <li><a style="padding-left: 8px; padding-right: 8px" uib-tooltip="Purchase Return" tooltip-placement="bottom" title=""  href="<?php echo SITE_URL.'pages/supply/adjustment.php';?>"><small><small class="nav-menu-text text-small">Supply Return</small></small></a></li>
-        <li><a style="padding-left: 8px; padding-right: 8px" uib-tooltip="Sale Return" tooltip-placement="bottom" title=""  href="<?php echo SITE_URL.'pages/orders/adjustment.php';?>"><small><small class="nav-menu-text text-small">Sale Return</small></small></a></li>
-        <li class="<?php if($params['page'] == 'supply') { echo 'active'; }?>"><a uib-tooltip="Add Supply" tooltip-placement="bottom" title=""  href="<?php echo SITE_URL.'pages/supply';?>"><small><small class="nav-menu-text text-small">Purchases</small></small></a></li>
-        <li class="<?php if($params['page'] == 'demand') { echo 'active'; }?>"><a uib-tooltip="Demands" tooltip-placement="bottom" title="" href="<?php echo SITE_URL; ?>pages/demand/create.php"><small><small class="nav-menu-text text-small">Invoicing</small></small></a></li>
+        <li class="dropdown" style="padding: 0; margin-right: -1px">
+          <a class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+            Returns
+          </a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="<?php echo SITE_URL.'pages/supply/adjustment.php';?>">Supply Return</a></li>
+            <li><a class="dropdown-item" href="<?php echo SITE_URL.'pages/orders/adjustment.php';?>">Sale Return</a></li>
+          </ul>
+        </li>
+        <li class="dropdown" style="padding: 0">
+          <a href="#" class="nav-menu-item btn btn-primary" data-toggle="dropdown">
+            Create
+          </a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="<?php echo SITE_URL; ?>pages/product/create.php"><span class="nav-menu-text">+ Product</span></a></li>
+            <li><a class="dropdown-item" href="<?php echo SITE_URL.'pages/supply';?>">+ Supply</a></li>
+            <li><a class="dropdown-item" href="<?php echo SITE_URL; ?>pages/demand/create.php">+ Demand</a></li>
+            <li><a class="dropdown-item" href="<?php echo SITE_URL; ?>pages/recipt/" target="_blank">+ Recipt</a></li>
+          </ul>
+        </li>
+        <li><a style="padding-left: 8px; padding-right: 8px" uib-tooltip="Reports" tooltip-placement="bottom" title=""  href="<?php echo SITE_URL.'pages/reports';?>"><small><small class="nav-menu-text text-small"><img class="fa" width="24" height="24" src="<?php echo SITE_URL; ?>assets/img/svg/reports.svg" alt="" /></small></small></a></li>
         <li><a href="<?php echo SITE_URL; ?>pages/product/running.php"><img width="22" uib-tooltip="Running Products" tooltip-placement="bottom" height="22" src="<?php echo SITE_URL; ?>assets/img/svg/lightning-bolt.svg" alt="" /></a></li>
-        <li><a href="<?php echo SITE_URL; ?>pages/product/create.php"><img width="22" uib-tooltip="Add Product" tooltip-placement="bottom" height="22" src="<?php echo SITE_URL; ?>assets/img/svg/012-package-red.svg" alt="" /></a></li>
         <li>
           <a title="" href="javascript:void(0)" data-toggle="dropdown" tooltip-placement="bottom" uib-tooltip="Settings"><span class="fa fa-cog"></span> <span class="caret"></span></a>
           <ul class="dropdown-menu">
@@ -39,6 +55,7 @@
   </nav>
   <div class="sidebar">
     <ul class="nav">
+    <li class="<?php if($params['page'] == 'product-create') { echo 'active'; }?>"><a uib-tooltip="Add New Product" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/product/create.php"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/product.svg" alt="" /> <span class="nav-menu-text">New Product</span></a></li>
       <li class="<?php if($params['page'] == 'product') { echo 'active'; }?>"><a uib-tooltip="Products" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/product"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/product.svg" alt="" /> <span class="nav-menu-text">Products</span></a></li>
       <li class="<?php if($params['page'] == 'coa') { echo 'active'; }?>"><a uib-tooltip="Chart of Accounts" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/chart-of-accounts"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/accounting.png" alt="" /> <span class="nav-menu-text">Accounts</span></a></li>
       <li class="<?php if($params['page'] == 'demand') { echo 'active'; }?>"><a uib-tooltip="Demands" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/demand/create.php"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/justice-hammer.svg" alt="" /> <span class="nav-menu-text">Invoicing</span></a></li>

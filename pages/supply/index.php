@@ -5,22 +5,9 @@
     $dateLabel = "Sales for ";
     $start = $end = date('Y-m-d');
     $stores = new Store();
-    $ownerStores = $stores->getOwnerStores($userData['created_by']);
+    $userId = $userData['role'] == 'owner' ? $userData['id'] : $userData['created_by'];
+    $ownerStores = $stores->getOwnerStores($userId);
     
-    if(isset($_GET['report'])) {
-        $from = $_GET['from'];
-        $to = $_GET['to'];
-        $orders = $ordersObj->userOrders($userData['shopId'], $from, $to);
-        $dateLabel .= $from.' to '.$to;
-        $start = date('Y-m-d', strtotime($from));
-        $end = date('Y-m-d', strtotime($to));
-    }
-    else {        
-        $orders = $ordersObj->userOrders($userData['shopId'], date('Y-m-d'));
-        $dateLabel .= date('Y-m-d');
-        $start = date('Y-m-d');
-        $end = date('Y-m-d');
-    }
     echo mainHeader();
 ?>
 
@@ -80,28 +67,28 @@
             <tr>
                 <th rowspan="6"></th>
                 <th class="text-right" colspan="4">Sub Total</th>
-                <th>{{subTotal}}</th>
+                <th colspan="2">{{subTotal}}</th>
             </tr>
             <tr>
                 <th class="text-right" colspan="4">Disc.</th>
-                <th width="200"><input type="number" ng-model="discount" class="form-control" ng-change="addDiscount(discount)"></th>
+                <th colspan="2" width="200"><input type="number" ng-model="discount" class="form-control" ng-change="addDiscount(discount)"></th>
             </tr>
             <tr>
                 <th class="text-right" colspan="4">Grand Total</th>
-                <th>{{grandTotal}}</th>
+                <th colspan="2">{{grandTotal}}</th>
             </tr>
             <tr>
                 <th class="text-right" colspan="4">Pay Amount</th>
-                <th width="200"><input type="number" ng-model="payment_amount" class="form-control"></th>
+                <th colspan="2" width="200"><input type="number" ng-model="payment_amount" class="form-control"></th>
             </tr>
             <tr>
                 <th class="text-right" colspan="4">Balance</th>
-                <th width="200">{{grandTotal - payment_amount}}</th>
+                <th colspan="2" width="200">{{grandTotal - payment_amount}}</th>
             </tr>
         </tbody>
         <tbody>
             <tr>
-                <th colspan="6" class="text-right">
+                <th colspan="7" class="text-right">
                     <div class="btn-group">
                         <label class="btn btn-default" ng-repeat="li in modes">
                             <input type="radio" name="mode" ng-model="payment_mode" ng-value="li.id" ng-change="printValue(li)">
