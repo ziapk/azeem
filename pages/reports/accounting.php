@@ -43,6 +43,7 @@ switch ($reportType) {
 		$params['parent_ids'][] = $store['expense'];
 		
 		$reportDataRaw = $doubleEntry->getClosingBalanceReport($params);
+		print_r($reportDataRaw);
 
 		// $rece = [];
 		// foreach ($reportData as $key => $value) {
