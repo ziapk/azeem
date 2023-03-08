@@ -49,6 +49,7 @@ echo mainHeader(['page' => 'recipt', 'title' => $order['customer']['full_name']]
                 <th>Sr.#</th>
                 <th>Description</th>
                 <th>Unit Price</th>
+                <th>Add Qty</th>
                 <th>Qty</th>
                 <th>Total</th>
                 <th></th>
@@ -64,6 +65,7 @@ echo mainHeader(['page' => 'recipt', 'title' => $order['customer']['full_name']]
                         <del class="text-danger">{{cart.price | number: 2}}</del> / </span>
                         <span class="text-success">{{(cart.price - cart.discount) | number: 2}}</span>
                 </td>
+                <td><input type="search" ng-model="newqty" class="form-control" on-enter-press="addMoreQty(cart, newqty)"></td>
                 <td>
                     <div class="quantity">
                         <a href="#" class="quantity__minus" ng-click="subQty(cart)"><span>-</span></a>
@@ -239,6 +241,16 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
         $scope.calculateSum();
         $scope.discountAmount = '';
     }
+    $scope.addMoreQty = function (obj, val) {
+        if(val > 0) {
+            obj += (parseFloat(val));
+        }
+        $scope.calculateSum();
+    }
+
+    addMoreQty
+
+
     $scope.directlyAdd = function (val, obj) {
         if(val > 0) {
             obj.qty = val
