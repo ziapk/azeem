@@ -65,7 +65,7 @@ echo mainHeader(['page' => 'recipt', 'title' => $order['customer']['full_name']]
                         <del class="text-danger">{{cart.price | number: 2}}</del> / </span>
                         <span class="text-success">{{(cart.price - cart.discount) | number: 2}}</span>
                 </td>
-                <td><input type="search" ng-model="newqty" class="form-control" on-enter-press="addMoreQty(cart, newqty)"></td>
+                <td width="100"><input type="search" ng-model="newqty" class="form-control" on-enter-press="addMoreQty(cart, newqty, $event)"></td>
                 <td>
                     <div class="quantity">
                         <a href="#" class="quantity__minus" ng-click="subQty(cart)"><span>-</span></a>
@@ -82,7 +82,7 @@ echo mainHeader(['page' => 'recipt', 'title' => $order['customer']['full_name']]
                 </td>
             </tr>
             <tr>
-                <td class="text-right" colspan="4" rowspan="6">
+                <td class="text-right" colspan="5" rowspan="6">
                     <p><input class="form-control" placeholder="Reference No" ng-model="ref_no" /></p>
                     <textarea class="form-control" rows="10" placeholder="Summery" ng-model="summery"></textarea>
                 </td>
@@ -112,7 +112,7 @@ echo mainHeader(['page' => 'recipt', 'title' => $order['customer']['full_name']]
         </tbody>
         <tbody>
             <tr>
-                <th colspan="6" class="text-right">
+                <th colspan="7" class="text-right">
                     <a href="#" class="btn btn-success pull-left" ng-click="park()">Park For Now</a>
                     <div class="btn-group">
                         <label class="btn btn-default" ng-repeat="li in modes">
@@ -143,6 +143,7 @@ app.directive('onEnterPress', function () {
                 scope.$apply(function (){
                     scope.$eval(attrs.onEnterPress);
                 });
+                $(element).val('')
                 event.preventDefault();
             }
         });
@@ -241,9 +242,9 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
         $scope.calculateSum();
         $scope.discountAmount = '';
     }
-    $scope.addMoreQty = function (obj, val) {
+    $scope.addMoreQty = function (obj, val, e) {
         if(val > 0) {
-            obj += (parseFloat(val));
+            obj.qty = parseFloat(obj.qty) + (parseFloat(val));
         }
         $scope.calculateSum();
     }
