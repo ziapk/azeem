@@ -9,12 +9,16 @@ $orders = $ordersObj->userOrders($shop['id'], $shop['sale_date'], null, 1);
 ?>
 <div ng-controller="cartController">
 <div class="container">
-    <p class="text-danger"><strong>Today's Parked Bills</strong></p>
-    <ul class="list-inline">
+    <h5><strong class="text-danger">Running Products</strong> <small class="text-danger"><strong>Click to Add</strong></small></h5>
+    <span class="btn-group btn-group-sm form-group">
+        <a class="btn btn-default" ng-repeat="l in pinList" href="javascript:void(0)" ng-click="selectProduct(l)">{{l.full_name}}</a>
+    </span>
+    <h5 class="text-danger"><strong>Today's Parked Bills</strong></h5>
+    <span class="btn-group btn-group-sm form-group">
         <?php foreach ($orders as $key => $value) {?>
-            <li class="list-group-item" ><a href="./edit.php?id=<?php echo $value['id'];?>"><?php echo $value['full_name'].' - '.$value['id'];?></a></li>
+            <a class="btn btn-default" href="./edit.php?id=<?php echo $value['id'];?>"><?php echo $value['full_name'].' - '.$value['id'];?></a>
         <?php }?>
-    </ul>
+    </span>
     <table class="table">
         <thead>
             <tr>
@@ -155,6 +159,7 @@ app.directive('onEnterPress', function () {
 app.controller('cartController', function($scope, $http, $httpParamSerializerJQLike, $filter, $window, $timeout, $location, $anchorScroll) {
     $scope.mainList = <?php echo safe_json_encode($list);?>;
 
+    $scope.pinList = [];
     $scope.list = [];
     $scope.priceList = localStorage.getItem('list') && JSON.parse(localStorage.getItem('list'));;
     $scope.focus = false;
@@ -176,6 +181,19 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
     //         $('#searchProduct').focus();
     //     }
     // }, 3000);
+
+    $scope.getPinProducts = () => {
+        // $scope.loading = true;
+        $http.get("<?php echo SITE_URL?>api/getProducts.php", {params: {page: 1, perPage: 10, search: '', full_name: '', group: '', author: '', board: '', searchBy: '', courceId: '', bookmark: 1}})
+        .then(function(response) {
+            // $scope.loading = false;
+            if(response.status === 200) {
+                $scope.pinList = response.data.records;
+            }
+        })
+    }
+
+    $scope.getPinProducts();
 
     $scope.printValue = o => {
         $scope.payment_mode = o.id;
