@@ -262,7 +262,7 @@ class DoubleEntry extends Connection
 				$accountCondition = "and (a.parent_id in (".implode(',', $parent_ids).") or a.id in (".implode(',', $account_ids)."))";
 			}
 
-			$stmt = "SELECT e.transaction_id, a.parent_id, a.code, e.account_id, a.account_type, a.title, e.entry_type, t.transaction_date, amount FROM `$this->table_transactions` t LEFT JOIN `$this->table_ledger_entries` e ON e.transaction_id = t.id LEFT JOIN `$this->table` a ON a.id = e.account_id and a.status = 1 WHERE (t.flag=1 $shopIdCondition $accountCondition) and (t.transaction_date BETWEEN :fromDate AND :toDate)";
+			$stmt = "SELECT e.transaction_id, a.parent_id, a.code, e.account_id, a.account_type, a.title, e.entry_type, t.transaction_date, amount FROM `$this->table_transactions` t LEFT JOIN `$this->table_ledger_entries` e ON e.transaction_id = t.id LEFT JOIN `$this->table` a ON a.id = e.account_id and a.status = 1 WHERE (t.flag=1 $shopIdCondition $accountCondition) and (DATE(t.transaction_date) BETWEEN :fromDate AND :toDate)";
 			// print_r($stmt);
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':fromDate', $fromDate, PDO::PARAM_STR);
