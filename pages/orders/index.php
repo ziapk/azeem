@@ -8,13 +8,13 @@
     if(isset($_GET['report'])) {
         $from = $_GET['from'];
         $to = $_GET['to'];
-        $orders = $ordersObj->userOrders($userData['shopId'], $from, $to);
+        $orders = $ordersObj->userOrders($shop['id'], $from, $to);
         $dateLabel .= '<strong>'.$from.'</strong> to <strong>'.$to.'</strong>';
         $start = date('Y-m-d', strtotime($from));
         $end = date('Y-m-d', strtotime($to));
     }
     else {        
-        $orders = $ordersObj->userOrders($stop['id'], $shop['sale_date']);
+        $orders = $ordersObj->userOrders($shop['id'], $shop['sale_date']);
         $dateLabel .= '<strong>'.$shop['sale_date'].'</strong>';
         $start = $shop['sale_date'];
         $end = $shop['sale_date'];

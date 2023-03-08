@@ -17,7 +17,7 @@ function mainHeader($params = null) {
         <head>
             <meta charset="utf-8">
             <meta http-equiv="X-UA-Compatible" content="IE=edge">
-            <title><?php echo $pages[$params['page']];?> | POINT OF SALE</title>
+            <title><?php echo $params['title'];?> | <?php echo $pages[$params['page']];?> | POINT OF SALE</title>
             <meta name="description" content="Recline Solution POS, POS, Point of Sale, Smart Commerce">
             <meta name="viewport" content="width=device-width, initial-scale=1">
             <link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/css/bootstrap.min.css">

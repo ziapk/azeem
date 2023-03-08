@@ -3,9 +3,9 @@ include_once dirname(__FILE__).'/../../include/settings.php';
 $productCls = new Products();
 $ownerId = $userData['role'] == 'owner' ? $userData['id'] : $userData['created_by'];
 $list = $productCls->getOwnerProducts($ownerId);
-echo mainHeader(['page' => 'recipt']);
 $orders = new Orders();
 $order = $orders->getOrder($_GET['id']);
+echo mainHeader(['page' => 'recipt', 'title' => $order['customer']['full_name']]);
 ?>
 <div ng-controller="cartController">
 <div class="container">

@@ -4,9 +4,17 @@ $productCls = new Products();
 $ownerId = $userData['role'] == 'owner' ? $userData['id'] : $userData['created_by'];
 $list = $productCls->getOwnerProducts($ownerId);
 echo mainHeader(['page' => 'recipt']);
+$ordersObj = new Orders();
+$orders = $ordersObj->userOrders($shop['id'], $shop['sale_date'], null, 1);
 ?>
 <div ng-controller="cartController">
 <div class="container">
+    <p class="text-danger"><strong>Today's Parked Bills</strong></p>
+    <ul class="list-inline">
+        <?php foreach ($orders as $key => $value) {?>
+            <li class="list-group-item" ><a href="./edit.php?id=<?php echo $value['id'];?>"><?php echo $value['full_name'].' - '.$value['id'];?></a></li>
+        <?php }?>
+    </ul>
     <table class="table">
         <thead>
             <tr>
