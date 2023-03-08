@@ -248,9 +248,6 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
         $scope.calculateSum();
     }
 
-    addMoreQty
-
-
     $scope.directlyAdd = function (val, obj) {
         if(val > 0) {
             obj.qty = val
