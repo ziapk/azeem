@@ -1,7 +1,8 @@
 <?php
   global $shopData;
-  global $shop;
   global $userData;
+  $storeDD = new Store();
+  $shop = $storeDD->getStore($shop['id']);
   $productCls = new Products();
   $ownerId = $userData['role'] == 'owner' ? $userData['id'] : $userData['created_by'];
   $list = $productCls->getOwnerProducts($ownerId);
@@ -20,7 +21,7 @@
         </div>
         <div class="pull-left welcome-header-section"><span>Welcome <strong><?php echo $userData['full_name'];?>!</strong></span></div>
       <ul class="list-inline navbar-right navbar-nav nav">
-        <div class="pull-left welcome-header-section sale-date hide-temp" ng-show="getClass()"><button class="btn btn-danger" ng-click="applyClosing()"><span ng-class="{'blink': getClass()}">Sale Close</span></button></div>
+        <?php if($shop['sale_date_show']) { ?><div class="pull-left welcome-header-section sale-date"><button class="btn btn-danger" ng-click="applyClosing()"><span>Sale Close</span></button></div><?php } ?>
         <li class="dropdown" style="padding: 0; margin-right: -1px">
           <a class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
             Returns

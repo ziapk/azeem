@@ -50,21 +50,23 @@ foreach ($publishersArr as $key => $value) {
                 <th>City</th>
                 <th>Location</th>
                 <th>Status</th>
+                <th colspan="3" style="text-align: center">Sale Related Actions</th>
                 <th></th>
             </tr>
         </thead>
         <tbody>
-            <?php $count = 1; foreach ($ownerStores as $store) { ?>
-                <tr>
-                    <td><?php echo $count; ?></td>
-                    <td><?php echo $store['full_name']; ?></td>
-                    <td><?php echo $storeTypes[$store['store_type']]['full_name']; ?></td>
-                    <td><?php echo $store['city']; ?></td>
-                    <td><?php echo $store['location']; ?></td>
-                    <td><?php echo $statusArr[$store['status']]; ?></td>
-                    <td><a href="<?php echo SITE_URL."pages/store/update.php?id=".$store['id'];?>">Modify</a></td>
+                <tr ng-repeat="store in shopData track by $index">
+                    <td>{{ $index + 1 }}</td>
+                    <td>{{ store.full_name }}</td>
+                    <td>{{ store.storeType }}</td>
+                    <td>{{ store.city }}</td>
+                    <td>{{ store.location }}</td>
+                    <td>{{ store.status }}</td>
+                    <td>{{ store.sale_date }}</td>
+                    <td><label uib-tooltip="When you enable this option [SHOP'S MANAGER] can close Today's Sale" tooltip-placement="bottom"><input type="checkbox" ng-model="store.sale_date_show" ng-true-value="'1'" ng-false-value="'0'" ng-change="showClosing(store.id, store.sale_date_show)"> Enable</label></td>
+                    <td><a class="btn btn-xs btn-danger" href="javascript:void(0)" ng-click="applyClosing(store.id, store.sale_date)">Sale Close</a></td>
+                    <td><a class="btn btn-xs btn-primary" href="<?php echo SITE_URL."pages/store/update.php?id=";?>{{store.id}}">Edit Shop</a></td>
                 </tr>
-            <?php $count++; } ?>
         </tbody>
     </table>
     <!-- <h4>Hot Products</h4>
@@ -222,6 +224,7 @@ app.controller('productController', function($scope, $http, $httpParamSerializer
     $scope.group = "";
     $scope.board = "";
     $scope.maxSize = 5;
+    $scope.checkbox = {}
     $scope.url = '<?php echo SITE_URL?>';
     $scope.getProducts = (page) => {
         $scope.loading = true;
@@ -266,6 +269,21 @@ app.controller('productController', function($scope, $http, $httpParamSerializer
                 console.log(err);
             })
         }
+    }
+
+    $scope.applyClosing = (id, sale_date) => {
+        if($window.confirm('Are you sure you want to close to sale for Today')) {
+        $http.post('<?php echo SITE_URL;?>api/closing.php', $httpParamSerializerJQLike({ id, sale_date }), {headers: {'Content-Type': 'application/x-www-form-urlencoded'} }).then((response) => {
+            // $window.location.reload();
+        })
+        }
+    }
+    $scope.showClosing = (id, enable) => {
+        // if($window.confirm('Are you sure you want to close to sale for Today')) {
+        $http.post('<?php echo SITE_URL;?>api/enable.php', $httpParamSerializerJQLike({ enable, id }), {headers: {'Content-Type': 'application/x-www-form-urlencoded'} }).then((response) => {
+            // $window.location.reload();
+        })
+        // }
     }
 })
 </script>
