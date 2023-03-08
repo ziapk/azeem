@@ -112,7 +112,7 @@ app.controller('reportController', function($scope, $http, $httpParamSerializerJ
         $window.open("<?php echo SITE_URL;?>print?id="+id+"&detail="+detail+'&largeView='+largeView, "", (largeView ? "width=600,height=900" : "width=300,height=300")); 
     }
     $scope.editRecipt = id => {
-        $window.location.assign("<?php echo SITE_URL;?>pages/recipt/edit.php?id="+id); 
+        $window.location.assign("<?php echo SITE_URL;?>pages/recipt/edit.php?id="+id, '_blank'); 
     }
 
     $scope.deleteRecipt = function (id) {
