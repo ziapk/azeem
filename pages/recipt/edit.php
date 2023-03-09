@@ -211,8 +211,7 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
     $scope.selectProduct = function (p, sep) {
         if(sep) {
             $scope.items.push({...p, qty: 1, show: true});
-        }
-        else {
+        } else {
             $scope.product = '';
             $scope.product = null
             let exists = false;

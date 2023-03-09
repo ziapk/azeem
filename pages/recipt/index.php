@@ -73,6 +73,7 @@ app.directive('onEnterPress', function () {
                     scope.$eval(attrs.onEnterPress);
                 });
                 event.preventDefault();
+                $(element).val('')
             }
         });
     };
@@ -198,6 +199,12 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
             $scope.product = '';
         }, 200);
         
+    }
+    $scope.addMoreQty = function (obj, val, e) {
+        if(val > 0) {
+            obj.qty = parseFloat(obj.qty) + (parseFloat(val));
+        }
+        $scope.calculateSum();
     }
     $scope.selectCustomer = function (p) {
         $scope.customerName = p.full_name;
