@@ -217,7 +217,7 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
             $scope.product = null
             let exists = false;
             $scope.items.map((pro) => {
-                if(pro.id == p.id) {
+                if(pro.id == p.id && !pro.show) {
                     exists = true;
                     pro.qty++;
                 }
