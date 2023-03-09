@@ -163,8 +163,8 @@ switch ($reportType) {
 
 		$hasFooter = true;
 		$footerCols = ['','Date', 'Account Code', 'Account Title'];
-		$summerCols = ['Gross Credit Sales','Gross Cash Sales', 'Discount', 'Net Credit Sales'];
-		$footerVals = ['grossCreditSales','grossCashSales', 'discount', 'netCreditSales'];
+		$summerCols = ['Gross Credit Sales','Gross Cash Sales', 'Discount', 'Net Credit Sales', 'Net Cash Sale'];
+		$footerVals = ['grossCreditSales','grossCashSales', 'discount', 'netCreditSales', 'netCashSales'];
 
 	break;
 	
@@ -370,13 +370,14 @@ $netCash = ($tsale + $receivings) - ($texpense - $payments);
 <table id="resultTable" style="border-collapse: collapse; width: 400px" border="1">
 	<?php foreach ($summerCols as $index => $value){ 
 		$key = $footerVals[$index];
+		if($key != 'netCashSales') {
 		
 		?>
 		<tr>
 			<th align="left"><?php echo $value; ?></th>
 			<th align="right"><?php echo number_format($footer[$key], 2); ?></th>
 		</tr>
-		<?php } ?>
+		<?php }} ?>
 		<?php foreach ($modes as $id => $value) {?>
 			<tr>
 				<th align="left">Sale via <?php echo $amodesList[$id]['title'];?></td>
