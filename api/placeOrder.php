@@ -57,6 +57,7 @@ try {
                     'owner_id' => $userData['role'] == 'owner' ? $userData['id'] : $userData['created_by'],
                     'product_id' => $item['id'],
                     'order_id' => $order_id,
+                    'description' => $item['description'],
                     'quantity' => $item['qty'],
                     'discount' => $item['discount'],
                     'price' => $item['price'],

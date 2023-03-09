@@ -9,6 +9,10 @@ echo mainHeader(['page' => 'recipt', 'title' => $order['customer']['full_name']]
 ?>
 <div ng-controller="cartController">
 <div class="container">
+    <h5><strong class="text-danger">Running Products</strong> <small class="text-danger"><strong>Click to Add</strong></small></h5>
+    <span class="btn-group btn-group-sm form-group">
+        <a class="btn btn-default" ng-repeat="l in pinList" href="javascript:void(0)" ng-click="selectProduct(l, 's')">{{l.full_name}}</a>
+    </span>
     <table class="table">
         <thead>
             <tr>
@@ -43,88 +47,7 @@ echo mainHeader(['page' => 'recipt', 'title' => $order['customer']['full_name']]
         </thead>
     </table>
     
-    <table class="table table-striped recipt-table">
-        <thead>
-            <tr>
-                <th>Sr.#</th>
-                <th>Description</th>
-                <th>Unit Price</th>
-                <th>Add Qty</th>
-                <th>Qty</th>
-                <th>Total</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr ng-repeat="cart in items track by $index" id="item-{{cart.id}}">
-                <td>{{$index + 1}}</td>
-                <td>{{cart.full_name}}</td>
-                <td>
-                    <span ng-if="cart.discount">
-                        {{cart.discount_percent ? cart.discount_percent : ''}}
-                        <del class="text-danger">{{cart.price | number: 2}}</del> / </span>
-                        <span class="text-success">{{(cart.price - cart.discount) | number: 2}}</span>
-                </td>
-                <td width="100"><input type="search" ng-model="newqty" class="form-control" on-enter-press="addMoreQty(cart, newqty, $event)"></td>
-                <td>
-                    <div class="quantity">
-                        <a href="#" class="quantity__minus" ng-click="subQty(cart)"><span>-</span></a>
-                        <input class="quantity__input" type="text" ng-model="qty" ng-value=" cart.qty | number " ng-change="directlyAdd(qty, cart)">
-                        <a href="#" class="quantity__plus" ng-click="addQty(cart)"><span>+</span></a>
-                    </div>
-                </td>
-                <td width="130">
-                    <input class="form-control text-center" type="number" ng-model="addprice" ng-change="directlyPrice(addprice, cart)" ng-keydown="initCheckKeypress($event)">
-                </td>
-                <td>
-                    {{(cart.price - cart.discount) * cart.qty | number: 2}}
-                    <a href="#" class="btn btn-xs btn-danger pull-right" ng-click="remove(cart)">Delete</a>
-                </td>
-            </tr>
-            <tr>
-                <td class="text-right" colspan="5" rowspan="6">
-                    <p><input class="form-control" placeholder="Reference No" ng-model="ref_no" /></p>
-                    <textarea class="form-control" rows="10" placeholder="Summery" ng-model="summery"></textarea>
-                </td>
-                <td class="text-right">Sub Total</td>
-                <td>{{subTotal | number: 2}}</td>
-            </tr>
-            <tr>
-                <td class="text-right">Add Discount</td>
-                <td width="200"><input type="search" ng-model="discountAmount" class="form-control" on-enter-press="addDiscount(discountAmount)"></td>
-            </tr>
-            <tr>
-                <td class="text-right" style="color: red; front-weight: bold;">Total Discount</td>
-                <td width="200" style="color: red; front-weight: bold;"><strong>{{discount | number: 2}}</strong></td>
-            </tr>
-            <tr>
-                <td class="text-right">Grand Total</td>
-                <td class="text-success">{{grandTotal | number: 2}}</td>
-            </tr>
-            <tr>
-                <td class="text-right text-success" style="front-weight: bold;">Pay Amount</td>
-                <td width="200"><input type="number" ng-model="payment_amount" class="form-control"></td>
-            </tr>
-            <tr>
-                <td class="text-right">Balance</td>
-                <td width="200">{{grandTotal - payment_amount | number: 2}}</td>
-            </tr>
-        </tbody>
-        <tbody>
-            <tr>
-                <th colspan="7" class="text-right">
-                    <a href="#" class="btn btn-success pull-left" ng-click="park()">Park For Now</a>
-                    <div class="btn-group">
-                        <label class="btn btn-default" ng-repeat="li in modes">
-                            <input type="radio" name="mode" ng-model="payment_mode" ng-value="li.id" ng-change="printValue(li)">
-                            {{li.title}}
-                        </label>
-                    </div>
-                    <a href="#" class="btn btn-primary" ng-click="checkout()"><img width="24" height="24" src="<?php echo SITE_URL; ?>assets/img/svg/001-checkout.svg" alt="" /> Checkout</a>
-                </th>
-            </tr>
-        </tbody>
-    </table>
+    <?php echo include_once dirname(___FILE___).'/table.php';?>
 </div>
 
 </div>
@@ -168,12 +91,26 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
     $scope.payment_mode = '1';
     const items = [];
     $scope.modes = [];
+    $scope.pinList = [];
     // setInterval(() => {
     //     if($scope.focus === true && !$('#searchProduct').is(':focus')) {
     //         $scope.product = null
     //         $('#searchProduct').focus();
     //     }
     // }, 3000);
+
+    $scope.getPinProducts = () => {
+        // $scope.loading = true;
+        $http.get("<?php echo SITE_URL?>api/getProducts.php", {params: {page: 1, perPage: 10, search: '', full_name: '', group: '', author: '', board: '', searchBy: '', courceId: '', bookmark: 1}})
+        .then(function(response) {
+            // $scope.loading = false;
+            if(response.status === 200) {
+                $scope.pinList = response.data.records;
+            }
+        })
+    }
+
+    $scope.getPinProducts();
 
     $scope.calculateSum = (c) => {
         const customerData = c || $scope.customerData;
@@ -219,7 +156,7 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
         
         shopCart.map(function(row){
             const obj = $scope.mainList.find(function (e) { return e.id == row.product_id});
-            items.push({...obj, qty: row.quantity})
+            items.push({...obj, qty: row.quantity, show: row.show, description: row.description})
         });
         $scope.items = items;
         // console.log('items', items);
@@ -271,18 +208,23 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
             $scope.calculateSum();
         }
     }
-    $scope.selectProduct = function (p) {
-        $scope.product = '';
-        $scope.product = null
-        let exists = false;
-        $scope.items.map((pro) => {
-            if(pro.id == p.id) {
-                exists = true;
-                pro.qty++;
+    $scope.selectProduct = function (p, sep) {
+        if(sep) {
+            $scope.items.push({...p, qty: 1, show: true});
+        }
+        else {
+            $scope.product = '';
+            $scope.product = null
+            let exists = false;
+            $scope.items.map((pro) => {
+                if(pro.id == p.id) {
+                    exists = true;
+                    pro.qty++;
+                }
+            })
+            if(!exists) { // if already not exits in bucket
+                $scope.items.push({...p, qty: 1});
             }
-        })
-        if(!exists) { // if already not exits in bucket
-            $scope.items.push({...p, qty: 1});
         }
         $scope.calculateSum();
 

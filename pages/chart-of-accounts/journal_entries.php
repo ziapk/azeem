@@ -63,7 +63,7 @@
                         </td>
                         <td colspan="6">
                          <?php echo $rows[0]['reference']; ?> [ <?php echo $rows['0']['v_description']; ?> ]
-                         <a href="javascript:void(0)" class="text-danger" ng-click="deleteTransaction(<?php echo $id;?>)">Delete Transaction</a>
+                         <?php if($userData['role'] === 'owner') {?><a href="javascript:void(0)" class="text-danger" ng-click="deleteTransaction(<?php echo $id;?>)">Delete Transaction</a><?php } ?>
                       </td>
                   </tr>			
                 <?php foreach ($rows as $key => $product){ ?>
@@ -94,7 +94,7 @@
         $http.post(url, $httpParamSerializerJQLike({ id }), {headers: {'Content-Type': 'application/x-www-form-urlencoded'} })
         .then(res => {
           alert('Transaction Deleted!');
-          // window.location.href = window.location.href;
+          window.location.href = window.location.href;
         });
       }
     }

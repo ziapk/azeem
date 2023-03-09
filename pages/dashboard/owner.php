@@ -62,9 +62,16 @@ foreach ($publishersArr as $key => $value) {
                     <td>{{ store.city }}</td>
                     <td>{{ store.location }}</td>
                     <td>{{ store.status }}</td>
-                    <td>{{ store.sale_date }}</td>
-                    <td><label uib-tooltip="When you enable this option [SHOP'S MANAGER] can close Today's Sale" tooltip-placement="bottom"><input type="checkbox" ng-model="store.sale_date_show" ng-true-value="'1'" ng-false-value="'0'" ng-change="showClosing(store.id, store.sale_date_show)"> Enable</label></td>
-                    <td><a class="btn btn-xs btn-danger" href="javascript:void(0)" ng-click="applyClosing(store.id, store.sale_date)">Sale Close</a></td>
+                    <td>
+                        <span ng-if="!showPicker[store.id]">{{ store.sale_date }}</span>
+                        <div style="position: relative; width: 100px" ng-if="showPicker[store.id]"><input type="text" class="form-control datepicker-single"/></div>
+                    </td>
+                    <td>
+                        <label uib-tooltip="When you enable this option [SHOP'S MANAGER] can close Today's Sale" tooltip-placement="bottom"><input type="checkbox" ng-model="store.sale_date_show" ng-true-value="'1'" ng-false-value="'0'" ng-change="showClosing(store.id, store.sale_date_show)"> Enable</label>
+                    </td>
+                    <td>
+                        <a class="btn btn-xs btn-danger" href="javascript:void(0)" ng-click="applyClosing(store.id, store)">Sale Close</a>
+                    </td>
                     <td><a class="btn btn-xs btn-primary" href="<?php echo SITE_URL."pages/store/update.php?id=";?>{{store.id}}">Edit Shop</a></td>
                 </tr>
         </tbody>
@@ -211,7 +218,7 @@ foreach ($publishersArr as $key => $value) {
     </table> -->
 </div>
 <script type="text/javascript">
-app.controller('productController', function($scope, $http, $httpParamSerializerJQLike, $filter, $window, toaster) {
+app.controller('productController', function($scope, $timeout, $http, $httpParamSerializerJQLike, $filter, $window, toaster) {
     $scope.currentPage = 1; 
     $scope.shopData = <?php echo safe_json_encode($storeList);?>;
     $scope.data = {perPage: 12}; //$scope.data.records;
@@ -225,6 +232,7 @@ app.controller('productController', function($scope, $http, $httpParamSerializer
     $scope.board = "";
     $scope.maxSize = 5;
     $scope.checkbox = {}
+    $scope.showPicker = {};
     $scope.url = '<?php echo SITE_URL?>';
     $scope.getProducts = (page) => {
         $scope.loading = true;
@@ -271,19 +279,37 @@ app.controller('productController', function($scope, $http, $httpParamSerializer
         }
     }
 
-    $scope.applyClosing = (id, sale_date) => {
-        if($window.confirm('Are you sure you want to close to sale for Today')) {
-        $http.post('<?php echo SITE_URL;?>api/closing.php', $httpParamSerializerJQLike({ id, sale_date }), {headers: {'Content-Type': 'application/x-www-form-urlencoded'} }).then((response) => {
-            // $window.location.reload();
-        })
-        }
+    $scope.applyClosing = (id, store) => {
+        $scope.showPicker = {};
+        $scope.showPicker[id] = true;
+        $timeout(() => {
+            const d = $('.datepicker-single').daterangepicker({
+                autoApply: true,
+                minDate: moment().subtract(1, 'week').format('YYYY-MM-DD'),
+                maxDate: moment().add(1, 'week').format('YYYY-MM-DD'),
+                singleDatePicker: true,
+                locale: {
+                    format: 'YYYY-MM-DD'
+                },
+            }, function(date) {
+                if($window.confirm('Are you sure you want to close to sale for Today')) {
+                    $http.post('<?php echo SITE_URL;?>api/closing.php', $httpParamSerializerJQLike({ id, sale_date: moment(date).format('YYYY-MM-DD') }), {headers: {'Content-Type': 'application/x-www-form-urlencoded'} }).then((response) => {
+                        store.sale_date = moment(date).format('YYYY-MM-DD');
+                        alert('Date Updated!');
+                        $scope.showPicker = {};
+                    })
+                }
+                $scope.$apply();
+            }).val(store.sale_date);
+        }, 100)
+        
     }
-    $scope.showClosing = (id, enable) => {
-        // if($window.confirm('Are you sure you want to close to sale for Today')) {
-        $http.post('<?php echo SITE_URL;?>api/enable.php', $httpParamSerializerJQLike({ enable, id }), {headers: {'Content-Type': 'application/x-www-form-urlencoded'} }).then((response) => {
-            // $window.location.reload();
-        })
-        // }
+    $scope.showClosing = (id, enable, sale_date) => {
+        if($window.confirm('Are you sure you want to close to sale for Today')) {
+            $http.post('<?php echo SITE_URL;?>api/enable.php', $httpParamSerializerJQLike({ enable, id }), {headers: {'Content-Type': 'application/x-www-form-urlencoded'} }).then((response) => {
+                $window.location.reload();
+            })
+        }
     }
 })
 </script>

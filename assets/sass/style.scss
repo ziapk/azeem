@@ -78,9 +78,9 @@ body {
     position: relative;
     padding-bottom: 50px;
     padding-top: 80px;
-    margin-left: $sidebarWidth;
+    padding-left: $sidebarWidth;
     background: none;
-    transition: margin-left 0.4s ease;
+    transition: padding-left 0.4s ease;
 }
 
 .container {
@@ -150,6 +150,7 @@ body {
     bottom: 0;
     background: $sidebarBg;
     width: $sidebarWidth;
+    transition: width 0.1s ease;
     padding-top: 80px;
     z-index: 2;
     overflow: auto;
@@ -221,7 +222,8 @@ label {
     position: absolute;
     bottom: 0;
     right: 0;
-    left: 0;
+    left: $sidebarWidth;
+    transition: left 0.4s ease;
 }
 
 
@@ -602,13 +604,15 @@ th {
     transform: rotate(-180deg);
 }
 
+.thumb-menu-screen .footer {
+    left: 60px;
+}
 body.thumb-menu-screen {
-    margin-left: 60px;
+    padding-left: 60px;
 }
 
 .thumb-menu-screen .sidebar {
     width: 60px;
-    transition: width 0.4s ease;
 }
 
 .thumb-menu-screen .nav-menu-text {

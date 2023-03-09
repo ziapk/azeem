@@ -65,11 +65,9 @@
 
 <script type="text/javascript">
     app.controller('reportController', function($scope, $http, $httpParamSerializerJQLike, $filter) {
-        console.log('abc')
-
     const a = $('.datepicker').daterangepicker({
             minDate: moment().subtract(1, 'year'),
-            maxDate: moment(),
+            maxDate: moment().add(1, 'week'),
             parentEl: '.datepicker-parent',
         },  function(start, end, label) {
             $('#from').val(moment(start).format('YYYY-MM-DD'));

@@ -15,6 +15,12 @@ $params['fromDate'] = isset($from) && !empty(trim($from)) ? $from : '';
 $params['toDate'] = isset($to) && !empty(trim($to)) ? $to : '';
 $report 		= isset($_GET['report']) && !empty(trim($_GET['report'])) ? $_GET['report'] : '';
 
+$modesList = $doubleEntry->getPaymentModes(['page' => 1, 'perPage' => 10000, 'search' => '', 'shopId' => $params['shopId']]);
+$amodesList = [];
+foreach ($modesList['records'] as $key => $value) {
+	$amodesList[$value['id']] = $value;
+}
+
 $headers 		= array();
 $columns 		= array();
 $orientation 	= 'P';
@@ -31,8 +37,6 @@ $subtitle = " Between ".$params['fromDate']." and ".$params['toDate'];
 $d = new DateTime('Y');
 
 $reportData = [];
-
-
 
 switch ($reportType) {
 	case '10':
@@ -60,6 +64,7 @@ switch ($reportType) {
 		$payments = 0;
 		$receivings = 0;
 		$final = [];
+		$modes = [];
 		foreach ($reportDataRaw as $key => $value) {
 			if($store['payable'] != $value['parent_id']) {
 				if($value['account_id'] != $exp && $value['parent_id'] != $expHead) {
@@ -76,6 +81,7 @@ switch ($reportType) {
 					else {
 						if(empty($rows[$value['transaction_date']][$value['transaction_id']]['isReceving'])) {
 							$rows[$value['transaction_date']][$value['transaction_id']]['row'] = $value;
+							$modes[$value['payment_mode']] += $value['amount'];
 							$rows[$value['transaction_date']][$value['transaction_id']]['totalPaid'] += $value['amount'];
 						}
 					}
@@ -93,7 +99,7 @@ switch ($reportType) {
 					$payments += $value['amount'];
 				}
 			}
-			
+
 			// $rows[$value['transaction_date']][$value['transaction_id']][$value['entry_type']]['total'] += $value['amount'];
 			$count++;
 		}
@@ -157,8 +163,8 @@ switch ($reportType) {
 
 		$hasFooter = true;
 		$footerCols = ['','Date', 'Account Code', 'Account Title'];
-		$summerCols = ['Gross Credit Sales','Gross Cash Sales', 'Discount', 'Net Credit Sales', 'Net Cash Sales'];
-		$footerVals = ['grossCreditSales','grossCashSales', 'discount', 'netCreditSales', 'netCashSales'];
+		$summerCols = ['Gross Credit Sales','Gross Cash Sales', 'Discount', 'Net Credit Sales'];
+		$footerVals = ['grossCreditSales','grossCashSales', 'discount', 'netCreditSales'];
 
 	break;
 	
@@ -329,8 +335,9 @@ ob_start();
 		<?php }?>
 	</tbody>
 </table>
-<?php if($reportType == '10') {?>
-<h3>Final Summery</h3>
+<?php if($reportType == '10') {
+if(!empty($expenses['rows'])) { ?>
+<h3>Expenses Summery</h3>
 <table class="table" id="resultTable" width="100%" style="border-collapse: collapse" border="1">
 	<?php foreach ($expenses['rows'] as $date => $value) {
 	$total = 0;
@@ -341,8 +348,6 @@ ob_start();
 				<th><?php echo $row['title'];?></th>
 			<?php };?>
 			<th>Total Expenses</th>
-			<th>Total Sale</th>
-			<th>Net Total</th>
 		</tr>
 		<tr>
 			<td><?php echo $date;?></td>
@@ -350,12 +355,11 @@ ob_start();
 				<td align="right"><?php echo number_format($row['amount'], 2);?></td>
 			<?php };?>
 			<th align="right"><?php echo number_format($total, 2);?></th>
-			<th align="right"><?php echo number_format($footer['finalCashSales'], 2);?></th>
-			<th align="right"><?php echo number_format($footer['finalCashSales'] - $total, 2);?></th>
 		</tr>
 	<?php }?>
 </table>
-<br>
+<?php } ?>
+<h3>Final Summery</h3>
 <?php 
 
 $tsale = empty($footer['netCashSales']) ? 0 : $footer['netCashSales'];
@@ -364,16 +368,21 @@ $texpense = empty($expenses['total']) ? 0 : $expenses['total'];
 $netCash = ($tsale + $receivings) - ($texpense - $payments);
 ?>
 <table id="resultTable" style="border-collapse: collapse; width: 400px" border="1">
-	<?php foreach ($summerCols as $index => $value){ $key = $footerVals[$index]; ?>
+	<?php foreach ($summerCols as $index => $value){ 
+		$key = $footerVals[$index];
+		
+		?>
 		<tr>
 			<th align="left"><?php echo $value; ?></th>
 			<th align="right"><?php echo number_format($footer[$key], 2); ?></th>
 		</tr>
 		<?php } ?>
-		<tr>
-			<th align="left">Receivings</td>
-			<th align="right"><?php echo number_format($receivings, 2);?></td>
-		</tr>
+		<?php foreach ($modes as $id => $value) {?>
+			<tr>
+				<th align="left">Sale via <?php echo $amodesList[$id]['title'];?></td>
+				<th align="right"><?php echo number_format($value, 2);?></td>
+			</tr>
+		<?php } ?>
 		<tr>
 			<th align="left">Payments</td>
 			<th align="right"><?php echo number_format($payments, 2);?></td>

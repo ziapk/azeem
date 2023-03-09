@@ -55,6 +55,18 @@
 app.controller('headerController', function($scope, $http, $httpParamSerializerJQLike, $filter, $window) {
   $scope.list = <?php echo safe_json_encode($list);?>;
   localStorage.setItem('list', JSON.stringify($scope.list));
+  $scope.exp = {};
+  $scope.createExpense = () => {
+    if($scope.exp.cat_id && $scope.exp.price) {
+      $http.post('<?php echo SITE_URL;?>api/createExpense.php', $httpParamSerializerJQLike($scope.exp), {headers: {'Content-Type': 'application/x-www-form-urlencoded'} }).then((response) => {
+        alert(response.data.message);
+        if(response.data.status == 200) {
+          $scope.exp.description = '';
+          $scope.exp.price = '';
+        }
+      })
+    }
+  }
   $scope.refreshList = function() {
     $scope.cart = JSON.parse($window.localStorage.getItem('shopping'));
     $scope.totalPrice = 0;
@@ -102,7 +114,7 @@ app.controller('headerController', function($scope, $http, $httpParamSerializerJ
   }
   $scope.applyClosing = () => {
     if($window.confirm('Are you sure you want to close to sale for Today')) {
-      $http.post('<?php echo SITE_URL;?>api/closing.php').then((response) => {
+      $http.post('<?php echo SITE_URL;?>api/closing.php', $httpParamSerializerJQLike({ sale_date: 'next' }), {headers: {'Content-Type': 'application/x-www-form-urlencoded'} }).then((response) => {
         $window.location.reload();
       })
     }
