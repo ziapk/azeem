@@ -41,7 +41,7 @@
             </td>
         </tr>
         <tr>
-            <td class="text-right" colspan="5" rowspan="6">
+            <td class="text-right" colspan="5" rowspan="8">
                 <p><input class="form-control" placeholder="Reference No" ng-model="ref_no" /></p>
                 <textarea class="form-control" rows="10" placeholder="Summery" ng-model="summery"></textarea>
             </td>
@@ -49,12 +49,20 @@
             <td>{{subTotal | number: 2}}</td>
         </tr>
         <tr>
+            <td class="text-right">Discount %</td>
+            <td width="200"><input type="search" ng-model="discountPercent" class="form-control" ng-change="calcDiscount(discountPercent)"></td>
+        </tr>
+        <tr>
+            <td class="text-right">Discount %</td>
+            <td width="200">{{discountPercentValue | number: 2}}</td>
+        </tr>
+        <tr>
             <td class="text-right">Add Discount</td>
             <td width="200"><input type="search" ng-model="discountAmount" class="form-control" on-enter-press="addDiscount(discountAmount)"></td>
         </tr>
         <tr>
             <td class="text-right" style="color: red; front-weight: bold;">Total Discount</td>
-            <td width="200" style="color: red; front-weight: bold;"><strong>{{discount | number: 2}}</strong></td>
+            <td width="200" style="color: red; front-weight: bold;"><strong>{{(discount + discountPercentValue) | number: 2}}</strong></td>
         </tr>
         <tr>
             <td class="text-right">Grand Total</td>

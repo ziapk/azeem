@@ -99,6 +99,15 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
     //     }
     // }, 3000);
 
+    $scope.calcDiscount = (v) => {
+        $scope.discountPercent = 0;
+        $scope.discountPercentValue = 0;
+        if(!isNaN(v)) {
+            $scope.discountPercent = parseFloat(v);
+            $scope.calculateSum();
+        }
+    }
+
     $scope.getPinProducts = () => {
         // $scope.loading = true;
         $http.get("<?php echo SITE_URL?>api/getProducts.php", {params: {page: 1, perPage: 10, search: '', full_name: '', group: '', author: '', board: '', searchBy: '', courceId: '', bookmark: 1}})
@@ -135,6 +144,12 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
         $scope.subTotal = subtotal;
         $scope.payment_amount = $scope.subTotal - $scope.discount;
         $scope.grandTotal = $scope.payment_amount = $scope.payment_amount + Math.round($scope.payment_amount * ($scope.gst / 100)) + Math.round($scope.payment_amount * ($scope.service_charges / 100));
+        $scope.subTotal = subtotal;
+        if($scope.discountPercent) {
+            $scope.discountPercentValue = Math.floor(subtotal * ($scope.discountPercent / 100));
+        }
+        $scope.payment_amount = $scope.subTotal - $scope.discount - $scope.discountPercentValue;
+        $scope.grandTotal = $scope.payment_amount = Math.round($scope.payment_amount + Math.round($scope.payment_amount * ($scope.gst / 100)) + Math.round($scope.payment_amount * ($scope.service_charges / 100)));
         // console.log('$scope.items', $scope.items);
         // $window.localStorage.setItem('shopping', JSON.stringify($scope.items));
     }
@@ -307,7 +322,7 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
         $scope.form = {
             customerId: $scope.customerData && $scope.customerData.id ? $scope.customerData.id : 1,
             subTotal: $scope.subTotal,
-            discount: $scope.discount,
+            discount: $scope.discount + $scope.discountPercentValue,
             items: $scope.items,
             payment_amount: $scope.payment_amount,
             gst: $scope.gst,
