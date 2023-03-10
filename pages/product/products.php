@@ -75,7 +75,7 @@
         <tbody>
                 <tr ng-repeat="li in list">
                     <td width="50"><img ng-if="li.image" width="40" class="image" src={{"<?php echo SITE_URL;?>uploads/products/"+li.image}} /></td>
-                    <td><strong>{{li.full_name}}</strong> <br />{{li.author}} - {{li.group}}</td>
+                    <td><strong>{{li.full_name}}</strong> <br />{{li.author}} - {{li.group}} - {{li.publisherName}}</td>
                     <td>{{li.description}} <br /> {{li.note}}</td>
                     <td><img class="fa" width="14" height="14" src="<?php echo SITE_URL; ?>assets/img/svg/qrcode.svg" alt="" /> {{li.code || li.id}}</td>
                     <td>{{li.price}}</td>

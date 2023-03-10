@@ -71,7 +71,7 @@
             </div>
             <div class="product-content">
                 <span class="title">{{li.full_name}}</span>
-                <span class="group">{{li.group}}</span>
+                <span class="group">{{li.group}} - {{li.publisherName}}</span>
                 <span class="author" ng-if="li.author"><img width="12" height="12" src="<?php echo SITE_URL; ?>assets/img/svg/pen.svg" alt="" /> {{li.author}}</span>
                 <span><img class="fa" width="14" height="14" src="<?php echo SITE_URL; ?>assets/img/svg/qrcode.svg" alt="" /><code>{{li.code || li.id}}</code></span>
             </div>
