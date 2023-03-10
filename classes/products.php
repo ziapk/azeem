@@ -224,7 +224,6 @@ class Products extends Connection
 			$prepare->bindParam(':perPage',$no_of_records_per_page,PDO::PARAM_INT);
 			$prepare->execute();
 			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
-			$this->updateProductPublisher();
 			return ['page' => $currentPage, 'totalRecords'=> $total_rows, 'perPage' => $no_of_records_per_page, 'records' => $result];
 
 		} catch (PDOException $e) {
