@@ -112,7 +112,7 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
             else {
                 const price = parseFloat(product.price);
                 if(product.discount_value) {
-                    product.discount = Math.floor(price * ((product.discount_value || 0) / 100));
+                    product.discount = price * ((product.discount_value || 0) / 100);
                     $scope.discountPercentValue += product.discount;
                 }
                 else {
