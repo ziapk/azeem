@@ -29,6 +29,7 @@ try {
         'status' => $status,
         'price' => $_POST['subTotal'],
         'paid_amount' => $_POST['payment_amount'],
+        'show_discount' => !empty($_POST['show_discount']) ? 1 : 0,
         'discount' => $_POST['discount'],
         'gst' => $_POST['gst'],
         'service_charges' => $_POST['service_charges'],

@@ -17,30 +17,18 @@ echo mainHeader(['page' => 'recipt', 'title' => $order['customer']['full_name']]
         <thead>
             <tr>
                 <th style="vertical-align: middle">Customer Name</th>
-                <th>
-                <div class="dropdown-wrapper" style="position: relative;">
-                    <input disabled type="text" class="form-control" ng-model="customerName" placeholder="Search Customer" uib-typeahead="address as address.full_name for address in searchCustomer($viewValue)" typeahead-on-select="selectCustomer($item)" ng-model-options="{debounce: 100}" typeahead-template-url="customer.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="1">
-                    <!-- <input type="text" class="form-control" ng-model="customerName" ng-change=""> -->
-                    <!-- <div class="list-group recipt-search-dropdown">
-                        <a ng-click="selectCustomer(l)" class="list-group-item clearfix" ng-repeat="l in customersList">
-                            <h4 class="list-group-item-heading"><strong>{{l.full_name}}</strong> <span class="text-danger"><strong>{{l.phoneNumber}}</strong></span></h4>
-                            <span style="font-weight: normal" ng-if="li.title != l.full_name">{{l.title}}</span><span class="pull-right">{{l.code}}</span>
-                            
-                        </a>
-                        <a ng-if="customersList.length" ng-click="clearCustomer()" class="list-group-item">Close</a>
-                    </div> -->
-                </div>
+                <th style="width: 200px">
+                    <div class="dropdown-wrapper" style="position: relative;">
+                        <input disabled type="text" class="form-control" ng-model="customerName" placeholder="Search Customer" uib-typeahead="address as address.full_name for address in searchCustomer($viewValue)" typeahead-on-select="selectCustomer($item)" ng-model-options="{debounce: 100}" typeahead-template-url="customer.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="1">
+                    </div>
                 </th>
-                <th style="vertical-align: middle"><label><span style="vertical-align: middle">Search Product</span> <span style="vertical-align: middle; margin-left: 4px"><input type="checkbox" name="focus" ng-model="focus"><span></label></th>
+                <th style="vertical-align: middle">
+                    <label class="pull-left"><span style="vertical-align: middle"><input type="checkbox" ng-model="show_discount"></span> <span style="vertical-align: middle">Add Discount</span></label>
+                    <label class="pull-right"><span style="vertical-align: middle">Search Product</span> <span style="vertical-align: middle; margin-left: 4px"><input type="checkbox" name="focus" ng-model="focus"><span></label>
+                </th>
                 <th width="100">
                 <div class="dropdown-wrapper align-right">
                     <input type="text" class="form-control" id="searchProduct" ng-model="product" placeholder="Search Products" uib-typeahead="address as address.full_name for address in searchProduct($viewValue)" typeahead-on-select="selectProduct($item)" ng-model-options="{debounce: 500}" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="1">
-                    <!-- <div class="list-group recipt-search-dropdown">
-                        <a ng-click="selectProduct(l)" class="list-group-item" ng-repeat="l in list">
-                            <h4 class="list-group-item-heading">{{l.full_name}} <span>{{l.price}}</span></h4>
-                        </a>
-                        <a ng-if="list.length" ng-click="clearSearch()" class="list-group-item">Close</a>
-                    </div> -->
                 </div>
                 </th>
             </tr>
@@ -83,30 +71,17 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
     $scope.customerData = {};
     $scope.summery = $scope.data.order.summery;
     $scope.ref_no = $scope.data.order.ref_no;
+    $scope.show_discount = parseInt($scope.data.order.show_discount) ? true : false
     $scope.gst = $scope.data.order.gst;
     $scope.service_charges = $scope.data.order.service_charges;
     $scope.subTotal =$scope.data.order.price;
+    $scope.discountPercentValue = 0;
     $scope.grandTotal = $scope.data.order.price + $scope.data.order.discount;
     $scope.discount = $scope.data.order.discount;
     $scope.payment_mode = '1';
     const items = [];
     $scope.modes = [];
     $scope.pinList = [];
-    // setInterval(() => {
-    //     if($scope.focus === true && !$('#searchProduct').is(':focus')) {
-    //         $scope.product = null
-    //         $('#searchProduct').focus();
-    //     }
-    // }, 3000);
-
-    $scope.calcDiscount = (v) => {
-        $scope.discountPercent = 0;
-        $scope.discountPercentValue = 0;
-        if(!isNaN(v)) {
-            $scope.discountPercent = parseFloat(v);
-            $scope.calculateSum();
-        }
-    }
 
     $scope.getPinProducts = () => {
         // $scope.loading = true;
@@ -124,8 +99,8 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
     $scope.calculateSum = (c) => {
         const customerData = c || $scope.customerData;
         let subtotal = 0;
+        $scope.discountPercentValue = 0;
         $scope.items.map((product) => {
-            // const prod = $scope.priceList.find(r => r.id == product.id);
             let currentRow = null;
             if(customerData.discount_array?.length && customerData.discount_array?.filter(r => r.publisher_id == product.publisher_id).length) {
                 const row = customerData.discount_array.find(r => r.publisher_id == product.publisher_id);
@@ -136,22 +111,22 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
             }
             else {
                 const price = parseFloat(product.price);
-                product.discount = 0;
-                product.discount_percent = '';
-                subtotal += (price * product.qty);
+                if(product.discount_value) {
+                    product.discount = Math.floor(price * ((product.discount_value || 0) / 100));
+                    $scope.discountPercentValue += product.discount;
+                }
+                else {
+                    product.discount_percent = '';
+                    product.discount = 0;
+                }
+                subtotal += ((product.price - product.discount) * product.qty);
             }
         })
         $scope.subTotal = subtotal;
         $scope.payment_amount = $scope.subTotal - $scope.discount;
-        $scope.grandTotal = $scope.payment_amount = $scope.payment_amount + Math.round($scope.payment_amount * ($scope.gst / 100)) + Math.round($scope.payment_amount * ($scope.service_charges / 100));
-        $scope.subTotal = subtotal;
-        if($scope.discountPercent) {
-            $scope.discountPercentValue = Math.floor(subtotal * ($scope.discountPercent / 100));
-        }
-        $scope.payment_amount = $scope.subTotal - $scope.discount - $scope.discountPercentValue;
         $scope.grandTotal = $scope.payment_amount = Math.round($scope.payment_amount + Math.round($scope.payment_amount * ($scope.gst / 100)) + Math.round($scope.payment_amount * ($scope.service_charges / 100)));
-        // console.log('$scope.items', $scope.items);
-        // $window.localStorage.setItem('shopping', JSON.stringify($scope.items));
+        $window.localStorage.setItem('shopping', JSON.stringify($scope.items));
+
     }
 
     $scope.initCheckKeypress = (evt) => {
@@ -166,22 +141,16 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
     $scope.printValue = o => {
         $scope.payment_mode = o.id;
     }
-    // if($window.localStorage.getItem('shopping')) {
-        const shopCart = $scope.data.order_items;
-        
-        shopCart.map(function(row){
-            const obj = $scope.mainList.find(function (e) { return e.id == row.product_id});
-            items.push({...obj, qty: row.quantity, show: row.show, description: row.description})
-        });
-        $scope.items = items;
-        // console.log('items', items);
-        // $timeout(() => {
-        //     $scope.calculateSum()
-        // });
-    // }
-    // else {
-    //     $scope.items = []
-    // }
+    const shopCart = $scope.data.order_items;
+    
+    shopCart.map(function(row){
+        const obj = $scope.mainList.find(function (e) { return e.id == row.product_id});
+        $scope.discountPercentValue += parseFloat(row.discount);
+        $scope.discount = parseFloat(row.discount) + parseFloat($scope.discount);
+        $scope.subTotal = parseFloat($scope.subTotal) + parseFloat($scope.discount);
+        items.push({...obj, qty: row.quantity, show: row.show, mdescription: row.description, discount: row.discount, discount_value: (parseFloat(row.discount || 0) / row.price) * 100 })
+    });
+    $scope.items = items;
 
     $scope.addTax = () => {
         $scope.calculateSum();
@@ -322,12 +291,13 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
         $scope.form = {
             customerId: $scope.customerData && $scope.customerData.id ? $scope.customerData.id : 1,
             subTotal: $scope.subTotal,
-            discount: $scope.discount + $scope.discountPercentValue,
+            discount: $scope.discount,
             items: $scope.items,
             payment_amount: $scope.payment_amount,
             gst: $scope.gst,
             service_charges: $scope.service_charges,
             summery: $scope.summery,
+            show_discount: $scope.show_discount,
             ref_no: $scope.ref_no,
             id: $scope.data.order.id,
             payment_mode: $scope.payment_mode,

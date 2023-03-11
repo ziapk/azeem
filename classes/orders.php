@@ -41,7 +41,7 @@ class Orders extends Connection
     {
         try {
             if(!empty($array['id'])) {
-                $stmt = "UPDATE `{$this->table}` SET `user_id`=:user_id, `customer_id`=:customer_id, `status`=:status, `price`=:price, `paid_amount`=:paid_amount, `discount`=:discount, `shopId`=:shopId, `order_date`=:order_date, `gst`=:gst, `service_charges`=:service_charges, `summery`=:summery, `ref_no`=:ref_no WHERE id=:id";
+                $stmt = "UPDATE `{$this->table}` SET `user_id`=:user_id, `customer_id`=:customer_id, `status`=:status, `price`=:price, `paid_amount`=:paid_amount, `discount`=:discount, `shopId`=:shopId, `order_date`=:order_date, `gst`=:gst, `service_charges`=:service_charges, `summery`=:summery, `ref_no`=:ref_no, `show_discount`=:show_discount WHERE id=:id";
                 $prepare = $this->dbh->prepare($stmt);        
                 $prepare->bindParam(':user_id', $array['user_id'], PDO::PARAM_STR);
                 $prepare->bindParam(':customer_id', $array['customer_id'], PDO::PARAM_STR);
@@ -55,12 +55,13 @@ class Orders extends Connection
                 $prepare->bindParam(':service_charges', $array['service_charges'], PDO::PARAM_STR);
                 $prepare->bindParam(':summery', $array['summery'], PDO::PARAM_STR);
                 $prepare->bindParam(':ref_no', $array['ref_no'], PDO::PARAM_STR);
+                $prepare->bindParam(':show_discount', $array['show_discount'], PDO::PARAM_STR);
                 $prepare->bindParam(':id', $array['id'], PDO::PARAM_STR);
                 $prepare->execute();
                 $result = $prepare->rowCount();
                 return $result;
             } else {
-                $stmt = "INSERT INTO `{$this->table}` (`user_id`, `customer_id`, `status`, `price`, `paid_amount`, `discount`, `shopId`, `order_date`, `gst`, `service_charges`, `summery`, `ref_no`) VALUES (:user_id, :customer_id, :status, :price, :paid_amount, :discount, :shopId, :order_date, :gst, :service_charges, :summery, :ref_no)";
+                $stmt = "INSERT INTO `{$this->table}` (`user_id`, `customer_id`, `status`, `price`, `paid_amount`, `discount`, `shopId`, `order_date`, `gst`, `service_charges`, `summery`, `ref_no`, `show_discount`) VALUES (:user_id, :customer_id, :status, :price, :paid_amount, :discount, :shopId, :order_date, :gst, :service_charges, :summery, :ref_no, :show_discount)";
                 $prepare = $this->dbh->prepare($stmt);        
                 $prepare->bindParam(':user_id', $array['user_id'], PDO::PARAM_STR);
                 $prepare->bindParam(':customer_id', $array['customer_id'], PDO::PARAM_STR);
@@ -74,6 +75,7 @@ class Orders extends Connection
                 $prepare->bindParam(':service_charges', $array['service_charges'], PDO::PARAM_STR);
                 $prepare->bindParam(':summery', $array['summery'], PDO::PARAM_STR);
                 $prepare->bindParam(':ref_no', $array['ref_no'], PDO::PARAM_STR);
+                $prepare->bindParam(':show_discount', $array['show_discount'], PDO::PARAM_STR);
                 $prepare->execute();
                 $result = $this->dbh->lastInsertId();
                 return $result;

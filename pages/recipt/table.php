@@ -3,6 +3,7 @@
         <tr>
             <th>Sr.# 111</th>
             <th>Description</th>
+            <th ng-if="show_discount">Discount %</th>
             <th>Unit Price</th>
             <th>Add Qty</th>
             <th>Qty</th>
@@ -16,7 +17,9 @@
             <td>
                 {{cart.full_name}}
                 <input type="text" ng-change="calculateSum()" ng-model="cart.description" placeholder="Description" ng-if="cart.show" class="form-control">
-
+            </td>
+            <td width="100" ng-if="show_discount">
+                <input type="number" class="form-control" ng-model="cart.discount_value" ng-change="calculateSum()">
             </td>
             <td>
                 <span ng-if="cart.discount">
@@ -41,7 +44,7 @@
             </td>
         </tr>
         <tr>
-            <td class="text-right" colspan="5" rowspan="8">
+            <td class="text-right" colspan="{{show_discount ?  6: 5}}" rowspan="8">
                 <p><input class="form-control" placeholder="Reference No" ng-model="ref_no" /></p>
                 <textarea class="form-control" rows="10" placeholder="Summery" ng-model="summery"></textarea>
             </td>
@@ -49,20 +52,12 @@
             <td>{{subTotal | number: 2}}</td>
         </tr>
         <tr>
-            <td class="text-right">Discount %</td>
-            <td width="200"><input type="search" ng-model="discountPercent" class="form-control" ng-change="calcDiscount(discountPercent)"></td>
-        </tr>
-        <tr>
-            <td class="text-right">Discount %</td>
-            <td width="200">{{discountPercentValue | number: 2}}</td>
-        </tr>
-        <tr>
             <td class="text-right">Add Discount</td>
-            <td width="200"><input type="search" ng-model="discountAmount" class="form-control" on-enter-press="addDiscount(discountAmount)"></td>
+            <td width="200"><input type="search" ng-model="cartdiscountAmount" class="form-control" on-enter-press="addDiscount(discountAmount)"></td>
         </tr>
         <tr>
             <td class="text-right" style="color: red; front-weight: bold;">Total Discount</td>
-            <td width="200" style="color: red; front-weight: bold;"><strong>{{(discount + discountPercentValue) | number: 2}}</strong></td>
+            <td width="200" style="color: red; front-weight: bold;"><strong>{{(discount + cart.discountPercentValue) | number: 2}}</strong></td>
         </tr>
         <tr>
             <td class="text-right">Grand Total</td>
@@ -79,7 +74,7 @@
     </tbody>
     <tbody>
         <tr>
-            <th colspan="7" class="text-right">
+            <th colspan="{{show_discount ? 8 : 7 }}" class="text-right">
                 <a href="#" class="btn btn-success pull-left" ng-click="park()">Park For Now</a>
                 <div class="btn-group">
                     <label class="btn btn-default" ng-repeat="li in modes">
