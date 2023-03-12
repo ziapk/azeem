@@ -24,6 +24,7 @@ if(empty($_REQUEST['mcode'])) {
 	$data['code'] = $_REQUEST['mcode'];
 }
 
+$data['parent_id'] = $_REQUEST['mparent_id'];
 $data['status'] = $_REQUEST['mstatus'];
 $data['created_by'] = $_SESSION['user_credentials']['id'];
 

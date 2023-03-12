@@ -78,6 +78,15 @@
             <input type="text" class="form-control" id="mcode" name="mcode" placeholder="Category Code"  required="" autocomplete="off">
           </fieldset>
           <fieldset class="form-group">
+            <label for="mparent_title">Parent Account</label>
+            <select id="mparent_id" name="mparent_id" class="form-control">
+              <?php foreach ($accounts as $value) {?>
+                <option value="<?php echo $value['id'];?>"><?php echo $value['title'];?></option>
+              <?php } ?>
+            </select>
+            
+          </fieldset>
+          <fieldset class="form-group">
             <label for="mstatus">Status</label>
             <select class="form-control c-select" id="mstatus" name="mstatus" required="">
               <?php foreach ($accStatusArray as $key => $value) { ?>
@@ -108,6 +117,7 @@
         $('#mtitle').val(obj.title);
         $('#mcode').val(obj.code);
         $('#maccount_type').val(obj.account_type);
+        $('#mparent_id').val(obj.parent_id);
         $('#mgroup_id').val(obj.group_id);
         $('#mstatus').val(obj.status);
     }

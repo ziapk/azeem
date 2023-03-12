@@ -339,7 +339,7 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
                 const price = parseFloat(product.price);
                 if(product.discount_value) {
                     product.discount = price * ((product.discount_value || 0) / 100);
-                    $scope.discountPercentValue += product.discount;
+                    $scope.discountPercentValue += (product.discount * product.qty);
                 }
                 else {
                     product.discount_percent = '';
@@ -350,7 +350,7 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
         })
         $scope.subTotal = subtotal;
         $scope.payment_amount = $scope.subTotal - $scope.discount;
-        $scope.grandTotal = $scope.payment_amount = Math.round($scope.payment_amount + Math.round($scope.payment_amount * ($scope.gst / 100)) + Math.round($scope.payment_amount * ($scope.service_charges / 100)));
+        $scope.grandTotal = $scope.payment_amount = $scope.payment_amount + Math.round($scope.payment_amount * ($scope.gst / 100)) + Math.round($scope.payment_amount * ($scope.service_charges / 100));
         $window.localStorage.setItem('shopping', JSON.stringify($scope.items));
 
     }

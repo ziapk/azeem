@@ -284,7 +284,7 @@ class DoubleEntry extends Connection
 
 			$stmt = "
 			
-			SELECT a.*, a.account_id, t.transaction_date, base.title as accountTitle, base.code as accountCode, t.reference, SUM(CASE a.entry_type WHEN 'D' THEN a.amount * -1 WHEN 'C' THEN a.amount * 1 ELSE 0 END) AS amount, SUM(CASE WHEN a.entry_type = 'D' THEN a.amount ELSE 0 END) AS debitAmount, SUM(CASE WHEN a.entry_type = 'C' THEN a.amount ELSE 0 END) AS creditAmount FROM `$this->table_ledger_entries` as a left join `$this->table_transactions` as t on t.id = a.transaction_id left join `$this->table` as base on base.id = a.account_id and base.status = 1 where t.flag=1 and t.transaction_date between :fromDate and :toDate GROUP BY a.account_id;
+			SELECT a.*, a.account_id, t.transaction_date, base.title as accountTitle, base.code as accountCode, t.reference, SUM(CASE a.entry_type WHEN 'D' THEN a.amount * -1 WHEN 'C' THEN a.amount * 1 ELSE 0 END) AS amount, SUM(CASE WHEN a.entry_type = 'D' THEN a.amount ELSE 0 END) AS debitAmount, SUM(CASE WHEN a.entry_type = 'C' THEN a.amount ELSE 0 END) AS creditAmount FROM `$this->table_ledger_entries` as a left join `$this->table_transactions` as t on t.id = a.transaction_id left join `$this->table` as base on base.id = a.account_id and base.status = 1 where t.flag=1 and t.transaction_date between :fromDate and :toDate GROUP BY a.account_id order by base.code;
 			";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':fromDate', $fromDate, PDO::PARAM_STR);
@@ -810,10 +810,11 @@ class DoubleEntry extends Connection
 	public function updateAccount($array) {
 		$id = $array['id'];
 		try {
-			$stmt = "UPDATE `{$this->table}` SET `title`=:title, `code`=:code, `status`=:status WHERE `id` = :id";
+			$stmt = "UPDATE `{$this->table}` SET `title`=:title, `code`=:code, `parent_id`=:parent_id, `status`=:status WHERE `id` = :id";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':title', $array['title'], PDO::PARAM_STR);
 			$prepare->bindParam(':code', $array['code'], PDO::PARAM_STR);
+			$prepare->bindParam(':parent_id', $array['parent_id'], PDO::PARAM_STR);
 			$prepare->bindParam(':status', $array['status'], PDO::PARAM_STR);
 			$prepare->bindParam(':id', $id, PDO::PARAM_INT);
 			$prepare->execute();

@@ -6,6 +6,7 @@ $list = $productCls->getOwnerProducts($ownerId);
 $orders = new Orders();
 $order = $orders->getOrder($_GET['id']);
 echo mainHeader(['page' => 'recipt', 'title' => $order['customer']['full_name']]);
+if ($order['order']['status'] == 1) {
 ?>
 <div ng-controller="cartController">
 <div class="container">
@@ -113,7 +114,7 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
                 const price = parseFloat(product.price);
                 if(product.discount_value) {
                     product.discount = price * ((product.discount_value || 0) / 100);
-                    $scope.discountPercentValue += product.discount;
+                    $scope.discountPercentValue += (product.discount * product.qty);
                 }
                 else {
                     product.discount_percent = '';
@@ -124,8 +125,8 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
         })
         $scope.subTotal = subtotal;
         $scope.payment_amount = $scope.subTotal - $scope.discount;
-        $scope.grandTotal = $scope.payment_amount = Math.round($scope.payment_amount + Math.round($scope.payment_amount * ($scope.gst / 100)) + Math.round($scope.payment_amount * ($scope.service_charges / 100)));
-        $window.localStorage.setItem('shopping', JSON.stringify($scope.items));
+        $scope.grandTotal = $scope.payment_amount = $scope.payment_amount + Math.round($scope.payment_amount * ($scope.gst / 100)) + Math.round($scope.payment_amount * ($scope.service_charges / 100));
+        // $window.localStorage.setItem('shopping', JSON.stringify($scope.items));
 
     }
 
@@ -336,3 +337,6 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
       <small><em>{{match.model.company}}</em></small>
   </a>
 </script>
+<?php } else {
+echo '<div class="container-fluid"><div class="alert alert-success">This Ordre Has been Processed from Park State</div></div>';
+}?>

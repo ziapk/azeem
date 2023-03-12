@@ -49,7 +49,7 @@
                 <textarea class="form-control" rows="10" placeholder="Summery" ng-model="summery"></textarea>
             </td>
             <td class="text-right">Sub Total</td>
-            <td>{{subTotal | number: 2}}</td>
+            <td>{{(subTotal + discountPercentValue) | number: 2}}</td>
         </tr>
         <tr>
             <td class="text-right">Add Discount</td>
@@ -57,7 +57,7 @@
         </tr>
         <tr>
             <td class="text-right" style="color: red; front-weight: bold;">Total Discount</td>
-            <td width="200" style="color: red; front-weight: bold;"><strong>{{(discount + cart.discountPercentValue) | number: 2}}</strong></td>
+            <td width="200" style="color: red; front-weight: bold;"><strong>{{(discount + discountPercentValue) | number: 2}}</strong></td>
         </tr>
         <tr>
             <td class="text-right">Grand Total</td>
