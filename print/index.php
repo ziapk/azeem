@@ -182,16 +182,16 @@ td {
             <td class="text-right"><?php echo number_format($item['quantity'] * ($item['price']), 2); ?></td>
         </tr>
         <?php } ?>
-        <!-- <tr class="no-border">
-            <td rowspan="7" style="line-height: 25px" valign="top" colspan="3">Total Qty</td>
-            <td rowspan="7" style="line-height: 25px" valign="top"><strong><?php // echo number_format($qty, 1); ?></strong></td>
-            <td class="text-right ref" colspan="3">Previous Balance</td>
-            <th class="text-right ref"><?php // echo number_format($foodpanda['wallet'] - $balance, 2);?></th>
-        </tr> -->
         <tr class="no-border">
+            <td rowspan="7" style="line-height: 25px" valign="top" colspan="3">Total Qty</td>
+            <td rowspan="7" style="line-height: 25px" valign="top"><strong><?php echo number_format($qty, 1); ?></strong></td>
             <td class="text-right ref" colspan="3">Invoice Total</td>
             <th class="text-right ref"><?php echo number_format($aprice, 2);?></th>
         </tr>
+        <!-- <tr class="no-border">
+            <td class="text-right ref" colspan="3">Invoice Total</td>
+            <th class="text-right ref"><?php echo number_format($aprice, 2);?></th>
+        </tr> -->
         <tr class="no-border">
             <td class="text-right ref" colspan="3">Additional Discount</td>
             <th class="text-right ref"><?php echo number_format($order['order']['discount'], 2);?></th>
