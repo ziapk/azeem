@@ -25,7 +25,7 @@ $orders = $ordersObj->userOrders($shop['id'], $shop['sale_date'], null, 1);
                 <th style="vertical-align: middle">Customer Name</th>
                 <th style="width: 200px">
                     <div class="dropdown-wrapper" style="position: relative;">
-                        <input disabled type="text" class="form-control" ng-model="customerName" placeholder="Search Customer" uib-typeahead="address as address.full_name for address in searchCustomer($viewValue)" typeahead-on-select="selectCustomer($item)" ng-model-options="{debounce: 100}" typeahead-template-url="customer.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="1">
+                        <input type="text" class="form-control" ng-model="customerName" placeholder="Search Customer" uib-typeahead="address as address.full_name for address in searchCustomer($viewValue)" typeahead-on-select="selectCustomer($item)" ng-model-options="{debounce: 100}" typeahead-template-url="customer.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="1">
                     </div>
                 </th>
                 <th style="vertical-align: middle">
