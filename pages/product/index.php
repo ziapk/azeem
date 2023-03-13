@@ -59,7 +59,7 @@
             <div class="product-image">
                 <div ng-if="!li.image" class="image"></div>
                 <img ng-if="li.image" class="image" src={{'<?php echo SITE_URL;?>uploads/products/'+li.image}} />
-                <a href="update.php?id={{li.id}}" class="btn-edit" uib-tooltip="Edit"><img width="18" height="18" src="<?php echo SITE_URL; ?>assets/img/svg/edit.svg" alt="" /></a>
+                <a href="<?php echo SITE_URL;?>pages/product/update.php?id={{li.id}}" class="btn-edit" uib-tooltip="Edit"><img width="18" height="18" src="<?php echo SITE_URL; ?>assets/img/svg/edit.svg" alt="" /></a>
                 <a href="javascript:void(0)" ng-click="addToCart(li)" class="btn-cart" uib-tooltip="Add to cart"><img width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/002-add-to-cart-red.svg" alt="" /></a>
                 <a ng-if="li.dup == 0" href="javascript:void(0)" ng-click="addDuplicate(li)" class="btn btn-dup" uib-tooltip="Mark as duplicate"><span class="fa fa-copy text-mute"></span></a>
                 <a ng-if="li.dup == 1" href="javascript:void(0)" ng-click="removeDuplicate(li)" class="btn btn-dup" uib-tooltip="Remove from duplicate"><span class="fa fa-copy text-danger"></span></a>
