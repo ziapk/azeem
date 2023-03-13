@@ -53,7 +53,7 @@
         </tr>
         <tr>
             <td class="text-right">Add Discount</td>
-            <td width="200"><input type="search" ng-model="cartdiscountAmount" class="form-control" on-enter-press="addDiscount(discountAmount)"></td>
+            <td width="200"><input type="search" ng-model="discountAmount" class="form-control" on-enter-press="addDiscount(discountAmount)"></td>
         </tr>
         <tr>
             <td class="text-right" style="color: red; front-weight: bold;">Total Discount</td>
