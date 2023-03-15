@@ -46,6 +46,8 @@ if(empty($_REQUEST['mid'])) {
 
 if(!$errors) {
 	$categories = new DoubleEntry();
+	$p = $categories->getAccount($data['parent_id']);
+	$data['account_type'] = $p['account_type'];
 	$category = $categories->updateAccount($data);
 	if($category) {
 		header('Content-Type: application/json; charset=UTF-8');

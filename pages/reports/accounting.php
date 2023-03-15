@@ -178,13 +178,22 @@ switch ($reportType) {
 	break;
 
     case '12':
+		// $params['parent_ids'][] = $store['receivable'];
+		$params['parent_ids'][] = $store['payable'];
+		$params['account_ids'][] = $store['sale_discount'];
+		$params['account_ids'][] = $store['sale_returns'];
+		$params['account_ids'][] = $store['purchase_discount'];
+		$params['account_ids'][] = $store['purchase_returns'];
+		$params['account_ids'][] = $store['receiving'];
+		$params['account_ids'][] = $store['cash'];
+		$params['account_ids'][] = $store['assets'];
+		$params['parent_ids'][] = $store['expense'];
 		$reportData = $doubleEntry->getPLStatementReport($params);
-        // print_r($reportData);exit;
-        $subtitle = 'Profit and Loss Statement'.$subtitle;
+		$subtitle = 'Profit and Loss Statement'.$subtitle;
         $headers = ['Account Code', 'Account Title', 'Debit', 'Credit'];
 		$columns = ['code', 'title', 'debitAmount', 'creditAmount'];
 
-        include_once dirname(__FILE__).'/print/plstatement.php';
+        include_once dirname(__FILE__).'/plstatement.php';
         exit;
 
 	break;

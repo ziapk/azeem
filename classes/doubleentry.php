@@ -301,15 +301,34 @@ class DoubleEntry extends Connection
 	public function getPLStatementReport($array) {
 		try {
 
-			$fromDate = !empty($array['fromDate']) ? Settings::dateForSql($array['fromDate']): '';
-			$toDate = !empty($array['toDate']) ? Settings::dateForSql($array['toDate']) : '';
+			$fromDate = !empty($array['fromDate']) ? $array['fromDate']: '';
+			$toDate = !empty($array['toDate']) ? $array['toDate'] : '';
+			// $fromDate = '2023-01-01';
+			// $toDate = '2023-12-01';;
+			$shopId = !empty($array['shopId']) ? $array['shopId'] : '';
+			$parent_ids = !empty($array['parent_ids']) ? $array['parent_ids'] : [];
+			$account_ids = !empty($array['account_ids']) ? $array['account_ids'] : [];
 
-			$stmt = "SELECT SQL_NO_CACHE a.code, e.account_id, a.account_type, a.title, t.transaction_date, SUM(CASE WHEN e.entry_type='D' THEN e.amount ELSE 0 END) AS debitAmount, SUM(CASE WHEN e.entry_type='C' THEN e.amount ELSE 0 END) AS creditAmount FROM `$this->table_transactions` t LEFT JOIN `$this->table_ledger_entries` e ON e.transaction_id = t.id LEFT JOIN `$this->table` a ON a.id = e.account_id and a.status = 1 WHERE t.flag=1 and t.transaction_date >= :fromDate AND t.transaction_date <= :toDate and a.account_type in (4, 5) GROUP BY e.account_id";
+
+			$shopIdCondition = "";
+			$accountCondition = "";
+
+			if(!empty($shopId)) {
+				$shopIdCondition = "and t.shopId = $shopId";
+			}
+
+			if(!empty($account_ids)) {
+				$accountCondition = "and (a.parent_id in (".implode(',', $parent_ids).") or a.id in (".implode(',', $account_ids)."))";
+			}
+
+			$stmt = "SELECT SQL_NO_CACHE a.code, e.account_id, a.account_type, a.title, t.transaction_date, SUM(CASE WHEN e.entry_type='D' THEN e.amount ELSE 0 END) AS debitAmount, SUM(CASE WHEN e.entry_type='C' THEN e.amount ELSE 0 END) AS creditAmount, e.transaction_id, e.payment_mode, a.parent_id, a.code, e.account_id, a.account_type, a.title, e.entry_type, t.transaction_date FROM `$this->table_transactions` t LEFT JOIN `$this->table_ledger_entries` e ON e.transaction_id = t.id LEFT JOIN `$this->table` a ON a.id = e.account_id and a.status = 1 WHERE (t.flag=1 $shopIdCondition $accountCondition) and (DATE(t.transaction_date) BETWEEN :fromDate AND :toDate) GROUP BY e.account_id";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':fromDate', $fromDate, PDO::PARAM_STR);
 			$prepare->bindParam(':toDate', $toDate, PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
+			// echo '<pre>';
+			// print_r($array);
 			return $result;
 			
 		} catch (PDOException $e) {
@@ -810,10 +829,11 @@ class DoubleEntry extends Connection
 	public function updateAccount($array) {
 		$id = $array['id'];
 		try {
-			$stmt = "UPDATE `{$this->table}` SET `title`=:title, `code`=:code, `parent_id`=:parent_id, `status`=:status WHERE `id` = :id";
+			$stmt = "UPDATE `{$this->table}` SET `title`=:title, `code`=:code, `account_type`=:account_type, `parent_id`=:parent_id, `status`=:status WHERE `id` = :id";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':title', $array['title'], PDO::PARAM_STR);
 			$prepare->bindParam(':code', $array['code'], PDO::PARAM_STR);
+			$prepare->bindParam(':account_type', $array['account_type'], PDO::PARAM_STR);
 			$prepare->bindParam(':parent_id', $array['parent_id'], PDO::PARAM_STR);
 			$prepare->bindParam(':status', $array['status'], PDO::PARAM_STR);
 			$prepare->bindParam(':id', $id, PDO::PARAM_INT);
