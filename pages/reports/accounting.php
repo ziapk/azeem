@@ -179,17 +179,17 @@ switch ($reportType) {
 
     case '12':
 		// $params['parent_ids'][] = $store['receivable'];
-		$params['parent_ids'][] = $store['payable'];
+		// $params['parent_ids'][] = $store['payable'];
 		$params['account_ids'][] = $store['sale_discount'];
 		$params['account_ids'][] = $store['sale_returns'];
 		$params['account_ids'][] = $store['purchase_discount'];
 		$params['account_ids'][] = $store['purchase_returns'];
-		$params['account_ids'][] = $store['receiving'];
-		$params['account_ids'][] = $store['cash'];
+		// $params['account_ids'][] = $store['receiving'];
+		// $params['account_ids'][] = $store['cash'];
 		$params['account_ids'][] = $store['assets'];
 		$params['parent_ids'][] = $store['expense'];
 		$reportData = $doubleEntry->getPLStatementReport($params);
-		$subtitle = 'Profit and Loss Statement'.$subtitle;
+		$subtitle = 'Profit and Loss Account'.$subtitle;
         $headers = ['Account Code', 'Account Title', 'Debit', 'Credit'];
 		$columns = ['code', 'title', 'debitAmount', 'creditAmount'];
 

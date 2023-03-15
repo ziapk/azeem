@@ -7,18 +7,6 @@ $incomeArray = [];
 $costArray = [];
 $expArray = [];
 
-foreach ($reportData as $key => $value) {
-  if($value['account_type'] == 4) {
-    $incomeArray[] = $value;
-  }
-  elseif($value['account_type'] == 1) {
-    $costArray[] = $value;
-  }
-  else {
-    $expArray[] = $value;
-  }
-};
-
 ob_start();
 ?>
 <style>
@@ -83,195 +71,153 @@ ob_start();
 			<?php if($srNo) { ?>
 				<th width="30">S.#</th>
 			<?php } ?>
-			<?php foreach ($headers as $value){ ?>
-				<th><?php echo $value; ?></th>
-			<?php } ?>
+			<th>Account</th>
+			<th>Amount</th>
 		</tr>
 	</thead>
 	<tbody>
         <tr>
-            <th colspan="7">
+            <th colspan="3">
                 INCOME
             </th>
         </tr>
 		<?php 
 		
 		$totals = [
-			'debit' => [
-				'sale' => 0
-			],
-			'credit' => [
-				'sale' => 0
-			]
+			'sale' => 0,
+			'purchase' => 0,
+			'expense' => 0
 		];
 		
-		$count = 1; foreach ($incomeArray as $s) {?>
+		$count = 1; foreach ($reportData as $s) {
+			if($shop['expense'] === $s['parent_id']) {
+				$expArray[] = $s;
+			}
+			?>
 			<tr>
-			<?php if($srNo) { 
-                
-                ?>
-				<td width="10"><?php echo $count; ?></td>
-			<?php } ?>
-
-				<?php 
-                
-            	$totals['debit']['sale'] += $s['debitAmount'];
-                $totals['credit']['sale'] += $s['creditAmount'];
-                
-                foreach ($columns as $value){ 
-                    $val = '';
-            
-                    
-                    $val = $s[$value];
-
-                    ?>
-
-					<?php if($value == '_blank') { ?>
-
-						<td width="300"><?php echo $val; ?></td>
-
-					<?php } elseif($value == '_blank_normal2') { ?>
-						<td width="170"><?php echo $val; ?></td>
-					<?php } elseif($value == '_blank_normal3') { ?>
-						<td width="370"><?php echo $val; ?></td>
-					<?php } elseif($value == '_blank_normal') { ?>
-						<td><?php echo $val; ?></td>
-					<?php } elseif($value == 'transaction_date') { ?>
-						<td><?php echo settings::dateToSimple($val); ?></td>
-					<?php } else { ?>
-
-						<td><?php echo $val; ?></td>
-
+			<?php 
+                if($shop['assets'] === $s['account_id'] && !empty($s['creditAmount'])) {
+					$totals['sale'] += $s['creditAmount'];
+					if($srNo) { ?>
+						<td width="10"><?php echo $count; ?></td>
 					<?php } ?>
-
-				<?php } ?>
+						<td><?php echo $s['title']; ?></td>
+						<td><?php echo $s['creditAmount']; ?></td>
+					<?php
+					$count++;
+				}
+				else if($shop['sale_discount'] === $s['account_id'] && !empty($s['debitAmount'])) {
+					$totals['sale'] -= $s['debitAmount'];
+					if($srNo) { ?>
+						<td width="10"><?php echo $count; ?></td>
+					<?php }
+					?>
+						<td><?php echo $s['title']; ?></td>
+						<td>(<?php echo $s['creditAmount']; ?>)</td>
+					<?php
+					$count++;
+				} 
+				
+				else if($shop['sale_returns'] === $s['account_id'] && !empty($s['debitAmount'])) {
+					$totals['sale'] -= $s['debitAmount'];
+					if($srNo) { ?>
+						<td width="10"><?php echo $count; ?></td>
+					<?php }
+					?>
+						<td><?php echo $s['title']; ?></td>
+						<td>(<?php echo $s['debitAmount']; ?>)</td>
+					<?php
+					$count++;} 
+				} ?>
 			</tr>
-		<?php $count++;} ?>
+		<?php ?>
         <tr>
-            <th colspan="3">Total</th>
-            <td><strong><?php echo $totals['debit']['sale'];?></strong></td>
-            <td><strong><?php echo $totals['credit']['sale'];?></strong></td>
+            <th colspan="2">Total</th>
+            <td><strong><?php echo $totals['sale'];?></strong></td>
         </tr>
         <tr>
-            <th colspan="7">
-                Cost
+            <th colspan="3">
+                Purchases
             </th>
         </tr>
 		<?php 
-        
-        
-        $count = 1; foreach ($costArray as $s) {?>
-			<tr>
-			<?php if($srNo) { 
-                
-                ?>
+        $count = 1; foreach ($reportData as $s) {
+		if($shop['assets'] === $s['account_id'] && !empty($s['debitAmount'])) {
+			$totals['purchase'] += $s['debitAmount'];
+			if($srNo) { ?>
 				<td width="10"><?php echo $count; ?></td>
 			<?php } ?>
-
-				<?php 
-                $totals['debit']['purchase'] += $s['debitAmount'];
-                $totals['credit']['purchase'] += $s['creditAmount'];
-                
-                foreach ($columns as $value){ 
-                    $val = '';
-            
-                    
-                    $val = $s[$value];
-
-                    ?>
-
-					<?php if($value == '_blank') { ?>
-
-						<td width="300"><?php echo $val; ?></td>
-
-					<?php } elseif($value == '_blank_normal2') { ?>
-						<td width="170"><?php echo $val; ?></td>
-					<?php } elseif($value == '_blank_normal3') { ?>
-						<td width="370"><?php echo $val; ?></td>
-					<?php } elseif($value == '_blank_normal') { ?>
-						<td><?php echo $val; ?></td>
-					<?php } elseif($value == 'transaction_date') { ?>
-						<td><?php echo settings::dateToSimple($val); ?></td>
-					<?php } else { ?>
-
-						<td><?php echo $val; ?></td>
-
-					<?php } ?>
-
-				<?php } ?>
-			</tr>
-		<?php $count++;} ?>
-        <tr>
-            <th colspan="3">Total</th>
-            <td><strong><?php echo $totals['debit']['purchase'];?></strong></td>
-            <td><strong><?php echo $totals['credit']['purchase'];?></strong></td>
+				<td><?php echo $s['title']; ?></td>
+				<td><?php echo $s['debitAmount']; ?></td>
+			<?php
+			$count++;
+			?> </tr><?php
+		}
+		else if($shop['purchase_discount'] === $s['account_id'] && !empty($s['creditAmount'])) {
+			$totals['purchase'] -= $s['creditAmount'];
+			if($srNo) { ?>
+				<td width="10"><?php echo $count; ?></td>
+			<?php }
+			?>
+				<td><?php echo $s['title']; ?></td>
+				<td>(<?php echo $s['creditAmount']; ?>)</td>
+			<?php $count++; ?> </tr><?php
+		}
+		else if($shop['purchase_returns'] === $s['account_id'] && !empty($s['creditAmount'])) {
+			$totals['purchase'] -= $s['creditAmount'];
+			if($srNo) { ?>
+				<td width="10"><?php echo $count; ?></td>
+			<?php }
+			?>
+				<td><?php echo $s['title']; ?></td>
+				<td>(<?php echo $s['creditAmount']; ?>)</td>
+			<?php $count++; ?> </tr><?php
+		}
+		
+	}?>
+        
+            <th colspan="2">Total</th>
+            <td><strong><?php echo $totals['purchase'];?></strong></td>
         </tr>
+		<!-- <tr>
+            <th colspan="2">Gross Sale</th>
+            <td><strong><?php echo ($totals['sale'] - $totals['purchase']);?></strong></td>
+        </tr> -->
         <tr>
-			<th colspan="3" rowspan="2">Gross Sale</th>
-            <th>INCOME TOTAL</th>
-			<td><strong><?php echo $totals['debit']['sale'] - $totals['credit']['sale'];?></strong></td>
-		</tr>
-		<tr>
-            <th>COST TOTAL</th>
-            <td><strong><?php echo $totals['debit']['purchase'] - $totals['credit']['purchase'];?></strong></td>
-        </tr>
-        <?php if(sizeof($expArray)) {?>
-        <tr>
-            <th colspan="7">
+            <th colspan="3">
                 Expense
             </th>
         </tr>
-        <?php } ?>
 
         <?php $count = 1; foreach ($expArray as $s) {?>
 			<tr>
 			<?php if($srNo) { ?>
 				<td width="10"><?php echo $count; ?></td>
 			<?php } ?>
-
+			<td><?php echo $s['title']; ?></td>
+			<td><?php echo $s['debitAmount']; ?></td>
             <?php 
-				$totals['debit']['expense'] += $s['debitAmount'];
-                $totals['credit']['expense'] += $s['creditAmount'];
-
-
-                foreach ($columns as $value){ 
-                    $val = '';
-                    $val = $s[$value];
-    
-                ?>
-
-					<?php if($value == '_blank') { ?>
-
-						<td width="300"><?php echo $val; ?></td>
-
-					<?php } elseif($value == '_blank_normal2') { ?>
-						<td width="170"><?php echo $val; ?></td>
-					<?php } elseif($value == '_blank_normal3') { ?>
-						<td width="370"><?php echo $val; ?></td>
-					<?php } elseif($value == '_blank_normal') { ?>
-						<td><?php echo $val; ?></td>
-					<?php } elseif($value == 'transaction_date') { ?>
-						<td><?php echo settings::dateToSimple($val); ?></td>
-					<?php } else { ?>
-
-						<td><?php echo $val; ?></td>
-
-					<?php } ?>
-
-				<?php } ?>
+				$totals['expense'] += $s['debitAmount'];
+ ?>
 			</tr>
 		<?php $count++;} ?>
 	</tbody>
 <tfoot>
     <tr>
-        <th colspan="3">Total</th>
-        <td><strong><?php echo $totalDebit;?></strong></td>
-        <td><strong><?php echo $totalCredit;?></strong></td>
+        <th colspan="2">Total</th>
+        <td><strong><?php echo $totals['expense'];?></strong></td>
     </tr>
     <tr>
-        <th colspan="3">Surplus/Deficit</th>
-        <th>Credit - Debit</th>
-        <td><strong><?php echo $totalCredit - $totalDebit;?></strong></td>
+        <th colspan="2">Profit and Loss Account</th>
+        <td><strong><?php 
+		
+		$totalExpense = $totals['expense'];
+		$totalIncome = $totals['sale'];
+		$totalPurchase = $totals['purchase'];
+
+		$total = $totalIncome - $totalPurchase - $totalExpense;
+		echo $total > 0 ? $total : '('. (-1 * $total).')'
+		?></strong></td>
     </tr>
 </tfoot>
 <?php if(!$params['pdf']) { ?>
