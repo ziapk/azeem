@@ -32,6 +32,19 @@ class Demands extends Connection
 		    die("Error!: " . $e->getMessage() . "<br/>");
 		}
 	}
+	public function getUserDemands($shop_id, $user_id) {
+		try {
+			$stmt = "SELECT * FROM `{$this->table}` WHERE `shop_id`=:shop_id and created_by=:user_id and flag < 4";
+			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':shop_id',$shop_id,PDO::PARAM_STR);
+			$prepare->bindParam(':user_id',$user_id,PDO::PARAM_STR);
+			$prepare->execute();
+			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
+			return $result;
+		} catch (PDOException $e) {
+		    die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
 
 	public function getStoreDemand($id, $owner_id) {
 		try {
