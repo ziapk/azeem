@@ -1,6 +1,6 @@
 <?php 
 require_once(dirname(__FILE__).'/autoload.php');
-$ownerId = $userData['owner_id'];
+$ownerId = $_GET['owner_id'];
 $products = new  Products();
 $page = !empty($_GET['page']) ? $_GET['page'] : 1;
 $perPage = !empty($_GET['perPage']) ? $_GET['perPage'] : 0;
