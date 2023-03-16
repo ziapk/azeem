@@ -2,7 +2,7 @@
 require_once(dirname(__FILE__).'/autoload.php');
 if(empty($_POST['email']) || empty($_POST['password'])) {
     // http_response_code(400);
-    echo json_encode(["message" => "Please fill all fields"]);
+    echo json_encode(["message" => "Please fill all fields", 'data' => $_POST]);
 }
 else {
     $email = $_POST['email'];
