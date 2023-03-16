@@ -1,5 +1,7 @@
 <?php
 require_once(dirname(__FILE__).'/autoload.php');
+$_POST = json_decode(file_get_contents('php://input'), true);
+
 if(empty($_POST['email']) || empty($_POST['password'])) {
     // http_response_code(400);
     echo json_encode(["message" => "Please fill all fields", 'data' => $_POST]);
