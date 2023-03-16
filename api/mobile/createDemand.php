@@ -4,6 +4,8 @@ require_once(dirname(__FILE__).'/autoload.php');
 $_POST = json_decode(file_get_contents('php://input'), true);
 
 
+print_r($_POST);
+
 if(empty($_POST['items']) || empty($_POST['demand_title']) || empty($_POST['demand_date']) || empty($_POST['shop_id'])) {
     echo json_encode(['message' => "Please fill all fields"]);
 }
