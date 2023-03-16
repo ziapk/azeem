@@ -1,9 +1,9 @@
 <?php 
-if(!empty($_POST)) {
 require_once(dirname(__FILE__).'/autoload.php');
-$error = "";
+$_POST = json_decode(file_get_contents('php://input'), true);
 
 if(empty($_POST['items']) || empty($_POST['title']) || empty($_POST['demand_date']) || empty($_POST['shop_id'])) {
+    http_response_code(400);
     echo json_encode(['status' => 400, 'message' => "Please fill all fields"]);
 }
 else {
@@ -13,7 +13,6 @@ else {
     $demandObj = new Demands();
     
     $create = $demandObj->modifyDemand($data);
-
+    http_response_code(200);
     echo json_encode(['status' => 200, 'message' =>"Updated Successfully!"]);
-}
 }
