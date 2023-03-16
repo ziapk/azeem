@@ -23,6 +23,21 @@ class Users extends Connection
 		    die("Error!: " . $e->getMessage() . "<br/>");
 		}
 	}
+    public function getUser($id) {
+		try {
+			$stmt = "SELECT * FROM `{$this->table}` WHERE `id`=:id";
+			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':id',$id,PDO::PARAM_STR);
+			$prepare->execute();
+			$result = $prepare->fetch(PDO::FETCH_ASSOC);
+			if($result) {
+				$owner = $result['role'] === 'owner' ? $result['id'] : $result['created_by'];
+				return $this->checkContract($owner, $result);
+			}
+		} catch (PDOException $e) {
+		    die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
 
 	
 	public function getShop($userInfo) {
