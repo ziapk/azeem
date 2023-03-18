@@ -117,7 +117,7 @@ class Products extends Connection
 			$offset =  ((!empty($currentPage) ? $currentPage : 1) -1) * $no_of_records_per_page;
 			
 
-			$mobileCols = "p.full_name,p.barcode,p.code,p.author,p.group,p.description,p.price,p.board,p.publisher_id";
+			$mobileCols = "p.id,p.full_name,p.code,p.author,p.price,p.publisher_id";
 			$allCols = "p.*, pub.full_name as publisherName, pub.discount_type, pub.discount_amount, CONVERT(case when (pub.discount_amount > 0) then (p.price * (1 - (pub.discount_amount / 100)) ) else p.price end, DECIMAL) as price $column";
 
 			$mainCols = "";
