@@ -7,7 +7,7 @@ class Products extends Connection
     private $table_st = 'store_products';
     private $pc_table = 'products_code';
 
-    public function getOwnerProductsPagination($owner_id, $params, $shopId = null) {
+    public function getOwnerProductsPagination($owner_id, $params, $shopId = null, $mobileCol = false) {
 		try {
 
 			$searchQry = "";
@@ -117,9 +117,17 @@ class Products extends Connection
 			$offset =  ((!empty($currentPage) ? $currentPage : 1) -1) * $no_of_records_per_page;
 			
 
-			
+			$mobileCols = "p.full_name,p.barcode,p.code,p.author,p.group,p.description,p.price,p.board,p.publisher_id";
+			$allCols = "p.*, pub.full_name as publisherName, pub.discount_type, pub.discount_amount, CONVERT(case when (pub.discount_amount > 0) then (p.price * (1 - (pub.discount_amount / 100)) ) else p.price end, DECIMAL) as price $column";
 
-			$stmt = "SELECT p.*, pub.full_name as publisherName, pub.discount_type, pub.discount_amount, CONVERT(case when (pub.discount_amount > 0) then (p.price * (1 - (pub.discount_amount / 100)) ) else p.price end, DECIMAL) as price $column  FROM `{$this->table}` as p $innerJoin LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id LEFT JOIN program_books as c ON c.product_id = p.id LEFT JOIN publishers as pub on p.publisher_id = pub.id  WHERE p.`owner_id`=:owner_id $publisher_query $dup $pin $searchQry  GROUP BY p.id $sortByQry LIMIT :offset, :perPage";
+			$mainCols = "";
+			if(!empty($mobileCol)) {
+				$mainCols = $mobileCols;
+			} else {
+				$mainCols = $allCols;
+			}
+
+			$stmt = "SELECT $mainCols  FROM `{$this->table}` as p $innerJoin LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id LEFT JOIN program_books as c ON c.product_id = p.id LEFT JOIN publishers as pub on p.publisher_id = pub.id  WHERE p.`owner_id`=:owner_id $publisher_query $dup $pin $searchQry  GROUP BY p.id $sortByQry LIMIT :offset, :perPage";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':owner_id',$owner_id,PDO::PARAM_STR);
 			$prepare->bindParam(':offset',$offset,PDO::PARAM_INT);
