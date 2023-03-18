@@ -449,7 +449,7 @@ class Products extends Connection
 			$offset =  ((!empty($currentPage) ? $currentPage : 1) -1) * $no_of_records_per_page;
 
 
-			$stmt = "SELECT st.*, p.code, p.id as product_id, p.full_name, p.group, p.author FROM `{$this->table_st}` as st LEFT JOIN `{$this->table}` AS p ON p.id = st.product_id LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id WHERE st.`owner_id`=:owner_id and st.status = 1 $shopCondition $searchQry order by p.id desc LIMIT :offset, :perPage";
+			$stmt = "SELECT st.*, p.code, p.id as product_id, p.full_name, p.group, p.publisher_id, p.author FROM `{$this->table_st}` as st LEFT JOIN `{$this->table}` AS p ON p.id = st.product_id LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id WHERE st.`owner_id`=:owner_id and st.status = 1 $shopCondition $searchQry order by p.id desc LIMIT :offset, :perPage";
 			$prepare2 = $this->dbh->prepare($stmt);
 			$prepare2->bindParam(':owner_id',$owner_id,PDO::PARAM_STR);
 			$prepare2->bindParam(':offset',$offset,PDO::PARAM_INT);
