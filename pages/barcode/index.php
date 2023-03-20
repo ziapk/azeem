@@ -36,6 +36,7 @@ if(!empty($_GET['all']) && $_GET['all'] == '1') {
 </div>
 
 <form action="print.php" method="post" target="_blank">
+<label><input type="checkbox" name="hidePrice" style="margin-right: 10px">Hide Price</label>
 <table class="table">
     <thead>
         <tr>
