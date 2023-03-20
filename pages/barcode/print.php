@@ -51,7 +51,7 @@ foreach ($_POST['full_name'] as $index => $full_name) {
         $priceText ='<strong style="font-size: 14px;font-family: sans-serif">'.number_format($price).'/-</strong>';
     }
     for($row = 0; $row < $qty; $row++) {
-        $examples .= '<table style="width: 1.2in; table-layout: fixed; border: 0;page-break-before: always; margin-bottom: 20px" cellpadding="0" cellspacing="0"><tr><td colspan="2"><strong style="white-space: nowrap">'.$shop['full_name'].'</strong></td></tr><tr><td colspan="2"><div style="white-space: nowrap">'.$full_name.'</div><td></tr><tr><td colspan="2">'.$bobj->getSvgCode().'</td></tr><tr><td style="white-space: nowrap">'.$priceText.'<small style="font-size: 14px;font-family: sans-serif; margin-left: 6px">'.$code.'</small></td></tr></table>';
+        $examples .= '<table style="width: 1.2in; table-layout: fixed; border: 0;page-break-before: always; margin-bottom: 20px" cellpadding="0" cellspacing="0"><tr><td colspan="2"><strong style="white-space: nowrap;">'.$shop['full_name'].'</strong></td></tr><tr><td colspan="2"><div style="white-space: nowrap; font-size: 10px">'.$full_name.'</div><td></tr><tr><td colspan="2">'.$bobj->getSvgCode().'</td></tr><tr><td style="white-space: nowrap">'.$priceText.'<small style="font-size: 14px;font-family: sans-serif; margin-left: 6px">'.$code.'</small></td></tr></table>';
     }
 }
 ?>
