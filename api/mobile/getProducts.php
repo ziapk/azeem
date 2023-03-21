@@ -26,7 +26,16 @@ function safe_json_encode($value, $options = 0, $depth = 512, $utfErrorFlag = fa
 
     }
 }
-
+function utf8ize($mixed) {
+    if (is_array($mixed)) {
+        foreach ($mixed as $key => $value) {
+            $mixed[$key] = utf8ize($value);
+        }
+    } else if (is_string ($mixed)) {
+        return utf8_encode($mixed);
+    }
+    return $mixed;
+}
 require_once(dirname(__FILE__).'/autoload.php');
 $ownerId = $_GET['owner_id'];
 $products = new  Products();
