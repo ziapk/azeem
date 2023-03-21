@@ -1,4 +1,7 @@
 <?php 
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 function safe_json_encode($value, $options = 0, $depth = 512, $utfErrorFlag = false) {
     $encoded = json_encode($value, $options, $depth);
     switch (json_last_error()) {
