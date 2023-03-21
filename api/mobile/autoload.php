@@ -1,4 +1,5 @@
 <?php
+header('Content-Type: application/json; charset=UTF-8');
 //function __autoload($class_name) {
 spl_autoload_register(function ($class_name) {
     //class directories
