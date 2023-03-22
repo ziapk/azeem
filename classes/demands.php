@@ -87,6 +87,17 @@ class Demands extends Connection
 		    die("Error!: " . $e->getMessage() . "<br/>");
 		}
 	}
+	public function getDemandsItems($ids) {
+		try {
+			$stmt = "SELECT a.*, b.full_name FROM `{$this->table_sub}` as a left join {$this->table_pro} as b on a.product_id=b.id WHERE demand_id IN (".(implode(', ', $ids)).")";
+            $prepare = $this->dbh->prepare($stmt);
+			$prepare->execute();
+			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
+			return $result;
+		} catch (PDOException $e) {
+		    die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
 
 
 	public function checkDemandRequested($array) {
