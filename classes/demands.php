@@ -223,12 +223,13 @@ class Demands extends Connection
 	
 	public function createDemand($array, $isOwner) {
 		try {
-			$stmt = "INSERT INTO `{$this->table}` (`title`, `demand_date`, `shop_id`, `owner_id`) VALUES (:demand_title, :demand_date, :shop_id, :owner_id)";
+			$stmt = "INSERT INTO `{$this->table}` (`title`, `demand_date`, `shop_id`, `owner_id`, `created_by`) VALUES (:demand_title, :demand_date, :shop_id, :owner_id, :created_by)";
             $prepare = $this->dbh->prepare($stmt);
             $prepare->bindParam(':demand_title',$array['demand_title'],PDO::PARAM_STR);
             $prepare->bindParam(':demand_date',$array['demand_date'],PDO::PARAM_STR);
             $prepare->bindParam(':shop_id',$array['shop_id'],PDO::PARAM_STR);
             $prepare->bindParam(':owner_id',$array['owner_id'],PDO::PARAM_STR);
+            $prepare->bindParam(':created_by',$array['created_by'],PDO::PARAM_STR);
 			$prepare->execute();
 			$array['id'] = $result = $this->dbh->lastInsertId();
 			if(!empty($result)) {

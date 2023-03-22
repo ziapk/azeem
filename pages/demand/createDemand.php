@@ -11,6 +11,8 @@ else {
 
     $data = $_POST;
 
+    $data['created_by'] = $userData['id'];
+
     $data['owner_id'] = $shop['owner_id'];
 
     $demandObj = new Demands();
