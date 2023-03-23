@@ -41,10 +41,11 @@ class Orders extends Connection
     {
         try {
             if(!empty($array['id'])) {
-                $stmt = "UPDATE `{$this->table}` SET `user_id`=:user_id, `customer_id`=:customer_id, `status`=:status, `price`=:price, `paid_amount`=:paid_amount, `discount`=:discount, `shopId`=:shopId, `order_date`=:order_date, `gst`=:gst, `service_charges`=:service_charges, `summery`=:summery, `ref_no`=:ref_no, `show_discount`=:show_discount WHERE id=:id";
+                $stmt = "UPDATE `{$this->table}` SET `user_id`=:user_id, `customer_id`=:customer_id, `customer_name`=:customer_name, `status`=:status, `price`=:price, `paid_amount`=:paid_amount, `discount`=:discount, `shopId`=:shopId, `order_date`=:order_date, `gst`=:gst, `service_charges`=:service_charges, `summery`=:summery, `ref_no`=:ref_no, `show_discount`=:show_discount WHERE id=:id";
                 $prepare = $this->dbh->prepare($stmt);        
                 $prepare->bindParam(':user_id', $array['user_id'], PDO::PARAM_STR);
                 $prepare->bindParam(':customer_id', $array['customer_id'], PDO::PARAM_STR);
+                $prepare->bindParam(':customer_name', $array['customer_name'], PDO::PARAM_STR);
                 $prepare->bindParam(':status', $array['status'], PDO::PARAM_STR);
                 $prepare->bindParam(':price', $array['price'], PDO::PARAM_STR);
                 $prepare->bindParam(':paid_amount', $array['paid_amount'], PDO::PARAM_STR);
@@ -61,10 +62,11 @@ class Orders extends Connection
                 $result = $prepare->rowCount();
                 return $array['id'];
             } else {
-                $stmt = "INSERT INTO `{$this->table}` (`user_id`, `customer_id`, `status`, `price`, `paid_amount`, `discount`, `shopId`, `order_date`, `gst`, `service_charges`, `summery`, `ref_no`, `show_discount`) VALUES (:user_id, :customer_id, :status, :price, :paid_amount, :discount, :shopId, :order_date, :gst, :service_charges, :summery, :ref_no, :show_discount)";
+                $stmt = "INSERT INTO `{$this->table}` (`user_id`, `customer_id`, `customer_name`, `status`, `price`, `paid_amount`, `discount`, `shopId`, `order_date`, `gst`, `service_charges`, `summery`, `ref_no`, `show_discount`) VALUES (:user_id, :customer_id, :customer_name, :status, :price, :paid_amount, :discount, :shopId, :order_date, :gst, :service_charges, :summery, :ref_no, :show_discount)";
                 $prepare = $this->dbh->prepare($stmt);        
                 $prepare->bindParam(':user_id', $array['user_id'], PDO::PARAM_STR);
                 $prepare->bindParam(':customer_id', $array['customer_id'], PDO::PARAM_STR);
+                $prepare->bindParam(':customer_name', $array['customer_name'], PDO::PARAM_STR);
                 $prepare->bindParam(':status', $array['status'], PDO::PARAM_STR);
                 $prepare->bindParam(':price', $array['price'], PDO::PARAM_STR);
                 $prepare->bindParam(':paid_amount', $array['paid_amount'], PDO::PARAM_STR);

@@ -48,7 +48,7 @@
         <tr ng-repeat="row in data.records">
             <td>{{$index + 1}}</td>
             <td>{{row.id}}</td>
-            <td>{{row.full_name}}</td>
+            <td>{{row.customer_name || row.full_name}}</td>
             <td>{{(row.price - row.discount).toFixed(0)}}</td>
             <td>{{statusArr[row.status].full_name}}</td>
             <td>{{row.order_date}}</td>

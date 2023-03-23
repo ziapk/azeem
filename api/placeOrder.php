@@ -25,6 +25,7 @@ try {
 
     $data = [
         'user_id' => $_SESSION['user_credentials']['id'],
+        'customer_name' => $_POST['customer_name'],
         'customer_id' => !empty($_POST['customerId']) ? $_POST['customerId'] : 1,
         'status' => $status,
         'price' => $_POST['subTotal'],

@@ -291,6 +291,7 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
     $scope.checkout = function (status) {
         $scope.form = {
             customerId: $scope.customerData && $scope.customerData.id ? $scope.customerData.id : 1,
+            customer_name: $scope.customerName,
             subTotal: $scope.subTotal,
             discount: $scope.discount,
             items: $scope.items,

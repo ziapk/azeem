@@ -140,7 +140,7 @@ td {
     <table class="table" style="width: 100%">
         <tr>
             <th width="140">Customer Name:</th>
-            <th class="border"><?php echo $foodpanda['full_name'];?></th>
+            <th class="border"><?php echo !empty($order['order']['customer_name']) ? $order['order']['customer_name'] : $foodpanda['full_name'];?></th>
             <th width="120">Date Time:</th>
             <th class="border"><?php echo date('d/m/Y H:i', strtotime($order['order']['created_at']) );?></th>
         </tr>
