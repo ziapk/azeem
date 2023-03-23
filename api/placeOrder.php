@@ -32,7 +32,7 @@ try {
         'show_discount' => !empty($_POST['show_discount']) ? 1 : 0,
         'discount' => $_POST['discount'],
         'gst' => $_POST['gst'],
-        'service_charges' => $_POST['service_charges'],
+        'service_charges' => !empty($_POST['service_charges']) ? $_POST['service_charges'] : 0,
         'shopId' => $userData['shopId'],
         'order_date' => $storeDATA['sale_date'],
         'summery' => $_POST['summery'],
@@ -43,7 +43,7 @@ try {
     $additionalDiscount += $_POST['discount'];
 
     $order_id = $orders->createOrder($data);
-    
+
     if($status == 1 && !empty($_POST['id'])) { // when edit a parked entry
         $order_id = $_POST['id'];
     }

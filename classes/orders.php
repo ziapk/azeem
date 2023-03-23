@@ -59,7 +59,7 @@ class Orders extends Connection
                 $prepare->bindParam(':id', $array['id'], PDO::PARAM_STR);
                 $prepare->execute();
                 $result = $prepare->rowCount();
-                return $result;
+                return $array['id'];
             } else {
                 $stmt = "INSERT INTO `{$this->table}` (`user_id`, `customer_id`, `status`, `price`, `paid_amount`, `discount`, `shopId`, `order_date`, `gst`, `service_charges`, `summery`, `ref_no`, `show_discount`) VALUES (:user_id, :customer_id, :status, :price, :paid_amount, :discount, :shopId, :order_date, :gst, :service_charges, :summery, :ref_no, :show_discount)";
                 $prepare = $this->dbh->prepare($stmt);        

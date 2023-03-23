@@ -149,7 +149,7 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
         $scope.discountPercentValue += parseFloat(row.discount);
         $scope.discount = parseFloat(row.discount) + parseFloat($scope.discount);
         $scope.subTotal = parseFloat($scope.subTotal) + parseFloat($scope.discount);
-        items.push({...obj, qty: row.quantity, show: row.show, mdescription: row.description, discount: row.discount, discount_value: (parseFloat(row.discount || 0) / row.price) * 100 })
+        items.push({...obj, qty: row.quantity, show: true, description: row.description, discount: row.discount, discount_value: (parseFloat(row.discount || 0) / row.price) * 100 })
     });
     $scope.items = items;
 
