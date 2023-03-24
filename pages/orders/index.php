@@ -55,6 +55,7 @@
             <td align="right">
                 <a class="btn btn-xs btn-default" ng-if="row.status == 1" href="{{'<?php echo SITE_URL;?>pages/recipt/edit.php?id=' + row.id }}" target="_blank">Edit</a>
                 <a class="btn btn-xs btn-danger" ng-click="deleteRecipt(row.id)" href="javascript:void(0)">Delete</a>
+                <a class="btn btn-xs btn-default" href="{{'<?php echo SITE_URL;?>pages/recipt/edit.php?dup=' + row.id }}">Duplicate</a>
                 <a class="btn btn-xs btn-info" ng-click="openRecipt(row.id)" href="javascript:void(0)">Print</a>
                 <a class="btn btn-xs btn-default" ng-click="openRecipt(row.id, 'details')" href="javascript:void(0)">View</a>
                 <a class="btn btn-xs btn-default" ng-click="openRecipt(row.id, 'details', 'large')" href="javascript:void(0)">Large View</a>

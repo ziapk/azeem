@@ -4,9 +4,13 @@ $productCls = new Products();
 $ownerId = $userData['role'] == 'owner' ? $userData['id'] : $userData['created_by'];
 $list = $productCls->getOwnerProducts($ownerId);
 $orders = new Orders();
-$order = $orders->getOrder($_GET['id']);
-echo mainHeader(['page' => 'recipt', 'title' => $order['customer']['full_name']]);
-if ($order['order']['status'] == 1) {
+$id = !empty($_GET['id']) ? $_GET['id'] : (!empty($_GET['dup']) ? $_GET['dup'] : 0);
+$order = $orders->getOrder($id);
+if(!empty($_GET['dup'])) { // remove id from order
+    unset($order['order']['id']);
+}
+echo mainHeader(['page' => 'recipt', 'title' => (!empty($_GET['dup']) ? "Duplicate => " : "").$order['customer']['full_name']]);
+if ($order['order']['status'] == 1 || !empty($_GET['dup'])) {
 ?>
 <div ng-controller="cartController">
 <div class="container">
@@ -20,7 +24,7 @@ if ($order['order']['status'] == 1) {
                 <th style="vertical-align: middle">Customer Name</th>
                 <th style="width: 200px">
                     <div class="dropdown-wrapper" style="position: relative;">
-                        <input disabled type="text" class="form-control" ng-model="customerName" placeholder="Search Customer" uib-typeahead="address as address.full_name for address in searchCustomer($viewValue)" typeahead-on-select="selectCustomer($item)" ng-model-options="{debounce: 100}" typeahead-template-url="customer.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="1">
+                        <input <?php echo empty($_GET['dup']) ? 'disabled' : '';?> type="text" class="form-control" ng-model="customerName" placeholder="Search Customer" uib-typeahead="address as address.full_name for address in searchCustomer($viewValue)" typeahead-on-select="selectCustomer($item)" ng-model-options="{debounce: 100}" typeahead-template-url="customer.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="1">
                     </div>
                 </th>
                 <th style="vertical-align: middle">
@@ -93,6 +97,18 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
                 $scope.pinList = response.data.records;
             }
         })
+    }
+
+    $scope.searchCustomer = function (value, onloading) {
+        $scope.customerName = value;
+        return $http.get("<?php echo SITE_URL?>api/getCustomer.php?term="+value)
+        .then(function(response) {
+            $scope.customersList = response.data;
+            if(onloading) {
+                $scope.selectCustomer($scope.customersList[0]);
+            }
+            return response.data
+        });
     }
 
     $scope.getPinProducts();
@@ -275,14 +291,14 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
         $scope.list = [];
     }
 
-    $scope.selectCustomer = (p) => {
-        $scope.customerName = p.full_name;
+    $scope.selectCustomer = (p, full_name) => {
+        $scope.customerName = full_name || p.full_name;
         $scope.customerData = p;
         console.log('p', p, $scope.calculateSum);
         $scope.calculateSum(p);
     }
 
-    $scope.selectCustomer($scope.data.customer);
+    $scope.selectCustomer($scope.data.customer, $scope.data.order.customer_name);
 
     $scope.park = () => {
         $scope.checkout(1);
