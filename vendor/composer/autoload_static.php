@@ -7,6 +7,10 @@ namespace Composer\Autoload;
 class ComposerStaticInit20fe337f68093f1e4f402c3315ddefc6
 {
     public static $prefixLengthsPsr4 = array (
+        'P' => 
+        array (
+            'PHPMailer\\PHPMailer\\' => 20,
+        ),
         'C' => 
         array (
             'Com\\Tecnick\\Color\\' => 18,
@@ -15,6 +19,10 @@ class ComposerStaticInit20fe337f68093f1e4f402c3315ddefc6
     );
 
     public static $prefixDirsPsr4 = array (
+        'PHPMailer\\PHPMailer\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/phpmailer/phpmailer/src',
+        ),
         'Com\\Tecnick\\Color\\' => 
         array (
             0 => __DIR__ . '/..' . '/tecnickcom/tc-lib-color/src',
