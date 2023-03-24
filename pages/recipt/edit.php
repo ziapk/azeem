@@ -82,7 +82,7 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
     $scope.subTotal =$scope.data.order.price;
     $scope.discountPercentValue = 0;
     $scope.grandTotal = $scope.data.order.price + $scope.data.order.discount;
-    $scope.discount = $scope.data.order.discount;
+    $scope.discount = parseFloat($scope.data.order.discount);
     $scope.payment_mode = '1';
     const items = [];
     $scope.modes = [];
@@ -163,7 +163,6 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
     shopCart.map(function(row){
         const obj = $scope.mainList.find(function (e) { return e.id == row.product_id});
         $scope.discountPercentValue += parseFloat(row.discount);
-        $scope.discount = parseFloat(row.discount) + parseFloat($scope.discount);
         $scope.subTotal = parseFloat($scope.subTotal) + parseFloat($scope.discount);
         items.push({...obj, qty: row.quantity, show: true, description: row.description, discount: row.discount, discount_value: (parseFloat(row.discount || 0) / row.price) * 100 })
     });

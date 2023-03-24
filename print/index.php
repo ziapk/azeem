@@ -326,7 +326,7 @@ td {
         $totalDist = $order['order']['discount'];
         foreach($order['order_items'] as $item) { 
             if(!empty($order['order']['show_discount'])) {
-                $totalDist += $item['discount'];
+                $totalDist += $item['discount'] * $item['quantity'];
                 $aprice += $item['quantity'] * ($item['price']);
             }
         ?>

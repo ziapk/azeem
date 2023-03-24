@@ -226,7 +226,7 @@ class Demands extends Connection
 				];
 				$this->createDemandItems($data);
 			}
-			return $result;
+			return $array['id'];
 		} catch (PDOException $e) {
 		    die("Error!: " . $e->getMessage() . "<br/>");
 		}
