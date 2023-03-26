@@ -137,8 +137,14 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
     }
 
     $scope.addDiscount = function (val, obj) {
-        if(val > 0) {
+        if(parseFloat(val) > 0) {
             $scope.discount = (parseFloat($scope.discount) + parseFloat(val));
+        }
+        else if(parseFloat($scope.discount) + parseFloat(val) >= 0) {
+            $scope.discount = (parseFloat($scope.discount) + parseFloat(val));
+        }
+        else {
+            alert('Negative Discount value must be less than equal to -'+ $scope.discount);
         }
         $scope.calculateSum();
         $scope.discountAmount = '';

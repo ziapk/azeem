@@ -52,12 +52,16 @@
             <td>{{(subTotal + discountPercentValue) | number: 2}}</td>
         </tr>
         <tr>
-            <td class="text-right">Add Discount</td>
-            <td width="200"><input type="search" ng-model="discountAmount" class="form-control" on-enter-press="addDiscount(discountAmount)"></td>
+            <td width="150" class="text-right">Add Discount</td>
+            <td width="150"><input type="search" ng-model="discountAmount" class="form-control" on-enter-press="addDiscount(discountAmount)"></td>
+        </tr>
+        <tr>
+            <td class="text-right" style="color: red; front-weight: bold;">Additional Discount</td>
+            <td style="color: red; front-weight: bold;"><strong>{{discount | number: 2}}</strong></td>
         </tr>
         <tr>
             <td class="text-right" style="color: red; front-weight: bold;">Total Discount</td>
-            <td width="200" style="color: red; front-weight: bold;"><strong>{{(discount + discountPercentValue) | number: 2}}</strong></td>
+            <td style="color: red; front-weight: bold;"><strong>{{(discount + discountPercentValue) | number: 2}}</strong></td>
         </tr>
         <tr>
             <td class="text-right">Grand Total</td>
@@ -65,11 +69,11 @@
         </tr>
         <tr>
             <td class="text-right text-success" style="front-weight: bold;">Pay Amount</td>
-            <td width="200"><input type="number" ng-model="payment_amount" class="form-control"></td>
+            <td><input type="number" ng-model="payment_amount" class="form-control"></td>
         </tr>
         <tr>
             <td class="text-right">Balance</td>
-            <td width="200">{{grandTotal - payment_amount | number: 2}}</td>
+            <td>{{grandTotal - payment_amount | number: 2}}</td>
         </tr>
     </tbody>
     <tbody>
