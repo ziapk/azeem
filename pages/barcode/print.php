@@ -53,7 +53,7 @@ foreach ($_POST['full_name'] as $index => $full_name) {
     }
     for($row = 0; $row < $qty; $row++) {
         // $examples .= '<table style="width: 1.2in; table-layout: fixed; border: 0;page-break-before: always; margin-bottom: 20px" cellpadding="0" cellspacing="0"><tr><td colspan="2"><strong style="white-space: nowrap;">'.$shop['full_name'].'</strong></td></tr><tr><td colspan="2"><div style="white-space: nowrap; font-size: 10px">'.$full_name.'</div><td></tr><tr><td colspan="2">'.$bobj->getSvgCode().'</td></tr><tr><td style="white-space: nowrap">'.$priceText.'<small style="font-size: 14px;font-family: sans-serif; margin-left: 6px">'.$code.'</small></td></tr></table>';
-        $examples .= '<table style="text-align: center; width: 1.4in; table-layout: fixed; border: 0;page-break-before: always; margin-bottom: 20px" cellpadding="0" cellspacing="0"><tr><td><strong>'.$shop['full_name'].'</strong></td></tr><tr><td><div style="font-size: 10px">'.$full_name.'</div></td></tr><tr><td>'.$bobj->getSvgCode().'</td></tr><tr><td>'.$priceText.'<small style="font-size: 14px;font-family: sans-serif; margin-left: 6px">'.$code.'</small></td></tr></table>';
+        $examples .= '<table style="text-align: center; width: 1.4in; table-layout: fixed; border: 0;page-break-before: always; margin-bottom: 20px; font-family: sans-serif" cellpadding="0" cellspacing="0"><tr><td><strong>'.$shop['full_name'].'</strong></td></tr><tr><td><div style="font-size: 10px; font-weight: 600">'.$full_name.'</div></td></tr><tr><td>'.$bobj->getSvgCode().'</td></tr><tr><td>'.$priceText.'<small style="font-size: 14px;font-family: sans-serif; margin-left: 6px">'.$code.'</small></td></tr></table>';
     }
 }
 ?>
