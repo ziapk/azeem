@@ -23,15 +23,9 @@
 
     $all = false;
     $products = [];
-    $productsObj = new Products();
     $storeObj = new Store();
     $ownerId = $userData['role'] == 'owner' ? $userData['id'] : $userData['owner_id'];
     $ownerStores = $storeObj->getOwnerStores($ownerId);
-
-    if(!empty($_GET['all']) && $_GET['all'] == '1') {
-        $shopId = $_GET['shopId'];
-        $products = $productsObj->getOwnerProductsPagination($ownerId, ['page' => 1, 'perPage' => 100000], $shopId);
-    }
 
 ?>
 <div class="container" ng-controller="categoryController">
@@ -133,23 +127,27 @@ app.controller('categoryController', function($scope, $http, $httpParamSerialize
 
     $scope.siteUrl = '<?php echo SITE_URL ?>';
     
-    $scope.books = <?php echo json_encode($products);?>;
+    $scope.books = [];
 
     $scope.items = $scope.books?.records || [];
-
 
     $scope.searchProduct = function (term, isCodeEnable) {
         let searchBy;
         if(isCodeEnable) {
             searchBy = 'id';
         }
-        return $http.get("<?php echo SITE_URL?>api/getStores.php", {params: {term, searchBy}})
-        .then(function(response) {
-            
-            $scope.list = response.data;
-            $scope.priceList = response.data;
-            return response.data
-        });
+        if(term) {
+            return $http.get("<?php echo SITE_URL?>api/getStores.php", {params: {term, searchBy}})
+            .then(function(response) {
+                
+                $scope.list = response.data;
+                $scope.priceList = response.data;
+                return response.data
+            });
+        }
+        else {
+            return [];
+        }
     }
 
     $scope.deleteCategory = function (id) {
