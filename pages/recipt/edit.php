@@ -40,7 +40,9 @@ if ($order['order']['status'] == 1 || !empty($_GET['dup'])) {
         </thead>
     </table>
     
-    <?php echo include_once dirname(___FILE___).'/table.php';?>
+    <?php 
+    $mode = 'edit';
+    echo include_once dirname(___FILE___).'/table.php';?>
 </div>
 
 </div>
