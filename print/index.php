@@ -313,6 +313,8 @@ td {
     </h3>
         
     </div>
+    <strong class="pull-left ref">Customer Name: <?php echo !empty($order['order']['customer_name']) ? $order['order']['customer_name'] : $foodpanda['full_name'];?></strong>
+    <div style="clear: both;"></div>
     <span class="pull-left ref">Ref. RSV0<?php echo $_GET['id'];?></span>
     <span class="pull-right date"><?php echo date('d/m/Y H:i', strtotime($order['order']['created_at']) );?></span>
     <table width="100%" cellpadding="0" cellspacing="0">
