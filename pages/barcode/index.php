@@ -66,7 +66,7 @@ app.controller('categoryController', function($scope, $http, $httpParamSerialize
     $scope.list = []; //$scope.data.records;
     $scope.siteUrl = '<?php echo SITE_URL ?>';
     
-    $scope.books = <?php echo json_encode($products);?>;
+    $scope.books = <?php echo safe_json_encode($products);?>;
 
     $scope.list = [];
     $scope.items = $scope.books?.records?.map(r => ({ ...r, qty: parseInt(r.qty) }))?.filter(r => r.qty) || [];
