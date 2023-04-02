@@ -7,8 +7,10 @@ $productsObj = new Products();
 
 if($userData['role'] == 'owner') {
     $demands = $demandsObj->getOwnerDemands($userData['id']);
-} else {
+} elseif($userData['role'] == 'manager') {
     $demands = $demandsObj->getStoreDemands($shop['id']);
+} else {
+    $demands = $demandsObj->getUserDemands($shop['id'], $userData['id']);
 }
 
 

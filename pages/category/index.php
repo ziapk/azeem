@@ -31,9 +31,11 @@ echo mainHeader(['page' => 'category']);
                     <span ng-if="li.title">{{li.title}} ({{li.code}})</span>
                 </td>
                 <td>
-                    <a class="btn btn-primary btn-xs" href="javascript:void(0)" ng-click="addCategory(li)">Edit</a>
-                    <?php if($userData['role'] === 'manager') {?><a class="btn btn-danger btn-xs" href="javascript:void(0)" ng-click="deleteCategory(li.id)">Delete</a><?php } ?>
-                    <a class="btn btn-default btn-xs" href="../chart-of-accounts/summery.php?t=e&id={{li.account_id}}">Ledger</a>
+                    <?php if($userData['role'] === 'manager' || $userData['role'] === 'owner') {?>
+                        <a class="btn btn-primary btn-xs" href="javascript:void(0)" ng-click="addCategory(li)">Edit</a>
+                        <a class="btn btn-danger btn-xs" href="javascript:void(0)" ng-click="deleteCategory(li.id)">Delete</a>
+                        <a class="btn btn-default btn-xs" href="../chart-of-accounts/summery.php?t=e&id={{li.account_id}}">Ledger</a>
+                    <?php } ?>
                 </td>
             </tr>
     </tbody>
