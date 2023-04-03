@@ -27,6 +27,26 @@
         <?php if($shop['sale_date_show']) { ?><div class="pull-left welcome-header-section sale-date"><button class="btn btn-danger" ng-click="applyClosing()"><span>Sale Close</span></button></div><?php } ?>
         <li class="dropdown" style="padding: 0">
           <a href="#" class="nav-menu-item btn btn-primary" data-toggle="dropdown">
+            Calculator
+          </a>
+          <form ng-submit="" class="dropdown-menu" style="padding: 20px; width: 300px">
+            <div class="row">
+              <div class="col-xs-6">
+                <div class="form-group">
+                  <input type="number" placeholder="Qty" ng-model="frm.qty" type="text" class="form-control">
+                </div>
+              </div>
+              <div class="col-xs-6">
+                <div class="form-group">
+                  <input type="number" placeholder="Price" ng-model="frm.price" type="text" class="form-control">
+                </div>
+              </div>
+            </div>
+            Total: {{(frm.price * frm.qty || 0) | number:2}}
+          </form>
+        </li>
+        <li class="dropdown" style="padding: 0">
+          <a href="#" class="nav-menu-item btn btn-primary" data-toggle="dropdown">
             + Expense
           </a>
           <form ng-submit="createExpense()" class="dropdown-menu" style="padding: 20px; width: 300px">

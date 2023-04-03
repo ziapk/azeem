@@ -20,6 +20,26 @@
         <div class="pull-left welcome-header-section"><span>Welcome to <strong><?php echo $shop['full_name'];?></strong></span></div>
         
       <ul class="list-inline navbar-right navbar-nav nav">
+        <li class="dropdown" style="padding: 0">
+          <a href="#" class="nav-menu-item btn btn-primary" data-toggle="dropdown">
+            Calculator
+          </a>
+          <form ng-submit="" class="dropdown-menu" style="padding: 20px; width: 300px">
+            <div class="row">
+              <div class="col-xs-6">
+                <div class="form-group">
+                  <input type="number" placeholder="Qty" ng-model="frm.qty" type="text" class="form-control">
+                </div>
+              </div>
+              <div class="col-xs-6">
+                <div class="form-group">
+                  <input type="number" placeholder="Price" ng-model="frm.price" type="text" class="form-control">
+                </div>
+              </div>
+            </div>
+            Total: {{(frm.price * frm.qty || 0) | number:2}}
+          </form>
+        </li>
         <li><a href="<?php echo SITE_URL; ?>pages/product/running.php"><img width="22" uib-tooltip="Running Products" tooltip-placement="bottom" height="22" src="<?php echo SITE_URL; ?>assets/img/svg/lightning-bolt.svg" alt="" /></a></li>
         <?php 
           include_once dirname(__FILE__).'/cart.php';
