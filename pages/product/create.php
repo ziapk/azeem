@@ -75,7 +75,7 @@
 
             if($create) {
                 $data = [                
-                    'qty' => !empty($_POST['in_hand']) ? $_POST['in_hand'] : 0,
+                    'qty' => !empty($_POST['in_hand']) ? (($userData['role'] == 'owner' || $userData['role'] == 'manager') ? $_POST['in_hand'] : 0) : 0,
                     'stock_out' => 0,
                     'product_id' => $create,
                     'location' => !empty($_POST['location']) ? $_POST['location'] : null,
