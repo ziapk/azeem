@@ -64,7 +64,7 @@
             </div>
         </div>
         <div class="row" ng-repeat="li in form.items track by $index">
-            <div class="col-sm-3 form-group">
+            <div class="col-sm-6 form-group">
                 <label for="">Product</label>
                 <span class="form-control">{{li.full_name}}</span>
             </div>
