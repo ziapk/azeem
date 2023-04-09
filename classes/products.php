@@ -74,6 +74,12 @@ class Products extends Connection
 				$searchQry = "AND (p.id = '".$params["search"]."' OR p.code = '".$params["search"]."' OR p.full_name LIKE '".$prefix.$params["search"]."%' OR p.group LIKE '".$prefix.$params["search"]."%' OR p.description LIKE '".$prefix.$params["search"]."%' OR p.board LIKE '".$prefix.$params["search"]."%' OR p.author LIKE '".$prefix.$params["search"]."%' OR p.price LIKE '".$prefix.$params["search"]."%' OR pc.code LIKE '".$prefix.$params["search"]."%' ) ";
 			}
 
+			$catQry = "";
+
+			if(!empty($params['cat_ids'])) {
+				$catQry = "AND p.cat_id IN (".implode(',', $params['cat_ids']).") ";	
+			}
+
 			if(!empty($params['sortByField'])) {
 				$name = $params['sortByField'];
 				$order = $params['sortByOrder'];
@@ -105,7 +111,7 @@ class Products extends Connection
 				$column = ", (sp.qty - sp.stock_out) as qty ";
 			}
 			
-			$stmt = "SELECT count(p.id) as count FROM `{$this->table}` as p $innerJoin LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id  LEFT JOIN program_books as c ON c.product_id = p.id WHERE p.owner_id=:owner_id $publisher_query $dup $pin $searchQry";
+			$stmt = "SELECT count(p.id) as count FROM `{$this->table}` as p $innerJoin LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id  LEFT JOIN program_books as c ON c.product_id = p.id WHERE p.owner_id=:owner_id $publisher_query $dup $pin $searchQry $catQry";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':owner_id',$owner_id,PDO::PARAM_STR);
 			$prepare->execute();
@@ -127,7 +133,7 @@ class Products extends Connection
 				$mainCols = $allCols;
 			}
 
-			$stmt = "SELECT $mainCols  FROM `{$this->table}` as p $innerJoin LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id LEFT JOIN program_books as c ON c.product_id = p.id LEFT JOIN publishers as pub on p.publisher_id = pub.id  WHERE p.`owner_id`=:owner_id $publisher_query $dup $pin $searchQry  GROUP BY p.id $sortByQry LIMIT :offset, :perPage";
+			$stmt = "SELECT $mainCols  FROM `{$this->table}` as p $innerJoin LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id LEFT JOIN program_books as c ON c.product_id = p.id LEFT JOIN publishers as pub on p.publisher_id = pub.id  WHERE p.`owner_id`=:owner_id $publisher_query $dup $pin $searchQry $catQry GROUP BY p.id $sortByQry LIMIT :offset, :perPage";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':owner_id',$owner_id,PDO::PARAM_STR);
 			$prepare->bindParam(':offset',$offset,PDO::PARAM_INT);
@@ -488,6 +494,18 @@ class Products extends Connection
 		    die("Error!: " . $e->getMessage() . "<br/>");
 		}
 	}
+	public function getCategoryProducts($owner_id, $ids, $shopId) {
+		try {
+			$result = $this->getOwnerProductsPagination($owner_id, ['page' => 1, 'perPage' => 15, 'cat_ids' => $ids], $shopId);
+			$res = [];
+			foreach ($result['records'] as $key => $value) {
+				$res[$value['cat_id']][] = $value;
+			}
+			return $res;
+		} catch (PDOException $e) {
+		    die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
 	
 	public function getProductCodes($id) {
 		try {
@@ -563,7 +581,7 @@ class Products extends Connection
 	
 	public function updateProduct($array) {
 		try {
-			$stmt = "UPDATE `{$this->table}` SET `full_name`=:full_name, `price`=:price, `pprice`=:pprice, `code`=:code, `description`=:description, `group`=:group, `board`=:board, `author`=:author, `image`=:image, `publisher_id`=:publisher_id WHERE id=:id AND owner_id=:owner_id";
+			$stmt = "UPDATE `{$this->table}` SET `full_name`=:full_name, `price`=:price, `pprice`=:pprice, `code`=:code, `description`=:description, `group`=:group, `board`=:board, `author`=:author, `image`=:image, `publisher_id`=:publisher_id, `cat_id`=:cat_id WHERE id=:id AND owner_id=:owner_id";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':full_name',$array['full_name'],PDO::PARAM_STR);
 			$prepare->bindParam(':price',$array['price'],PDO::PARAM_STR);
@@ -575,6 +593,7 @@ class Products extends Connection
 			$prepare->bindParam(':board',$array['board'],PDO::PARAM_STR);
 			$prepare->bindParam(':author',$array['author'],PDO::PARAM_STR);
 			$prepare->bindParam(':publisher_id',$array['publisher_id'],PDO::PARAM_STR);
+			$prepare->bindParam(':cat_id',$array['cat_id'],PDO::PARAM_STR);
 			$prepare->bindParam(':id',$array['id'],PDO::PARAM_INT);
 			$prepare->bindParam(':owner_id',$array['owner_id'],PDO::PARAM_INT);
 			$prepare->execute();
@@ -754,7 +773,7 @@ class Products extends Connection
 
 	public function createProduct($array) {
 		try {
-			$stmt = "INSERT INTO `{$this->table}` (`full_name`, `owner_id`, `user_id`, `price`, `pprice`, `image`, `code`, `barcode`, `description`, `group`, `board`, `author`, `publisher_id`) VALUES (:full_name, :owner_id, :user_id, :price, :pprice, :image, :code, :barcode, :description, :group, :board, :author, :publisher_id)";
+			$stmt = "INSERT INTO `{$this->table}` (`full_name`, `owner_id`, `user_id`, `price`, `pprice`, `image`, `code`, `barcode`, `description`, `group`, `board`, `author`, `publisher_id`, `cat_id`) VALUES (:full_name, :owner_id, :user_id, :price, :pprice, :image, :code, :barcode, :description, :group, :board, :author, :publisher_id, :cat_id)";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':full_name',$array['full_name'],PDO::PARAM_STR);
 			$prepare->bindParam(':owner_id',$array['owner_id'],PDO::PARAM_INT);
@@ -769,6 +788,7 @@ class Products extends Connection
 			$prepare->bindParam(':author',$array['author'],PDO::PARAM_STR);
 			$prepare->bindParam(':group',$array['group'],PDO::PARAM_STR);
 			$prepare->bindParam(':publisher_id',$array['publisher_id'],PDO::PARAM_STR);
+			$prepare->bindParam(':cat_id',$array['cat_id'],PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $this->dbh->lastInsertId();
 			return $result;

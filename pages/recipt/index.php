@@ -171,6 +171,27 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
             $scope.calculateSum();
         }
     }
+
+    $(document).on("ProdcutAdded", function(e) {
+        const items = [];
+        if($window.localStorage.getItem('shopping')) {
+            const shopCart = JSON.parse($window.localStorage.getItem('shopping'));
+
+            shopCart.map(function(row){
+                const obj = $scope.mainList.find(function (e) { return e.id == row.id});
+                items.push({...obj, qty: row.qty, show: row.show, description: row.description})
+            });
+            $scope.items = items;
+            $timeout(() => {
+                $scope.calculateSum()
+            });
+        }
+        else {
+            $scope.items = []
+        }
+    });
+
+    
     $scope.selectProduct = function (p, sep) {
         if(sep) {
             $scope.items.push({...p, qty: 1, show: true});

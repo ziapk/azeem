@@ -90,6 +90,8 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
     $scope.modes = [];
     $scope.pinList = [];
 
+
+
     $scope.getPinProducts = () => {
         // $scope.loading = true;
         $http.get("<?php echo SITE_URL?>api/getProducts.php", {params: {page: 1, perPage: 10, search: '', full_name: '', group: '', author: '', board: '', searchBy: '', courceId: '', bookmark: 1}})
@@ -173,6 +175,24 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
     $scope.addTax = () => {
         $scope.calculateSum();
     }
+
+    $(document).on("ProdcutAdded", function(e) {
+        const items = [];
+        if($window.localStorage.getItem('shopping')) {
+            const shopCart = JSON.parse($window.localStorage.getItem('shopping'));
+            shopCart.map(function(row){
+                const obj = $scope.mainList.find(function (e) { return e.id == row.id});
+                items.push({...obj, qty: row.qty, show: row.show, description: row.description})
+            });
+            $scope.items = items;
+            $timeout(() => {
+                $scope.calculateSum()
+            });
+        }
+        else {
+            $scope.items = []
+        }
+    });
 
     $scope.addDiscount = function (val, obj) {
         if(parseFloat(val) > 0) {

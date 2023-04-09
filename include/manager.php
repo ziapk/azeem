@@ -3,12 +3,20 @@
   global $userData;
   global $shop;
   $storeDD = new Store();
+  $categoryObj = new Categories();
   $shop = $storeDD->getStore($shop['id']);
   $productCls = new Products();
   $ownerId = $userData['role'] == 'owner' ? $userData['id'] : $userData['created_by'];
   $categoryObj = new Categories();
   $categories = $categoryObj->getOwnerCategories($ownerId);
   $list = $productCls->getOwnerProducts($ownerId);
+  
+  $categories = $categoryObj->getCategories('pro');
+  $ids = [];
+  foreach ($categories as $v) {
+    $ids[] = $v['id'];
+  }
+  $categoryProducts = $productCls->getCategoryProducts($shop['owner_id'], $ids, $shop['id']);
 ?>
 <div ng-controller="headerController">
   <nav class="navbar navbar-fixed-top">
@@ -25,6 +33,27 @@
         <div class="pull-left welcome-header-section"><span>Welcome <strong><?php echo $userData['full_name'];?>!</strong></span></div>
       <ul class="list-inline navbar-right navbar-nav nav">
         <?php if($shop['sale_date_show']) { ?><div class="pull-left welcome-header-section sale-date"><button class="btn btn-danger" ng-click="applyClosing()"><span>Sale Close</span></button></div><?php } ?>
+        <li class="dropdown" style="padding: 0">
+          <a href="#" class="nav-menu-item btn btn-primary" data-toggle="dropdown">
+            <img src="<?php echo SITE_URL.'assets/img/stationary.png';?>" alt="" width="40" height="40" style="margin: -10px 0" /> 
+          </a>
+          <ul class="dropdown-menu">
+            <?php foreach ($categories as $key => $value) {?>
+              <li class="dropdown">
+                <a style="padding: 3px 6px" class="dropdown-item" href="#" data-toggle="dropdown"><span class="nav-menu-icon" style="margin-right: 6px"><img width="30" height="30" src="<?php echo SITE_URL.'uploads/products/'.$value['image'];?>" alt="" /></span><span class="nav-menu-text"><?php echo $value['full_name'];?></span> <div class="fa fa-caret-right"></div></a>
+                <?php if(!empty($categoryProducts[$value['id']])) {?>
+                <ul class="dropdown-menu dropdown-submenu" style="min-width: 200px">
+                  <?php foreach ($categoryProducts[$value['id']] as $c) {?>
+                    <li>
+                      <a ng-click='addToCart(<?php echo safe_json_encode($c);?>)' style="padding: 3px 6px" class="dropdown-item" href="#"><code class="nav-menu-text"><?php echo $c['price'];?></code><span class="nav-menu-text" style="white-space: normal"><?php echo $c['full_name'];?></span></a>
+                    </li>
+                  <?php }?>
+                </ul>
+                <?php } ?>
+              </li>
+            <?php }?>
+          </ul>
+        </li>
         <li class="dropdown" style="padding: 0">
           <a href="#" class="nav-menu-item btn btn-primary" data-toggle="dropdown">
             Calculator

@@ -32,12 +32,20 @@ class Categories extends Connection
 	}
 	public function updateCategory($array) {
 		try {
-			$stmt = "UPDATE `{$this->table}` SET full_name=:full_name, groupName=:groupName,  cat_type=:cat_type WHERE id=:id";
+			$img = "";
+			if(!empty($array['image'])) {
+				$img =", image=:image";
+			}
+			print_r($array);
+			$stmt = "UPDATE `{$this->table}` SET full_name=:full_name, groupName=:groupName, cat_type=:cat_type $img WHERE id=:id";
             $prepare = $this->dbh->prepare($stmt);
             $prepare->bindParam(':full_name',$array['full_name'],PDO::PARAM_STR);
             $prepare->bindParam(':id',$array['id'],PDO::PARAM_STR);
             $prepare->bindParam(':cat_type',$array['cat_type'],PDO::PARAM_STR);
-            $prepare->bindParam(':groupName',$array['groupName'],PDO::PARAM_STR);
+			$prepare->bindParam(':groupName',$array['groupName'],PDO::PARAM_STR);
+			if(!empty($img)) {
+				$prepare->bindParam(':image',$array['image'],PDO::PARAM_STR);
+			}
 			$prepare->execute();
 			$result = $prepare->rowCount();
 			return $result;
@@ -105,10 +113,10 @@ class Categories extends Connection
 		try {
 			$where = "";
 			if($type == 'pro') {
-				$where = 'where flag=1 and cat_type = 1';
+				$where = 'where flag=1 and cat_type = 2';
 			};
 			if($type == 'exp') {
-				$where = 'where flag=1 and cat_type = 2';
+				$where = 'where flag=1 and cat_type = 1';
 			}
 			$stmt = "SELECT * FROM `{$this->table}` ".$where;
 			$prepare = $this->dbh->prepare($stmt);
@@ -147,13 +155,14 @@ class Categories extends Connection
 	}
 	public function createCategory($array) {
 		try {
-			$stmt = "INSERT INTO `{$this->table}` (`full_name`, `cat_type`, `groupName`, `owner_id`, `account_id`) VALUES (:full_name, :cat_type, :groupName, :owner_id, :account_id)";
+			$stmt = "INSERT INTO `{$this->table}` (`full_name`, `cat_type`, `groupName`, `owner_id`, `account_id`, `image`) VALUES (:full_name, :cat_type, :groupName, :owner_id, :account_id, :image)";
             $prepare = $this->dbh->prepare($stmt);
             $prepare->bindParam(':full_name',$array['full_name'],PDO::PARAM_STR);
             $prepare->bindParam(':cat_type',$array['cat_type'],PDO::PARAM_STR);
             $prepare->bindParam(':groupName',$array['groupName'],PDO::PARAM_STR);
             $prepare->bindParam(':owner_id',$array['owner_id'],PDO::PARAM_STR);
             $prepare->bindParam(':account_id',$array['account_id'],PDO::PARAM_STR);
+            $prepare->bindParam(':image',$array['image'],PDO::PARAM_STR);
             $prepare->execute();
 			$result = $this->dbh->lastInsertId();
 			return $result;

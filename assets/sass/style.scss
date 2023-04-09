@@ -874,3 +874,25 @@ body.no-padding {
         right: 0;
     }
 }
+.dropdown-menu {
+    li {
+        position: relative;
+    }
+    .dropdown-submenu {
+        display: none;
+        position: absolute;
+        left: 100%;
+        top: -7px;
+    }
+    .dropdown-submenu-left {
+        right: 100%;
+        left: auto;
+    }
+    .dropdown-submenu-right {
+        left: 100%;
+        right: auto;
+    }
+    > li:hover > .dropdown-submenu {
+        display: block;
+    }
+}

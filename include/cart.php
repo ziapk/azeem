@@ -52,7 +52,10 @@
 </li>
 
 <script>
-app.controller('headerController', function($scope, $http, $httpParamSerializerJQLike, $filter, $window) {
+// Create the event
+var event = new CustomEvent("ProdcutAdded");
+
+app.controller('headerController', function($scope, $http, $httpParamSerializerJQLike, $filter, $window, toaster) {
   $scope.list = <?php echo safe_json_encode($list);?>;
   localStorage.setItem('list', JSON.stringify($scope.list));
   $scope.exp = {};
@@ -84,11 +87,54 @@ app.controller('headerController', function($scope, $http, $httpParamSerializerJ
     $scope.finalList = [];
   }
 
-  $scope.toggleSidebar = () => {
-    $('body').toggleClass('thumb-menu-screen')
-  }
+  $scope.addToCart = function (item, type) {
+    if($window.localStorage.getItem('shopping')) {
+        const shopCart = JSON.parse($window.localStorage.getItem('shopping'));
+        let found = false;
+        shopCart.map(row => {
+          if(type && type == 'list') {
+            item.map(l => {
+              if(row.id == l.id) {
+                const rr = {...l, ...row};
+                found = true
+                rr.qty++;
+                return rr
+              }
+            })
+          }
+          else {
+            if(row.id == item.id) {
+              const rr = {...item, ...row};
+              found = true
+              rr.qty++;
+              row.qty++;
+              return rr
+            }
+          }
+        });
+        if(!found) {
+          console.log('found', found);
+          $window.localStorage.setItem('shopping', JSON.stringify([...shopCart, ...(type && type=='list' ? item.map(r => ({...r, qty: 1})) : [{...item, id: item.id, qty: 1}] )] ));
+        } else {
+          console.log('found', found, shopCart);
+            $window.localStorage.setItem('shopping', JSON.stringify([...shopCart]))
+        }
+    }
+    else {
+        $window.localStorage.setItem('shopping', JSON.stringify(type && type=='list' ? item.map(r => ({...r, qty: 1})) : [{...item, id: item.id, qty: 1}]))
+    }
 
+      
+      // Dispatch/Trigger/Fire the event
+      document.dispatchEvent(event);
 
+      toaster.success({body: 'Book Added to Cart successfully!'});
+    }
+
+    $scope.toggleSidebar = () => {
+      $('body').toggleClass('thumb-menu-screen')
+    }
+  
   $scope.increaseValue = row => {
     const cart = JSON.parse($window.localStorage.getItem('shopping'))
     cart.map(r => {
