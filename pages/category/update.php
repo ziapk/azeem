@@ -8,11 +8,43 @@
     }
     else {
 
+        $photo = $_FILES['image'];
+        $uploaded = false;
+        $image = "";
+        if(isset($photo) && count($photo) ) {
+            if($photo['error'] == 0) {
+                $img = explode('.', $photo['name']);
+                $photo['dst_path'] 	= dirname(__FILE__).'/../../uploads/products/';
+                
+                $image = time().'.'.$img[1];
+
+                if (!file_exists($photo['dst_path'])) {
+
+                    mkdir($photo['dst_path'], 0777, true);
+
+                }
+                
+                $moved = move_uploaded_file($photo['tmp_name'], $photo['dst_path'].$image);
+                if($moved) {	
+                    $uploaded = true;
+                }
+        
+            }
+        }
+
+
+        var_dump($uploaded);
+        var_dump($image);
+
+
+
         $data = [                
             'id' => $_POST['id'],
             'full_name' => $_POST['full_name'],
             'groupName' => $_POST['groupName'],
-            'cat_type' => $_POST['cat_type']
+            'cat_type' => $_POST['cat_type'],
+            'image' => $uploaded ? $image : '',
+
         ];
 
         $update = $categoryObj->updateCategory($data);

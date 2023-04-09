@@ -150,6 +150,7 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
             $('#searchProduct').focus();
         }
     }, 3000);
+    
     if($window.localStorage.getItem('shopping')) {
         const shopCart = JSON.parse($window.localStorage.getItem('shopping'));
         
@@ -244,6 +245,26 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
             $scope.calculateSum();
         }
     }
+
+    $(document).on("ProdcutAdded", function(e) {
+        $scope.$apply(() => {
+            if($window.localStorage.getItem('shopping')) {
+                const shopCart = JSON.parse($window.localStorage.getItem('shopping'));
+                
+                shopCart.map(function(row){
+                    const obj = $scope.mainList.find(function (e) { return e.id == row.id});
+                    items.push({...obj, qty: row.qty})
+                });
+                $scope.items = items;
+                $timeout(() => {
+                    $scope.calculateSum()
+                });
+            }
+            else {
+                $scope.items = []
+            }
+        })
+    });
 
     $scope.searchProduct = function (term) {
         const params = {};

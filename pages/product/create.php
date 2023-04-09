@@ -57,7 +57,7 @@
                 'owner_id' => $ownerId,
                 'full_name' => $_POST['full_name'],
                 'code' => $_POST['code'],
-                'cat' => !empty($_POST['cat']) ? $_POST['cat'] : NULL,
+                'cat_id' => !empty($_POST['cat_id']) ? $_POST['cat_id'] : NULL,
                 'sub_cat' => !empty($_POST['subCat']) ? $_POST['subCat'] : NULL,
                 'group' => $_POST['group'],
                 'author' => $_POST['author'],
@@ -158,6 +158,13 @@
                     <select class="form-control" name="publisher_id" ng-model="form.publisher_id">
                         <option value="">-- Select a Publisher --</option>
                         <?php foreach($publishers as $publisher) { echo "<option value='$publisher[id]'>$publisher[full_name]</option>";}?>
+                    </select>
+                </div>
+                <div class="col-sm-3 form-group">
+                    <label>Category</label>
+                    <select class="form-control" name="cat_id" ng-model="form.cat_id">
+                        <option value="">-- Select a Category --</option>
+                        <?php foreach($categories as $publisher) { echo "<option value='$publisher[id]'>$publisher[full_name]</option>";}?>
                     </select>
                 </div>
                 <div class="col-sm-3 form-group">

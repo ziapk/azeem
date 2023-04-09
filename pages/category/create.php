@@ -20,7 +20,32 @@ if(empty($_POST['full_name'])) {
 }
 else {
 
-    $data = [                
+    $photo = $_FILES['image'];
+    $uploaded = false;
+    $image = "";
+    if(isset($photo) && count($photo) ) {
+        if($photo['error'] == 0) {
+            $img = explode('.', $photo['name']);
+            $photo['dst_path'] 	= dirname(__FILE__).'/../../uploads/products/';
+            
+            $image = time().'.'.$img[1];
+
+            if (!file_exists($photo['dst_path'])) {
+
+                mkdir($photo['dst_path'], 0777, true);
+
+            }
+            
+            $moved = move_uploaded_file($photo['tmp_name'], $photo['dst_path'].$image);
+            if($moved) {	
+                $uploaded = true;
+            }
+    
+        }
+    }
+
+    $data = [
+        'image' => $uploaded ? $image : "",
         'full_name' => $_POST['full_name'],
         'cat_type' => $_POST['cat_type'],
         'groupName' => !empty($_POST['groupName']) ? $_POST['groupName'] : 'General',
@@ -28,24 +53,30 @@ else {
         'created_by' => $userId
     ];
 
-    $de = new DoubleEntry();
+    if($_POST['cat_type'] == 1) {
 
-    $receivableAccount = $de->getAccount($shop['expense']);
-
-    $accountData = [
-        'title' => 'Expense - '.$_POST['full_name'].' - '.$data['groupName'],
-        'code' => $receivableAccount['code'],
-        'account_type' => $receivableAccount['account_type'],
-        'group_id' => $receivableAccount['group_id'],
-        'status' => $receivableAccount['status'],
-        'parent_id' => $receivableAccount['id'],
-        'opening_balance' => empty($_POST['opening_balance']) ? 0 : $_POST['opening_balance'],
-        'created_by' => $userId
-    ];
-
+        $de = new DoubleEntry();
     
-    $accountId = $de->insertAccount($accountData);
-    $data['account_id'] = $accountId;
+        $receivableAccount = $de->getAccount($shop['expense']);
+    
+        $accountData = [
+            'title' => 'Expense - '.$_POST['full_name'].' - '.$data['groupName'],
+            'code' => $receivableAccount['code'],
+            'account_type' => $receivableAccount['account_type'],
+            'group_id' => $receivableAccount['group_id'],
+            'status' => $receivableAccount['status'],
+            'parent_id' => $receivableAccount['id'],
+            'opening_balance' => empty($_POST['opening_balance']) ? 0 : $_POST['opening_balance'],
+            'created_by' => $userId
+        ];
+    
+        
+        $accountId = $de->insertAccount($accountData);
+        $data['account_id'] = $accountId;
+    
+    } else {
+        $data['account_id'] = null;
+    }
 
     $create = $categoryObj->createCategory($data);
 

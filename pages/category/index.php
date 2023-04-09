@@ -27,7 +27,7 @@ echo mainHeader(['page' => 'category']);
                 <td>{{li.groupName}}</td>
                 <td>{{catTypes[li.cat_type]}}</td>
                 <td>
-                    <a ng-if="!li.title" href="javascript:void(0)" ng-click="linkAccount(li)">Link and Account</a>
+                    <a ng-if="!li.title && li.cat_type == 1" href="javascript:void(0)" ng-click="linkAccount(li)">Link and Account</a>
                     <span ng-if="li.title">{{li.title}} ({{li.code}})</span>
                 </td>
                 <td>
@@ -43,33 +43,37 @@ echo mainHeader(['page' => 'category']);
 <div style="display: flex; align-items: center; justify-content: space-between"><ul uib-pagination ng-if="data.perPage < data.totalRecords" items-per-page="data.perPage" total-items="data.totalRecords" ng-model="currentPage" ng-change="pageChanged(currentPage)"></ul> <span>Per Page <select ng-change="perPage()" ng-model="data.perPage"><option value="10">10</option><option value="25">25</option><option value="50">50</option><option value="100">100</option></select></span> <span>Total number of Records <strong>{{data.totalRecords}}</strong></span></div>
 
 <script type="text/ng-template" id="addCategory.html">
-    <form ng-submit="ok()"> 
+    <form ng-submit="ok($event)"> 
         <div class="modal-header">
             <h3 class="modal-title" id="modal-title">Add Category</h3>
         </div>
         <div class="modal-body" id="modal-body">
             <div class="form-group">
+                <label>Image</label>
+                <input name="image" type="file" id="image">
+            </div>
+            <div class="form-group">
                 <label for="sname">Name</label>
-                <input id="sname" type="text" ng-model="form.full_name" class="form-control" placeholder="Supplier's Name">
+                <input id="sname" type="text" ng-model="form.full_name" name="full_name" class="form-control" placeholder="Supplier's Name">
             </div>
             <div class="form-group">
                 <label for="groupName">Group</label>
-                <input id="groupName" type="text" ng-model="form.groupName" class="form-control" placeholder="Group Name">
+                <input id="groupName" type="text" ng-model="form.groupName" name="groupName" class="form-control" placeholder="Group Name">
             </div>
             <div class="form-group">
                 <label for="swallet">Type</label>
-                <select ng-model="form.cat_type" class="form-control">
-                  <?php foreach($catTypesArr as $key => $value) {?><option ng-value="<?php echo $key;?>"><?php echo $value;?></option><?php } ?> 
+                <select ng-model="form.cat_type" name="cat_type" class="form-control">
+                  <?php foreach($catTypesArr as $key => $value) {?><option value="<?php echo $key;?>"><?php echo $value;?></option><?php } ?> 
                 </select>
             </div>
             <div class="clearfix"></div>
             <div class="form-group" ng-if="form.account_id">
                 <label for="title">Account Linked</label>
-                <input id="title" name="form.title" type="text" class="form-control" placeholder="Title">
+                <input id="title" ng-model="form.title" name="title" type="text" class="form-control" placeholder="Title">
             </div>
             <div class="form-group" ng-if="form.account_id">
                 <label for="opening_balance">Opening Balance</label>
-                <input id="opening_balance" name="form.opening_balance" type="text" class="form-control" placeholder="Opening Balance">
+                <input id="opening_balance" ng-model="form.opening_balance" name="opening_balance" type="text" class="form-control" placeholder="Opening Balance">
             </div>
         </div>
         <div class="modal-footer">
@@ -110,7 +114,7 @@ app.controller('categoryController', function($scope, $http, $httpParamSerialize
     $scope.deleteCategory = function (id) {
         if($window.confirm('Are you sure?')) {
             $http.get('delete.php?id='+id).then(function(response) {
-                $scope.getCategories(1);
+                $scope.getCategories($scope.currentPage);
             });
         }
     }
@@ -141,8 +145,11 @@ app.controller('categoryController', function($scope, $http, $httpParamSerialize
                     return form
                 }
             }
-        }).result.then(function (selectedItem) {
-            $http.post(selectedItem && selectedItem.id ? 'update.php' : 'create.php', $httpParamSerializerJQLike(selectedItem), {headers: {'Content-Type': 'application/x-www-form-urlencoded'} }).then(function() {
+        }).result.then(function (selectedItem, data) {
+            $http.post(selectedItem.form && selectedItem.form.id ? 'update.php' : 'create.php', selectedItem.formData, {
+                transformRequest: angular.identity,
+                headers: {'Content-Type': undefined}
+            }).then(function() {
                 $scope.getCategories(1);
             });
         });
@@ -155,8 +162,10 @@ app.controller('ModalInstanceCtrl', function ($scope, $uibModalInstance, form) {
         cat_type: "",
         ...form
     }
-    $scope.ok = function () {
-        $uibModalInstance.close($scope.form);
+    $scope.ok = function (event) {
+        var formData = new FormData(event.target);
+        formData.append('id', $scope.form.id);
+        $uibModalInstance.close({formData, form: $scope.form});
     };
 
     $scope.cancel = function () {

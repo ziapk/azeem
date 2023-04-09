@@ -158,6 +158,7 @@
                 'price' => $_POST['price'],
                 'code' => $_POST['code'],
                 'publisher_id' => !empty($_POST['publisher_id']) ? $_POST['publisher_id'] : null,
+                'cat_id' => !empty($_POST['cat_id']) ? $_POST['cat_id'] : null,
                 'description' => $_POST['description'],
                 'group' => $_POST['group'],
                 'author' => $_POST['author'],
@@ -186,7 +187,7 @@
         header('location: '.SITE_URL.'');
     }
 
-    $categories = $categoryObj->getCategories($ownerId);
+    $categories = $categoryObj->getCategories('pro');
 
     $programs = $programObj->getPrograms();
 
@@ -281,6 +282,13 @@
                     <select class="form-control" name="publisher_id" ng-model="form.publisher_id">
                         <option value="">-- Select a Publisher --</option>
                         <?php foreach($publishers as $publisher) { echo "<option value='$publisher[id]'>$publisher[full_name]</option>";}?>
+                    </select>
+                </div>
+                <div class="col-sm-3 form-group">
+                    <label>Category</label>
+                    <select class="form-control" name="cat_id" ng-model="form.cat_id">
+                        <option value="">-- Select a Category --</option>
+                        <?php foreach($categories as $publisher) { echo "<option value='$publisher[id]'>$publisher[full_name]</option>";}?>
                     </select>
                 </div>
                 <div class="col-sm-12 form-group text-right">
