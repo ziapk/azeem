@@ -71,7 +71,7 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
     $scope.mainList = <?php echo safe_json_encode($list);?>;
 
     $scope.list = [];
-    $scope.priceList = localStorage.getItem('list') && JSON.parse(localStorage.getItem('list'));;
+    $scope.priceList = sessionStorage.getItem('list') && JSON.parse(sessionStorage.getItem('list'));;
     $scope.focus = false;
 
     $scope.data = <?php echo json_encode($order);?>;
@@ -146,7 +146,7 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
         $scope.subTotal = subtotal;
         $scope.payment_amount = $scope.subTotal - $scope.discount;
         $scope.grandTotal = $scope.payment_amount = $scope.payment_amount + Math.round($scope.payment_amount * ($scope.gst / 100)) + Math.round($scope.payment_amount * ($scope.service_charges / 100));
-        // $window.localStorage.setItem('shopping', JSON.stringify($scope.items));
+        // $window.sessionStorage.setItem('shopping', JSON.stringify($scope.items));
 
     }
 
@@ -170,6 +170,17 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
         $scope.subTotal = parseFloat($scope.subTotal) + parseFloat($scope.discount);
         items.push({...obj, qty: row.quantity, show: true, description: row.description, discount: row.discount, discount_value: (parseFloat(row.discount || 0) / row.price) * 100 })
     });
+    if($window.sessionStorage.getItem('shopping')) {
+        const shopCart = JSON.parse($window.sessionStorage.getItem('shopping'));
+        shopCart.map(function(row){
+            const obj = $scope.mainList.find(function (e) { return e.id == row.id});
+            items.push({...obj, qty: row.qty, show: row.show, description: row.description})
+        });
+        $scope.items = items;
+        $timeout(() => {
+            $scope.calculateSum()
+        });
+    }
     $scope.items = items;
 
     $scope.addTax = () => {
@@ -177,9 +188,16 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
     }
 
     $(document).on("ProdcutAdded", function(e) {
+        const shopCart = $scope.data.order_items;
         const items = [];
-        if($window.localStorage.getItem('shopping')) {
-            const shopCart = JSON.parse($window.localStorage.getItem('shopping'));
+        shopCart.map(function(row){
+            const obj = $scope.mainList.find(function (e) { return e.id == row.product_id});
+            $scope.discountPercentValue += parseFloat(row.discount);
+            $scope.subTotal = parseFloat($scope.subTotal) + parseFloat($scope.discount);
+            items.push({...obj, qty: row.quantity, show: true, description: row.description, discount: row.discount, discount_value: (parseFloat(row.discount || 0) / row.price) * 100 })
+        });
+        if($window.sessionStorage.getItem('shopping')) {
+            const shopCart = JSON.parse($window.sessionStorage.getItem('shopping'));
             shopCart.map(function(row){
                 const obj = $scope.mainList.find(function (e) { return e.id == row.id});
                 items.push({...obj, qty: row.qty, show: row.show, description: row.description})
@@ -284,7 +302,7 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
             params.searchBy = 'id';
             $scope.product = '';
             params.term = parseFloat(term.split('-')[0]);
-            const list = localStorage.getItem('list') && JSON.parse(localStorage.getItem('list'));
+            const list = sessionStorage.getItem('list') && JSON.parse(sessionStorage.getItem('list'));
             const item = list.find(r  => r.id == params.term || r.code == params.term || r.barcode == params.term);
             $scope.product = '';
             $scope.selectProduct(item);
@@ -358,7 +376,7 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
                 window.open("<?php echo SITE_URL;?>print?id="+response.data.order.id, "", "width=300,height=300"); 
                 $scope.items = $scope.list = [];
                 $scope.subTotal = $scope.discount = $scope.grandTotal = $scope.payment_amount = 0;
-                // $window.localStorage.setItem('shopping', JSON.stringify($scope.items))
+                // $window.sessionStorage.setItem('shopping', JSON.stringify($scope.items))
                 // $window.location.assign('<?php echo SITE_URL?>')
                 $scope.selectCustomer($scope.customersList[0]);
             }

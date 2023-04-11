@@ -57,7 +57,8 @@ var event = new CustomEvent("ProdcutAdded");
 
 app.controller('headerController', function($scope, $http, $httpParamSerializerJQLike, $filter, $window, toaster) {
   $scope.list = <?php echo safe_json_encode($list);?>;
-  localStorage.setItem('list', JSON.stringify($scope.list));
+  sessionStorage
+  sessionStorage.setItem('list', JSON.stringify($scope.list));
   $scope.exp = {};
   $scope.createExpense = () => {
     if($scope.exp.cat_id && $scope.exp.price) {
@@ -71,25 +72,26 @@ app.controller('headerController', function($scope, $http, $httpParamSerializerJ
     }
   }
   $scope.refreshList = function() {
-    $scope.cart = JSON.parse($window.localStorage.getItem('shopping'));
+    $scope.cart = JSON.parse($window.sessionStorage.getItem('shopping'));
     $scope.totalPrice = 0;
     $scope.finalList = [];
     $scope.cart.map(row => {
       const obj = $scope.list.find(r => r.id === row.id);
       $scope.finalList.push({...obj, price: row.price, discount: row.discount, qty: row.qty})
-      $scope.totalPrice += row.qty * (row.price - row.discount)
+      $scope.totalPrice += parseFloat(row.qty) * (parseFloat(row.price || 0) - parseFloat(row.discount || 0))
     })
+    document.dispatchEvent(event);
   }
 
   $scope.clear = () => {
-    $scope.cart = $window.localStorage.setItem('shopping', JSON.stringify([]));
+    $scope.cart = $window.sessionStorage.setItem('shopping', JSON.stringify([]));
     $scope.totalPrice = 0;
     $scope.finalList = [];
   }
 
   $scope.addToCart = function (item, type) {
-    if($window.localStorage.getItem('shopping')) {
-        const shopCart = JSON.parse($window.localStorage.getItem('shopping'));
+    if($window.sessionStorage.getItem('shopping')) {
+        const shopCart = JSON.parse($window.sessionStorage.getItem('shopping'));
         let found = false;
         shopCart.map(row => {
           if(type && type == 'list') {
@@ -113,22 +115,20 @@ app.controller('headerController', function($scope, $http, $httpParamSerializerJ
           }
         });
         if(!found) {
-          console.log('found', found);
-          $window.localStorage.setItem('shopping', JSON.stringify([...shopCart, ...(type && type=='list' ? item.map(r => ({...r, qty: 1})) : [{...item, id: item.id, qty: 1}] )] ));
+          $window.sessionStorage.setItem('shopping', JSON.stringify([...shopCart, ...(type && type=='list' ? item.map(r => ({...r, qty: 1})) : [{...item, id: item.id, qty: 1}] )] ));
         } else {
-          console.log('found', found, shopCart);
-            $window.localStorage.setItem('shopping', JSON.stringify([...shopCart]))
+          $window.sessionStorage.setItem('shopping', JSON.stringify([...shopCart]))
         }
     }
     else {
-        $window.localStorage.setItem('shopping', JSON.stringify(type && type=='list' ? item.map(r => ({...r, qty: 1})) : [{...item, id: item.id, qty: 1}]))
+        $window.sessionStorage.setItem('shopping', JSON.stringify(type && type=='list' ? item.map(r => ({...r, qty: 1})) : [{...item, id: item.id, qty: 1}]))
     }
 
       
       // Dispatch/Trigger/Fire the event
       document.dispatchEvent(event);
 
-      toaster.success({body: 'Book Added to Cart successfully!'});
+      toaster.success({body: 'Product added to Cart successfully!'});
     }
 
     $scope.toggleSidebar = () => {
@@ -136,25 +136,25 @@ app.controller('headerController', function($scope, $http, $httpParamSerializerJ
     }
   
   $scope.increaseValue = row => {
-    const cart = JSON.parse($window.localStorage.getItem('shopping'))
+    const cart = JSON.parse($window.sessionStorage.getItem('shopping'))
     cart.map(r => {
       if(row.id == r.id) {
         r.qty++
       }
     })
-    $window.localStorage.setItem('shopping', JSON.stringify(cart));
+    $window.sessionStorage.setItem('shopping', JSON.stringify(cart));
     $scope.refreshList();
   }
   
   $scope.decreaseValue = (row) => {
-    const cart = JSON.parse($window.localStorage.getItem('shopping'))
+    const cart = JSON.parse($window.sessionStorage.getItem('shopping'))
     
     cart.map(r => {
       if(row.id == r.id) {
         r.qty > 1 ? r.qty-- : r.qty
       }
     })
-    $window.localStorage.setItem('shopping', JSON.stringify(cart));
+    $window.sessionStorage.setItem('shopping', JSON.stringify(cart));
     $scope.refreshList()
 
   }

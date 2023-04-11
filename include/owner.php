@@ -81,7 +81,7 @@ function createCustomer () {
 app.controller('headerController', function($scope, $http, $httpParamSerializerJQLike, $filter, $window) {
   $scope.list = <?php echo safe_json_encode($list);?>;
   $scope.refreshList = function() {
-    $scope.cart = JSON.parse($window.localStorage.getItem('shopping'));
+    $scope.cart = JSON.parse($window.sessionStorage.getItem('shopping'));
     $scope.totalPrice = 0;
     $scope.finalList = [];
     $scope.cart.map(row => {
@@ -91,18 +91,18 @@ app.controller('headerController', function($scope, $http, $httpParamSerializerJ
     })
   }
   $scope.increaseValue = row => {
-    const cart = JSON.parse($window.localStorage.getItem('shopping'))
+    const cart = JSON.parse($window.sessionStorage.getItem('shopping'))
     cart.map(r => {
       if(row.id == r.id) {
         r.qty++
       }
     })
-    $window.localStorage.setItem('shopping', JSON.stringify(cart));
+    $window.sessionStorage.setItem('shopping', JSON.stringify(cart));
     $scope.refreshList();
   }
   
   $scope.decreaseValue = (row) => {
-    const cart = JSON.parse($window.localStorage.getItem('shopping'))
+    const cart = JSON.parse($window.sessionStorage.getItem('shopping'))
     
     cart.map(r => {
       if(row.id == r.id) {
@@ -110,7 +110,7 @@ app.controller('headerController', function($scope, $http, $httpParamSerializerJ
       }
     })
     console.log(cart);
-    $window.localStorage.setItem('shopping', JSON.stringify(cart));
+    $window.sessionStorage.setItem('shopping', JSON.stringify(cart));
     $scope.refreshList()
   }
 });

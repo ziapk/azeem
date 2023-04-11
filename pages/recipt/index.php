@@ -77,7 +77,7 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
 
     $scope.pinList = [];
     $scope.list = [];
-    $scope.priceList = localStorage.getItem('list') && JSON.parse(localStorage.getItem('list'));;
+    $scope.priceList = sessionStorage.getItem('list') && JSON.parse(sessionStorage.getItem('list'));;
     $scope.focus = false;
 
     $scope.customerData = {};
@@ -116,8 +116,8 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
     $scope.printValue = o => {
         $scope.payment_mode = o.id;
     }
-    if($window.localStorage.getItem('shopping')) {
-        const shopCart = JSON.parse($window.localStorage.getItem('shopping'));
+    if($window.sessionStorage.getItem('shopping')) {
+        const shopCart = JSON.parse($window.sessionStorage.getItem('shopping'));
         
         shopCart.map(function(row){
             const obj = $scope.mainList.find(function (e) { return e.id == row.id});
@@ -174,8 +174,8 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
 
     $(document).on("ProdcutAdded", function(e) {
         const items = [];
-        if($window.localStorage.getItem('shopping')) {
-            const shopCart = JSON.parse($window.localStorage.getItem('shopping'));
+        if($window.sessionStorage.getItem('shopping')) {
+            const shopCart = JSON.parse($window.sessionStorage.getItem('shopping'));
 
             shopCart.map(function(row){
                 const obj = $scope.mainList.find(function (e) { return e.id == row.id});
@@ -252,7 +252,7 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
             params.searchBy = 'id';
             $scope.product = '';
             params.term = parseFloat(term.split('-')[0]);
-            const list = localStorage.getItem('list') && JSON.parse(localStorage.getItem('list'));
+            const list = sessionStorage.getItem('list') && JSON.parse(sessionStorage.getItem('list'));
             const item = list.find(r  => r.id == params.term || r.code == params.term || r.barcode == params.term);
             $scope.product = '';
             $scope.selectProduct(item);
@@ -335,7 +335,7 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
 
             $scope.items = $scope.list = [];
             $scope.subTotal = $scope.discount = $scope.grandTotal = $scope.payment_amount = 0;
-            $window.localStorage.setItem('shopping', JSON.stringify($scope.items))
+            $window.sessionStorage.setItem('shopping', JSON.stringify($scope.items))
             // $window.location.assign('<?php echo SITE_URL?>')
             $scope.selectCustomer($scope.customersList[0]);
         });
@@ -379,7 +379,7 @@ app.controller('cartController', function($scope, $http, $httpParamSerializerJQL
         $scope.subTotal = subtotal;
         $scope.payment_amount = $scope.subTotal - $scope.discount;
         $scope.grandTotal = $scope.payment_amount = $scope.payment_amount + Math.round($scope.payment_amount * ($scope.gst / 100)) + Math.round($scope.payment_amount * ($scope.service_charges / 100));
-        $window.localStorage.setItem('shopping', JSON.stringify($scope.items));
+        $window.sessionStorage.setItem('shopping', JSON.stringify($scope.items));
 
     }
 

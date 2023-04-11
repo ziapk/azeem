@@ -107,8 +107,8 @@ app.controller('productsController', function($scope, $http, $httpParamSerialize
         $scope.getProducts(page)
     }
     $scope.addToCard = function (item) {
-        if($window.localStorage.getItem('shopping')) {
-            const shopCart = JSON.parse($window.localStorage.getItem('shopping'));
+        if($window.sessionStorage.getItem('shopping')) {
+            const shopCart = JSON.parse($window.sessionStorage.getItem('shopping'));
             let found = false;
             shopCart.map(row => {
                 if(row.id == item.id) {
@@ -119,13 +119,13 @@ app.controller('productsController', function($scope, $http, $httpParamSerialize
             });
 
             if(!found) {
-                $window.localStorage.setItem('shopping', JSON.stringify([...shopCart, ...[{id: item.id, qty: 1}] ] ))
+                $window.sessionStorage.setItem('shopping', JSON.stringify([...shopCart, ...[{id: item.id, qty: 1}] ] ))
             } else {
-                $window.localStorage.setItem('shopping', JSON.stringify([...shopCart]))
+                $window.sessionStorage.setItem('shopping', JSON.stringify([...shopCart]))
             }
         }
         else {
-            $window.localStorage.setItem('shopping', JSON.stringify([{qty: 1, id: item.id}]))
+            $window.sessionStorage.setItem('shopping', JSON.stringify([{qty: 1, id: item.id}]))
         }
     }
 
