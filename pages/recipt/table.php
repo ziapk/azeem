@@ -1,4 +1,4 @@
-<?php if($mode === 'edit') {?>
+<?php if ($mode === 'edit') { ?>
     <a href="#" class="btn btn-primary" ng-click="checkout()"><img width="24" height="24" src="<?php echo SITE_URL; ?>assets/img/svg/001-checkout.svg" alt="" /> Checkout</a>
 <?php } ?>
 <table class="table table-striped recipt-table">
@@ -28,7 +28,7 @@
                 <span ng-if="cart.discount">
                     {{cart.discount_percent ? cart.discount_percent : ''}}
                     <del class="text-danger">{{cart.price | number: 2}}</del> / </span>
-                    <span class="text-success">{{(cart.price - cart.discount) | number: 2}}</span>
+                <span class="text-success">{{(cart.price - cart.discount) | number: 2}}</span>
             </td>
             <td width="100"><input type="search" ng-model="newqty" class="form-control" on-enter-press="addMoreQty(cart, newqty, $event)"></td>
             <td>
@@ -89,7 +89,7 @@
                         {{li.title}}
                     </label>
                 </div>
-                <?php if($mode === 'edit') {?>
+                <?php if ($mode === 'edit') { ?>
                     <a href="#" class="btn btn-success" ng-click="park()">Park For Now</a>
                 <?php } else { ?>
                     <a href="#" class="btn btn-primary" ng-click="checkout()"><img width="24" height="24" src="<?php echo SITE_URL; ?>assets/img/svg/001-checkout.svg" alt="" /> Checkout</a>
