@@ -385,8 +385,8 @@ if ($largeView) {
                     <td style="padding: 0 3px"><?php echo ($item['price']); ?></td>
                     <td style="padding: 0 3px"><?php echo ($item['price'] - $item['discount']); ?></td>
                     <td style="padding: 0 3px"><?php echo $item['quantity']; ?></td>
-                    <td style="padding: 0 3px" class="text-right"><?php echo number_format($item['quantity'] * ($item['price']), 1); ?></td>
-                    <td style="padding: 0 3px" class="text-right"><?php echo number_format($item['quantity'] * ($item['price'] - $item['discount']), 1); ?></td>
+                    <td style="padding: 0 3px" class="text-right"><?php echo number_format($item['quantity'] * ($item['price']), 0); ?></td>
+                    <td style="padding: 0 3px" class="text-right"><?php echo number_format($item['quantity'] * ($item['price'] - $item['discount']), 0); ?></td>
                 </tr>
             <?php } ?>
             <tr class="no-border">
@@ -409,7 +409,7 @@ if ($largeView) {
                 </tr>
                 <tr class="no-border">
                     <td class="text-right ref" colspan="5">Balance</td>
-                    <th class="text-right ref"><?php echo number_format($balance, 2); ?></th>
+                    <th class="text-right ref"><?php echo number_format($balance, 0); ?></th>
                 </tr>
             <?php } ?>
         </table>
