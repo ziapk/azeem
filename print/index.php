@@ -192,7 +192,7 @@ if ($largeView) {
                 <th class="text-right thead" width="100">Total</th>
             </tr>
             <?php foreach ($order['order_items'] as $key => $item) { ?>
-                <tr>
+                <tr style="border-bottom: 0">
                     <td class="text-left"><?php echo $key + 1; ?></td>
                     <td class="text-left" style="padding: 0 6px"><?php echo $item['product_id']; ?></td>
                     <td class="text-left"><?php echo $item['product_title']; ?></td>
@@ -208,8 +208,8 @@ if ($largeView) {
                 </tr>
                 <?php if (!empty($item['description'])) { ?>
                     <tr>
-                        <td></td>
-                        <td colspan="7"><?php echo $item['description']; ?></td>
+                        <th colspan="2">Description</th>
+                        <td colspan="6" style="text-align: left"><?php echo $item['description']; ?></td>
                     </tr>
                 <?php } ?>
             <?php } ?>
