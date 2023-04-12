@@ -195,7 +195,7 @@ if ($largeView) {
                 <tr>
                     <td class="text-left"><?php echo $key + 1; ?></td>
                     <td class="text-left" style="padding: 0 6px"><?php echo $item['product_id']; ?></td>
-                    <td class="text-left"><?php echo $item['product_title']; ?> <br /><?php echo $item['description']; ?></td>
+                    <td class="text-left"><?php echo $item['product_title']; ?></td>
                     <td><?php echo number_format($item['quantity'], 1); ?></td>
                     <td><?php echo number_format($item['price'], 1); ?></td>
                     <td><?php echo number_format($item['price'] - $item['discount'], 1); ?></td>
@@ -206,6 +206,12 @@ if ($largeView) {
                                             echo number_format($item['quantity'] * ($item['price'] - $item['discount']), 2); ?></td>
                     <td class="text-right"><?php echo number_format($item['quantity'] * ($item['price']), 2); ?></td>
                 </tr>
+                <?php if (!empty($item['description'])) { ?>
+                    <tr>
+                        <td></td>
+                        <td colspan="7"><?php echo $item['description']; ?></td>
+                    </tr>
+                <?php } ?>
             <?php } ?>
             <tr class="no-border">
                 <td rowspan="7" style="line-height: 25px" valign="top" colspan="3">Total Qty</td>
