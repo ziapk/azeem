@@ -382,11 +382,11 @@ if ($largeView) {
                 </tr>
                 <tr style="font-weight: bold">
                     <td class="text-left"></td>
-                    <td><?php echo ($item['price']); ?></td>
-                    <td><?php echo ($item['price'] - $item['discount']); ?></td>
-                    <td><?php echo $item['quantity']; ?></td>
-                    <td class="text-right"><?php echo number_format($item['quantity'] * ($item['price']), 1); ?></td>
-                    <td class="text-right"><?php echo number_format($item['quantity'] * ($item['price'] - $item['discount']), 1); ?></td>
+                    <td style="padding: 0 3px"><?php echo ($item['price']); ?></td>
+                    <td style="padding: 0 3px"><?php echo ($item['price'] - $item['discount']); ?></td>
+                    <td style="padding: 0 3px"><?php echo $item['quantity']; ?></td>
+                    <td style="padding: 0 3px" class="text-right"><?php echo number_format($item['quantity'] * ($item['price']), 1); ?></td>
+                    <td style="padding: 0 3px" class="text-right"><?php echo number_format($item['quantity'] * ($item['price'] - $item['discount']), 1); ?></td>
                 </tr>
             <?php } ?>
             <tr class="no-border">
