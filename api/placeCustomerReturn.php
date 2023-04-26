@@ -1,5 +1,5 @@
-<?php 
-include_once dirname(__FILE__).'/../include/settings.php';
+<?php
+include_once dirname(__FILE__) . '/../include/settings.php';
 $ownerId = $userData['role'] == 'owner' ? $userData['id'] : $userData['created_by'];
 
 // 1. add supplier if not get id or if didn't get id or name set no supplier [done]
@@ -37,24 +37,30 @@ $productIds = [];
 foreach ($_POST['items'] as $key => $value) {
     $productIds[$value['id']] = $value['qty'];
 }
-
-$orderDetails = $orders->getOrderItemsByProductIds(array_keys($productIds), $supplierId);
+if (empty($_POST['order_id'])) {
+    $orderDetails = $orders->getOrderItemsByProductIds(array_keys($productIds), $supplierId);
+} else {
+    $orderDetails = $_POST['items'];
+}
 $or = [];
 $oi = [];
 foreach ($productIds as $id => $qty) {
     $remaining = $qty;
     foreach ($orderDetails as $key => $value) {
-        if(!empty($remaining)) {
+        if (!empty($remaining)) {
             $oi[$value['order_id']]['total'] += 1;
-            if(!empty($remaining) && $value['product_id'] == $id && $value['quantity'] <= $remaining) { // full return products
-                $remaining -= $value['quantity'];
-                $oi[$value['order_id']]['full']+=1;
-                $oi[$value['order_id']]['full_items'][$id]= ['quantity' => $value['quantity'], 'price' => $value['price']];
+            $product_id = $value['product_id'];
+            if (!empty($_POST['order_id'])) {
+                $product_id = $value['id'];
             }
-            elseif(!empty($remaining) &&  $value['product_id'] == $id && $value['quantity'] > $remaining) { // partial return products
+            if (!empty($remaining) && $product_id == $id && $value['quantity'] <= $remaining) { // full return products
+                $remaining -= $value['quantity'];
+                $oi[$value['order_id']]['full'] += 1;
+                $oi[$value['order_id']]['full_items'][$id] = ['quantity' => $value['quantity'], 'price' => $value['price']];
+            } elseif (!empty($remaining) &&  $product_id == $id && $value['quantity'] > $remaining) { // partial return products
                 // $diff = $value['quantity'] - $remaining;
-                $oi[$value['order_id']]['partial'] +=1;
-                $oi[$value['order_id']]['partial_items'][$id] =['quantity' => $remaining, 'price' => $value['price']];;
+                $oi[$value['order_id']]['partial'] += 1;
+                $oi[$value['order_id']]['partial_items'][$id] = ['quantity' => $remaining, 'price' => $value['price']];;
                 $remaining = 0;
             }
         }
@@ -65,9 +71,9 @@ foreach ($oi as $id => $row) {
     $t = $row['total'];
     $t -= $row['full'];
 
-    if($t == 0) {
+    if ($t == 0) {
         echo 'full';
-        if(!empty($row['full_items'])) {
+        if (!empty($row['full_items'])) {
             foreach ($row['full_items'] as $product_id => $value) {
                 $data = [
                     'order_id' => $id,
@@ -85,7 +91,7 @@ foreach ($oi as $id => $row) {
     } else {
         echo 'partial';
         // partial
-        if(!empty($row['partial_items'])) {
+        if (!empty($row['partial_items'])) {
             foreach ($row['partial_items'] as $product_id => $value) {
                 $data = [
                     'order_id' => $id,
@@ -96,11 +102,11 @@ foreach ($oi as $id => $row) {
                     'quantity' => $value['quantity'],
                     'price' => $value['price'],
                 ];
-                $res[$product_id][] =$orders->orderReturnAll($data, 1, 3);
+                $res[$product_id][] = $orders->orderReturnAll($data, 1, 3);
             }
         }
 
-        if(!empty($row['full_items'])) {
+        if (!empty($row['full_items'])) {
             foreach ($row['full_items'] as $product_id => $value) {
                 $data = [
                     'order_id' => $id,
@@ -111,7 +117,7 @@ foreach ($oi as $id => $row) {
                     'quantity' => $value['quantity'],
                     'price' => $value['price'],
                 ];
-                $res[$product_id][] =$orders->orderReturnAll($data, 1, 3);
+                $res[$product_id][] = $orders->orderReturnAll($data, 1, 3);
             }
         }
     }
@@ -148,97 +154,94 @@ $supplier = $supplierObj->getCustomer($supplierId);
 // echo 'Products';
 // print_r($storeDATA);
 
-    $doubleEntry = new DoubleEntry();
+$doubleEntry = new DoubleEntry();
 
-    $makeTransaction = [
-        'description' => !empty($_POST['summery']) ? $_POST['summery'] : "Sale Return PLACED",
-        'transaction_date' => $storeDATA['sale_date'],
-        'reference' => $_POST['ref_no'],
-        'shopId' => $shopId,
-        'created_by' => $_SESSION['user_credentials']['id'],
-        'order_ref' => null,
-        'supply_ref' => null,
-    ];
+$makeTransaction = [
+    'description' => !empty($_POST['summery']) ? $_POST['summery'] : "Sale Return PLACED",
+    'transaction_date' => $storeDATA['sale_date'],
+    'reference' => $_POST['ref_no'],
+    'shopId' => $shopId,
+    'created_by' => $_SESSION['user_credentials']['id'],
+    'order_ref' => null,
+    'supply_ref' => null,
+];
 
-    $makeTransactionId = $doubleEntry->makeTransaction($makeTransaction);
+$makeTransactionId = $doubleEntry->makeTransaction($makeTransaction);
 
-    
-    $assetPrice = $productsValue; // D 1000
-    $saleDiscount = $discount; // C 200
-    $returnAmount = $purchaseValue; // C 800
 
+$assetPrice = $productsValue; // D 1000
+$saleDiscount = $discount; // C 200
+$returnAmount = $purchaseValue; // C 800
+
+$entry = [
+    'transaction_id' => $makeTransactionId,
+    'account_id' => $storeDATA['assets'],
+    'entry_type' => 'D',
+    'description' => '',
+    'amount' => $assetPrice, // 2000
+    'payment_mode' => $_POST['payment_mode'],
+    'user_id' => $_SESSION['user_credentials']['id'],
+];
+
+$a[] = $doubleEntry->makeEntry($entry);
+
+
+$entry = [
+    'transaction_id' => $makeTransactionId,
+    'account_id' => $supplier['account_id'],
+    'entry_type' => 'C',
+    'description' => '',
+    'amount' => $returnAmount,
+    'payment_mode' => $_POST['payment_mode'],
+    'user_id' => $_SESSION['user_credentials']['id'],
+];
+
+$a[] = $doubleEntry->makeEntry($entry);
+
+if (!empty($saleDiscount)) {
+    // saleDiscount credit entry
     $entry = [
         'transaction_id' => $makeTransactionId,
-        'account_id' => $storeDATA['assets'],
-        'entry_type' => 'D',
+        'account_id' => $storeDATA['sale_discount'],
+        'entry_type' => 'C',
         'description' => '',
-        'amount' => $assetPrice, // 2000
-        'payment_mode'=> $_POST['payment_mode'],
+        'amount' => $saleDiscount, // 200 @ 10%
+        'payment_mode' => $_POST['payment_mode'],
         'user_id' => $_SESSION['user_credentials']['id'],
     ];
-
     $a[] = $doubleEntry->makeEntry($entry);
+}
 
 
+// assets debit entry - debit
+// liability payable entry - credit
+// purchase discount entry - credit
+
+
+if (!empty($payment_amount)) {
+    $makeTransactionId = $doubleEntry->makeTransaction($makeTransaction);
+    // payable credit entry
     $entry = [
         'transaction_id' => $makeTransactionId,
         'account_id' => $supplier['account_id'],
         'entry_type' => 'C',
         'description' => '',
-        'amount' => $returnAmount,
-        'payment_mode'=> $_POST['payment_mode'],
+        'amount' => $payment_amount,
+        'payment_mode' => $_POST['payment_mode'],
         'user_id' => $_SESSION['user_credentials']['id'],
     ];
-
     $a[] = $doubleEntry->makeEntry($entry);
+    // cash credit entry
+    $entry = [
+        'transaction_id' => $makeTransactionId,
+        'account_id' => $storeDATA['sale_returns'],
+        'entry_type' => 'D',
+        'description' => '',
+        'amount' => $payment_amount, // 200 @ 10%
+        'payment_mode' => $_POST['payment_mode'],
+        'user_id' => $_SESSION['user_credentials']['id'],
+    ];
+    $a[] = $doubleEntry->makeEntry($entry);
+}
 
-    if(!empty($saleDiscount)) {
-        // saleDiscount credit entry
-        $entry = [
-            'transaction_id' => $makeTransactionId,
-            'account_id' => $storeDATA['sale_discount'],
-            'entry_type' => 'C',
-            'description' => '',
-            'amount' => $saleDiscount, // 200 @ 10%
-            'payment_mode'=> $_POST['payment_mode'],
-            'user_id' => $_SESSION['user_credentials']['id'],
-        ];
-        $a[] = $doubleEntry->makeEntry($entry);
-    }
-
-
-    // assets debit entry - debit
-    // liability payable entry - credit
-    // purchase discount entry - credit
-    
-
-    if(!empty($payment_amount)) {
-        $makeTransactionId = $doubleEntry->makeTransaction($makeTransaction);
-        // payable credit entry
-        $entry = [
-            'transaction_id' => $makeTransactionId,
-            'account_id' => $supplier['account_id'],
-            'entry_type' => 'C',
-            'description' => '',
-            'amount' => $payment_amount,
-            'payment_mode'=> $_POST['payment_mode'],
-            'user_id' => $_SESSION['user_credentials']['id'],
-        ];
-        $a[] = $doubleEntry->makeEntry($entry);
-        // cash credit entry
-        $entry = [
-            'transaction_id' => $makeTransactionId,
-            'account_id' => $storeDATA['sale_returns'],
-            'entry_type' => 'D',
-            'description' => '',
-            'amount' => $payment_amount, // 200 @ 10%
-            'payment_mode'=> $_POST['payment_mode'],
-            'user_id' => $_SESSION['user_credentials']['id'],
-        ];
-        $a[] = $doubleEntry->makeEntry($entry);
-        
-    }
-
-    echo json_encode(['status' => 200, 'message' => 'successfully done', 'supply' => [ 'id'=> $makeTransactionId ]]);
-
-?>
+echo json_encode(['status' => 200, 'message' => 'successfully done', 'supply' => ['id' => $makeTransactionId]]);
