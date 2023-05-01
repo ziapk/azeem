@@ -144,6 +144,9 @@ $categoryProducts = $productCls->getCategoryProducts($shop['owner_id'], $ids, $s
       <li class="<?php if ($params['page'] == 'product') {
                     echo 'active';
                   } ?>"><a uib-tooltip="Products" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/product"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/product.svg" alt="" /> <span class="nav-menu-text">Products</span></a></li>
+      <li class="<?php if ($params['page'] == 'least') {
+                    echo 'active';
+                  } ?>"><a uib-tooltip="Least Products" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/product/least.php"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/product.svg" alt="" /> <span class="nav-menu-text">Min Products</span></a></li>
       <li class="<?php if ($params['page'] == 'customer') {
                     echo 'active';
                   } ?>"><a uib-tooltip="Customers" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/customers"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/customer.svg" alt="" /> <span class="nav-menu-text">Customers</span></a></li>

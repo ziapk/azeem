@@ -99,11 +99,15 @@ class Products extends Connection
 
 			$column = "";
 
+			$minQry = "";
 			if (!empty($shopId)) {
-				$column = ", (sp.qty - sp.stock_out) as qty ";
+				$column = ", (sp.qty - sp.stock_out) as qty, sp.min_qty ";
+				if (!empty($params['minQty'])) {
+					$minQry = " HAVING qty <= sp.min_qty";
+				}
 			}
 
-			$stmt = "SELECT count(p.id) as count FROM `{$this->table}` as p $innerJoin LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id  LEFT JOIN program_books as c ON c.product_id = p.id WHERE p.owner_id=:owner_id $publisher_query $dup $pin $searchQry $catQry";
+			$stmt = "SELECT count(p.id) as count $column FROM `{$this->table}` as p $innerJoin LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id  LEFT JOIN program_books as c ON c.product_id = p.id WHERE p.owner_id=:owner_id $publisher_query $dup $pin $searchQry $catQry $minQry";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':owner_id', $owner_id, PDO::PARAM_STR);
 			$prepare->execute();
@@ -125,7 +129,8 @@ class Products extends Connection
 				$mainCols = $allCols;
 			}
 
-			$stmt = "SELECT $mainCols  FROM `{$this->table}` as p $innerJoin LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id LEFT JOIN program_books as c ON c.product_id = p.id LEFT JOIN publishers as pub on p.publisher_id = pub.id  WHERE p.`owner_id`=:owner_id $publisher_query $dup $pin $searchQry $catQry GROUP BY p.id $sortByQry LIMIT :offset, :perPage";
+			$stmt = "SELECT $mainCols  FROM `{$this->table}` as p $innerJoin LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id LEFT JOIN program_books as c ON c.product_id = p.id LEFT JOIN publishers as pub on p.publisher_id = pub.id  WHERE p.`owner_id`=:owner_id $publisher_query $dup $pin $searchQry $catQry GROUP BY p.id $sortByQry $minQry LIMIT :offset, :perPage";
+
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':owner_id', $owner_id, PDO::PARAM_STR);
 			$prepare->bindParam(':offset', $offset, PDO::PARAM_INT);
@@ -734,6 +739,20 @@ class Products extends Connection
 			$prepare->bindParam(':id', $id, PDO::PARAM_INT);
 			$prepare->bindParam(':qty', $qty, PDO::PARAM_INT);
 			$prepare->bindParam(':shopId', $shopId, PDO::PARAM_INT);
+			$prepare->execute();
+			$result = $prepare->rowCount();
+			return $result;
+		} catch (PDOException $e) {
+			die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
+	public function resetCounters($owner_id, $shopId)
+	{
+		try {
+			$stmt = "UPDATE `{$this->table_st}` SET `qty`=0,`stock_out`=0,`min_qty`=2 WHERE owner_id=:owner_id and shopId=:shopId";
+			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':owner_id', $owner_id, PDO::PARAM_STR);
+			$prepare->bindParam(':shopId', $shopId, PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $prepare->rowCount();
 			return $result;
