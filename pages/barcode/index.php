@@ -1,5 +1,5 @@
-<?php 
-include_once dirname(__FILE__).'/../../include/settings.php';
+<?php
+include_once dirname(__FILE__) . '/../../include/settings.php';
 echo mainHeader(['page' => 'barcode']);
 
 $all = false;
@@ -9,7 +9,7 @@ $storeObj = new Store();
 $ownerId = $userData['role'] == 'owner' ? $userData['id'] : $userData['created_by'];
 $ownerStores = $storeObj->getOwnerStores($ownerId);
 
-if(!empty($_GET['all']) && $_GET['all'] == '1') {
+if (!empty($_GET['all']) && $_GET['all'] == '1') {
     $shopId = $_GET['shopId'];
     $products = $productsObj->getOwnerProductsPagination($ownerId, ['page' => 1, 'perPage' => 100000], $shopId);
 }
@@ -17,129 +17,180 @@ if(!empty($_GET['all']) && $_GET['all'] == '1') {
 ?>
 
 <div class="container" ng-controller="categoryController">
-<form class="row" action="" method="GET">
-    <div class="col-sm-3 form-group">
-        <input type="hidden" class="form-control" name="all" value="1">
-        <select class="form-control" name="shopId" ng-model="shopId">
-            <?php foreach ($ownerStores as $value) { ?>
-                <option value="<?php echo $value['id'];?>"><?php echo $value['full_name'];?></option>
+    <form class="row" action="" method="GET">
+        <div class="col-sm-3 form-group">
+            <input type="hidden" class="form-control" name="all" value="1">
+            <select class="form-control" name="shopId" ng-model="shopId">
+                <?php foreach ($ownerStores as $value) { ?>
+                    <option value="<?php echo $value['id']; ?>"><?php echo $value['full_name']; ?></option>
+                <?php } ?>
+            </select>
+        </div>
+        <div class="col-sm-3 form-group">
+            <input type="submit" class="btn btn-primary" value="Fetch All Items" />
+        </div>
+    </form>
+    <h4>Products</h4>
+    <div class="form-group">
+        <input type="text" class="form-control" ng-model="product" placeholder="Search Products" typeahead-on-select="selectProduct($item)" uib-typeahead="address as address.full_name for address in searchProduct($viewValue)" typeahead-template-url="row.html" class="form-control" ng-model-options="{debounce: 500}" typeahead-show-hint="true" typeahead-min-length="1">
+    </div>
+
+    <form action="print.php" method="post" target="_blank">
+        <label><input type="checkbox" name="hidePrice" style="margin-right: 10px">Hide Price</label>
+        <table class="table">
+            <?php if ($userData['role'] == 'owner') { ?>
+                <thead>
+                    <tr>
+                        <th>Select Shop for Demand</th>
+                        <th>
+                            <div class="col-md-3 col-sm-4 form-group">
+                                <label for="">Select Store</label>
+                                <select id="shop_id" class="form-control">
+                                    <?php foreach ($ownerStores as $type) { ?>
+                                        <option value="<?php echo $type['id']; ?>"><?php echo $type['full_name']; ?></option>
+                                    <?php } ?>
+                                </select>
+                            </div>
+                        </th>
+                    </tr>
+                </thead>
+            <?php } else { ?>
+                <input type="hidden" id="shop_id" value="<?php echo $userData['shopId']; ?>">
             <?php } ?>
-        </select>
-    </div>
-    <div class="col-sm-3 form-group">
-        <input type="submit" class="btn btn-primary" value="Fetch All Items" />
-    </div>
-</form>
-<h4>Products</h4>
-<div class="form-group">
-<input type="text" class="form-control" ng-model="product" placeholder="Search Products" typeahead-on-select="selectProduct($item)" uib-typeahead="address as address.full_name for address in searchProduct($viewValue)" typeahead-template-url="row.html" class="form-control" ng-model-options="{debounce: 500}" typeahead-show-hint="true" typeahead-min-length="1">
-</div>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Print Qty</th>
+                    <th width="200"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="li in items" id="item-{{li.id}}">
+                    <td>{{li.full_name}}
+                        <input type="hidden" value="{{li.id}}" name="id[]" />
+                        <input type="hidden" value="{{li.price}}" name="price[]" />
+                        <input type="hidden" value="{{li.full_name}}" name="full_name[]" />
+                    </td>
+                    <td><input type="number" ng-model="li.qty" class="input-qty input-control" name="qty[]" /></td>
+                    <td>
+                        <a class="btn btn-danger btn-xs" href="javascript:void(0)" ng-click="deleteCategory(li.id)">Delete</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
 
-<form action="print.php" method="post" target="_blank">
-<label><input type="checkbox" name="hidePrice" style="margin-right: 10px">Hide Price</label>
-<table class="table">
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Print Qty</th>
-            <th width="200"></th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr ng-repeat="li in items" id="item-{{li.id}}">
-            <td>{{li.full_name}} 
-                <input type="hidden" value="{{li.id}}" name="id[]" />
-                <input type="hidden" value="{{li.price}}" name="price[]" />
-                <input type="hidden" value="{{li.full_name}}" name="full_name[]" />
-            </td>
-            <td><input type="number" ng-model="li.qty" class="input-qty input-control" name="qty[]"/></td>
-            <td>
-                <a class="btn btn-danger btn-xs" href="javascript:void(0)" ng-click="deleteCategory(li.id)">Delete</a>
-            </td>
-        </tr>
-    </tbody>
-</table>
-<input type="submit" class="btn btn-primary" value="Print Tags" />
+        <input type="submit" class="btn btn-primary" value="Print Tags" />
+        <input type="button" class="btn btn-danger pull-right" value="Create Demand" ng-click="createDemand()" />
 
-<script>
-app.controller('categoryController', function($scope, $http, $httpParamSerializerJQLike, $filter, $window, $document, $uibModal, $log, $location, $anchorScroll, $timeout) {
-    $scope.list = []; //$scope.data.records;
-    $scope.siteUrl = '<?php echo SITE_URL ?>';
-    
-    $scope.books = <?php echo safe_json_encode($products);?>;
+        <script>
+            app.controller('categoryController', function($scope, $http, $httpParamSerializerJQLike, $filter, $window, $document, $uibModal, $log, $location, $anchorScroll, $timeout) {
+                $scope.list = []; //$scope.data.records;
+                $scope.siteUrl = '<?php echo SITE_URL ?>';
 
-    $scope.list = [];
-    $scope.items = $scope.books?.records?.map(r => ({ ...r, qty: parseInt(r.qty) }))?.filter(r => r.qty) || [];
-    $scope.shopId = '<?php echo $_GET['shopId'];?>';
-    console.log($scope.shopId);
+                $scope.books = <?php echo safe_json_encode($products); ?>;
 
-    $scope.selectProduct = function (p) {
-        let exists = false;
-        $scope.items.map((pro) => {
-            if(pro.id == p.id) {
-                exists = true;
-                pro.qty = pro.qty || 0;
-                pro.qty++;
-            }
-        })
-        $scope.product = ""
-        if(!exists) {
-            $scope.items.push({...p, qty: 1});
-        }
+                $scope.list = [];
+                $scope.items = $scope.books?.records?.map(r => ({
+                    ...r,
+                    qty: parseInt(r.qty)
+                }))?.filter(r => r.qty) || [];
+                $scope.shopId = '<?php echo $_GET['shopId']; ?>';
 
-        $location.hash('item-'+p.id);
+                $scope.selectProduct = function(p) {
+                    let exists = false;
+                    $scope.items.map((pro) => {
+                        if (pro.id == p.id) {
+                            exists = true;
+                            pro.qty = pro.qty || 0;
+                            pro.qty++;
+                        }
+                    })
+                    $scope.product = ""
+                    if (!exists) {
+                        $scope.items.push({
+                            ...p,
+                            qty: 1
+                        });
+                    }
 
-        // call $anchorScroll()
-        $anchorScroll();
-        $timeout(() => {
-            $('#item-'+p.id).find('.input-qty').focus();
-        }, 100);
-        
-    }
+                    $location.hash('item-' + p.id);
 
-    $scope.searchProduct = function (term) {
-        return $http.get("<?php echo SITE_URL?>api/getStores.php", {params: {term}})
-        .then(function(response) {
-            
-            $scope.list = response.data;
-            $scope.priceList = response.data;
-            return response.data
-        });
-    }
+                    // call $anchorScroll()
+                    $anchorScroll();
+                    $timeout(() => {
+                        $('#item-' + p.id).find('.input-qty').focus();
+                    }, 100);
 
-    $scope.deleteCategory = function (id) {
-        $scope.items = $scope.items.filter(r => r.id !== id);
-    }
-    
-    $scope.printTags = function (form) {
-        $http.post('print.php', $httpParamSerializerJQLike($scope.items), {headers: {'Content-Type': 'application/x-www-form-urlencoded'} }).then(function() {
-            // $scope.getCategories(1);
-        });
-    };
-});
+                }
 
-app.controller('ModalInstanceCtrl', function ($scope, $uibModalInstance, form) {
-    $scope.form = {
-        full_name: "",
-        cat_type: "",
-        ...form
-    }
-    $scope.ok = function () {
-        $uibModalInstance.close($scope.form);
-    };
+                $scope.searchProduct = function(term) {
+                    return $http.get("<?php echo SITE_URL ?>api/getStores.php", {
+                            params: {
+                                term
+                            }
+                        })
+                        .then(function(response) {
 
-    $scope.cancel = function () {
-        $uibModalInstance.dismiss('cancel');
-    };
-});
-</script>
+                            $scope.list = response.data;
+                            $scope.priceList = response.data;
+                            return response.data
+                        });
+                }
 
-<script type="text/ng-template" id="row.html">
-  <a>
+                $scope.deleteCategory = function(id) {
+                    $scope.items = $scope.items.filter(r => r.id !== id);
+                }
+
+                $scope.printTags = function(form) {
+                    $http.post('print.php', $httpParamSerializerJQLike($scope.items), {
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        }
+                    }).then(function() {
+                        // $scope.getCategories(1);
+                    });
+                };
+
+                $scope.createDemand = function() {
+                    const form = {
+                        demand_title: 'DEMAND BY BARCODE',
+                        demand_date: moment().format('YYYY-MM-DD'),
+                        shop_id: $('#shop_id').val(),
+                        items: $scope.items,
+                    }
+                    $http.post('<?php echo SITE_URL . "pages/demand/createDemand.php" ?>', $httpParamSerializerJQLike(form), {
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        }
+                    }).then(function(res) {
+                        alert(res.data.message)
+                        // $scope.getCategories(1);
+                    });
+                };
+            });
+
+            app.controller('ModalInstanceCtrl', function($scope, $uibModalInstance, form) {
+                $scope.form = {
+                    full_name: "",
+                    cat_type: "",
+                    ...form
+                }
+                $scope.ok = function() {
+                    $uibModalInstance.close($scope.form);
+                };
+
+                $scope.cancel = function() {
+                    $uibModalInstance.dismiss('cancel');
+                };
+            });
+        </script>
+
+        <script type="text/ng-template" id="row.html">
+            <a>
       <span ng-bind-html="match.model.full_name | uibTypeaheadHighlight:query"></span>
       <span class="pull-right">{{match.model.price}}</span>
   </a>
 </script>
 
-<?php
-echo mainFooter();
+        <?php
+        echo mainFooter();
