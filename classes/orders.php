@@ -248,7 +248,8 @@ class Orders extends Connection
     public function runQuery()
     {
         try {
-            $stmt = "ALTER TABLE `order_items` CHANGE `discount` `discount` FLOAT NOT NULL DEFAULT '0';";
+            $stmt = "ALTER TABLE `orders` CHANGE `paid_amount` `paid_amount` FLOAT(11) NULL DEFAULT NULL, CHANGE `discount` `discount` FLOAT(11) NOT NULL, CHANGE `gst` `gst` FLOAT(11) NULL DEFAULT NULL, CHANGE `service_charges` `service_charges` FLOAT(11) NULL DEFAULT NULL;
+            ALTER TABLE `order_items` CHANGE `discount` `discount` FLOAT NOT NULL DEFAULT '0';";
             $prepare = $this->dbh->prepare($stmt);
             // $prepare->bindParam(':id', $id, PDO::PARAM_STR);
             $prepare->execute();
