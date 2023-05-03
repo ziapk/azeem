@@ -271,7 +271,7 @@ class Orders extends Connection
     public function getOrder($id)
     {
         try {
-            $this->runQuery();
+            // $this->runQuery();
             $stmt = "SELECT * FROM `{$this->table}` WHERE id=:id ";
             $prepare = $this->dbh->prepare($stmt);
             $prepare->bindParam(':id', $id, PDO::PARAM_STR);
