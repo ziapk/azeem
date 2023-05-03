@@ -362,7 +362,7 @@ if ($largeView) {
             </h3>
 
         </div>
-        <strong class="pull-left ref">Customer Name: <?php echo !empty($order['order']['customer_name']) ? $order['order']['customer_name'] : $foodpanda['full_name']; ?></strong>
+        <span class="pull-left ref"><span style="font-size: 10px">Customer Name:</span> <strong><?php echo !empty($order['order']['customer_name']) ? $order['order']['customer_name'] : $foodpanda['full_name']; ?></strong></span>
         <div style="clear: both;"></div>
         <span class="pull-left ref">Ref. RSV0<?php echo $_GET['id']; ?></span>
         <span class="pull-right date"><?php echo date('d/m/Y H:i', strtotime($order['order']['created_at'])); ?></span>
@@ -384,7 +384,7 @@ if ($largeView) {
                 }
             ?>
                 <tr style="border: 0">
-                    <td class="text-left" colspan="6" style="font-size: 10px"><?php echo $item['product_title']; ?></td>
+                    <td class="text-left" colspan="6" style="font-size: 10px"><strong style="font-weight: 700"><?php echo $item['product_id']; ?></strong> | <?php echo $item['product_title']; ?><br /> <?php echo $item['description']; ?></td>
                 </tr>
                 <tr style="font-weight: bold">
                     <td class="text-left"></td>
