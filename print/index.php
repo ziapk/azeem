@@ -208,7 +208,7 @@ if ($largeView) {
                 </tr>
                 <?php if (!empty($item['description'])) { ?>
                     <tr>
-                        <th colspan="2">Description</th>
+                        <th colspan="2">--</th>
                         <td colspan="6" style="text-align: left"><?php echo $item['description']; ?></td>
                     </tr>
                 <?php } ?>
@@ -384,38 +384,38 @@ if ($largeView) {
                 }
             ?>
                 <tr style="border: 0">
-                    <td class="text-left" colspan="6" style="font-size: 10px"><strong style="font-weight: 700"><?php echo $item['product_id']; ?></strong> | <?php echo $item['product_title']; ?><br /> <?php echo $item['description']; ?></td>
+                    <td class="text-left" colspan="6" style="font-size: 10px"><strong style="font-weight: 700"><?php echo $item['product_id']; ?></strong> | <?php echo !empty($item['description']) ? $item['description'] : $item['product_title']; ?></td>
                 </tr>
                 <tr style="font-weight: bold">
                     <td class="text-left"></td>
                     <td style="padding: 0 3px"><?php echo ($item['price']); ?></td>
                     <td style="padding: 0 3px"><?php echo ($item['price'] - $item['discount']); ?></td>
                     <td style="padding: 0 3px"><?php echo $item['quantity']; ?></td>
-                    <td style="padding: 0 3px" class="text-right"><?php echo number_format($item['quantity'] * ($item['price']), 0); ?></td>
-                    <td style="padding: 0 3px" class="text-right"><?php echo number_format($item['quantity'] * ($item['price'] - $item['discount']), 0); ?></td>
+                    <td style="padding: 0 3px" class="text-right"><?php echo number_format($item['quantity'] * ($item['price']), 2); ?></td>
+                    <td style="padding: 0 3px" class="text-right"><?php echo number_format($item['quantity'] * ($item['price'] - $item['discount']), 2); ?></td>
                 </tr>
             <?php } ?>
             <tr class="no-border">
                 <td class="text-right ref" colspan="5">Gross Total</td>
-                <td class="text-right ref"><?php echo number_format($aprice, 0); ?></td>
+                <td class="text-right ref"><?php echo number_format($aprice, 2); ?></td>
             </tr>
             <tr class="no-border">
                 <th class="text-right ref" colspan="5">Disc</th>
-                <th class="text-right ref"><?php echo number_format($totalDist, 0); ?></th>
+                <th class="text-right ref"><?php echo number_format($totalDist, 2); ?></th>
             </tr>
             <tr class="no-border">
                 <td class="text-right ref" colspan="5">Net Total</td>
-                <th class="text-right ref"><?php echo number_format($price - $order['order']['discount'], 0); ?></th>
+                <th class="text-right ref"><?php echo number_format($price - $order['order']['discount'], 2); ?></th>
             </tr>
             <?php if (!empty($order['order']['paid_amount'])) { ?>
 
                 <tr class="no-border">
                     <td class="text-right ref" colspan="5">Deposit</td>
-                    <th class="text-right ref"><?php echo number_format($order['order']['paid_amount'], 0); ?></th>
+                    <th class="text-right ref"><?php echo number_format($order['order']['paid_amount'], 2); ?></th>
                 </tr>
                 <tr class="no-border">
                     <td class="text-right ref" colspan="5">Balance</td>
-                    <th class="text-right ref"><?php echo number_format($balance, 0); ?></th>
+                    <th class="text-right ref"><?php echo number_format($balance, 2); ?></th>
                 </tr>
             <?php } ?>
         </table>
