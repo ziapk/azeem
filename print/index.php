@@ -68,10 +68,6 @@ if ($largeView) {
             font-family: Tahoma;
         }
 
-        tr {
-            border-bottom: 1px dashed
-        }
-
         p {
             font-family: Tahoma;
             font-style: normal;
@@ -192,7 +188,7 @@ if ($largeView) {
                 <th class="text-right thead" width="100">Total</th>
             </tr>
             <?php foreach ($order['order_items'] as $key => $item) { ?>
-                <tr style="border-bottom: 0">
+                <tr>
                     <td class="text-left"><?php echo $key + 1; ?></td>
                     <td class="text-left" style="padding: 0 6px"><?php echo $item['product_id']; ?></td>
                     <td class="text-left"><?php echo $item['product_title']; ?></td>
