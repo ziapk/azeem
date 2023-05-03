@@ -244,9 +244,33 @@ class Orders extends Connection
         }
     }
 
+
+    public function runQuery()
+    {
+        try {
+            $stmt = "ALTER TABLE `order_items` CHANGE `discount` `discount` FLOAT NOT NULL DEFAULT '0';";
+            $prepare = $this->dbh->prepare($stmt);
+            // $prepare->bindParam(':id', $id, PDO::PARAM_STR);
+            $prepare->execute();
+            // $result['order'] = $prepare->fetch(PDO::FETCH_ASSOC);
+            // if (!empty($result['order'])) {
+            //     $stmt = "SELECT item.*, p.full_name AS product_title FROM `{$this->table_sub}` AS item LEFT JOIN products AS p ON item.product_id = p.id WHERE item.order_id=:id";
+            //     $prepare = $this->dbh->prepare($stmt);
+            //     $prepare->bindParam(':id', $id, PDO::PARAM_STR);
+            //     $prepare->execute();
+            //     $result['order_items'] = $prepare->fetchAll(PDO::FETCH_ASSOC);
+            //     $c = new Customers();
+            //     $result['customer'] = $c->getCustomer($result['order']['customer_id']);
+            // }
+            return true;
+        } catch (PDOException $e) {
+            die("Error!: " . $e->getMessage() . "<br/>");
+        }
+    }
     public function getOrder($id)
     {
         try {
+            $this->runQuery();
             $stmt = "SELECT * FROM `{$this->table}` WHERE id=:id ";
             $prepare = $this->dbh->prepare($stmt);
             $prepare->bindParam(':id', $id, PDO::PARAM_STR);
