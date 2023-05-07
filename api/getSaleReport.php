@@ -9,6 +9,7 @@ $data['records'] = $orders;
 $data['income'] = 0;
 foreach ($orders as $row) {
     $data['totalIncome'] += $row['price'] - $row['discount'];
+    $data['credit'] += $row['price'] - $row['discount'] - $row['paid_amount'];
     if ($row['status'] == 1) {
         $data['park'] += $row['price'] - $row['discount'];
     } else {

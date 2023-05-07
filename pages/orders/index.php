@@ -75,6 +75,10 @@ echo mainHeader(['page' => 'order']);
                             <th style="text-align: right">{{data.income}}</th>
                         </tr>
                         <tr>
+                            <th style="text-align: right">Total Credit</th>
+                            <th style="text-align: right">{{data.credit}}</th>
+                        </tr>
+                        <tr>
                             <th style="text-align: right">Total Parked</th>
                             <th style="text-align: right">{{data.park}}</th>
                         </tr>
