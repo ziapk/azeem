@@ -45,6 +45,11 @@ if ($largeView) {
             margin: 0;
         }
 
+        .recipt>table {
+            font-size: 12px;
+            font-family: inherit;
+        }
+
         .recipt {
             font-family: Tahoma;
             text-align: center;
