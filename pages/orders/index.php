@@ -64,8 +64,7 @@ echo mainHeader(['page' => 'order']);
         </tbody>
         <tfoot>
             <tr>
-                <th>Total</th>
-                <th colspan="6">
+                <th colspan="7">
                     <table style="text-align: right" width="100%" cellspacing="0" cellpadding="0">
                         <tr>
                             <th style="text-align: right">Number of Orders</th>
@@ -74,6 +73,14 @@ echo mainHeader(['page' => 'order']);
                         <tr>
                             <th style="text-align: right">Total Payment</th>
                             <th style="text-align: right">{{data.income}}</th>
+                        </tr>
+                        <tr>
+                            <th style="text-align: right">Total Parked</th>
+                            <th style="text-align: right">{{data.park}}</th>
+                        </tr>
+                        <tr>
+                            <th style="text-align: right">G. Total</th>
+                            <th style="text-align: right">{{data.totalIncome}}</th>
                         </tr>
                     </table>
                 </th>
