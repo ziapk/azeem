@@ -8,11 +8,8 @@ $details = !empty($_GET['detail']) && $_GET['detail'] == 'true' ? true : false;
 $largeView = !empty($_GET['largeView']) && $_GET['largeView'] == 'large' ? true : false;
 $ordersObj = new Orders();
 $order = $ordersObj->getOrder($id);
-?>
-<link href="https://fonts.googleapis.com/css?family=Courgette&display=swap" rel="stylesheet">
-<?php
-
-$foodpanda = $order['customer'];
+$customers = new DoubleEntry();
+$blc = $customers->getOpeningBalance($order['customer']['account_id']);
 
 $gst = 0;
 $service_charges = 0;
@@ -25,6 +22,19 @@ if (!empty($order['order']['price'])) {
     $price = $order['order']['price'] + $gst + $service_charges;
 }
 
+
+$prevbalance = ($blc['debitAmount'] + $blc['opening_balance']) - $blc['creditAmount'];
+$balance = ($price - $order['order']['discount']) - $order['order']['paid_amount'];
+
+if ($order['order']['status'] != 1) {
+    $prevbalance -= $balance;
+}
+?>
+<link href="https://fonts.googleapis.com/css?family=Courgette&display=swap" rel="stylesheet">
+<?php
+
+$foodpanda = $order['customer'];
+
 $a = [];
 if (!empty($shop['phoneNumber1'])) {
     array_push($a, $shop['phoneNumber1']);
@@ -36,7 +46,6 @@ if (!empty($shop['phoneNumber3'])) {
     array_push($a, $shop['phoneNumber3']);
 }
 $result = array_filter($a, 'strlen');
-$balance = ($price - $order['order']['discount']) - $order['order']['paid_amount'];
 if ($largeView) {
     $distTotal = 0;
     $qty = 0; ?>
@@ -185,7 +194,7 @@ if ($largeView) {
                                     </p>
                                     <div>
                             </h3>
-                            <h2 style="text-align: center">Sales Invoice</h2>
+                            <h2 style="text-align: center">Sales Invoice <?php echo $order['order']['status'] == 1 ? '(Parked Invoice)' : null ?></h2>
                         </div>
                         <?php $net = number_format($price - $order['order']['discount'], 2); ?>
                         <table class="table" style="width: 100%">
@@ -266,7 +275,7 @@ if ($largeView) {
                                 </tr>
                                 <tr class="no-border">
                                     <th rowspan="2" style="border: 0;" valign="middle" colspan="4">
-                                        Previous Balance: 0
+                                        Previous Balance: <?php echo number_format($prevbalance, 2); ?>
                                     </th>
                                     <td class="text-right ref" style="border: 0" colspan="3">Amount After Discount</td>
                                     <th class="text-right ref"><?php echo $net; ?></th>
