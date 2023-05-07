@@ -229,8 +229,6 @@ if ($largeView) {
                         </tr>
                     <?php } ?>
                 <?php } ?>
-            </tbody>
-            <tfoot>
                 <tr class="no-border">
                     <td valign="top" style="border: 0" class="text-right" colspan="3">Total Quantity</td>
                     <td valign="top" style="border: 0" class="text-right"><strong><?php echo number_format($qty, 1); ?></strong></td>
@@ -277,7 +275,7 @@ if ($largeView) {
                         <th class="text-right ref"><?php echo number_format($balance, 2); ?></th>
                     </tr>
                 <?php } ?>
-            </tfoot>
+                </tfoot>
         </table>
         <footer>
             Power by: Zia ur Rehman Ph.# <strong>03245120412</strong>
@@ -427,8 +425,6 @@ if ($largeView) {
                         <td style="padding: 0 3px" class="text-right"><?php echo number_format($item['quantity'] * ($item['price'] - $item['discount']), 2); ?></td>
                     </tr>
                 <?php } ?>
-            </tbody>
-            <tfoot>
                 <tr class="no-border">
                     <td class="text-right ref" colspan="5">Gross Total</td>
                     <td class="text-right ref"><?php echo number_format($aprice, 2); ?></td>
@@ -452,7 +448,7 @@ if ($largeView) {
                         <th class="text-right ref"><?php echo number_format($balance, 2); ?></th>
                     </tr>
                 <?php } ?>
-            </tfoot>
+                </tfoot>
         </table>
         <footer>
             Power by: Zia ur Rehman Ph.# <strong>03245120412</strong>
