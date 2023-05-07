@@ -157,125 +157,142 @@ if ($largeView) {
             margin-bottom: 20px;
             font-size: inherit;
         }
+
+        @page {
+            @bottom-left {
+                content: counter(page) "/" counter(pages);
+            }
+        }
     </style>
     <div class="recipt large">
-        <header>
-            <div class="head text-left">
-                <span class="pull-right">
-                    <img width="120" height="60" style="vertical-align: middle; margin-right: 5px; filter: grayscale(100%);" src="<?php echo SITE_URL; ?>assets/clients/<?php echo $shop['image']; ?>" />
-                </span>
-                <h3>
-                    <div style="padding-top: 10px"><?php echo strtoupper($shop['full_name']); ?>
-                        <p class="mt-0"><?php echo $shop['location']; ?>, <?php echo $shop['city']; ?> <br>
-                            <strong><small><?php echo implode(", ", $result); ?></small></strong>
-                        </p>
-                        <div>
-                </h3>
-                <h2>Sales Invoice</h2>
-            </div>
-            <?php $net = number_format($price - $order['order']['discount'], 2); ?>
-            <table class="table" style="width: 100%">
-                <tr>
-                    <td width="140" class="text-right">Customer Name:</td>
-                    <th><?php echo !empty($order['order']['customer_name']) ? $order['order']['customer_name'] : $foodpanda['full_name']; ?></th>
-                    <td width="120" class="text-right">Bill Ref.</td>
-                    <th>0000<?php echo $_GET['id']; ?></th>
-                </tr>
-                <tr>
-                    <td class="text-right">Contact No.</td>
-                    <th><?php if (!empty($foodpanda['phoneNumber'])) { ?><?php echo $foodpanda['phoneNumber']; ?><?php } ?></th>
-                    <td width="120" class="text-right">Date Time:</td>
-                    <th><?php echo date('d/m/Y H:i', strtotime($order['order']['created_at'])); ?></th>
-                </tr>
-                <span class="ref"><strong></strong> </span>
-                <span class="date"></span>
-                <span class="ref"><strong></strong> </span>
-
-            </table>
-        </header>
-        <table class="recipt-table" width="100%" cellpadding="0" cellspacing="0">
+        <table width="100%">
             <thead>
                 <tr>
-                    <th class="text-left thead">Sr.#</th>
-                    <th class="text-left thead">Code</th>
-                    <th class="text-left thead">Item</th>
-                    <th width="80" class="thead">Qty</th>
-                    <th width="80" class="thead">U. Price</th>
-                    <th width="80" class="thead">D. Price</th>
-                    <th width="80" class="thead">D. Total</th>
-                    <th class="text-right thead" width="100">Total</th>
+                    <th>
+                        <div class="head text-left">
+                            <span class="pull-right">
+                                <img width="120" height="60" style="vertical-align: middle; margin-right: 5px; filter: grayscale(100%);" src="<?php echo SITE_URL; ?>assets/clients/<?php echo $shop['image']; ?>" />
+                            </span>
+                            <h3>
+                                <div style="padding-top: 10px"><?php echo strtoupper($shop['full_name']); ?>
+                                    <p class="mt-0"><?php echo $shop['location']; ?>, <?php echo $shop['city']; ?> <br>
+                                        <strong><small><?php echo implode(", ", $result); ?></small></strong>
+                                    </p>
+                                    <div>
+                            </h3>
+                            <h2 style="text-align: center">Sales Invoice</h2>
+                        </div>
+                        <?php $net = number_format($price - $order['order']['discount'], 2); ?>
+                        <table class="table" style="width: 100%">
+                            <tr>
+                                <td width="140" class="text-right">Customer Name:</td>
+                                <th><?php echo !empty($order['order']['customer_name']) ? $order['order']['customer_name'] : $foodpanda['full_name']; ?></th>
+                                <td width="120" class="text-right">Bill Ref.</td>
+                                <th>0000<?php echo $_GET['id']; ?></th>
+                            </tr>
+                            <tr>
+                                <td class="text-right">Contact No.</td>
+                                <th><?php if (!empty($foodpanda['phoneNumber'])) { ?><?php echo $foodpanda['phoneNumber']; ?><?php } ?></th>
+                                <td width="120" class="text-right">Date Time:</td>
+                                <th><?php echo date('d/m/Y H:i', strtotime($order['order']['created_at'])); ?></th>
+                            </tr>
+                            <span class="ref"><strong></strong> </span>
+                            <span class="date"></span>
+                            <span class="ref"><strong></strong> </span>
+                        </table>
+                    </th>
                 </tr>
             </thead>
             <tbody>
-                <?php foreach ($order['order_items'] as $key => $item) { ?>
-                    <tr>
-                        <td class="text-left"><?php echo $key + 1; ?></td>
-                        <td class="text-left" style="padding: 0 6px"><?php echo $item['product_id']; ?></td>
-                        <td class="text-left"><?php echo $item['product_title']; ?></td>
-                        <td class="text-right"><?php echo number_format($item['quantity'], 2); ?></td>
-                        <td class="text-right"><?php echo number_format($item['price'], 2); ?></td>
-                        <td class="text-right"><?php echo number_format($item['price'] - $item['discount'], 2); ?></td>
-                        <td class="text-right"><?php
-                                                $aprice += $item['quantity'] * ($item['price']);
-                                                $distTotal += $item['quantity'] * ($item['discount']);
-                                                $qty += $item['quantity'];
-                                                echo number_format($item['quantity'] * ($item['price'] - $item['discount']), 2); ?></td>
-                        <td class="text-right"><?php echo number_format($item['quantity'] * ($item['price']), 2); ?></td>
-                    </tr>
-                    <?php if (!empty($item['description'])) { ?>
-                        <tr>
-                            <th colspan="2">--</th>
-                            <td colspan="6" style="text-align: left"><?php echo $item['description']; ?></td>
-                        </tr>
-                    <?php } ?>
-                <?php } ?>
-                <tr class="no-border">
-                    <td valign="top" style="border: 0" class="text-right" colspan="3">Total Quantity</td>
-                    <td valign="top" style="border: 0" class="text-right"><strong><?php echo number_format($qty, 1); ?></strong></td>
-                    <td class="text-right ref" style="border: 0" colspan="3">Invoice Total</td>
-                    <th class="text-right ref"><?php echo number_format($aprice, 2); ?></th>
-                </tr>
-                <tr class="no-border">
-                    <th rowspan="2" style="border: 0;" valign="middle" colspan="4">
-                        Important Note: Books once sold nerver be returned.
-                    </th>
-                    <td class="text-right ref" style="border: 0" colspan="3">Additional Discount</td>
-                    <th class="text-right ref"><?php echo number_format($order['order']['discount'], 2); ?></th>
-                </tr>
-                <tr class="no-border">
-                    <td class="text-right ref" style="border: 0" colspan="3">Total Discount</td>
-                    <th class="text-right ref"><?php echo number_format($order['order']['discount'] + $distTotal, 2); ?></th>
-                </tr>
-                <tr class="no-border">
-                    <th rowspan="2" style="border: 0;" valign="middle" colspan="4">
-                        Previous Balance: 0
-                    </th>
-                    <td class="text-right ref" style="border: 0" colspan="3">Amount After Discount</td>
-                    <th class="text-right ref"><?php echo $net; ?></th>
-                </tr>
-                <tr class="no-border">
-                    <td class="text-right ref" style="border: 0" colspan="3">Expense</td>
-                    <th class="text-right ref"><?php echo number_format(0, 2); ?></th>
-                </tr>
-                <tr class="no-border">
-                    <th rowspan="3" style="border: 0;" valign="middle" colspan="4" class="text-left">
-                        Net in words: <?php echo convertNumberToWord($net); ?>
-                    </th>
-                    <td class="text-right ref" style="border: 0" colspan="3">Net Invoice</td>
-                    <th class="text-right ref"><?php echo $net; ?></th>
-                </tr>
-                <?php if (!empty($order['order']['paid_amount'])) { ?>
+                <tr>
+                    <td>
+                        <table class="recipt-table" width="100%" cellpadding="0" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th class="text-left thead">Sr.#</th>
+                                    <th class="text-left thead">Code</th>
+                                    <th class="text-left thead">Item</th>
+                                    <th width="80" class="thead">Qty</th>
+                                    <th width="80" class="thead">U. Price</th>
+                                    <th width="80" class="thead">D. Price</th>
+                                    <th width="80" class="thead">D. Total</th>
+                                    <th class="text-right thead" width="100">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($order['order_items'] as $key => $item) { ?>
+                                    <tr>
+                                        <td class="text-left"><?php echo $key + 1; ?></td>
+                                        <td class="text-left" style="padding: 0 6px"><?php echo $item['product_id']; ?></td>
+                                        <td class="text-left"><?php echo $item['product_title']; ?></td>
+                                        <td class="text-right"><?php echo number_format($item['quantity'], 2); ?></td>
+                                        <td class="text-right"><?php echo number_format($item['price'], 2); ?></td>
+                                        <td class="text-right"><?php echo number_format($item['price'] - $item['discount'], 2); ?></td>
+                                        <td class="text-right"><?php
+                                                                $aprice += $item['quantity'] * ($item['price']);
+                                                                $distTotal += $item['quantity'] * ($item['discount']);
+                                                                $qty += $item['quantity'];
+                                                                echo number_format($item['quantity'] * ($item['price'] - $item['discount']), 2); ?></td>
+                                        <td class="text-right"><?php echo number_format($item['quantity'] * ($item['price']), 2); ?></td>
+                                    </tr>
+                                    <?php if (!empty($item['description'])) { ?>
+                                        <tr>
+                                            <th colspan="2">--</th>
+                                            <td colspan="6" style="text-align: left"><?php echo $item['description']; ?></td>
+                                        </tr>
+                                    <?php } ?>
+                                <?php } ?>
+                                <tr class="no-border">
+                                    <td valign="top" style="border: 0" class="text-right" colspan="3">Total Quantity</td>
+                                    <td valign="top" style="border: 0" class="text-right"><strong><?php echo number_format($qty, 1); ?></strong></td>
+                                    <td class="text-right ref" style="border: 0" colspan="3">Invoice Total</td>
+                                    <th class="text-right ref"><?php echo number_format($aprice, 2); ?></th>
+                                </tr>
+                                <tr class="no-border">
+                                    <th rowspan="2" style="border: 0;" valign="middle" colspan="4">
+                                        Important Note: Books once sold nerver be returned.
+                                    </th>
+                                    <td class="text-right ref" style="border: 0" colspan="3">Additional Discount</td>
+                                    <th class="text-right ref"><?php echo number_format($order['order']['discount'], 2); ?></th>
+                                </tr>
+                                <tr class="no-border">
+                                    <td class="text-right ref" style="border: 0" colspan="3">Total Discount</td>
+                                    <th class="text-right ref"><?php echo number_format($order['order']['discount'] + $distTotal, 2); ?></th>
+                                </tr>
+                                <tr class="no-border">
+                                    <th rowspan="2" style="border: 0;" valign="middle" colspan="4">
+                                        Previous Balance: 0
+                                    </th>
+                                    <td class="text-right ref" style="border: 0" colspan="3">Amount After Discount</td>
+                                    <th class="text-right ref"><?php echo $net; ?></th>
+                                </tr>
+                                <tr class="no-border">
+                                    <td class="text-right ref" style="border: 0" colspan="3">Expense</td>
+                                    <th class="text-right ref"><?php echo number_format(0, 2); ?></th>
+                                </tr>
+                                <tr class="no-border">
+                                    <th rowspan="3" style="border: 0;" valign="middle" colspan="4" class="text-left">
+                                        Net in words: <?php echo convertNumberToWord($net); ?>
+                                    </th>
+                                    <td class="text-right ref" style="border: 0" colspan="3">Net Invoice</td>
+                                    <th class="text-right ref"><?php echo $net; ?></th>
+                                </tr>
+                                <?php if (!empty($order['order']['paid_amount'])) { ?>
 
-                    <tr class="no-border">
-                        <th class="text-right ref" style="border: 0" colspan="3">Amount Paid</th>
-                        <th class="text-right ref"><?php echo number_format($order['order']['paid_amount'], 2); ?></th>
-                    </tr>
-                    <tr class="no-border">
-                        <td class="text-right ref" style="border: 0" colspan="3">Balance</td>
-                        <th class="text-right ref"><?php echo number_format($balance, 2); ?></th>
-                    </tr>
-                <?php } ?>
-                </tfoot>
+                                    <tr class="no-border">
+                                        <th class="text-right ref" style="border: 0" colspan="3">Amount Paid</th>
+                                        <th class="text-right ref"><?php echo number_format($order['order']['paid_amount'], 2); ?></th>
+                                    </tr>
+                                    <tr class="no-border">
+                                        <td class="text-right ref" style="border: 0" colspan="3">Balance</td>
+                                        <th class="text-right ref"><?php echo number_format($balance, 2); ?></th>
+                                    </tr>
+                                <?php } ?>
+                                </tfoot>
+                        </table>
+                    </td>
+                </tr>
+            </tbody>
         </table>
         <footer>
             Power by: Zia ur Rehman Ph.# <strong>03245120412</strong>
