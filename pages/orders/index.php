@@ -72,19 +72,19 @@ echo mainHeader(['page' => 'order']);
                         </tr>
                         <tr>
                             <th style="text-align: right">Total Payment</th>
-                            <th style="text-align: right">{{data.income}}</th>
+                            <th style="text-align: right">{{data.income | number: 2}}</th>
                         </tr>
                         <tr>
                             <th style="text-align: right">Total Credit</th>
-                            <th style="text-align: right">{{data.credit}}</th>
+                            <th style="text-align: right">{{data.credit | number: 2}}</th>
                         </tr>
                         <tr>
                             <th style="text-align: right">Total Parked</th>
-                            <th style="text-align: right">{{data.park}}</th>
+                            <th style="text-align: right">{{data.park | number: 2}}</th>
                         </tr>
                         <tr>
                             <th style="text-align: right">G. Total</th>
-                            <th style="text-align: right">{{data.totalIncome}}</th>
+                            <th style="text-align: right">{{data.totalIncome | number: 2}}</th>
                         </tr>
                     </table>
                 </th>
