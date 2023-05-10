@@ -62,6 +62,7 @@ foreach ($ownerStores as $store) {
                                 <a class="btn btn-info btn-xs" href="#" ng-click="rejectDemand(<?php echo $demand['id']; ?>)">Reject</a>
                                 <a class="btn btn-danger btn-xs" href="#" ng-click="deleteDemand(<?php echo $demand['id']; ?>)">Delete</a>
                                 <a class="btn btn-success btn-xs" href="<?php echo SITE_URL . "pages/demand/assign.php?id=" . $demand['id']; ?>">Assign</a>
+                                <a class="btn btn-success btn-xs" href="<?php echo SITE_URL . "pages/demand/modify.php?id=" . $demand['id']; ?>">Modify</a>
                             <?php } ?>
                             <?php } else {
                             if ($demand['flag'] == 0) { ?>
