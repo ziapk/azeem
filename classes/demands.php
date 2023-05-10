@@ -148,7 +148,7 @@ class Demands extends Connection
 
 		// pickup from stock
 		$drop = [
-			'qty' => $array['assign_qty'],
+			'qty' => !empty($array['product_assign_qty']) ? $array['product_assign_qty'] : $array['assign_qty'],
 			'stock_out' => 0,
 		];
 		return $productObj->updateProductToStore($drop, $dropoffShop);
@@ -200,7 +200,7 @@ class Demands extends Connection
 	public function updateDemandItems($array, $shop_id, $owner_id)
 	{
 		try {
-			$assign_qty = $array['assign_qty'];
+			$assign_qty = !empty($array['product_assign_qty']) ? $array['product_assign_qty'] : $array['assign_qty'];
 			$id = $array['id'];
 
 			$stmt = "UPDATE `{$this->table_sub}` SET `product_assign_qty`=:assign_qty WHERE id=:id";
