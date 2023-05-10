@@ -83,7 +83,7 @@ class Demands extends Connection
 	public function getDemandItems($id)
 	{
 		try {
-			$stmt = "SELECT a.*, (b.id, ' | ', b.full_name) as full_name FROM `{$this->table_sub}` as a left join {$this->table_pro} as b on a.product_id=b.id WHERE demand_id = :demand_id";
+			$stmt = "SELECT a.*, concat(b.id, ' | ', b.full_name) as full_name FROM `{$this->table_sub}` as a left join {$this->table_pro} as b on a.product_id=b.id WHERE demand_id = :demand_id";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':demand_id', $id, PDO::PARAM_STR);
 			$prepare->execute();
@@ -96,7 +96,7 @@ class Demands extends Connection
 	public function getDemandsItems($ids)
 	{
 		try {
-			$stmt = "SELECT a.*, (b.id, ' | ', b.full_name) as full_name FROM `{$this->table_sub}` as a left join {$this->table_pro} as b on a.product_id=b.id WHERE demand_id IN (" . (implode(', ', $ids)) . ")";
+			$stmt = "SELECT a.*, concat(b.id, ' | ', b.full_name) as full_name FROM `{$this->table_sub}` as a left join {$this->table_pro} as b on a.product_id=b.id WHERE demand_id IN (" . (implode(', ', $ids)) . ")";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->execute();
 			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
