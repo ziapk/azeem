@@ -120,7 +120,7 @@ class Products extends Connection
 
 
 			$mobileCols = "p.id,p.full_name";
-			$allCols = "p.*, pub.full_name as publisherName, pub.discount_type, pub.discount_amount, CONVERT(case when (pub.discount_amount > 0) then (p.price * (1 - (pub.discount_amount / 100)) ) else p.price end, DECIMAL) as price $column";
+			$allCols = "p.*, concat(p.id, ' | ', p.full_name) as full_name, pub.full_name as publisherName, pub.discount_type, pub.discount_amount, CONVERT(case when (pub.discount_amount > 0) then (p.price * (1 - (pub.discount_amount / 100)) ) else p.price end, DECIMAL) as price $column";
 
 			$mainCols = "";
 			if (!empty($mobileCol)) {
