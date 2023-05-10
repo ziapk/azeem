@@ -68,6 +68,7 @@ foreach ($ownerStores as $store) {
                             if ($demand['flag'] == 0) { ?>
                                 <a class="btn btn-info btn-xs" href="#" ng-click="withdrawalDemand(<?php echo $demand['id']; ?>)">Withdrawal</a>
                                 <a class="btn btn-danger btn-xs" href="#" ng-click="deleteDemand(<?php echo $demand['id']; ?>)">Delete</a>
+                                <a class="btn btn-success btn-xs" href="<?php echo SITE_URL . "pages/demand/modify.php?id=" . $demand['id']; ?>">Modify</a>
                             <?php } ?>
                         <?php } ?>
 
