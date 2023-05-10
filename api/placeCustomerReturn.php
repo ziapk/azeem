@@ -219,12 +219,12 @@ if (!empty($saleDiscount)) {
 
 
 if (!empty($payment_amount)) {
-    $makeTransactionId = $doubleEntry->makeTransaction($makeTransaction);
+    // $makeTransactionId = $doubleEntry->makeTransaction($makeTransaction);
     // payable credit entry
     $entry = [
         'transaction_id' => $makeTransactionId,
         'account_id' => $supplier['account_id'],
-        'entry_type' => 'C',
+        'entry_type' => 'D',
         'description' => '',
         'amount' => $payment_amount,
         'payment_mode' => $_POST['payment_mode'],
@@ -235,7 +235,7 @@ if (!empty($payment_amount)) {
     $entry = [
         'transaction_id' => $makeTransactionId,
         'account_id' => $storeDATA['sale_returns'],
-        'entry_type' => 'D',
+        'entry_type' => 'C',
         'description' => '',
         'amount' => $payment_amount, // 200 @ 10%
         'payment_mode' => $_POST['payment_mode'],

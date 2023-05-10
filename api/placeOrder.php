@@ -1,5 +1,5 @@
-<?php 
-include_once dirname(__FILE__).'/../include/settings.php';
+<?php
+include_once dirname(__FILE__) . '/../include/settings.php';
 try {
     global $shop;
     $orders = new Orders();
@@ -10,15 +10,14 @@ try {
     $totalDiscount = 0;
     $additionalDiscount = 0;
     $parked = false;
-    if($_POST['status'] == 1) {
+    if ($_POST['status'] == 1) {
         $status = 1; // parked
         $parked = true;
-    }
-    else if(!empty($_POST['payment_amount'])) {
+    } else if (!empty($_POST['payment_amount'])) {
         $gst = round($_POST['subTotal'] * ($_POST['gst'] / 100));
         $service_charges = round($_POST['subTotal'] * ($_POST['service_charges'] / 100));
         $status = 8;
-        if((($_POST['subTotal'] + $gst + $service_charges) - $_POST['discount'] - $_POST['payment_amount']) == 0) {
+        if ((($_POST['subTotal'] + $gst + $service_charges) - $_POST['discount'] - $_POST['payment_amount']) == 0) {
             $status = 2;
         }
     }
@@ -45,13 +44,13 @@ try {
 
     $order_id = $orders->createOrder($data);
 
-    if($status == 1 && !empty($_POST['id'])) { // when edit a parked entry
+    if ($status == 1 && !empty($_POST['id'])) { // when edit a parked entry
         $order_id = $_POST['id'];
     }
 
-    if($order_id) {
+    if ($order_id) {
         $items = [];
-        if(sizeof($_POST['items'])) {
+        if (sizeof($_POST['items'])) {
             $orders->deleteOrderItems($order_id);
             foreach ($_POST['items'] as $item) {
                 $d = [
@@ -70,13 +69,13 @@ try {
             }
         }
 
-        if($status != 1) {
+        if ($status != 1) {
 
             $customer = $customersObj->getCustomer($data['customer_id']);
             $doubleEntry = new DoubleEntry();
 
             $makeTransaction = [
-                'description' => !empty($_POST['summery']) ? $_POST['summery'] : "ORDER ID: ".$order_id." PLACED",
+                'description' => !empty($_POST['summery']) ? $_POST['summery'] : "ORDER ID: " . $order_id . " PLACED",
                 'transaction_date' => $storeDATA['sale_date'],
                 'reference' => $_POST['ref_no'],
                 'shopId' => $shop['id'],
@@ -101,7 +100,7 @@ try {
                 'entry_type' => 'C',
                 'description' => '',
                 'amount' => $assetPrice, // 2000
-                'payment_mode'=> $_POST['payment_mode'],
+                'payment_mode' => $_POST['payment_mode'],
                 'user_id' => $_SESSION['user_credentials']['id'],
             ];
 
@@ -114,12 +113,12 @@ try {
                 'entry_type' => 'D',
                 'description' => '',
                 'amount' => $receivable,
-                'payment_mode'=> $_POST['payment_mode'],
+                'payment_mode' => $_POST['payment_mode'],
                 'user_id' => $_SESSION['user_credentials']['id'],
             ];
             $a[] = $doubleEntry->makeEntry($entry);
 
-            if(!empty($saleDiscount)) {
+            if (!empty($saleDiscount)) {
                 // saleDiscount credit entry
                 $entry = [
                     'transaction_id' => $makeTransactionId,
@@ -127,14 +126,13 @@ try {
                     'entry_type' => 'D',
                     'description' => '',
                     'amount' => $saleDiscount, // 200 @ 10%
-                    'payment_mode'=> $_POST['payment_mode'],
+                    'payment_mode' => $_POST['payment_mode'],
                     'user_id' => $_SESSION['user_credentials']['id'],
                 ];
                 $a[] = $doubleEntry->makeEntry($entry);
             }
 
-            
-            if(!empty($cash)) {
+            if (!empty($cash)) {
                 $makeTransactionId = $doubleEntry->makeTransaction($makeTransaction);
                 // cash credit entry
                 $entry = [
@@ -143,11 +141,11 @@ try {
                     'entry_type' => 'D',
                     'description' => '',
                     'amount' => $cash, // 200 @ 10%
-                    'payment_mode'=> $_POST['payment_mode'],
+                    'payment_mode' => $_POST['payment_mode'],
                     'user_id' => $_SESSION['user_credentials']['id'],
                 ];
                 $a[] = $doubleEntry->makeEntry($entry);
-                
+
                 // receivable credit entry
                 $entry = [
                     'transaction_id' => $makeTransactionId,
@@ -155,7 +153,7 @@ try {
                     'entry_type' => 'C',
                     'description' => '',
                     'amount' => $cash,
-                    'payment_mode'=> $_POST['payment_mode'],
+                    'payment_mode' => $_POST['payment_mode'],
                     'user_id' => $_SESSION['user_credentials']['id'],
                 ];
                 $a[] = $doubleEntry->makeEntry($entry);
@@ -171,9 +169,8 @@ try {
         }
     */
 
-        echo json_encode(['status' => 200, 'message' => 'successfully done', 'order' => [ 'id'=> $order_id ]]);
+        echo json_encode(['status' => 200, 'message' => 'successfully done', 'order' => ['id' => $order_id]]);
     }
 } catch (PDOException $e) {
     die("Error!: " . $e->getMessage() . "<br/>");
 }
-?>

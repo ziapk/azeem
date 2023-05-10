@@ -62,7 +62,7 @@ echo mainHeader();
                 <td width="100">
                     <input type="number" class="form-control" ng-change="isValid(row,  calculateSum)" max="row.maxQty" ng-model="row.qty" ng-keydown="initCheckKeypress($event)" />
                 </td>
-                <td width="60"><a href="#" class="btn btn-xs btn-danger pull-right" ng-click="remove(cart)">Delete</a></td>
+                <td width="60"><a href="#" class="btn btn-xs btn-danger pull-right" ng-click="remove(row)">Delete</a></td>
             </tr>
         </tbody>
         <tbody>
@@ -290,8 +290,8 @@ echo mainFooter();
 
         $scope.remove = function(item) {
             if (confirm('Are you sure you want delete?')) {
-                var index = $scope.items.indexOf(item);
-                $scope.items.splice(index, 1);
+                console.log($scope.items);
+                $scope.items = $scope.items.filter((r) => r.id !== item.id);
                 $scope.calculateSum();
             }
         }
@@ -388,8 +388,8 @@ echo mainFooter();
                     // window.open("<?php echo SITE_URL; ?>print?id="+response.data.order.id, "", "width=300,height=300"); 
                     // $scope.items = $scope.list = [];
                     // $scope.subTotal = $scope.discount = $scope.grandTotal = $scope.payment_amount = 0;
-                    // alert(response.data.message);
-                    // $window.location.reload()
+                    alert(response.data.message);
+                    $window.location.reload()
                 });
         }
 

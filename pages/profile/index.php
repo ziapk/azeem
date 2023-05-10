@@ -1,6 +1,6 @@
-<?php 
+<?php
 
-include_once dirname(__FILE__).'/../../include/settings.php';
+include_once dirname(__FILE__) . '/../../include/settings.php';
 echo mainHeader(['page' => 'profile']);
 ?>
 <div class="container" ng-controller="profileController">
@@ -10,7 +10,7 @@ echo mainHeader(['page' => 'profile']);
             <div class="row">
                 <div class="col-sm-4 text-center">
                     <div class="profile-img-section">
-                        <img src="<?php echo SITE_URL;?>assets/img/avatar/{{form.photo || 'avatar1.jpg'}}" alt="" />
+                        <img src="<?php echo SITE_URL; ?>assets/img/avatar/{{form.photo || 'avatar1.jpg'}}" alt="" />
                     </div>
                     <a href="#" class="btn btn-primary" ng-click="changeAvatar()">Change Avatar</a>
                 </div>
@@ -63,52 +63,55 @@ echo mainHeader(['page' => 'profile']);
     </div>
 </div>
 <script>
-app.controller("profileController", function($scope, $http, $uibModal, $httpParamSerializerJQLike) {
-    $scope.form = <?php echo json_encode($userData);?>;
-    $scope.updateProfile = function () {
+    app.controller("profileController", function($scope, $http, $uibModal, $httpParamSerializerJQLike) {
+        $scope.form = <?php echo json_encode($userData); ?>;
+        $scope.updateProfile = function() {
+            $scope.message = "";
+            $http.post("<?php echo SITE_URL ?>api/updateProfile.php", $httpParamSerializerJQLike($scope.form), {
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    }
+                })
+                .then(function(response) {
+                    $scope.message = response.data.message;
+                })
+        };
+
         $scope.message = "";
-        $http.post("<?php echo SITE_URL?>api/updateProfile.php", $httpParamSerializerJQLike($scope.form), {headers: {'Content-Type': 'application/x-www-form-urlencoded'} })
-        .then(function(response) {
-            $scope.message = response.data.message;
-        })
-    };
 
-    $scope.message = "";
+        $scope.changeAvatar = function(size, parentSelector) {
 
-    $scope.changeAvatar = function (size, parentSelector) {
-    
-        $uibModal.open({
-            ariaLabelledBy: 'modal-title',
-            ariaDescribedBy: 'modal-body',
-            templateUrl: 'changeAvatar.html',
-            controller: 'ModalInstanceCtrl',
-            size: size,
-            resolve: {
-                avatar: function() {
-                    return $scope.form.photo || 'avatar1.jpg'
+            $uibModal.open({
+                ariaLabelledBy: 'modal-title',
+                ariaDescribedBy: 'modal-body',
+                templateUrl: 'changeAvatar.html',
+                controller: 'ModalInstanceCtrl',
+                size: size,
+                resolve: {
+                    avatar: function() {
+                        return $scope.form.photo || 'avatar1.jpg'
+                    }
                 }
-            }
-        }).result.then(function (selectedItem) {
-            $scope.form.photo = selectedItem;
-        });
-    };
+            }).result.then(function(selectedItem) {
+                $scope.form.photo = selectedItem;
+            });
+        };
 
-});
+    });
 
-app.controller('ModalInstanceCtrl', function ($scope, $uibModalInstance, $http, $httpParamSerializerJQLike, avatar) {
-    $scope.avatar = avatar;
+    app.controller('ModalInstanceCtrl', function($scope, $uibModalInstance, $http, $httpParamSerializerJQLike, avatar) {
+        $scope.avatar = avatar;
 
-    console.log(avatar)
-    
-    $scope.ok = function () {
-        $uibModalInstance.close($scope.avatar);
-    };
+        console.log(avatar)
 
-    $scope.cancel = function () {
-        $uibModalInstance.dismiss('cancel');
-    };
-});
+        $scope.ok = function() {
+            $uibModalInstance.close($scope.avatar);
+        };
 
+        $scope.cancel = function() {
+            $uibModalInstance.dismiss('cancel');
+        };
+    });
 </script>
 <script type="text/ng-template" id="changeAvatar.html">
     <form ng-submit="ok()"> 
@@ -119,25 +122,25 @@ app.controller('ModalInstanceCtrl', function ($scope, $uibModalInstance, $http, 
             <div class="row">
                 <div class="col-sm-3 col-xs-12 form-group text-center">
                     <label>
-                        <img class="img-responsive" src="<?php echo SITE_URL;?>assets/img/avatar/avatar1.jpg" alt="">
+                        <img class="img-responsive" src="<?php echo SITE_URL; ?>assets/img/avatar/avatar1.jpg" alt="">
                         <input type="radio" value="avatar1.jpg" name="avatar" ng-model="avatar">
                     </label>
                 </div>
                 <div class="col-sm-3 col-xs-12 form-group text-center">
                     <label>
-                        <img class="img-responsive" src="<?php echo SITE_URL;?>assets/img/avatar/avatar2.jpg" alt="">
+                        <img class="img-responsive" src="<?php echo SITE_URL; ?>assets/img/avatar/avatar2.jpg" alt="">
                         <input type="radio" value="avatar2.jpg" name="avatar" ng-model="avatar">
                     </label>
                 </div>
                 <div class="col-sm-3 col-xs-12 form-group text-center">
                     <label>
-                        <img class="img-responsive" src="<?php echo SITE_URL;?>assets/img/avatar/avatar3.jpg" alt="">
+                        <img class="img-responsive" src="<?php echo SITE_URL; ?>assets/img/avatar/avatar3.jpg" alt="">
                         <input type="radio" value="avatar3.jpg" name="avatar" ng-model="avatar">
                     </label>
                 </div>
                 <div class="col-sm-3 col-xs-12 form-group text-center">
                     <label>
-                        <img class="img-responsive" src="<?php echo SITE_URL;?>assets/img/avatar/avatar4.jpg" alt="">
+                        <img class="img-responsive" src="<?php echo SITE_URL; ?>assets/img/avatar/avatar4.jpg" alt="">
                         <input type="radio" value="avatar4.jpg" name="avatar" ng-model="avatar">
                     </label>
                 </div>

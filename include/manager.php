@@ -8,12 +8,12 @@ $shop = $storeDD->getStore($shop['id']);
 $productCls = new Products();
 $ownerId = $userData['role'] == 'owner' ? $userData['id'] : $userData['created_by'];
 $categoryObj = new Categories();
-$categories = $categoryObj->getOwnerCategories($ownerId);
+$categories = $categoryObj->getCategories('exp');
 $list = $productCls->getOwnerProducts($ownerId);
 
-$categories = $categoryObj->getCategories('pro');
+$categoryList = $categoryObj->getCategories('pro');
 $ids = [];
-foreach ($categories as $v) {
+foreach ($categoryList as $v) {
   $ids[] = $v['id'];
 }
 $categoryProducts = $productCls->getCategoryProducts($shop['owner_id'], $ids, $shop['id']);
