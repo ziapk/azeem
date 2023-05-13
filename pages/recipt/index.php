@@ -5,7 +5,7 @@ $ownerId = $userData['role'] == 'owner' ? $userData['id'] : $userData['created_b
 $list = $productCls->getOwnerProducts($ownerId);
 echo mainHeader(['page' => 'recipt']);
 $ordersObj = new Orders();
-$orders = $ordersObj->userOrders($shop['id'], $shop['sale_date'], null, 1);
+$orders = $ordersObj->userOrders($shop['id'], '', null, 1);
 ?>
 <div ng-controller="cartController">
     <div class="container">
