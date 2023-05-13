@@ -313,7 +313,7 @@ class Orders extends Connection
             $toCondition = "";
             if (!empty($to)) {
                 $toCondition .= " AND DATE(o.order_date) BETWEEN '" . $date . "' AND '" . $to . "'";
-            } else {
+            } else if (!empty($date)) {
                 $toCondition .= " AND DATE(o.order_date) BETWEEN '" . $date . "' AND '" . $date . "'";
             }
             $flagCondition = "";
