@@ -15,14 +15,14 @@
         </tr>
     </thead>
     <tbody>
-        <tr ng-repeat="cart in items track by $index" id="item-{{cart.id}}">
+        <tr ng-repeat="cart in items track by $index" id="product-{{$index + 1}}">
             <td>{{$index + 1}}</td>
             <td>
                 {{cart.full_name}}
                 <input type="text" ng-change="calculateSum()" ng-model="cart.description" placeholder="Description" ng-if="cart.show" class="form-control">
             </td>
             <td width="100" ng-if="show_discount">
-                <input type="number" class="form-control" ng-model="cart.discount_value" ng-change="calculateSum()">
+                <input type="number" class="form-control input-add-dist" ng-model="cart.discount_value" ng-change="calculateSum()">
             </td>
             <td>
                 <span ng-if="cart.discount">
@@ -30,7 +30,7 @@
                     <del class="text-danger">{{cart.price | number: 2}}</del> / </span>
                 <span class="text-success">{{(cart.price - cart.discount) | number: 2}}</span>
             </td>
-            <td width="100"><input type="search" ng-model="newqty" class="form-control" on-enter-press="addMoreQty(cart, newqty, $event)"></td>
+            <td width="100"><input type="search" ng-model="newqty" class="form-control input-qty" on-enter-press="addMoreQty(cart, newqty, $event)"></td>
             <td>
                 <div class="quantity">
                     <a href="#" class="quantity__minus" ng-click="subQty(cart)"><span>-</span></a>

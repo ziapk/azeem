@@ -295,18 +295,22 @@ if ($order['order']['status'] == 1 || !empty($_GET['dup'])) {
                 }
             }
             $scope.selectProduct = function(p, sep) {
+                let currentIndex = 0
                 if (sep) {
                     $scope.items.push({
                         ...p,
                         qty: 1,
                         show: true
                     });
+                    currentIndex = $scope.items.length;
                 } else {
                     $scope.product = '';
                     $scope.product = null
                     let exists = false;
-                    $scope.items.map((pro) => {
+
+                    $scope.items.map((pro, index) => {
                         if (pro.id == p.id && !pro.show) {
+                            currentIndex = index + 1;
                             exists = true;
                             pro.qty++;
                         }
@@ -316,17 +320,25 @@ if ($order['order']['status'] == 1 || !empty($_GET['dup'])) {
                             ...p,
                             qty: 1
                         });
+                        currentIndex = $scope.items.length;
                     }
                 }
                 $scope.calculateSum();
 
-                // $location.hash('item-'+p.id);
-
                 // // call $anchorScroll()
-                // $anchorScroll();
-                // $('#item-'+p.id).find('.input-qty').focus();
                 // $scope.product = null;
                 $timeout(() => {
+                    console.log('currentIndex', currentIndex);
+                    $location.hash('product-' + currentIndex);
+                    $anchorScroll();
+                    console.log($('#product-' + currentIndex).length, $('#product-' + currentIndex).find('.input-qty').length)
+                    if ($('#product-' + currentIndex).find('.input-add-dist').length) {
+                        $('#product-' + currentIndex).find('.input-add-dist').focus();
+                    } else {
+                        $('#product-' + currentIndex).find('.input-qty').focus();
+
+                    }
+
                     $scope.product = '';
                 }, 200);
 
