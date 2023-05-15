@@ -90,9 +90,9 @@
                     </label>
                 </div>
                 <?php if ($mode === 'edit') { ?>
-                    <a href="#" class="btn btn-success" ng-click="park()">Park For Now</a>
+                    <a href="#" class="btn btn-success" ng-disabled="loading" ng-click="park()">Park For Now</a>
                 <?php } else { ?>
-                    <a href="#" class="btn btn-primary" ng-click="checkout()"><img width="24" height="24" src="<?php echo SITE_URL; ?>assets/img/svg/001-checkout.svg" alt="" /> Checkout</a>
+                    <a href="#" class="btn btn-primary" ng-disabled="loading" ng-click="checkout()"><img width="24" height="24" src="<?php echo SITE_URL; ?>assets/img/svg/001-checkout.svg" alt="" /> Checkout</a>
                 <?php } ?>
             </th>
         </tr>

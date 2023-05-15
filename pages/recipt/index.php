@@ -5,7 +5,7 @@ $ownerId = $userData['role'] == 'owner' ? $userData['id'] : $userData['created_b
 $list = $productCls->getOwnerProducts($ownerId);
 echo mainHeader(['page' => 'recipt']);
 $ordersObj = new Orders();
-$orders = $ordersObj->userOrders($shop['id'], '', null, 1);
+$orders = $ordersObj->userOrders($shop['id'], $shop['sale_date'], null, 1);
 ?>
 <div ng-controller="cartController">
     <div class="container">
@@ -93,6 +93,7 @@ echo mainFooter();
         $scope.payment_mode = '1';
         const items = [];
         $scope.modes = [];
+        $scope.loading = false;
         // setInterval(() => {
         //     if($scope.focus === true && !$('#searchProduct').is(':focus')) {
         //         $scope.product = null
@@ -336,6 +337,7 @@ echo mainFooter();
         }
 
         $scope.checkout = function(status) {
+            $scope.loading = true;
             $scope.form = {
                 customer_name: $scope.customerName,
                 customerId: $scope.customerData && $scope.customerData.id ? $scope.customerData.id : 1,
@@ -360,7 +362,7 @@ echo mainFooter();
                     }
                 })
                 .then(function(response) {
-
+                    $scope.loading = false;
                     if (status == 1) {
                         alert(response.data.message);
                     } else {
@@ -372,6 +374,9 @@ echo mainFooter();
                     $window.sessionStorage.setItem('shopping', JSON.stringify($scope.items))
                     // $window.location.assign('<?php echo SITE_URL ?>')
                     $scope.selectCustomer($scope.customersList[0]);
+                }).catch(err => {
+                    $scope.loading = false;
+                    alert(err.message)
                 });
         }
 
