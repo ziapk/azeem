@@ -8,12 +8,20 @@ $data = [];
 $data['records'] = $orders;
 $data['income'] = 0;
 foreach ($orders as $row) {
-    $data['totalIncome'] += $row['price'] - $row['discount'];
+    if ($row['flag'] == 1) {
+        $data['totalIncome'] += $row['price'] - $row['discount'];
+    } else {
+        $data['totalReturn'] += $row['paid_amount'];
+    }
     $data['credit'] += $row['price'] - $row['discount'] - $row['paid_amount'];
     if ($row['status'] == 1) {
         $data['park'] += $row['price'] - $row['discount'];
     } else {
-        $data['income'] += $row['paid_amount'] - $row['discount'];
+        if ($row['flag'] == 1) {
+            $data['income'] += $row['paid_amount'] - $row['discount'];
+        } else {
+            $data['return'] += $row['paid_amount'];
+        }
     }
 }
 $data['total'] = sizeof($orders);

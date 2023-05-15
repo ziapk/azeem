@@ -86,6 +86,10 @@ echo mainHeader(['page' => 'order']);
                             <th style="text-align: right">G. Total</th>
                             <th style="text-align: right">{{data.totalIncome | number: 2}}</th>
                         </tr>
+                        <tr>
+                            <th style="text-align: right">Total Return</th>
+                            <th style="text-align: right">{{data.return | number: 2}}</th>
+                        </tr>
                     </table>
                 </th>
             </tr>
