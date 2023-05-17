@@ -23,6 +23,10 @@ $items = [];
 
 $purchaseValue = $_POST['subTotal'];
 $discount = !empty($_POST['discount']) ? $_POST['discount'] : 0;
+$givenDiscount = !empty($_POST['givenDiscount']) ? $_POST['givenDiscount'] : 0;
+
+$discount += $givenDiscount;
+
 $opening_balance = !empty($_POST['opening_balance']) ? $_POST['opening_balance'] : 0;
 $remaining_balance = $opening_balance - $_POST['subTotal'];
 $productsValue = $purchaseValue + $discount;
