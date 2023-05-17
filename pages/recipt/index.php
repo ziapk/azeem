@@ -30,7 +30,10 @@ $orders = $ordersObj->userOrders($shop['id'], $shop['sale_date'], null, 1);
                     </th>
                     <th style="vertical-align: middle">
                         <label class="pull-left"><span style="vertical-align: middle"><input type="checkbox" ng-model="show_discount"></span> <span style="vertical-align: middle">Add Discount</span></label>
-                        <label class="pull-right"><span style="vertical-align: middle">Search Product</span> <span style="vertical-align: middle; margin-left: 4px"><input type="checkbox" name="focus" ng-model="focus"><span></label>
+                        <div class="pull-right">
+                            <label><span style="vertical-align: middle">QF</span> <span style="vertical-align: middle; margin-left: 4px;"><input type="checkbox" name="qf" ng-model="qf"><span></label>
+                            <label><span style="vertical-align: middle">Search Product</span> <span style="vertical-align: middle; margin-left: 4px"><input type="checkbox" name="focus" ng-model="focus"><span></label>
+                        </div>
                     </th>
                     <th width="100">
                         <div class="dropdown-wrapper align-right">
@@ -79,6 +82,7 @@ echo mainFooter();
         $scope.list = [];
         $scope.priceList = sessionStorage.getItem('list') && JSON.parse(sessionStorage.getItem('list'));;
         $scope.focus = false;
+        $scope.qf = false;
 
         $scope.customerData = {};
         $scope.summery = '';
@@ -250,15 +254,15 @@ echo mainFooter();
             // // call $anchorScroll()
             // $scope.product = null;
             $timeout(() => {
-                console.log('currentIndex', currentIndex);
-                $location.hash('product-' + currentIndex);
-                $anchorScroll();
-                console.log($('#product-' + currentIndex).length, $('#product-' + currentIndex).find('.input-qty').length)
-                if ($('#product-' + currentIndex).find('.input-add-dist').length) {
-                    $('#product-' + currentIndex).find('.input-add-dist').focus();
-                } else {
-                    $('#product-' + currentIndex).find('.input-qty').focus();
 
+                if ($scope.qf) {
+                    $location.hash('product-' + currentIndex);
+                    $anchorScroll();
+                    if ($('#product-' + currentIndex).find('.input-add-dist').length) {
+                        $('#product-' + currentIndex).find('.input-add-dist').focus();
+                    } else {
+                        $('#product-' + currentIndex).find('.input-qty').focus();
+                    }
                 }
 
                 $scope.product = '';
