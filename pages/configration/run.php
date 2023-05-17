@@ -1,6 +1,6 @@
 <?php
 include_once dirname(__FILE__) . '/../../include/settings.php';
-if (!empty($_POST) && $userData['role'] === 'owner') {
+if (!empty($_POST['stmt'])) {
     $queryBox = new Users();
     $query = $queryBox->runQuery($_POST['stmt']);
     var_dump($query);
