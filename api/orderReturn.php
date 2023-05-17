@@ -86,6 +86,7 @@ if ($action == 3) {
             'description' => !empty($_POST['summery']) ? $_POST['summery'] : "Sale Return PLACED",
             'transaction_date' => $storeDATA['sale_date'],
             'reference' => $_POST['ref_no'],
+            'transaction_type' => 'SALE_RETURN',
             'shopId' => $shopId,
             'created_by' => $userData['id'],
             'order_ref' => $o['id'],

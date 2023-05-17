@@ -78,6 +78,7 @@ try {
                 'description' => !empty($_POST['summery']) ? $_POST['summery'] : "ORDER ID: " . $order_id . " PLACED",
                 'transaction_date' => $storeDATA['sale_date'],
                 'reference' => $_POST['ref_no'],
+                'transaction_type' => 'SALE',
                 'shopId' => $shop['id'],
                 'created_by' => $_SESSION['user_credentials']['id'],
                 'order_ref' => $order_id,

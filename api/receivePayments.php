@@ -18,6 +18,7 @@ try {
     $makeTransaction = [
         'description' => !empty($_POST['summery']) ? $_POST['summery'] : "PAYMENT RECEVIED",
         'transaction_date' => $storeDATA['sale_date'],
+        'transaction_type' => 'CASH_RECEIVED',
         'reference' => $_POST['ref_no'],
         'shopId' => $shop['id'],
         'created_by' => $_SESSION['user_credentials']['id'],

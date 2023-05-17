@@ -174,6 +174,7 @@ $makeTransaction = [
     'description' => !empty($_POST['summery']) ? $_POST['summery'] : "Purchase Return PLACED",
     'transaction_date' => $storeDATA['sale_date'],
     'reference' => $_POST['ref_no'],
+    'transaction_type' => 'PURCHASE_RETURN',
     'shopId' => $shopId,
     'created_by' => $_SESSION['user_credentials']['id'],
     'order_ref' => null,

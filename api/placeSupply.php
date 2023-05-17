@@ -157,6 +157,7 @@ if ($supply_id) {
         'description' => !empty($_POST['summery']) ? $_POST['summery'] : "Supplier Invoice: " . $supply_id . " PLACED",
         'transaction_date' => $storeDATA['sale_date'],
         'reference' => $data['ref_no'],
+        'transaction_type' => 'PURCHASE',
         'shopId' => $shop['id'],
         'created_by' => $_SESSION['user_credentials']['id'],
         'order_ref' => null,
