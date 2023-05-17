@@ -8,12 +8,14 @@ $shop = $storeDD->getStore($shop['id']);
 $productCls = new Products();
 $ownerId = $userData['role'] == 'owner' ? $userData['id'] : $userData['created_by'];
 $categoryObj = new Categories();
-$categories = $categoryObj->getCategories('pro');
+$categories = $categoryObj->getCategories('exp');
 $list = $productCls->getOwnerProducts($ownerId);
 
-$categoryList = $categoryObj->getCategories('exp');
+$categoryList = $categoryObj->getCategories('pro');
 $ids = [];
+$productCategories = [];
 foreach ($categoryList as $v) {
+  $productCategories[] = $v;
   $ids[] = $v['id'];
 }
 $categoryProducts = $productCls->getCategoryProducts($shop['owner_id'], $ids, $shop['id']);
@@ -38,7 +40,7 @@ $categoryProducts = $productCls->getCategoryProducts($shop['owner_id'], $ids, $s
               <img src="<?php echo SITE_URL . 'assets/img/stationary.png'; ?>" alt="" width="40" height="40" style="margin: -10px 0" />
             </a>
             <ul class="dropdown-menu">
-              <?php foreach ($categories as $key => $value) { ?>
+              <?php foreach ($productCategories as $key => $value) { ?>
                 <li class="dropdown">
                   <a style="padding: 3px 6px" class="dropdown-item" href="#" data-toggle="dropdown"><span class="nav-menu-icon" style="margin-right: 6px"><img width="30" height="30" src="<?php echo SITE_URL . 'uploads/products/' . $value['image']; ?>" alt="" /></span><span class="nav-menu-text"><?php echo $value['full_name']; ?></span>
                     <div class="fa fa-caret-right"></div>
