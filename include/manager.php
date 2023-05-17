@@ -11,7 +11,7 @@ $categoryObj = new Categories();
 $categories = $categoryObj->getCategories('pro');
 $list = $productCls->getOwnerProducts($ownerId);
 
-$categoryList = $categoryObj->getCategories('pro');
+$categoryList = $categoryObj->getCategories('exp');
 $ids = [];
 foreach ($categoryList as $v) {
   $ids[] = $v['id'];
