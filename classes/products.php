@@ -178,7 +178,7 @@ class Products extends Connection
 
 
 
-			$stmt = "SELECT p.*, sum(oi.quantity) as maxQty, customer_id, (oi.price - oi.discount) as price, oi.discount, oi.order_id  FROM `{$this->table}` as p $innerJoin WHERE p.owner_id=:owner_id and o.customer_id=:customer_id $searchQry group by p.id, oi.price LIMIT :offset, :perPage";
+			$stmt = "SELECT p.*, concat(p.id, ' | ', p.full_name) as full_name, sum(oi.quantity) as maxQty, customer_id, (oi.price - oi.discount) as price, oi.discount, oi.order_id  FROM `{$this->table}` as p $innerJoin WHERE p.owner_id=:owner_id and o.customer_id=:customer_id $searchQry group by p.id, oi.price LIMIT :offset, :perPage";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':owner_id', $owner_id, PDO::PARAM_STR);
 			$prepare->bindParam(':customer_id', $customer_id, PDO::PARAM_STR);
@@ -227,7 +227,7 @@ class Products extends Connection
 
 
 
-			$stmt = "SELECT p.*, sum(oi.quantity) as maxQty, supplier_id, oi.price as price, 0 as discount, oi.supply_id, oi.id, oi.product_id  FROM `{$this->table}` as p $innerJoin WHERE p.owner_id=:owner_id and o.supplier_id=:supplier_id $searchQry group by p.id, oi.price LIMIT :offset, :perPage";
+			$stmt = "SELECT p.*, concat(p.id, ' | ', p.full_name) as full_name, sum(oi.quantity) as maxQty, supplier_id, oi.price as price, 0 as discount, oi.supply_id, oi.id, oi.product_id  FROM `{$this->table}` as p $innerJoin WHERE p.owner_id=:owner_id and o.supplier_id=:supplier_id $searchQry group by p.id, oi.price LIMIT :offset, :perPage";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':owner_id', $owner_id, PDO::PARAM_STR);
 			$prepare->bindParam(':supplier_id', $supplier_id, PDO::PARAM_STR);
@@ -356,7 +356,7 @@ class Products extends Connection
 	public function getOwnerProducts($owner_id)
 	{
 		try {
-			$stmt = "SELECT p.*, pub.discount_type, pub.discount_amount, CONVERT(case when (pub.discount_amount > 0) then (p.price * (1 - (pub.discount_amount / 100)) ) else p.price end, DECIMAL) as price FROM `{$this->table}` as p left join publishers as pub on pub.id = p.publisher_id WHERE p.`owner_id`=:owner_id";
+			$stmt = "SELECT p.*, concat(p.id, ' | ', p.full_name) as full_name, pub.discount_type, pub.discount_amount, CONVERT(case when (pub.discount_amount > 0) then (p.price * (1 - (pub.discount_amount / 100)) ) else p.price end, DECIMAL) as price FROM `{$this->table}` as p left join publishers as pub on pub.id = p.publisher_id WHERE p.`owner_id`=:owner_id";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':owner_id', $owner_id, PDO::PARAM_STR);
 			$prepare->execute();
@@ -369,7 +369,7 @@ class Products extends Connection
 	public function searchProducts($shopId, $search)
 	{
 		$searchQuery = "(p.full_name LIKE '%" . $search . "%' OR p.code LIKE '%" . $search . "%' OR p.group LIKE '%" . $search . "%' OR p.description LIKE '%" . $search . "%' OR p.board LIKE '%" . $search . "%' OR p.author LIKE '%" . $search . "%' OR p.price LIKE '%" . $search . "%' OR pc.code LIKE '%" . $search . "%' ) ";
-		$stmt = "SELECT p.* FROM  `{$this->table}` as p LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id WHERE $searchQuery GROUP BY p.id LIMIT 10";
+		$stmt = "SELECT p.*, concat(p.id, ' | ', p.full_name) as full_name, FROM  `{$this->table}` as p LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id WHERE $searchQuery GROUP BY p.id LIMIT 10";
 		$prepare = $this->dbh->prepare($stmt);
 		// $prepare->bindParam(':shopId',$shopId,PDO::PARAM_STR);
 		//$prepare->bindParam(':search',$search,PDO::PARAM_STR);
