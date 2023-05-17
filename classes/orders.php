@@ -278,7 +278,7 @@ class Orders extends Connection
             $prepare->execute();
             $result['order'] = $prepare->fetch(PDO::FETCH_ASSOC);
             if (!empty($result['order'])) {
-                $stmt = "SELECT item.*, p.full_name AS product_title FROM `{$this->table_sub}` AS item LEFT JOIN products AS p ON item.product_id = p.id WHERE item.order_id=:id";
+                $stmt = "SELECT item.*, concat(p.id, ' | ', p.full_name) AS product_title FROM `{$this->table_sub}` AS item LEFT JOIN products AS p ON item.product_id = p.id WHERE item.order_id=:id";
                 $prepare = $this->dbh->prepare($stmt);
                 $prepare->bindParam(':id', $id, PDO::PARAM_STR);
                 $prepare->execute();
