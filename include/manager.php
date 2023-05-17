@@ -46,7 +46,7 @@ $categoryProducts = $productCls->getCategoryProducts($shop['owner_id'], $ids, $s
                     <div class="fa fa-caret-right"></div>
                   </a>
                   <?php if (!empty($categoryProducts[$value['id']])) { ?>
-                    <ul class="dropdown-menu dropdown-submenu" style="min-width: 200px; max-height: 300px; overflow: auto">
+                    <ul class="dropdown-menu dropdown-submenu" style="min-width: 250px; max-height: 300px; overflow: auto">
                       <?php foreach ($categoryProducts[$value['id']] as $c) { ?>
                         <li>
                           <a ng-click='addToCart(<?php echo safe_json_encode($c); ?>)' style="padding: 3px 6px" class="dropdown-item" href="#"><code class="nav-menu-text"><?php echo $c['price']; ?></code><span class="nav-menu-text" style="white-space: normal"><?php echo $c['full_name']; ?></span></a>
