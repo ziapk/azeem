@@ -29,10 +29,12 @@ $discount += $givenDiscount;
 
 $opening_balance = !empty($_POST['opening_balance']) ? $_POST['opening_balance'] : 0;
 $remaining_balance = $opening_balance - $_POST['subTotal'];
-$productsValue = $purchaseValue + $discount;
+$productsValue = $purchaseValue;
 $payment_amount = !empty($_POST['payment_amount']) ? $_POST['payment_amount'] : 0;
 $shopId = $_POST['shopId'];
 $productsForReturn = [];
+
+$payment_amount -= $discount;
 
 $storeDATA = $storeObj->getStore($shopId);
 
@@ -176,7 +178,7 @@ $makeTransactionId = $doubleEntry->makeTransaction($makeTransaction);
 
 $assetPrice = $productsValue; // D 1000
 $saleDiscount = $discount; // C 200
-$returnAmount = $purchaseValue; // C 800
+$returnAmount = $purchaseValue - $discount; // C 800
 
 $entry = [
     'transaction_id' => $makeTransactionId,
