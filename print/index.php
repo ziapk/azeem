@@ -7,7 +7,7 @@ if (empty($id)) {
 $details = !empty($_GET['detail']) && $_GET['detail'] == 'true' ? true : false;
 $largeView = !empty($_GET['largeView']) && $_GET['largeView'] == 'large' ? true : false;
 $ordersObj = new Orders();
-$order = $ordersObj->getOrder($id);
+$order = $ordersObj->getOrder($id, true);
 $customers = new DoubleEntry();
 $blc = $customers->getOpeningBalance($order['customer']['account_id']);
 

@@ -268,7 +268,7 @@ class Orders extends Connection
             die("Error!: " . $e->getMessage() . "<br/>");
         }
     }
-    public function getOrder($id)
+    public function getOrder($id, $disableConcat = false)
     {
         try {
             // $this->runQuery();
@@ -278,7 +278,13 @@ class Orders extends Connection
             $prepare->execute();
             $result['order'] = $prepare->fetch(PDO::FETCH_ASSOC);
             if (!empty($result['order'])) {
-                $stmt = "SELECT item.*, concat(p.id, ' | ', p.full_name) AS product_title FROM `{$this->table_sub}` AS item LEFT JOIN products AS p ON item.product_id = p.id WHERE item.order_id=:id";
+                $full_name = '';
+                if ($disableConcat) {
+                    $full_name .= ", p.full_name AS product_title";
+                } else {
+                    $full_name .= ", concat(p.id, ' | ', p.full_name) AS product_title";
+                }
+                $stmt = "SELECT item.* $full_name FROM `{$this->table_sub}` AS item LEFT JOIN products AS p ON item.product_id = p.id WHERE item.order_id=:id";
                 $prepare = $this->dbh->prepare($stmt);
                 $prepare->bindParam(':id', $id, PDO::PARAM_STR);
                 $prepare->execute();
