@@ -418,7 +418,7 @@ class Products extends Connection
 		}
 
 		try {
-			$stmt = "SELECT st.*, s.price, s.pprice, s.full_name, s.group FROM `{$this->table_st}` as st LEFT JOIN `{$this->table}` AS s ON s.id = st.product_id WHERE st.`owner_id`=:owner_id and st.status = 1 " . $shopCondition . " order by s.id";
+			$stmt = "SELECT st.*, s.code, s.id as product_id, s.full_name, s.group, s.publisher_id, s.author, pub.full_name as publisherName FROM `{$this->table_st}` as st LEFT JOIN `{$this->table}` AS s ON s.id = st.product_id LEFT JOIN publishers as pub on s.publisher_id = pub.id WHERE st.`owner_id`=:owner_id and st.status = 1 " . $shopCondition . " order by s.id";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':owner_id', $owner_id, PDO::PARAM_STR);
 			$prepare->execute();
