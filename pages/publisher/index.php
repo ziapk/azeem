@@ -81,8 +81,8 @@ echo mainHeader(['page' => 'publisher']);
     <script>
         app.controller('publisherController', function($scope, $http, $httpParamSerializerJQLike, $filter, $window, $document, $uibModal, $log) {
             $scope.currentPage = 1;
-            $scope.discountTypes = <?php echo json_encode($discountTypesArr); ?>
-            $scope.statusArr = <?php echo json_encode($statusArr); ?>
+            $scope.discountTypes = <?php echo json_encode($discountTypesArr); ?>;
+            $scope.statusArr = <?php echo json_encode($statusArr); ?>;
             $scope.data = {
                 perPage: "10"
             }; //$scope.data.records;
