@@ -443,7 +443,7 @@ if ($order['order']['status'] == 1 || !empty($_GET['dup'])) {
                             $scope.items = $scope.list = [];
                             $scope.subTotal = $scope.discount = $scope.grandTotal = $scope.payment_amount = 0;
                             // $window.sessionStorage.setItem('shopping', JSON.stringify($scope.items))
-                            // $window.location.assign('<?php echo SITE_URL ?>')
+                            $window.location.assign('<?php echo SITE_URL ?>')
                             $scope.selectCustomer($scope.customersList[0]);
                         }
                     }).catch(err => {
