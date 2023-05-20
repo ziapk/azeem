@@ -427,7 +427,7 @@ if ($largeView) {
         <table width="100%" cellpadding="0" cellspacing="0">
             <thead>
                 <tr>
-                    <th class="text-left thead">Desciption</th>
+                    <th class="text-left thead"></th>
                     <th width="45" class="thead">Price</th>
                     <th width="45" class="thead">D.Price</th>
                     <th width="20" class="thead">Qty</th>
