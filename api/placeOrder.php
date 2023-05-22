@@ -22,6 +22,8 @@ try {
         }
     }
 
+    print_r($_POST['items']);
+
     $data = [
         'user_id' => $_SESSION['user_credentials']['id'],
         'customer_name' => $_POST['customer_name'],
@@ -52,7 +54,7 @@ try {
         $items = [];
         if (sizeof($_POST['items'])) {
             $orders->deleteOrderItems($order_id);
-            print_r($_POST['items']);
+
             $c = [];
             foreach ($_POST['items'] as $item) {
                 $d = [
