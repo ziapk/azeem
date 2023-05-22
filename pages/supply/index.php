@@ -58,7 +58,7 @@ echo mainHeader();
                     <input type="text" class="form-control" ng-model="row.full_name" placeholder="Product title" />
                 </td>
                 <td><input type="number" class="form-control" ng-change="calculateSum()" ng-model="row.discount" /></td>
-                <td><input type="number" class="form-control" ng-change="calculateSum()" ng-model="row.pprice" /></td>
+                <td><input type="number" class="form-control" ng-change="calculatePercent(row)" ng-model="row.pprice" /></td>
                 <td width="100"><input type="number" class="form-control" ng-model="row.price" /></td>
                 <td width="100"><input type="number" class="form-control" ng-change="calculateSum()" ng-model="row.qty" ng-keydown="initCheckKeypress($event)" /></td>
                 <td width="60"><a href="#" class="btn btn-xs btn-danger pull-right" ng-click="remove(cart)">Delete</a></td>
@@ -316,6 +316,10 @@ echo mainFooter();
             })
             $scope.subTotal = subtotal;
             $scope.grandTotal = $scope.payment_amount = $scope.subTotal - $scope.discount;
+        }
+
+        $scope.calculatePercent = product => {
+            product.discount = parseFloat(((1 - (product.pprice / product.price)) * 100).toFixed(1))
         }
 
 
