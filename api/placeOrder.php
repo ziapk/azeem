@@ -52,6 +52,8 @@ try {
         $items = [];
         if (sizeof($_POST['items'])) {
             $orders->deleteOrderItems($order_id);
+            print_r($_POST['items']);
+            $c = [];
             foreach ($_POST['items'] as $item) {
                 $d = [
                     'shopId' => $userData['shopId'],
@@ -65,8 +67,9 @@ try {
                     'status' => $staus,
                 ];
                 $totalDiscount += $item['discount'];
-                $orders->createOrderDetails($d);
+                $c[] = $orders->createOrderDetails($d);
             }
+            print_r($c);
         }
 
         if ($status != 1) {
