@@ -311,6 +311,7 @@ echo mainFooter();
             let subtotal = 0;
             $scope.items.map((product) => {
                 product.pprice = parseFloat((parseFloat(product.price || 0) * (100 - (parseFloat(product.discount || 0)) / 100)).toFixed(1))
+                console.log('product.pprice', product.pprice);
                 subtotal += (product.pprice * product.qty);
             })
             $scope.subTotal = subtotal;
