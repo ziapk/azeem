@@ -22,8 +22,6 @@ try {
         }
     }
 
-    print_r($_POST['items']);
-
     $data = [
         'user_id' => $_SESSION['user_credentials']['id'],
         'customer_name' => $_POST['customer_name'],
@@ -71,7 +69,6 @@ try {
                 $totalDiscount += $item['discount'];
                 $c[] = $orders->createOrderDetails($d);
             }
-            print_r($c);
         }
 
         if ($status != 1) {
