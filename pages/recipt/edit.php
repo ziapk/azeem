@@ -29,7 +29,11 @@ if ($order['order']['status'] == 1 || !empty($_GET['dup'])) {
                         </th>
                         <th style="vertical-align: middle">
                             <label class="pull-left"><span style="vertical-align: middle"><input type="checkbox" ng-model="show_discount"></span> <span style="vertical-align: middle">Add Discount</span></label>
-                            <label class="pull-right"><span style="vertical-align: middle">Search Product</span> <span style="vertical-align: middle; margin-left: 4px"><input type="checkbox" name="focus" ng-model="focus"><span></label>
+
+                            <div class="pull-right">
+                                <label><span style="vertical-align: middle">QF</span> <span style="vertical-align: middle; margin-left: 4px;"><input type="checkbox" name="qf" ng-model="qf"><span></label>
+                                <label><span style="vertical-align: middle">Search Product</span> <span style="vertical-align: middle; margin-left: 4px"><input type="checkbox" name="focus" ng-model="focus"><span></label>
+                            </div>
                         </th>
                         <th width="100">
                             <div class="dropdown-wrapper align-right">
@@ -73,6 +77,7 @@ if ($order['order']['status'] == 1 || !empty($_GET['dup'])) {
             $scope.list = [];
             $scope.priceList = sessionStorage.getItem('list') && JSON.parse(sessionStorage.getItem('list'));;
             $scope.focus = false;
+            $scope.qf = false;
 
             $scope.data = <?php echo json_encode($order); ?>;
             $scope.customerData = {};
@@ -232,9 +237,10 @@ if ($order['order']['status'] == 1 || !empty($_GET['dup'])) {
                         discount_value: (parseFloat(row.discount || 0) / row.price) * 100
                     })
                 });
+
                 if ($window.sessionStorage.getItem('shopping')) {
-                    const shopCart = JSON.parse($window.sessionStorage.getItem('shopping'));
-                    shopCart.map(function(row) {
+                    const storageCart = JSON.parse($window.sessionStorage.getItem('shopping'));
+                    storageCart.map(function(row) {
                         const obj = $scope.mainList.find(function(e) {
                             return e.id == row.id
                         });
@@ -249,8 +255,6 @@ if ($order['order']['status'] == 1 || !empty($_GET['dup'])) {
                     $timeout(() => {
                         $scope.calculateSum()
                     });
-                } else {
-                    $scope.items = []
                 }
             });
 
@@ -328,15 +332,15 @@ if ($order['order']['status'] == 1 || !empty($_GET['dup'])) {
                 // // call $anchorScroll()
                 // $scope.product = null;
                 $timeout(() => {
-                    console.log('currentIndex', currentIndex);
-                    $location.hash('product-' + currentIndex);
-                    $anchorScroll();
-                    console.log($('#product-' + currentIndex).length, $('#product-' + currentIndex).find('.input-qty').length)
-                    if ($('#product-' + currentIndex).find('.input-add-dist').length) {
-                        $('#product-' + currentIndex).find('.input-add-dist').focus();
-                    } else {
-                        $('#product-' + currentIndex).find('.input-qty').focus();
 
+                    if ($scope.qf) {
+                        $location.hash('product-' + currentIndex);
+                        $anchorScroll();
+                        if ($('#product-' + currentIndex).find('.input-add-dist').length) {
+                            $('#product-' + currentIndex).find('.input-add-dist').focus();
+                        } else {
+                            $('#product-' + currentIndex).find('.input-qty').focus();
+                        }
                     }
 
                     $scope.product = '';
