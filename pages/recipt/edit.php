@@ -420,7 +420,19 @@ if ($order['order']['status'] == 1 || !empty($_GET['dup'])) {
                     customer_name: $scope.customerName,
                     subTotal: $scope.subTotal,
                     discount: $scope.discount,
-                    items: $scope.items,
+                    items: $scope.items.map(({
+                        id,
+                        description,
+                        qty,
+                        discount,
+                        price
+                    }) => ({
+                        id,
+                        description,
+                        qty,
+                        discount,
+                        price
+                    })),
                     payment_amount: $scope.payment_amount,
                     gst: $scope.gst,
                     service_charges: $scope.service_charges,
