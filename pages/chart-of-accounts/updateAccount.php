@@ -1,6 +1,6 @@
 <?php
 session_start();
-include_once dirname(__FILE__).'/../../include/settings.php';
+include_once dirname(__FILE__) . '/../../include/settings.php';
 $errors = false;
 $response = array();
 $data 	= array();
@@ -8,7 +8,7 @@ $data 	= array();
 
 // title
 
-if(empty($_REQUEST['mtitle'])) {
+if (empty($_REQUEST['mtitle'])) {
 	$errors = false;
 	$response['title'] = 'please fill title';
 } else {
@@ -17,7 +17,7 @@ if(empty($_REQUEST['mtitle'])) {
 
 // code 
 
-if(empty($_REQUEST['mcode'])) {
+if (empty($_REQUEST['mcode'])) {
 	$errors = false;
 	$response['code'] = 'please fill code';
 } else {
@@ -26,6 +26,7 @@ if(empty($_REQUEST['mcode'])) {
 
 $data['parent_id'] = $_REQUEST['mparent_id'];
 $data['status'] = $_REQUEST['mstatus'];
+$data['opening_balance'] = !empty($_REQUEST['mopening_balance']) ? $_REQUEST['mopening_balance'] : 0;
 $data['created_by'] = $_SESSION['user_credentials']['id'];
 
 
@@ -34,7 +35,7 @@ $data['created_by'] = $_SESSION['user_credentials']['id'];
 
 // id
 
-if(empty($_REQUEST['mid'])) {
+if (empty($_REQUEST['mid'])) {
 	$errors = false;
 	$response['id'] = 'please fill id';
 } else {
@@ -44,21 +45,21 @@ if(empty($_REQUEST['mid'])) {
 
 
 
-if(!$errors) {
+if (!$errors) {
 	$categories = new DoubleEntry();
 	$p = $categories->getAccount($data['parent_id']);
 	$data['account_type'] = $p['account_type'];
 	$category = $categories->updateAccount($data);
-	if($category) {
+	if ($category) {
 		header('Content-Type: application/json; charset=UTF-8');
 		echo json_encode($category);
-	}else {
+	} else {
 		header('HTTP/1.1 500 ServerError');
 		header('Content-Type: application/json; charset=UTF-8');
-		echo json_encode('internal server');	
+		echo json_encode('internal server');
 	}
-}else {
+} else {
 	header('HTTP/1.1 400 Form');
 	header('Content-Type: application/json; charset=UTF-8');
-	echo json_encode($response);	
+	echo json_encode($response);
 }

@@ -1,8 +1,8 @@
-<?php 
+<?php
 
 /**
-* 
-*/
+ * 
+ */
 class DoubleEntry extends Connection
 {
 	private $table = 'accounts';
@@ -18,12 +18,13 @@ class DoubleEntry extends Connection
 	private $table_ds = 'demand_status';
 	private $table_ds_history = 'demand_status_history';
 
-	
 
-	public function getAccounts($shopId = null) {
+
+	public function getAccounts($shopId = null)
+	{
 		try {
 			$shopIdCond = '';
-			if(!empty($shopId)) {
+			if (!empty($shopId)) {
 				$shopIdCond = "and shopId = $shopId";
 			}
 			$stmt = "SELECT * from `$this->table` where status = 1 $shopIdCond order by code asc";
@@ -31,42 +32,42 @@ class DoubleEntry extends Connection
 			$prepare->execute();
 			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
 			return $result;
-			
 		} catch (PDOException $e) {
-		    die("Error!: " . $e->getMessage() . "<br/>");
+			die("Error!: " . $e->getMessage() . "<br/>");
 		}
 	}
 
-	public function addColumn($columnName, $table) {
-        try {
-            $stmt = "ALTER TABLE `{$table}` ADD COLUMN IF NOT EXISTS `{$columnName}` varchar(20) NULL DEFAULT NULL AFTER `reference`";
-            $prepare = $this->dbh->prepare($stmt);
-            $prepare->execute();
-        } catch (PDOException $e) {
-		    die("Error!: " . $e->getMessage() . "<br/>");
+	public function addColumn($columnName, $table)
+	{
+		try {
+			$stmt = "ALTER TABLE `{$table}` ADD COLUMN IF NOT EXISTS `{$columnName}` varchar(20) NULL DEFAULT NULL AFTER `reference`";
+			$prepare = $this->dbh->prepare($stmt);
+			$prepare->execute();
+		} catch (PDOException $e) {
+			die("Error!: " . $e->getMessage() . "<br/>");
 		}
-    }
-	
-	public function searchAccounts($shopId = null, $search) {
+	}
+
+	public function searchAccounts($shopId = null, $search)
+	{
 		try {
 			$shopIdCond = '';
-			if(!empty($shopId)) {
+			if (!empty($shopId)) {
 				$shopIdCond = " and shopId=$shopId ";
-
 			}
 
-			$stmt = "SELECT * FROM `$this->table` WHERE (title LIKE '%".$search."%' or code LIKE '%".$search."%') and status = 1 $shopIdCond LIMIT 10";
+			$stmt = "SELECT * FROM `$this->table` WHERE (title LIKE '%" . $search . "%' or code LIKE '%" . $search . "%') and status = 1 $shopIdCond LIMIT 10";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':shopId', $shopId, PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
 			return $result;
-			
 		} catch (PDOException $e) {
-		    die("Error!: " . $e->getMessage() . "<br/>");
+			die("Error!: " . $e->getMessage() . "<br/>");
 		}
 	}
-	public function getAccount($id) {
+	public function getAccount($id)
+	{
 		try {
 			$stmt = "SELECT * from `$this->table` where status = 1 and id=:id";
 			$prepare = $this->dbh->prepare($stmt);
@@ -74,25 +75,25 @@ class DoubleEntry extends Connection
 			$prepare->execute();
 			$result = $prepare->fetch(PDO::FETCH_ASSOC);
 			return $result;
-			
 		} catch (PDOException $e) {
-		    die("Error!: " . $e->getMessage() . "<br/>");
+			die("Error!: " . $e->getMessage() . "<br/>");
 		}
 	}
-	public function getStatus() {
+	public function getStatus()
+	{
 		try {
 			$stmt = "SELECT * from `$this->table_ds` order by sortorder asc";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->execute();
 			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
 			return $result;
-			
 		} catch (PDOException $e) {
-		    die("Error!: " . $e->getMessage() . "<br/>");
+			die("Error!: " . $e->getMessage() . "<br/>");
 		}
 	}
 
-	public function getAccountLeafs($shopId = null) {
+	public function getAccountLeafs($shopId = null)
+	{
 		try {
 			// $this->addColumn('order_ref', $this->table_transactions);
 			// $this->addColumn('supply_ref', $this->table_transactions);
@@ -102,112 +103,111 @@ class DoubleEntry extends Connection
 			$prepare->execute();
 			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
 			return $result;
-			
 		} catch (PDOException $e) {
-		    die("Error!: " . $e->getMessage() . "<br/>");
+			die("Error!: " . $e->getMessage() . "<br/>");
 		}
 	}
 
-	public function getSuppliers() {
+	public function getSuppliers()
+	{
 		try {
 			$stmt = "SELECT * from `$this->table_suppliers` where flag = 1";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->execute();
 			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
 			return $result;
-			
 		} catch (PDOException $e) {
-		    die("Error!: " . $e->getMessage() . "<br/>");
+			die("Error!: " . $e->getMessage() . "<br/>");
 		}
 	}
 
-	public function getAccountsByIds($idArray) {
+	public function getAccountsByIds($idArray)
+	{
 		try {
 			$ids = implode(',', $idArray);
-			$stmt = "SELECT * from `$this->table`  where status = 1 and id IN (".$ids.")";
+			$stmt = "SELECT * from `$this->table`  where status = 1 and id IN (" . $ids . ")";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->execute();
 			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
 			return $result;
-			
 		} catch (PDOException $e) {
-		    die("Error!: " . $e->getMessage() . "<br/>");
+			die("Error!: " . $e->getMessage() . "<br/>");
 		}
 	}
-	
-	public function getDemands() {
+
+	public function getDemands()
+	{
 		try {
 			$stmt = "SELECT b.*, ds.title as statusName from `$this->table_demands` as b left join `$this->table_ds` as ds on ds.id = b.status where 1";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->execute();
 			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
 			return $result;
-			
 		} catch (PDOException $e) {
-		    die("Error!: " . $e->getMessage() . "<br/>");
+			die("Error!: " . $e->getMessage() . "<br/>");
 		}
 	}
-	public function getUserDemandsForApproval($id = false) {
+	public function getUserDemandsForApproval($id = false)
+	{
 		try {
-			if($id) {
+			if ($id) {
 				$stmt = "SELECT b.*, ds.title as statusName from `$this->table_demands` as b left join `$this->table_ds` as ds on ds.id = b.status left join `$this->table_ds_history` as dh on dh.demand_id = b.id where dh.user_id = :id";
-			}
-			else {
+			} else {
 				$stmt = "SELECT b.*, ds.title as statusName from `$this->table_demands` as b left join `$this->table_ds` as ds on ds.id = b.status where 1";
 			}
 			$prepare = $this->dbh->prepare($stmt);
-			if($id) {
+			if ($id) {
 				$prepare->bindParam(':id', $id, PDO::PARAM_STR);
 			}
 			$prepare->execute();
 			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
 			return $result;
-			
 		} catch (PDOException $e) {
-		    die("Error!: " . $e->getMessage() . "<br/>");
+			die("Error!: " . $e->getMessage() . "<br/>");
 		}
 	}
-	
-	
-	public function getJournals($arr = []) {
+
+
+	public function getJournals($arr = [])
+	{
 		try {
 			$where = "where t.flag=1 ";
-			if(!empty($arr['from']) && !empty($arr['to'])) {
+			if (!empty($arr['from']) && !empty($arr['to'])) {
 
 				$to = $arr['to'];
 				$from = $arr['from'];
 				$account_id = $arr['account_id'];
 
 				$where .= " and t.transaction_date between '$from' AND '$to'";
-				if(!empty($account_id)) {
-					$where .=" AND a.transaction_id = (select transaction_id from `$this->table_ledger_entries` where account_id = $account_id and transaction_id = a.transaction_id)";
+				if (!empty($account_id)) {
+					$where .= " AND a.transaction_id = (select transaction_id from `$this->table_ledger_entries` where account_id = $account_id and transaction_id = a.transaction_id)";
 				}
 			}
-			 
+
 			$stmt = "SELECT a.*, t.transaction_date, t.reference, a.description, t.description as v_description from `$this->table_ledger_entries` as a left join `$this->table_transactions` as t on t.id = a.transaction_id $where";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->execute();
 			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
 			return $result;
-			
 		} catch (PDOException $e) {
-		    die("Error!: " . $e->getMessage() . "<br/>");
+			die("Error!: " . $e->getMessage() . "<br/>");
 		}
 	}
 
-	public function getLedgerByAccount($arr = []) {
+	public function getLedgerByAccount($arr = [])
+	{
 		try {
 			$where = "where t.flag=1 ";
 			$account_id = $arr['account_id'];
-			if(!empty($arr['from']) && !empty($arr['to'])) {
+			if (!empty($arr['from']) && !empty($arr['to'])) {
 
 				$to = $arr['to'];
 				$from = $arr['from'];
 				$where .= " and t.transaction_date between '$from' AND '$to'";
 			}
-			
-			if(!empty($account_id)) {
-				$where .=" and a.account_id = $account_id";
+
+			if (!empty($account_id)) {
+				$where .= " and a.account_id = $account_id";
 			}
 
 
@@ -222,13 +222,13 @@ class DoubleEntry extends Connection
 			$prepare->execute();
 			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
 			return ['rows' => $result, 'summery' => $summery];
-			
 		} catch (PDOException $e) {
-		    die("Error!: " . $e->getMessage() . "<br/>");
+			die("Error!: " . $e->getMessage() . "<br/>");
 		}
 	}
 
-	public function getOpeningBalance($account_id) {
+	public function getOpeningBalance($account_id)
+	{
 		try {
 
 			$stmt = "SELECT a.opening_balance, a.id, SUM(CASE WHEN e.entry_type = 'D' THEN e.amount ELSE 0 END) AS debitAmount, SUM(CASE WHEN e.entry_type = 'C' THEN e.amount ELSE 0 END) AS creditAmount FROM `$this->table_ledger_entries` as e LEFT JOIN `$this->table` as a ON a.id = e.account_id and a.status = 1 left join `{$this->table_transactions}` as t on t.id=e.transaction_id WHERE t.flag = 1 and a.id = :account_id";
@@ -238,14 +238,14 @@ class DoubleEntry extends Connection
 			$prepare->execute();
 			$result = $prepare->fetch(PDO::FETCH_ASSOC);
 			return $result;
-			
 		} catch (PDOException $e) {
-		    die("Error!: " . $e->getMessage() . "<br/>");
+			die("Error!: " . $e->getMessage() . "<br/>");
 		}
 	}
-	public function getClosingBalanceReport($array) {
+	public function getClosingBalanceReport($array)
+	{
 		try {
-			$fromDate = !empty($array['fromDate']) ? $array['fromDate']: '';
+			$fromDate = !empty($array['fromDate']) ? $array['fromDate'] : '';
 			$toDate = !empty($array['toDate']) ? $array['toDate'] : '';
 			$shopId = !empty($array['shopId']) ? $array['shopId'] : '';
 			$parent_ids = !empty($array['parent_ids']) ? $array['parent_ids'] : [];
@@ -254,12 +254,12 @@ class DoubleEntry extends Connection
 			$shopIdCondition = "";
 			$accountCondition = "";
 
-			if(!empty($shopId)) {
+			if (!empty($shopId)) {
 				$shopIdCondition = "and t.shopId = $shopId";
 			}
 
-			if(!empty($account_ids)) {
-				$accountCondition = "and (a.parent_id in (".implode(',', $parent_ids).") or a.id in (".implode(',', $account_ids)."))";
+			if (!empty($account_ids)) {
+				$accountCondition = "and (a.parent_id in (" . implode(',', $parent_ids) . ") or a.id in (" . implode(',', $account_ids) . "))";
 			}
 
 			$stmt = "SELECT e.transaction_id, e.payment_mode, a.parent_id, a.code, e.account_id, a.account_type, a.title, e.entry_type, t.transaction_date, amount FROM `$this->table_transactions` t LEFT JOIN `$this->table_ledger_entries` e ON e.transaction_id = t.id LEFT JOIN `$this->table` a ON a.id = e.account_id and a.status = 1 WHERE (t.flag=1 $shopIdCondition $accountCondition) and (DATE(t.transaction_date) BETWEEN :fromDate AND :toDate)";
@@ -270,16 +270,16 @@ class DoubleEntry extends Connection
 			$prepare->execute();
 			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
 			return $result;
-			
 		} catch (PDOException $e) {
-		    die("Error!: " . $e->getMessage() . "<br/>");
+			die("Error!: " . $e->getMessage() . "<br/>");
 		}
 	}
 
-	public function getTrialBalanceReport($array) {
+	public function getTrialBalanceReport($array)
+	{
 		try {
 
-			$fromDate = !empty($array['fromDate']) ? $array['fromDate']: '';
+			$fromDate = !empty($array['fromDate']) ? $array['fromDate'] : '';
 			$toDate = !empty($array['toDate']) ? $array['toDate'] : '';
 
 			$stmt = "
@@ -292,16 +292,16 @@ class DoubleEntry extends Connection
 			$prepare->execute();
 			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
 			return $result;
-			
 		} catch (PDOException $e) {
-		    die("Error!: " . $e->getMessage() . "<br/>");
+			die("Error!: " . $e->getMessage() . "<br/>");
 		}
 	}
 
-	public function getPLStatementReport($array) {
+	public function getPLStatementReport($array)
+	{
 		try {
 
-			$fromDate = !empty($array['fromDate']) ? $array['fromDate']: '';
+			$fromDate = !empty($array['fromDate']) ? $array['fromDate'] : '';
 			$toDate = !empty($array['toDate']) ? $array['toDate'] : '';
 			// $fromDate = '2023-01-01';
 			// $toDate = '2023-12-01';;
@@ -313,12 +313,12 @@ class DoubleEntry extends Connection
 			$shopIdCondition = "";
 			$accountCondition = "";
 
-			if(!empty($shopId)) {
+			if (!empty($shopId)) {
 				$shopIdCondition = "and t.shopId = $shopId";
 			}
 
-			if(!empty($account_ids)) {
-				$accountCondition = "and (a.parent_id in (".implode(',', $parent_ids).") or a.id in (".implode(',', $account_ids)."))";
+			if (!empty($account_ids)) {
+				$accountCondition = "and (a.parent_id in (" . implode(',', $parent_ids) . ") or a.id in (" . implode(',', $account_ids) . "))";
 			}
 
 			$stmt = "SELECT SQL_NO_CACHE a.code, e.account_id, a.account_type, a.title, t.transaction_date, SUM(CASE WHEN e.entry_type='D' THEN e.amount ELSE 0 END) AS debitAmount, SUM(CASE WHEN e.entry_type='C' THEN e.amount ELSE 0 END) AS creditAmount, e.transaction_id, e.payment_mode, a.parent_id, a.code, e.account_id, a.account_type, a.title, e.entry_type, t.transaction_date FROM `$this->table_transactions` t LEFT JOIN `$this->table_ledger_entries` e ON e.transaction_id = t.id LEFT JOIN `$this->table` a ON a.id = e.account_id and a.status = 1 WHERE (t.flag=1 $shopIdCondition $accountCondition) and (DATE(t.transaction_date) BETWEEN :fromDate AND :toDate) GROUP BY e.account_id";
@@ -330,13 +330,13 @@ class DoubleEntry extends Connection
 			// echo '<pre>';
 			// print_r($array);
 			return $result;
-			
 		} catch (PDOException $e) {
-		    die("Error!: " . $e->getMessage() . "<br/>");
+			die("Error!: " . $e->getMessage() . "<br/>");
 		}
 	}
 
-	public function resetAccountChildrens($parent_id) {
+	public function resetAccountChildrens($parent_id)
+	{
 		try {
 			$stmt = "UPDATE `$this->table` SET parent_id=account_type where parent_id=:parent_id";
 			$prepare = $this->dbh->prepare($stmt);
@@ -345,13 +345,13 @@ class DoubleEntry extends Connection
 			$result = $prepare->rowCount();
 			echo $result;
 			return $result;
-			
 		} catch (PDOException $e) {
-		    die("Error!: " . $e->getMessage() . "<br/>");
+			die("Error!: " . $e->getMessage() . "<br/>");
 		}
 	}
 
-	public function updateDemandProcess($array) {
+	public function updateDemandProcess($array)
+	{
 		try {
 			$stmt = "UPDATE `$this->table_demands` SET flag=:flag where id=:id";
 			$prepare = $this->dbh->prepare($stmt);
@@ -360,13 +360,13 @@ class DoubleEntry extends Connection
 			$prepare->execute();
 			$result = $prepare->rowCount();
 			return $result;
-			
 		} catch (PDOException $e) {
-		    die("Error!: " . $e->getMessage() . "<br/>");
+			die("Error!: " . $e->getMessage() . "<br/>");
 		}
 	}
 
-	public function getAccountSiblings($parent_id) {
+	public function getAccountSiblings($parent_id)
+	{
 		try {
 			$stmt = "SELECT count(id) as total from `$this->table` where parent_id=:parent_id and `status` = 1";
 			$prepare = $this->dbh->prepare($stmt);
@@ -374,65 +374,67 @@ class DoubleEntry extends Connection
 			$prepare->execute();
 			$result = $prepare->fetch(PDO::FETCH_ASSOC);
 			return $result;
-			
 		} catch (PDOException $e) {
-		    die("Error!: " . $e->getMessage() . "<br/>");
+			die("Error!: " . $e->getMessage() . "<br/>");
 		}
 	}
 
 
-	
-	public function searchAccountLeafs($search, $shopId = null) {
+
+	public function searchAccountLeafs($search, $shopId = null)
+	{
 		try {
 			$shopIdCond = "";
-			if(!empty($shopId)) {
+			if (!empty($shopId)) {
 				$shopIdCond = " and t1.shopId=$shopId ";
 			}
-			$stmt = "SELECT t1.id as account_id, t1.account_type, t1.code, t1.title FROM `$this->table` AS t1 LEFT JOIN `$this->table` as t2 ON t1.id = t2.parent_id WHERE t2.id IS NULL and (t1.title LIKE '%".$search."%' or t1.code LIKE '%".$search."%') and t1.status = 1 $shopIdCond LIMIT 10";
+			$stmt = "SELECT t1.id as account_id, t1.account_type, t1.code, t1.title FROM `$this->table` AS t1 LEFT JOIN `$this->table` as t2 ON t1.id = t2.parent_id WHERE t2.id IS NULL and (t1.title LIKE '%" . $search . "%' or t1.code LIKE '%" . $search . "%') and t1.status = 1 $shopIdCond LIMIT 10";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->execute();
 			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
 			return $result;
 		} catch (PDOException $e) {
-		    die("Error!: " . $e->getMessage() . "<br/>");
+			die("Error!: " . $e->getMessage() . "<br/>");
 		}
 	}
-	
-	public function getBalanceSheet() {
+
+	public function getBalanceSheet()
+	{
 		$stmt = "SELECT e.* FROM `{$this->table_ledger_entries}` as e left join `{$this->table_transactions}` as t on t.id = e.transaction_id where flag=1";
 		$prepare = $this->dbh->prepare($stmt);
 		$prepare->execute();
 		$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
-		return $result;		
+		return $result;
 	}
-	
-	public function getAccountTypes() {
+
+	public function getAccountTypes()
+	{
 		try {
 			$stmt = "SELECT * from `$this->table_types` where 1";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->execute();
 			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
 			return $result;
-			
 		} catch (PDOException $e) {
-		    die("Error!: " . $e->getMessage() . "<br/>");
+			die("Error!: " . $e->getMessage() . "<br/>");
 		}
 	}
-	
-	public function getUnits() {
+
+	public function getUnits()
+	{
 		try {
 			$stmt = "SELECT * from `$this->table_units` where 1";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->execute();
 			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
 			return $result;
-			
 		} catch (PDOException $e) {
-		    die("Error!: " . $e->getMessage() . "<br/>");
+			die("Error!: " . $e->getMessage() . "<br/>");
 		}
 	}
 
-	public function getAccountType($id) {
+	public function getAccountType($id)
+	{
 		try {
 			$stmt = "SELECT * from `$this->table_types` where id=:id";
 			$prepare = $this->dbh->prepare($stmt);
@@ -440,9 +442,8 @@ class DoubleEntry extends Connection
 			$prepare->execute();
 			$result = $prepare->fetch(PDO::FETCH_ASSOC);
 			return $result;
-			
 		} catch (PDOException $e) {
-		    die("Error!: " . $e->getMessage() . "<br/>");
+			die("Error!: " . $e->getMessage() . "<br/>");
 		}
 	}
 
@@ -451,36 +452,37 @@ class DoubleEntry extends Connection
 
 	// insert method
 
-	public function getPaymentModes($params) {
+	public function getPaymentModes($params)
+	{
 		try {
-			
+
 			$stmt = "SELECT COUNT(id) as total FROM `{$this->table_modes}` where `shopId`=:shopId";
 			$prepare = $this->dbh->prepare($stmt);
-			$prepare->bindParam(':shopId',$params['shopId'],PDO::PARAM_INT);
+			$prepare->bindParam(':shopId', $params['shopId'], PDO::PARAM_INT);
 			$prepare->execute();
 			$result = $prepare->fetch(PDO::FETCH_ASSOC);
-			
+
 			$no_of_records_per_page = $params['perPage'] ? $params['perPage'] : 10;
 			$total_rows = $result['total'];
 			$total_pages = ceil($total_rows / $no_of_records_per_page);
 			$currentPage = $total_pages >= $params['page'] ? $params['page'] : $total_pages;
-			$offset = (($currentPage-1) < 0 ? 0 : ($currentPage-1)) * $no_of_records_per_page;
-			$search = "(title LIKE '%".$params["search"]."%' or code LIKE '%".$params["search"]."%') ";
+			$offset = (($currentPage - 1) < 0 ? 0 : ($currentPage - 1)) * $no_of_records_per_page;
+			$search = "(title LIKE '%" . $params["search"] . "%' or code LIKE '%" . $params["search"] . "%') ";
 			$stmt = "SELECT * FROM `{$this->table_modes}` WHERE $search and `shopId`=:shopId order by id desc LIMIT :offset, :perPage";
 			$prepare = $this->dbh->prepare($stmt);
-			$prepare->bindParam(':offset',$offset,PDO::PARAM_INT);
-			$prepare->bindParam(':shopId',$params['shopId'],PDO::PARAM_INT);
-			$prepare->bindParam(':perPage',$no_of_records_per_page,PDO::PARAM_INT);
+			$prepare->bindParam(':offset', $offset, PDO::PARAM_INT);
+			$prepare->bindParam(':shopId', $params['shopId'], PDO::PARAM_INT);
+			$prepare->bindParam(':perPage', $no_of_records_per_page, PDO::PARAM_INT);
 			$prepare->execute();
 			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
-			return ['page' => $currentPage, 'totalRecords'=> $total_rows, 'perPage' => $no_of_records_per_page, 'records' => $result];
-
+			return ['page' => $currentPage, 'totalRecords' => $total_rows, 'perPage' => $no_of_records_per_page, 'records' => $result];
 		} catch (PDOException $e) {
-		    die("Error!: " . $e->getMessage() . "<br/>");
+			die("Error!: " . $e->getMessage() . "<br/>");
 		}
 	}
 
-	public function createPaymentMode($array) {
+	public function createPaymentMode($array)
+	{
 		$title = $array['title'];
 		$code = $array['code'];
 		$status = $array['status'];
@@ -498,11 +500,12 @@ class DoubleEntry extends Connection
 			$result = $this->dbh->lastInsertId();
 			return $result;
 		} catch (PDOException $e) {
-		    die("Error!: " . $e->getMessage() . "<br/>");
+			die("Error!: " . $e->getMessage() . "<br/>");
 		}
 	}
 
-	public function updatePaymentMode($array) {
+	public function updatePaymentMode($array)
+	{
 		$id = $array['id'];
 		$title = $array['title'];
 		$code = $array['code'];
@@ -518,11 +521,12 @@ class DoubleEntry extends Connection
 			$result = $prepare->rowCount();
 			return $result;
 		} catch (PDOException $e) {
-		    die("Error!: " . $e->getMessage() . "<br/>");
+			die("Error!: " . $e->getMessage() . "<br/>");
 		}
 	}
-	
-	public function deletePaymentMode($array) {
+
+	public function deletePaymentMode($array)
+	{
 		$id = $array['id'];
 		try {
 			$stmt = "UPDATE `{$this->table_modes}` SET `status`=3 WHERE `id` = :id";
@@ -532,12 +536,13 @@ class DoubleEntry extends Connection
 			$result = $prepare->rowCount();
 			return $result;
 		} catch (PDOException $e) {
-		    die("Error!: " . $e->getMessage() . "<br/>");
+			die("Error!: " . $e->getMessage() . "<br/>");
 		}
 	}
 	// insert method
 
-	public function insertUnit($array) {
+	public function insertUnit($array)
+	{
 		$title = $array['title'];
 		$code = $array['code'];
 		try {
@@ -549,11 +554,12 @@ class DoubleEntry extends Connection
 			$result = $this->dbh->lastInsertId();
 			return $result;
 		} catch (PDOException $e) {
-		    die("Error!: " . $e->getMessage() . "<br/>");
+			die("Error!: " . $e->getMessage() . "<br/>");
 		}
 	}
 
-	public function insertStatus($array) {
+	public function insertStatus($array)
+	{
 		$title = $array['title'];
 		$code = $array['code'];
 		$sortorder = $array['sortorder'];
@@ -567,11 +573,12 @@ class DoubleEntry extends Connection
 			$result = $this->dbh->lastInsertId();
 			return $result;
 		} catch (PDOException $e) {
-		    die("Error!: " . $e->getMessage() . "<br/>");
+			die("Error!: " . $e->getMessage() . "<br/>");
 		}
 	}
 
-	public function updateStatus($array) {
+	public function updateStatus($array)
+	{
 		$id = $array['id'];
 		$title = $array['title'];
 		$code = $array['code'];
@@ -589,11 +596,12 @@ class DoubleEntry extends Connection
 			$result = $prepare->rowCount();
 			return $result;
 		} catch (PDOException $e) {
-		    die("Error!: " . $e->getMessage() . "<br/>");
+			die("Error!: " . $e->getMessage() . "<br/>");
 		}
 	}
 
-	public function insertAccountType($array) {
+	public function insertAccountType($array)
+	{
 		$title = $array['title'];
 		$code = $array['code'];
 		try {
@@ -605,11 +613,12 @@ class DoubleEntry extends Connection
 			$result = $this->dbh->lastInsertId();
 			return $result;
 		} catch (PDOException $e) {
-		    die("Error!: " . $e->getMessage() . "<br/>");
+			die("Error!: " . $e->getMessage() . "<br/>");
 		}
 	}
-	
-	public function insertSupplier($array) {
+
+	public function insertSupplier($array)
+	{
 		$title = $array['title'];
 		$short_title = $array['short_title'];
 		$phone = $array['phone'];
@@ -627,7 +636,7 @@ class DoubleEntry extends Connection
 			$result = $this->dbh->lastInsertId();
 			return $result;
 		} catch (PDOException $e) {
-		    die("Error!: " . $e->getMessage() . "<br/>");
+			die("Error!: " . $e->getMessage() . "<br/>");
 		}
 	}
 
@@ -636,7 +645,8 @@ class DoubleEntry extends Connection
 
 
 	// update method
-	public function updateSupplier($array) {
+	public function updateSupplier($array)
+	{
 		$id = $array['id'];
 		$title = $array['title'];
 		$short_title = $array['short_title'];
@@ -656,14 +666,15 @@ class DoubleEntry extends Connection
 			$result = $prepare->rowCount();
 			return $result;
 		} catch (PDOException $e) {
-		    die("Error!: " . $e->getMessage() . "<br/>");
+			die("Error!: " . $e->getMessage() . "<br/>");
 		}
 	}
-	
-	
-	public function deleteAccount($array) {
+
+
+	public function deleteAccount($array)
+	{
 		$id = $array['id'];
-		
+
 		try {
 			$stmt = "UPDATE `{$this->table}` SET `status`=3 WHERE `id` = :id";
 			$prepare = $this->dbh->prepare($stmt);
@@ -674,13 +685,14 @@ class DoubleEntry extends Connection
 			$this->resetAccountChildrens($id);
 			return $result;
 		} catch (PDOException $e) {
-		    die("Error!: " . $e->getMessage() . "<br/>");
+			die("Error!: " . $e->getMessage() . "<br/>");
 		}
 	}
-	
-	
+
+
 	// update method
-	public function updateAccountType($array) {
+	public function updateAccountType($array)
+	{
 		$id = $array['id'];
 		$title = $array['title'];
 		$code = $array['code'];
@@ -694,11 +706,12 @@ class DoubleEntry extends Connection
 			$result = $prepare->rowCount();
 			return $result;
 		} catch (PDOException $e) {
-		    die("Error!: " . $e->getMessage() . "<br/>");
+			die("Error!: " . $e->getMessage() . "<br/>");
 		}
 	}
 
-	public function updateUnit($array) {
+	public function updateUnit($array)
+	{
 		$id = $array['id'];
 		$title = $array['title'];
 		$code = $array['code'];
@@ -712,7 +725,7 @@ class DoubleEntry extends Connection
 			$result = $prepare->rowCount();
 			return $result;
 		} catch (PDOException $e) {
-		    die("Error!: " . $e->getMessage() . "<br/>");
+			die("Error!: " . $e->getMessage() . "<br/>");
 		}
 	}
 
@@ -720,23 +733,22 @@ class DoubleEntry extends Connection
 
 	// insert method
 
-	public function insertAccount($array) {
+	public function insertAccount($array)
+	{
 
 		$getSiblings = $this->getAccountSiblings($array['parent_id']);
 		$count = $getSiblings['total'];
-		if(!empty($getSiblings) && $count > 0) {
-			if($count < 9) {
-				$array['code'] .= '-0' . ($count+1);
+		if (!empty($getSiblings) && $count > 0) {
+			if ($count < 9) {
+				$array['code'] .= '-0' . ($count + 1);
+			} else {
+				$array['code'] .= '-' . ($count + 1);
 			}
-			else {
-				$array['code'] .= '-' . ($count+1);
-			}
-		}
-		else {
+		} else {
 			$array['code'] = $array['code'] . '-01';
 		}
 
-		
+
 		try {
 			$stmt = "INSERT INTO `{$this->table}` (`title`, `code`, `account_type`, `group_id`, `status`, `parent_id`, `created_by`, `opening_balance`) VALUES (:title, :code, :account_type, :group_id, :status, :parent_id, :created_by, :opening_balance)";
 			$prepare = $this->dbh->prepare($stmt);
@@ -752,12 +764,13 @@ class DoubleEntry extends Connection
 			$result = $this->dbh->lastInsertId();
 			return $result;
 		} catch (PDOException $e) {
-		    die("Error!: " . $e->getMessage() . "<br/>");
+			die("Error!: " . $e->getMessage() . "<br/>");
 		}
 	}
 
 
-	public function createDemand($array) {
+	public function createDemand($array)
+	{
 		try {
 			$stmt = "INSERT INTO `{$this->table_demands}` (`title`, `department`, `wing`, `created_by`) VALUES (:title, :department, :wing, :created_by)";
 			$prepare = $this->dbh->prepare($stmt);
@@ -769,11 +782,12 @@ class DoubleEntry extends Connection
 			$result = $this->dbh->lastInsertId();
 			return $result;
 		} catch (PDOException $e) {
-		    die("Error!: " . $e->getMessage() . "<br/>");
+			die("Error!: " . $e->getMessage() . "<br/>");
 		}
 	}
 
-	public function inactiveDemandStatus($array) {
+	public function inactiveDemandStatus($array)
+	{
 		try {
 
 			$stmt = "UPDATE `{$this->table_ds_history}` SET `flag`=0  WHERE `id` = :id";
@@ -783,11 +797,12 @@ class DoubleEntry extends Connection
 			$result = $this->dbh->lastInsertId();
 			return $result;
 		} catch (PDOException $e) {
-		    die("Error!: " . $e->getMessage() . "<br/>");
+			die("Error!: " . $e->getMessage() . "<br/>");
 		}
 	}
 
-	public function addDemandStatus($array) {
+	public function addDemandStatus($array)
+	{
 		try {
 			$stmt = "INSERT INTO `{$this->table_ds_history}` (`demand_id`, `demand_status_id`, `user_id`, `flag`) VALUES (:demand_id, :demand_status_id, :user_id, :flag)";
 			$prepare = $this->dbh->prepare($stmt);
@@ -799,11 +814,12 @@ class DoubleEntry extends Connection
 			$result = $this->dbh->lastInsertId();
 			return $result;
 		} catch (PDOException $e) {
-		    die("Error!: " . $e->getMessage() . "<br/>");
+			die("Error!: " . $e->getMessage() . "<br/>");
 		}
 	}
 
-	public function createDemandItem($array) {
+	public function createDemandItem($array)
+	{
 		try {
 			$stmt = "INSERT INTO `{$this->table_demandItems}` (`title`, `code`, `qty`, `deno`, `price`, `demand_id`) VALUES (:title, :code, :qty, :deno, :price, :demand_id)";
 			$prepare = $this->dbh->prepare($stmt);
@@ -817,7 +833,7 @@ class DoubleEntry extends Connection
 			$result = $this->dbh->lastInsertId();
 			return $result;
 		} catch (PDOException $e) {
-		    die("Error!: " . $e->getMessage() . "<br/>");
+			die("Error!: " . $e->getMessage() . "<br/>");
 		}
 	}
 
@@ -826,14 +842,16 @@ class DoubleEntry extends Connection
 
 
 	// update method
-	public function updateAccount($array) {
+	public function updateAccount($array)
+	{
 		$id = $array['id'];
 		try {
-			$stmt = "UPDATE `{$this->table}` SET `title`=:title, `code`=:code, `account_type`=:account_type, `parent_id`=:parent_id, `status`=:status WHERE `id` = :id";
+			$stmt = "UPDATE `{$this->table}` SET `title`=:title, `code`=:code, `account_type`=:account_type, `opening_balance`=:opening_balance, `parent_id`=:parent_id, `status`=:status WHERE `id` = :id";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':title', $array['title'], PDO::PARAM_STR);
 			$prepare->bindParam(':code', $array['code'], PDO::PARAM_STR);
 			$prepare->bindParam(':account_type', $array['account_type'], PDO::PARAM_STR);
+			$prepare->bindParam(':opening_balance', $array['opening_balance'], PDO::PARAM_STR);
 			$prepare->bindParam(':parent_id', $array['parent_id'], PDO::PARAM_STR);
 			$prepare->bindParam(':status', $array['status'], PDO::PARAM_STR);
 			$prepare->bindParam(':id', $id, PDO::PARAM_INT);
@@ -841,11 +859,12 @@ class DoubleEntry extends Connection
 			$result = $prepare->rowCount();
 			return $result;
 		} catch (PDOException $e) {
-		    die("Error!: " . $e->getMessage() . "<br/>");
+			die("Error!: " . $e->getMessage() . "<br/>");
 		}
 	}
 
-	public function setOpeningBalance($id, $opening_balance) {
+	public function setOpeningBalance($id, $opening_balance)
+	{
 		try {
 			$opening_balance = !empty($opening_balance) ? $opening_balance : 0;
 			$stmt = "UPDATE `{$this->table}` SET `opening_balance`=:opening_balance WHERE `id` = :id";
@@ -856,11 +875,12 @@ class DoubleEntry extends Connection
 			$result = $prepare->rowCount();
 			return $result;
 		} catch (PDOException $e) {
-		    die("Error!: " . $e->getMessage() . "<br/>");
+			die("Error!: " . $e->getMessage() . "<br/>");
 		}
 	}
 
-	public function deleteTransaction($id) {
+	public function deleteTransaction($id)
+	{
 		try {
 			$stmt = "UPDATE `{$this->table_transactions}` SET flag=2 where id=:id";
 			$prepare = $this->dbh->prepare($stmt);
@@ -869,14 +889,14 @@ class DoubleEntry extends Connection
 			$result = $prepare->rowCount();
 			echo $result;
 			return $result;
-			
 		} catch (PDOException $e) {
-		    die("Error!: " . $e->getMessage() . "<br/>");
+			die("Error!: " . $e->getMessage() . "<br/>");
 		}
 	}
 
 	// insert method
-	public function makeTransaction($array) {
+	public function makeTransaction($array)
+	{
 		try {
 			$stmt = "INSERT INTO `{$this->table_transactions}` (`description`, `reference`, `transaction_date`, `created_by`, `shopId`, `order_ref`,`supply_ref`) VALUES (:description, :reference, :transaction_date, :created_by, :shopId, :order_ref, :supply_ref)";
 			$prepare = $this->dbh->prepare($stmt);
@@ -891,12 +911,13 @@ class DoubleEntry extends Connection
 			$result = $this->dbh->lastInsertId();
 			return $result;
 		} catch (PDOException $e) {
-		    die("Error!: " . $e->getMessage() . "<br/>");
+			die("Error!: " . $e->getMessage() . "<br/>");
 		}
 	}
 
 	// insert method
-	public function makeEntry($array) {
+	public function makeEntry($array)
+	{
 		try {
 			$paymentMode = !empty($array['payment_mode']) ? $array['payment_mode'] : 1;
 			$stmt = "INSERT INTO `{$this->table_ledger_entries}` (`transaction_id`, `account_id`, `entry_type`, `amount`, `user_id`, `description`, `payment_mode`) VALUES (:transaction_id, :account_id, :entry_type, :amount, :user_id, :description, :payment_mode)";
@@ -912,9 +933,7 @@ class DoubleEntry extends Connection
 			$result = $this->dbh->lastInsertId();
 			return $result;
 		} catch (PDOException $e) {
-		    die("Error!: " . $e->getMessage() . "<br/>");
+			die("Error!: " . $e->getMessage() . "<br/>");
 		}
 	}
-
-
 }
