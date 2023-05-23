@@ -223,14 +223,14 @@ if ($largeView) {
                         <table class="recipt-table" width="100%" cellpadding="0" cellspacing="0">
                             <thead>
                                 <tr>
-                                    <th class="text-left thead">Sr.#</th>
-                                    <th class="text-left thead">Code</th>
+                                    <th width="40" class="text-left thead">Sr.#</th>
+                                    <th width="40" class="text-left thead">Code</th>
                                     <th class="text-left thead">Item</th>
-                                    <th width="80" class="thead">Qty</th>
-                                    <th width="80" class="thead">U. Price</th>
-                                    <th width="80" class="thead">D. Price</th>
-                                    <th width="80" class="thead">D. Total</th>
-                                    <th class="text-right thead" width="100">Total</th>
+                                    <th width="40" class="thead">Qty</th>
+                                    <th width="50" class="thead">U. Price</th>
+                                    <th width="50" class="thead">D. Price</th>
+                                    <th width="50" class="thead">D. Total</th>
+                                    <th class="text-right thead" width="50">Total</th>
                                 </tr>
                             </thead>
                             <tbody>
