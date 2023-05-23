@@ -894,6 +894,23 @@ class DoubleEntry extends Connection
 		}
 	}
 
+	public function deleteTransactionByOrderId($id)
+	{
+		if (!empty($id)) {
+			try {
+				$stmt = "UPDATE `{$this->table_transactions}` SET flag=2 where order_ref=:id";
+				$prepare = $this->dbh->prepare($stmt);
+				$prepare->bindParam(':id', $id, PDO::PARAM_INT);
+				$prepare->execute();
+				$result = $prepare->rowCount();
+				echo $result;
+				return $result;
+			} catch (PDOException $e) {
+				die("Error!: " . $e->getMessage() . "<br/>");
+			}
+		}
+	}
+
 	// insert method
 	public function makeTransaction($array)
 	{

@@ -10,7 +10,12 @@ if (!empty($_GET['dup'])) { // remove id from order
     unset($order['order']['id']);
 }
 echo mainHeader(['page' => 'recipt', 'title' => (!empty($_GET['dup']) ? "Duplicate => " : "") . $order['customer']['full_name']]);
-if ($order['order']['status'] == 1 || !empty($_GET['dup'])) {
+if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
+
+    $allowCustomer = true;
+    if (in_array($order['order']['status'], [1]) || !empty($_GET['dup'])) {
+        $allowCustomer = false;
+    }
 ?>
     <div ng-controller="cartController">
         <div class="container">
@@ -24,7 +29,7 @@ if ($order['order']['status'] == 1 || !empty($_GET['dup'])) {
                         <th style="vertical-align: middle">Customer Name</th>
                         <th style="width: 200px">
                             <div class="dropdown-wrapper" style="position: relative;">
-                                <input <?php echo empty($_GET['dup']) ? 'disabled' : ''; ?> type="text" class="form-control" ng-model="customerName" placeholder="Search Customer" uib-typeahead="address as address.full_name for address in searchCustomer($viewValue)" typeahead-on-select="selectCustomer($item)" ng-model-options="{debounce: 100}" typeahead-template-url="customer.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="1">
+                                <input <?php echo empty($allowCustomer) ? 'disabled' : ''; ?> type="text" class="form-control" ng-model="customerName" placeholder="Search Customer" uib-typeahead="address as address.full_name for address in searchCustomer($viewValue)" typeahead-on-select="selectCustomer($item)" ng-model-options="{debounce: 100}" typeahead-template-url="customer.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="1">
                             </div>
                         </th>
                         <th style="vertical-align: middle">
@@ -46,6 +51,7 @@ if ($order['order']['status'] == 1 || !empty($_GET['dup'])) {
 
             <?php
             $mode = 'edit';
+
             echo include_once dirname(___FILE___) . '/table.php'; ?>
         </div>
 
@@ -410,6 +416,7 @@ if ($order['order']['status'] == 1 || !empty($_GET['dup'])) {
             $scope.selectCustomer($scope.data.customer, $scope.data.order.customer_name);
 
             $scope.park = () => {
+                console.log('i am called');
                 $scope.checkout(1);
             }
 
@@ -443,6 +450,8 @@ if ($order['order']['status'] == 1 || !empty($_GET['dup'])) {
                     payment_mode: $scope.payment_mode,
                     status: status || 2
                 }
+
+                console.log($scope.form);
 
 
                 $http.post("<?php echo SITE_URL ?>api/placeOrder.php", $httpParamSerializerJQLike($scope.form), {

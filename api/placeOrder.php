@@ -42,6 +42,25 @@ try {
 
     $additionalDiscount += $_POST['discount'];
 
+    $doubleEntry = new DoubleEntry();
+
+    if (!empty($_POST['id'])) {
+        $orderDetail = $orders->getOrder($_POST['id']);
+        $currentStatus = $orderDetail['order']['status'];
+        if (in_array($orderDetail['order']['status'], [2, 8, 9])) {
+
+            print_r($orderDetail['order_items']);
+
+            // rollback products first
+            $products = new Products();
+            foreach ($orderDetail['order_items'] as $prod) {
+                $products->addProductQty($prod['product_id'], $prod['quantity'], $orderDetail['order']['shopId']);
+            }
+
+            // delete transactions
+            $doubleEntry->deleteTransactionByOrderId($orderDetail['order']['id']);
+        }
+    }
     $order_id = $orders->createOrder($data);
 
     if ($status == 1 && !empty($_POST['id'])) { // when edit a parked entry
@@ -74,7 +93,6 @@ try {
         if ($status != 1) {
 
             $customer = $customersObj->getCustomer($data['customer_id']);
-            $doubleEntry = new DoubleEntry();
 
             $makeTransaction = [
                 'description' => !empty($_POST['summery']) ? $_POST['summery'] : "ORDER ID: " . $order_id . " PLACED",

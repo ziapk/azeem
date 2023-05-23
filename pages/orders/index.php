@@ -52,7 +52,11 @@ echo mainHeader(['page' => 'order']);
                 <td>{{statusArr[row.status].full_name}}</td>
                 <td>{{row.order_date}}</td>
                 <td align="right">
-                    <a class="btn btn-xs btn-default" ng-if="row.status == 1" href="{{'<?php echo SITE_URL; ?>pages/recipt/edit.php?id=' + row.id }}" target="_blank">Edit</a>
+                    <?php if ($userData['role'] == 'owner') { ?>
+                        <a class="btn btn-xs btn-default" ng-if="row.status != 5" href="{{'<?php echo SITE_URL; ?>pages/recipt/edit.php?id=' + row.id }}" target="_blank">Edit</a>
+                    <?php } else { ?>
+                        <a class="btn btn-xs btn-default" ng-if="row.status == 1" href="{{'<?php echo SITE_URL; ?>pages/recipt/edit.php?id=' + row.id }}" target="_blank">Edit</a>
+                    <?php } ?>
                     <a class="btn btn-xs btn-danger" ng-if="row.status == 2" href="{{'<?php echo SITE_URL; ?>pages/orders/adjustment.php?id=' + row.id }}">Return</a>
                     <a class="btn btn-xs btn-danger" ng-click="deleteRecipt(row.id)" href="javascript:void(0)">Delete</a>
                     <a class="btn btn-xs btn-default" href="{{'<?php echo SITE_URL; ?>pages/recipt/edit.php?dup=' + row.id }}">Duplicate</a>
