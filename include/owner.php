@@ -56,6 +56,9 @@ $list = $productCls->getOwnerProducts($ownerId);
   </nav>
   <div class="sidebar">
     <ul class="nav">
+      <li class="<?php if ($params['page'] == 'order') {
+                    echo 'active';
+                  } ?>"><a uib-tooltip="Sales" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/orders"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/sales.svg" alt="" /> <span class="nav-menu-text">Sales</span></a></li>
       <li class="<?php if ($params['page'] == 'product-create') {
                     echo 'active';
                   } ?>"><a uib-tooltip="Add New Product" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/product/create.php"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/product.svg" alt="" /> <span class="nav-menu-text">New Product</span></a></li>
