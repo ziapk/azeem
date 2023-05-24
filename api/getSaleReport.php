@@ -18,7 +18,7 @@ foreach ($orders as $row) {
         $data['park'] += $row['price'] - $row['discount'];
     } else {
         if ($row['flag'] == 1) {
-            $data['income'] += $row['paid_amount'] - $row['discount'];
+            $data['income'] += $row['paid_amount'];
         } else {
             $data['return'] += $row['paid_amount'];
         }
