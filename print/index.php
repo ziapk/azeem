@@ -23,13 +23,9 @@ if (!empty($order['order']['price'])) {
 }
 
 
-$prevbalance = 0;
 $currentBalance = ($blc['debitAmount'] + $blc['opening_balance']) - $blc['creditAmount'];
 $balance = ($price - $order['order']['discount']) - $order['order']['paid_amount'];
 
-if ($order['order']['status'] != 1) {
-    $prevbalance = $currentBalance - $balance;
-}
 ?>
 <link href="https://fonts.googleapis.com/css?family=Courgette&display=swap" rel="stylesheet">
 <?php
@@ -278,13 +274,8 @@ if ($largeView) {
                                     <th rowspan="2" style="border: 0;" valign="middle" colspan="4">
                                         <center>
                                             <table width="260" class="table" style="border-collapse: collapse;">
-                                                <?php if (!empty($balance)) { ?><tr>
-                                                        <td width="130">Previous Balance:</td>
-                                                        <th style="text-align: right"><?php echo abs(($prevbalance)); ?></th>
-                                                    </tr>
-                                                <?php } ?>
                                                 <tr>
-                                                    <td>Current Balance:</td>
+                                                    <td width="130">Current Balance:</td>
                                                     <th style="text-align: right"><?php echo abs(($currentBalance)); ?></th>
                                                 </tr>
                                             </table>
