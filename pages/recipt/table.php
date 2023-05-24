@@ -85,12 +85,12 @@
         <tr>
             <th colspan="{{show_discount ? 8 : 7 }}" class="text-right">
                 <a href="#" class="btn btn-success pull-left" ng-click="park()">Park For Now</a>
-                <div class="btn-group">
+                <!-- <div class="btn-group">
                     <label class="btn btn-default" ng-repeat="li in modes">
                         <input type="radio" name="mode" ng-model="payment_mode" ng-value="li.id" ng-change="printValue(li)">
                         {{li.title}}
                     </label>
-                </div>
+                </div> -->
                 <?php if ($mode === 'edit') { ?>
                     <a href="#" class="btn btn-success" ng-disabled="loading" ng-click="park()">Park For Now</a>
                 <?php } else { ?>
