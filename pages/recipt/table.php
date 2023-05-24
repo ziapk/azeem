@@ -47,7 +47,7 @@
             </td>
         </tr>
         <tr>
-            <td class="text-right" colspan="{{show_discount ?  6: 5}}" rowspan="8">
+            <td class="text-right" colspan="{{show_discount ?  (6) : (5)}}" rowspan="{{8 + modes.length}}">
                 <p><input class="form-control" placeholder="Reference No" ng-model="ref_no" /></p>
                 <textarea class="form-control" rows="10" placeholder="Summery" ng-model="summery"></textarea>
             </td>
@@ -70,13 +70,15 @@
             <td class="text-right">Grand Total</td>
             <td class="text-success">{{grandTotal | number: 2}}</td>
         </tr>
-        <tr>
-            <td class="text-right text-success" style="front-weight: bold;">Pay Amount</td>
-            <td><input type="number" ng-model="payment_amount" class="form-control"></td>
+        <tr ng-repeat="m in modes">
+            <td class="text-right text-success" style="front-weight: bold;">Pay with {{modeNames[m.id]}}</td>
+            <td>
+                <input class="form-control" type="number" ng-change="calculatePayment(payWith)" ng-model="payWith[m.id].amount" />
+            </td>
         </tr>
         <tr>
             <td class="text-right">Balance</td>
-            <td>{{grandTotal - payment_amount | number: 2}}</td>
+            <td>{{grandTotal - payment_total | number: 2}}</td>
         </tr>
     </tbody>
     <tbody>

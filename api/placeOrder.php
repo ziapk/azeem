@@ -49,8 +49,6 @@ try {
         $currentStatus = $orderDetail['order']['status'];
         if (in_array($orderDetail['order']['status'], [2, 8, 9])) {
 
-            print_r($orderDetail['order_items']);
-
             // rollback products first
             $products = new Products();
             foreach ($orderDetail['order_items'] as $prod) {
@@ -111,6 +109,12 @@ try {
             $cash = $data['paid_amount'];
             $saleDiscount = $totalDiscount + $additionalDiscount;
             $receivable = ($assetPrice - $saleDiscount);
+            $defaultId = 0;
+            foreach ($_POST['payment_with'] as $value) {
+                if (!empty($value['is_default'])) {
+                    $defaultId = $value['id'];
+                }
+            }
 
             // assets debit entry - credit
             // assets receivable entry - debit
@@ -121,7 +125,7 @@ try {
                 'entry_type' => 'C',
                 'description' => '',
                 'amount' => $assetPrice, // 2000
-                'payment_mode' => $_POST['payment_mode'],
+                'payment_mode' => $defaultId,
                 'user_id' => $_SESSION['user_credentials']['id'],
             ];
 
@@ -134,7 +138,7 @@ try {
                 'entry_type' => 'D',
                 'description' => '',
                 'amount' => $receivable,
-                'payment_mode' => $_POST['payment_mode'],
+                'payment_mode' => $defaultId,
                 'user_id' => $_SESSION['user_credentials']['id'],
             ];
             $a[] = $doubleEntry->makeEntry($entry);
@@ -147,7 +151,7 @@ try {
                     'entry_type' => 'D',
                     'description' => '',
                     'amount' => $saleDiscount, // 200 @ 10%
-                    'payment_mode' => $_POST['payment_mode'],
+                    'payment_mode' => $defaultId,
                     'user_id' => $_SESSION['user_credentials']['id'],
                 ];
                 $a[] = $doubleEntry->makeEntry($entry);
@@ -155,29 +159,33 @@ try {
 
             if (!empty($cash)) {
                 $makeTransactionId = $doubleEntry->makeTransaction($makeTransaction);
-                // cash credit entry
-                $entry = [
-                    'transaction_id' => $makeTransactionId,
-                    'account_id' => $shop['cash'],
-                    'entry_type' => 'D',
-                    'description' => '',
-                    'amount' => $cash, // 200 @ 10%
-                    'payment_mode' => $_POST['payment_mode'],
-                    'user_id' => $_SESSION['user_credentials']['id'],
-                ];
-                $a[] = $doubleEntry->makeEntry($entry);
+                foreach ($_POST['payment_with'] as $value) {
+                    if (!empty($value['amount'])) {
+                        // cash credit entry
+                        $entry = [
+                            'transaction_id' => $makeTransactionId,
+                            'account_id' => $shop['cash'],
+                            'entry_type' => 'D',
+                            'description' => '',
+                            'amount' => $value['amount'], // 200 @ 10%
+                            'payment_mode' => $value['id'],
+                            'user_id' => $_SESSION['user_credentials']['id'],
+                        ];
+                        $a[] = $doubleEntry->makeEntry($entry);
 
-                // receivable credit entry
-                $entry = [
-                    'transaction_id' => $makeTransactionId,
-                    'account_id' => $customer['account_id'],
-                    'entry_type' => 'C',
-                    'description' => '',
-                    'amount' => $cash,
-                    'payment_mode' => $_POST['payment_mode'],
-                    'user_id' => $_SESSION['user_credentials']['id'],
-                ];
-                $a[] = $doubleEntry->makeEntry($entry);
+                        // receivable credit entry
+                        $entry = [
+                            'transaction_id' => $makeTransactionId,
+                            'account_id' => $customer['account_id'],
+                            'entry_type' => 'C',
+                            'description' => '',
+                            'amount' => $value['amount'],
+                            'payment_mode' => $value['id'],
+                            'user_id' => $_SESSION['user_credentials']['id'],
+                        ];
+                        $a[] = $doubleEntry->makeEntry($entry);
+                    }
+                }
             }
         }
 

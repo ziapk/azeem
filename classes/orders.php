@@ -290,7 +290,9 @@ class Orders extends Connection
                 $prepare->execute();
                 $result['order_items'] = $prepare->fetchAll(PDO::FETCH_ASSOC);
                 $c = new Customers();
+                $de = new DoubleEntry();
                 $result['customer'] = $c->getCustomer($result['order']['customer_id']);
+                $result['transactions'] = $de->getPaymentTransactionsByAccountId($result['order']['id'], $result['customer']['account_id']);
             }
             return $result;
         } catch (PDOException $e) {

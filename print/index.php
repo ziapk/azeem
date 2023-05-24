@@ -23,11 +23,12 @@ if (!empty($order['order']['price'])) {
 }
 
 
-$prevbalance = ($blc['debitAmount'] + $blc['opening_balance']) - $blc['creditAmount'];
+$prevbalance = 0;
+$currentBalance = ($blc['debitAmount'] + $blc['opening_balance']) - $blc['creditAmount'];
 $balance = ($price - $order['order']['discount']) - $order['order']['paid_amount'];
 
 if ($order['order']['status'] != 1) {
-    $prevbalance -= $balance;
+    $prevbalance = $currentBalance - $balance;
 }
 ?>
 <link href="https://fonts.googleapis.com/css?family=Courgette&display=swap" rel="stylesheet">
@@ -264,7 +265,7 @@ if ($largeView) {
                                 </tr>
                                 <tr class="no-border">
                                     <th rowspan="2" style="border: 0;" valign="middle" colspan="4">
-                                        Important Note: Books once sold nerver be returned.
+                                        Important Note: Books once sold nerver be returned or exchanged.
                                     </th>
                                     <td class="text-right ref" style="border: 0" colspan="3">Additional Discount</td>
                                     <th class="text-right ref"><?php echo abs(($order['order']['discount'])); ?></th>
@@ -275,7 +276,19 @@ if ($largeView) {
                                 </tr>
                                 <tr class="no-border">
                                     <th rowspan="2" style="border: 0;" valign="middle" colspan="4">
-                                        Previous Balance: <?php echo abs(($prevbalance)); ?>
+                                        <center>
+                                            <table width="260" class="table" style="border-collapse: collapse;">
+                                                <?php if (!empty($balance)) { ?><tr>
+                                                        <td width="130">Previous Balance:</td>
+                                                        <th style="text-align: right"><?php echo abs(($prevbalance)); ?></th>
+                                                    </tr>
+                                                <?php } ?>
+                                                <tr>
+                                                    <td>Current Balance:</td>
+                                                    <th style="text-align: right"><?php echo abs(($currentBalance)); ?></th>
+                                                </tr>
+                                            </table>
+                                        </center>
                                     </th>
                                     <td class="text-right ref" style="border: 0" colspan="3">Amount After Discount</td>
                                     <th class="text-right ref"><?php echo $net; ?></th>

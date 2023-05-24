@@ -227,12 +227,27 @@ class DoubleEntry extends Connection
 		}
 	}
 
+	public function getPaymentTransactionsByAccountId($order_id, $account_id)
+	{
+		try {
+
+			$stmt = "SELECT e.payment_mode, e.amount FROM `$this->table_transactions` t LEFT JOIN `$this->table_ledger_entries` e ON e.transaction_id = t.id LEFT JOIN `$this->table` a ON a.id = e.account_id and a.status = 1 WHERE t.order_ref = :order_id and e.account_id=:account_id and e.entry_type = 'C' and t.flag =1";
+			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':order_id', $order_id, PDO::PARAM_STR);
+			$prepare->bindParam(':account_id', $account_id, PDO::PARAM_STR);
+			$prepare->execute();
+			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
+			return $result;
+		} catch (PDOException $e) {
+			die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
+
 	public function getOpeningBalance($account_id)
 	{
 		try {
 
 			$stmt = "SELECT a.opening_balance, a.id, SUM(CASE WHEN e.entry_type = 'D' THEN e.amount ELSE 0 END) AS debitAmount, SUM(CASE WHEN e.entry_type = 'C' THEN e.amount ELSE 0 END) AS creditAmount FROM `$this->table_ledger_entries` as e LEFT JOIN `$this->table` as a ON a.id = e.account_id and a.status = 1 left join `{$this->table_transactions}` as t on t.id=e.transaction_id WHERE t.flag = 1 and a.id = :account_id";
-			// print_r($stmt);
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':account_id', $account_id, PDO::PARAM_STR);
 			$prepare->execute();
@@ -263,7 +278,6 @@ class DoubleEntry extends Connection
 			}
 
 			$stmt = "SELECT e.transaction_id, e.payment_mode, a.parent_id, a.code, e.account_id, a.account_type, a.title, e.entry_type, t.transaction_date, amount FROM `$this->table_transactions` t LEFT JOIN `$this->table_ledger_entries` e ON e.transaction_id = t.id LEFT JOIN `$this->table` a ON a.id = e.account_id and a.status = 1 WHERE (t.flag=1 $shopIdCondition $accountCondition) and (DATE(t.transaction_date) BETWEEN :fromDate AND :toDate)";
-			// print_r($stmt);
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':fromDate', $fromDate, PDO::PARAM_STR);
 			$prepare->bindParam(':toDate', $toDate, PDO::PARAM_STR);
@@ -327,8 +341,6 @@ class DoubleEntry extends Connection
 			$prepare->bindParam(':toDate', $toDate, PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
-			// echo '<pre>';
-			// print_r($array);
 			return $result;
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
@@ -343,7 +355,6 @@ class DoubleEntry extends Connection
 			$prepare->bindParam(':parent_id', $parent_id, PDO::PARAM_INT);
 			$prepare->execute();
 			$result = $prepare->rowCount();
-			echo $result;
 			return $result;
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
@@ -468,7 +479,7 @@ class DoubleEntry extends Connection
 			$currentPage = $total_pages >= $params['page'] ? $params['page'] : $total_pages;
 			$offset = (($currentPage - 1) < 0 ? 0 : ($currentPage - 1)) * $no_of_records_per_page;
 			$search = "(title LIKE '%" . $params["search"] . "%' or code LIKE '%" . $params["search"] . "%') ";
-			$stmt = "SELECT * FROM `{$this->table_modes}` WHERE $search and `shopId`=:shopId order by id desc LIMIT :offset, :perPage";
+			$stmt = "SELECT * FROM `{$this->table_modes}` WHERE $search and `shopId`=:shopId order by id asc LIMIT :offset, :perPage";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':offset', $offset, PDO::PARAM_INT);
 			$prepare->bindParam(':shopId', $params['shopId'], PDO::PARAM_INT);
@@ -486,18 +497,33 @@ class DoubleEntry extends Connection
 		$title = $array['title'];
 		$code = $array['code'];
 		$status = $array['status'];
+		$is_default = $array['is_default'];
 		$shopId = $array['shopId'];
 		$owner_id = $array['owner_id'];
 		try {
-			$stmt = "INSERT INTO `{$this->table_modes}` (`title`, `code`, `status`, `shopId`, `owner_id`) VALUES (:title, :code, :status, :shopId, :owner_id)";
+			$stmt = "INSERT INTO `{$this->table_modes}` (`title`, `code`, `status`, `is_default`, `shopId`, `owner_id`) VALUES (:title, :code, :status, :is_default, :shopId, :owner_id)";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':title', $title, PDO::PARAM_STR);
 			$prepare->bindParam(':code', $code, PDO::PARAM_STR);
 			$prepare->bindParam(':status', $status, PDO::PARAM_STR);
+			$prepare->bindParam(':is_default', $is_default, PDO::PARAM_STR);
 			$prepare->bindParam(':shopId', $shopId, PDO::PARAM_STR);
 			$prepare->bindParam(':owner_id', $owner_id, PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $this->dbh->lastInsertId();
+			return $result;
+		} catch (PDOException $e) {
+			die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
+
+	public function updateAll()
+	{
+		try {
+			$stmt = "UPDATE `{$this->table_modes}` SET `is_default`=0";
+			$prepare = $this->dbh->prepare($stmt);
+			$prepare->execute();
+			$result = $prepare->rowCount();
 			return $result;
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
@@ -509,13 +535,16 @@ class DoubleEntry extends Connection
 		$id = $array['id'];
 		$title = $array['title'];
 		$code = $array['code'];
+		$is_default = $array['is_default'];
 		$status = $array['status'];
+		$this->updateAll();
 		try {
-			$stmt = "UPDATE `{$this->table_modes}` SET `title`=:title, `code`=:code, `status`=:status WHERE `id` = :id";
+			$stmt = "UPDATE `{$this->table_modes}` SET `title`=:title, `code`=:code, `is_default`=:is_default, `status`=:status WHERE `id` = :id";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':title', $title, PDO::PARAM_STR);
 			$prepare->bindParam(':code', $code, PDO::PARAM_STR);
 			$prepare->bindParam(':status', $status, PDO::PARAM_STR);
+			$prepare->bindParam(':is_default', $is_default, PDO::PARAM_STR);
 			$prepare->bindParam(':id', $id, PDO::PARAM_INT);
 			$prepare->execute();
 			$result = $prepare->rowCount();
@@ -681,7 +710,6 @@ class DoubleEntry extends Connection
 			$prepare->bindParam(':id', $id, PDO::PARAM_INT);
 			$prepare->execute();
 			$result = $prepare->rowCount();
-			echo $result;
 			$this->resetAccountChildrens($id);
 			return $result;
 		} catch (PDOException $e) {
@@ -903,7 +931,6 @@ class DoubleEntry extends Connection
 				$prepare->bindParam(':id', $id, PDO::PARAM_INT);
 				$prepare->execute();
 				$result = $prepare->rowCount();
-				echo $result;
 				return $result;
 			} catch (PDOException $e) {
 				die("Error!: " . $e->getMessage() . "<br/>");

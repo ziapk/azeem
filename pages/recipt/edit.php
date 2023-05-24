@@ -100,6 +100,17 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
             const items = [];
             $scope.modes = [];
             $scope.pinList = [];
+            $scope.payment_total = 0;
+
+            $scope.calculatePayment = (payWith) => {
+                $scope.payment_total = 0;
+                $scope.payWith = payWith;
+                Object.values(payWith).map(row => {
+                    $scope.payment_total += parseFloat(row.amount || 0)
+                })
+            }
+            $scope.modeNames = [];
+            $scope.payWith = {};
 
 
 
@@ -169,6 +180,14 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                 $scope.payment_amount = $scope.subTotal - $scope.discount;
                 $scope.grandTotal = $scope.payment_amount = $scope.payment_amount + Math.round($scope.payment_amount * ($scope.gst / 100)) + Math.round($scope.payment_amount * ($scope.service_charges / 100));
                 // $window.sessionStorage.setItem('shopping', JSON.stringify($scope.items));
+                const pay = Object.values($scope.payWith);
+                pay.map(p => {
+                    if (p.is_default == 1) {
+                        $scope.payWith[p.id].amount = $scope.payment_amount;
+                    } else {
+                        $scope.payWith[p.id].amount = 0;
+                    }
+                });
 
             }
 
@@ -395,6 +414,20 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                 return $http.get("<?php echo SITE_URL ?>api/getPaymentModes.php")
                     .then(function(response) {
                         $scope.modes = response.data.records;
+                        $scope.modes.forEach(p => {
+                            $scope.modeNames[p.id] = p.title;
+                            $scope.payWith[p.id] = {
+                                ...p,
+                                amount: p.is_default == 1 ? $scope.payment_amount : 0
+                            }
+                        })
+                        $scope.data.transactions?.forEach(row => {
+                            console.log('payWith', $scope.payWith);
+                            $scope.payWith[row.payment_mode].amount = parseFloat(row.amount);
+                        })
+
+                        $scope.calculatePayment($scope.payWith);
+
                         return response.data
                     });
             }
@@ -440,7 +473,8 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                         discount,
                         price
                     })),
-                    payment_amount: $scope.payment_amount,
+                    payment_amount: $scope.payment_total,
+                    payment_with: $scope.payWith,
                     gst: $scope.gst,
                     service_charges: $scope.service_charges,
                     summery: $scope.summery,
