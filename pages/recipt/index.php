@@ -371,6 +371,7 @@ echo mainFooter();
         }
 
         $scope.checkout = function(status) {
+            $scope.calculatePayment($scope.payWith);
             $scope.loading = true;
             $scope.form = {
                 customer_name: $scope.customerName,

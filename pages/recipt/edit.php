@@ -454,6 +454,7 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
             }
 
             $scope.checkout = function(status) {
+                $scope.calculatePayment($scope.payWith);
                 $scope.loading = true;
                 $scope.form = {
                     customerId: $scope.customerData && $scope.customerData.id ? $scope.customerData.id : 1,
