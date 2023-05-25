@@ -412,14 +412,6 @@ ob_start();
 			<th align="right"><?php echo number_format($sale_returns, 2); ?></td>
 		</tr>
 		<tr>
-			<th align="left">Purchase Return</td>
-			<th align="right"><?php echo number_format($purchase_returns, 2); ?></td>
-		</tr>
-		<tr>
-			<th align="left">Receivings</td>
-			<th align="right"><?php echo number_format($receivings, 2); ?></td>
-		</tr>
-		<tr>
 			<th align="left">Payments</td>
 			<th align="right"><?php echo number_format($payments, 2); ?></td>
 		</tr>
