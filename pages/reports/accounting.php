@@ -136,14 +136,14 @@ switch ($reportType) {
 				unset($reportData1);
 			} else {
 				$reportData[$count] = $value;
-				$reportData[$count]['grossCreditSales'] = $value['grossCredit'] - $value['totalPaid'];
+				$reportData[$count]['grossCreditSales'] = !empty($value['grossCredit'] - $value['totalPaid']) ? $value['grossCredit'] - $value['totalPaid'] + $value['totalDiscount'] : 0;
 				$reportData[$count]['grossCashSales'] = !empty($value['totalPaid']) ? $value['totalPaid'] + $value['totalDiscount'] : 0;
 				$reportData[$count]['discount'] = $value['totalDiscount'];
 				$reportData[$count]['netCreditSales'] = $value['totalCredit'] - $value['totalPaid'];
 				$reportData[$count]['netCashSales'] = $value['totalPaid'];
 				$reportData[$count]['finalCashSales'] = $value['totalPaid'];
 
-				$footer['grossCreditSales'] += $value['grossCredit'] - $value['totalPaid'];
+				$footer['grossCreditSales'] += !empty($value['grossCredit'] - $value['totalPaid']) ? $value['grossCredit'] - $value['totalPaid'] + $value['totalDiscount'] : 0;
 				$footer['grossCashSales'] += !empty($value['totalPaid']) ? $value['totalPaid'] + $value['totalDiscount'] : 0;
 				$footer['discount'] += $value['totalDiscount'];
 				$footer['netCreditSales'] += $value['totalCredit'] - $value['totalPaid'];
