@@ -397,8 +397,8 @@ ob_start();
 		</tr>
 
 		<tr>
-			<th>Total</th>
-			<th><?php echo $cash; ?></th>
+			<th align="left">Total</th>
+			<th align="right"><?php echo $cash; ?></th>
 		</tr>
 
 
