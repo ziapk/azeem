@@ -371,6 +371,7 @@ ob_start();
 	$deduction = ($sale_returns + $texpense + $payments);
 	$netCash = ($tsale + $receivings + $purchase_returns) - $deduction;
 	?>
+	<h5>Sale</h5>
 	<table id="resultTable" style="border-collapse: collapse; width: 400px" border="1">
 		<tr>
 			<th align="left">Opening Balance</th>
@@ -404,6 +405,37 @@ ob_start();
 		<tr>
 			<th>Net Total</th>
 			<th><?php echo $cash - $deduction; ?></th>
+		</tr>
+
+
+
+	</table>
+	<h5>Deductions</h5>
+	<table id="resultTable" style="border-collapse: collapse; width: 400px" border="1">
+
+		<tr>
+			<th align="left">Sale Return</td>
+			<th align="right"><?php echo number_format($sale_returns, 2); ?></td>
+		</tr>
+		<tr>
+			<th align="left">Purchase Return</td>
+			<th align="right"><?php echo number_format($purchase_returns, 2); ?></td>
+		</tr>
+		<tr>
+			<th align="left">Receivings</td>
+			<th align="right"><?php echo number_format($receivings, 2); ?></td>
+		</tr>
+		<tr>
+			<th align="left">Payments</td>
+			<th align="right"><?php echo number_format($payments, 2); ?></td>
+		</tr>
+		<tr>
+			<th align="left">Expenses</td>
+			<th align="right"><?php echo number_format($texpense, 2); ?></td>
+		</tr>
+		<tr>
+			<th align="left">Net Cash</td>
+			<th align="right"><?php echo number_format($netCash, 2); ?></td>
 		</tr>
 	</table>
 
