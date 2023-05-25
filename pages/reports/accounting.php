@@ -398,7 +398,7 @@ ob_start();
 
 		<tr>
 			<th align="left">Total</th>
-			<th align="right"><?php echo $cash; ?></th>
+			<th align="right"><?php echo number_format($cash, 2); ?></th>
 		</tr>
 
 
