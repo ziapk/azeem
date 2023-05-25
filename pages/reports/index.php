@@ -1,14 +1,14 @@
-<?php 
-    include_once dirname(__FILE__).'/../../include/settings.php';
+<?php
+include_once dirname(__FILE__) . '/../../include/settings.php';
 
-   
-    $cat = new Categories();
-    $stores = new Store();
 
-    $groupNames = $cat->getGroupNames($shop['owner_id']);
-    $ownerStores = $stores->getOwnerStores($userData['id']);
+$cat = new Categories();
+$stores = new Store();
 
-    echo mainHeader(['page' => 'reports']);
+$groupNames = $cat->getGroupNames($shop['owner_id']);
+$ownerStores = $stores->getOwnerStores($userData['id']);
+
+echo mainHeader(['page' => 'reports']);
 
 ?>
 
@@ -22,38 +22,48 @@
                 <input type="hidden" name="from" id="from">
                 <input type="hidden" name="to" id="to">
             </div>
-            <?php 
+            <?php
 
-            if($userData['role'] == 'owner') {?>
-            <div class="col-sm-4 col-md-3 form-group">
-                <label>Select Shop</label>
-                <select class="form-control c-select" name="shopId">
-                    <?php foreach ($ownerStores as $value) { ?>
-                        <option value="<?php echo $value['id'];?>"><?php echo $value['full_name'];?></option>
-                    <?php } ?>
-                </select>
-            </div>
+            if ($userData['role'] == 'owner') { ?>
+                <div class="col-sm-4 col-md-3 form-group">
+                    <label>Select Shop</label>
+                    <select class="form-control c-select" name="shopId">
+                        <?php foreach ($ownerStores as $value) { ?>
+                            <option value="<?php echo $value['id']; ?>"><?php echo $value['full_name']; ?></option>
+                        <?php } ?>
+                    </select>
+                </div>
             <?php } ?>
             <div class="col-sm-4 col-md-3 form-group">
                 <label>Select Report</label>
                 <select class="form-control" name="reportType" ng-change="checkReport(reportType)" ng-model="reportType">
                     <option value="">Select a Report</option>
-                    <?php foreach ($reportsArray as $value) { if(in_array($userData['role'], $value['access'])) { ?>
-                        <option value="<?php echo $value['id'];?>"><?php echo $value['title'];?></option>
-                    <?php } } ?>
+                    <?php foreach ($reportsArray as $value) {
+                        if (in_array($userData['role'], $value['access'])) { ?>
+                            <option value="<?php echo $value['id']; ?>"><?php echo $value['title']; ?></option>
+                    <?php }
+                    } ?>
                 </select>
+            </div>
+            <div class="col-sm-4 col-md-3 form-group">
+
+                <div class="form-group">
+                    <label>Today's Opening Balace</label>
+                    <input type="text" name="opening_balance" class="form-control" />
+                </div>
             </div>
         </div>
         <div class="row" ng-if="reportType == 8 || reportType == 9">
-            <?php foreach($groupNames as $group) {?>
+            <?php foreach ($groupNames as $group) { ?>
                 <div class="col-md-3">
                     <label>
-                        <input type="checkbox" name="groupName[]" value="<?php echo $group['groupName'];?>">
-                        <?php echo $group['groupName'];?>
+                        <input type="checkbox" name="groupName[]" value="<?php echo $group['groupName']; ?>">
+                        <?php echo $group['groupName']; ?>
                     </label>
                 </div>
-            <?php }?>
+            <?php } ?>
         </div>
+
         <div class="input-group">
             <div class="input-group-btn">
                 <input type="submit" value="Submit" name="report" class="btn btn-primary" />
@@ -65,14 +75,14 @@
 
 <script type="text/javascript">
     app.controller('reportController', function($scope, $http, $httpParamSerializerJQLike, $filter) {
-    const a = $('.datepicker').daterangepicker({
+        const a = $('.datepicker').daterangepicker({
             minDate: moment().subtract(1, 'year'),
             maxDate: moment().add(1, 'week'),
             parentEl: '.datepicker-parent',
-        },  function(start, end, label) {
+        }, function(start, end, label) {
             $('#from').val(moment(start).format('YYYY-MM-DD'));
             $('#to').val(moment(end).format('YYYY-MM-DD'));
-            
+
         });
         $('#from').val(moment(a.data().daterangepicker.startDate).format('YYYY-MM-DD'));
         $('#to').val(moment(a.data().daterangepicker.endDate).format('YYYY-MM-DD'));

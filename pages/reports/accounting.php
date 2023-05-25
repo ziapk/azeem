@@ -20,6 +20,7 @@ $amodesList = [];
 foreach ($modesList['records'] as $key => $value) {
 	$amodesList[$value['id']] = $value;
 }
+$ob = !empty($opening_balance) ? $opening_balance : 0;
 
 $headers 		= array();
 $columns 		= array();
@@ -375,7 +376,7 @@ ob_start();
 	<table id="resultTable" style="border-collapse: collapse; width: 400px" border="1">
 		<tr>
 			<th align="left">Opening Balance</th>
-			<th align="right"></th>
+			<th align="right"><?php echo $ob; ?></th>
 		</tr>
 		<tr>
 			<th align="left">Credit Sale</th>
@@ -398,7 +399,7 @@ ob_start();
 
 		<tr>
 			<th align="left">Total</th>
-			<th align="right"><?php echo number_format($cash, 2); ?></th>
+			<th align="right"><?php echo number_format($cash + $ob, 2); ?></th>
 		</tr>
 
 
@@ -429,7 +430,7 @@ ob_start();
 	<table id="resultTable" style="border-collapse: collapse; width: 400px" border="1">
 		<tr>
 			<th align="left">Total Sale</th>
-			<th align="right"><?php echo number_format($cash, 2); ?></th>
+			<th align="right"><?php echo number_format($cash + $ob, 2); ?></th>
 		</tr>
 		<tr>
 			<th align="left">Total Deduction</th>
@@ -437,7 +438,7 @@ ob_start();
 		</tr>
 		<tr>
 			<th align="left">Net Total</td>
-			<th align="right"><?php echo number_format($cash - $deduction, 2); ?></th>
+			<th align="right"><?php echo number_format(($cash + $ob) - $deduction, 2); ?></th>
 		</tr>
 	</table>
 

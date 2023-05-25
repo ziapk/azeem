@@ -4,6 +4,7 @@ include_once dirname(__FILE__) . '/../../include/settings.php';
 $orders = [];
 $from = $_POST['from'];
 $to = $_POST['to'];
+$opening_balance = $_POST['opening_balance'];
 $shopId = !empty($_POST['shopId']) ? $_POST['shopId'] : $shop['id'];
 $reportType = $_POST['reportType'];
 
