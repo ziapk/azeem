@@ -371,7 +371,7 @@ ob_start();
 	$deduction = ($sale_returns + $texpense + $payments);
 	$netCash = ($tsale + $receivings + $purchase_returns) - $deduction;
 	?>
-	<h5>Sale</h5>
+	<h5 style="marign: 10px 0">Sale</h5>
 	<table id="resultTable" style="border-collapse: collapse; width: 400px" border="1">
 		<tr>
 			<th align="left">Opening Balance</th>
@@ -397,20 +397,14 @@ ob_start();
 		</tr>
 
 		<tr>
-			<th>Total Payment</th>
-			<th><?php echo $deduction; ?></th>
-		</tr>
-
-
-		<tr>
-			<th>Net Total</th>
-			<th><?php echo $cash - $deduction; ?></th>
+			<th>Total</th>
+			<th><?php echo $cash; ?></th>
 		</tr>
 
 
 
 	</table>
-	<h5>Deductions</h5>
+	<h5 style="marign: 10px 0">Deductions</h5>
 	<table id="resultTable" style="border-collapse: collapse; width: 400px" border="1">
 
 		<tr>
