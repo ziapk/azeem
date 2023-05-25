@@ -45,10 +45,11 @@ echo mainHeader();
                 <th width="100">P. Price</th>
                 <th width="100">S. Price</th>
                 <th width="100">Qty</th>
+                <th width="100">Total</th>
                 <th></th>
             </tr>
             <tr>
-                <td colspan="7"><input type="text" id="searchProduct" class="form-control" ng-model="product" placeholder="Search Product to add" typeahead-on-select="selectProduct($item, row)" uib-typeahead="address as address.full_name for address in searchProduct($viewValue)" typeahead-template-url="row2.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="0" class="form-control" ng-model="row.product_name" /></td>
+                <td colspan="8"><input type="text" id="searchProduct" class="form-control" ng-model="product" placeholder="Search Product to add" typeahead-on-select="selectProduct($item, row)" uib-typeahead="address as address.full_name for address in searchProduct($viewValue)" typeahead-template-url="row2.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="0" class="form-control" ng-model="row.product_name" /></td>
             </tr>
         </thead>
         <tbody>
@@ -61,35 +62,36 @@ echo mainHeader();
                 <td><input type="number" class="form-control" ng-change="calculatePercent(row)" ng-model="row.pprice" /></td>
                 <td width="100"><input type="number" class="form-control" ng-model="row.price" /></td>
                 <td width="100"><input type="number" class="form-control" ng-change="calculateSum()" ng-model="row.qty" ng-keydown="initCheckKeypress($event)" /></td>
+                <td width="100">{{row.total}}</td>
                 <td width="60"><a href="#" class="btn btn-xs btn-danger pull-right" ng-click="remove(cart)">Delete</a></td>
             </tr>
         </tbody>
         <tbody>
             <tr>
                 <th rowspan="6"></th>
-                <th class="text-right" colspan="4">Sub Total</th>
+                <th class="text-right" colspan="5">Sub Total</th>
                 <th colspan="2">{{subTotal}}</th>
             </tr>
             <tr>
-                <th class="text-right" colspan="4">Disc.</th>
+                <th class="text-right" colspan="5">Disc.</th>
                 <th colspan="2" width="200"><input type="number" ng-model="discount" class="form-control" ng-change="addDiscount(discount)"></th>
             </tr>
             <tr>
-                <th class="text-right" colspan="4">Grand Total</th>
+                <th class="text-right" colspan="5">Grand Total</th>
                 <th colspan="2">{{grandTotal}}</th>
             </tr>
             <tr>
-                <th class="text-right" colspan="4">Pay Amount</th>
+                <th class="text-right" colspan="5">Pay Amount</th>
                 <th colspan="2" width="200"><input type="number" ng-model="payment_amount" class="form-control"></th>
             </tr>
             <tr>
-                <th class="text-right" colspan="4">Balance</th>
+                <th class="text-right" colspan="5">Balance</th>
                 <th colspan="2" width="200">{{grandTotal - payment_amount}}</th>
             </tr>
         </tbody>
         <tbody>
             <tr>
-                <th colspan="7" class="text-right">
+                <th colspan="8" class="text-right">
                     <div class="btn-group">
                         <label class="btn btn-default" ng-repeat="li in modes">
                             <input type="radio" name="mode" ng-model="payment_mode" ng-value="li.id" ng-change="printValue(li)">
@@ -311,7 +313,8 @@ echo mainFooter();
             let subtotal = 0;
             $scope.items.map((product) => {
                 product.pprice = product.price * ((100 - (parseFloat(product.discount || 0))) / 100);
-                subtotal += (product.pprice * product.qty);
+                product.total = subtotal += (product.pprice * product.qty);
+
                 return Object.assign({}, product);
             })
             $scope.subTotal = subtotal;
