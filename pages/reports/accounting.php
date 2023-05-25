@@ -317,7 +317,7 @@ ob_start();
 						<td><?php echo $val; ?></td>
 					<?php } else { ?>
 
-						<td <?php echo is_numeric($val) ? 'align="right"' : null; ?>><?php echo is_numeric($val) ? number_format($val, 2) : $val; ?></td>
+						<td <?php echo is_numeric($val) ? 'align="right"' : null; ?>><?php echo is_numeric($val) ? number_format($val, 0) : $val; ?></td>
 
 					<?php } ?>
 
@@ -331,7 +331,7 @@ ob_start();
 					<th><?php echo $value; ?></th>
 				<?php } ?>
 				<?php foreach ($footerVals as $value) { ?>
-					<th align="right"><?php echo number_format($footer[$value], 2); ?></th>
+					<th align="right"><?php echo number_format($footer[$value], 0); ?></th>
 				<?php } ?>
 			</tr>
 		<?php } ?>
@@ -355,9 +355,9 @@ ob_start();
 					<td><?php echo $date; ?></td>
 					<?php foreach ($value['row'] as $row) {
 						$total += $row['amount'] ?>
-						<td align="right"><?php echo number_format($row['amount'], 2); ?></td>
+						<td align="right"><?php echo number_format($row['amount'], 0); ?></td>
 					<?php }; ?>
-					<th align="right"><?php echo number_format($total, 2); ?></th>
+					<th align="right"><?php echo number_format($total, 0); ?></th>
 				</tr>
 			<?php } ?>
 		</table>
@@ -376,30 +376,30 @@ ob_start();
 	<table id="resultTable" style="border-collapse: collapse; width: 400px" border="1">
 		<tr>
 			<th align="left">Opening Balance</th>
-			<th align="right"><?php echo $ob; ?></th>
+			<th align="right"><?php echo number_format($ob); ?></th>
 		</tr>
 		<tr>
 			<th align="left">Credit Sale</th>
-			<th align="right"><?php echo number_format($footer['netCreditSales'], 2); ?></th>
+			<th align="right"><?php echo number_format($footer['netCreditSales'], 0); ?></th>
 		</tr>
 		<?php foreach ($modes as $id => $value) { ?>
 			<tr>
 				<th align="left">Sale via <?php echo $amodesList[$id]['title']; ?></td>
-				<th align="right"><?php echo number_format($value, 2); ?></td>
+				<th align="right"><?php echo number_format($value, 0); ?></td>
 			</tr>
 		<?php } ?>
 		<tr>
 			<th align="left">Receivings</th>
-			<th align="right"><?php echo number_format($receivings, 2); ?></th>
+			<th align="right"><?php echo number_format($receivings, 0); ?></th>
 		</tr>
 		<tr>
 			<th align="left">Purchase Returns</th>
-			<th align="right"><?php echo number_format($purchase_returns, 2); ?></th>
+			<th align="right"><?php echo number_format($purchase_returns, 0); ?></th>
 		</tr>
 
 		<tr>
 			<th align="left">Total</th>
-			<th align="right"><?php echo number_format($cash + $ob, 2); ?></th>
+			<th align="right"><?php echo number_format($cash + $ob, 0); ?></th>
 		</tr>
 
 
@@ -410,19 +410,19 @@ ob_start();
 
 		<tr>
 			<th align="left">Sale Return</td>
-			<th align="right"><?php echo number_format($sale_returns, 2); ?></td>
+			<th align="right"><?php echo number_format($sale_returns, 0); ?></td>
 		</tr>
 		<tr>
 			<th align="left">Payments</td>
-			<th align="right"><?php echo number_format($payments, 2); ?></td>
+			<th align="right"><?php echo number_format($payments, 0); ?></td>
 		</tr>
 		<tr>
 			<th align="left">Expenses</td>
-			<th align="right"><?php echo number_format($texpense, 2); ?></td>
+			<th align="right"><?php echo number_format($texpense, 0); ?></td>
 		</tr>
 		<tr>
 			<th align="left">Total</th>
-			<th align="right"><?php echo number_format($deduction, 2); ?></th>
+			<th align="right"><?php echo number_format($deduction, 0); ?></th>
 		</tr>
 
 	</table>
@@ -430,15 +430,15 @@ ob_start();
 	<table id="resultTable" style="border-collapse: collapse; width: 400px" border="1">
 		<tr>
 			<th align="left">Total Sale</th>
-			<th align="right"><?php echo number_format($cash + $ob, 2); ?></th>
+			<th align="right"><?php echo number_format($cash + $ob, 0); ?></th>
 		</tr>
 		<tr>
 			<th align="left">Total Deduction</th>
-			<th align="right"><?php echo number_format($deduction, 2); ?></th>
+			<th align="right"><?php echo number_format($deduction, 0); ?></th>
 		</tr>
 		<tr>
 			<th align="left">Net Total</td>
-			<th align="right"><?php echo number_format(($cash + $ob) - $deduction, 2); ?></th>
+			<th align="right"><?php echo number_format(($cash + $ob) - $deduction, 0); ?></th>
 		</tr>
 	</table>
 
