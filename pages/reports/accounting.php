@@ -367,20 +367,19 @@ ob_start();
 	$tsale = empty($footer['netCashSales']) ? 0 : $footer['netCashSales'];
 	$creditsale = empty($footer['netCreditSales']) ? 0 : $footer['netCreditSales'];
 	$texpense = empty($expenses['total']) ? 0 : $expenses['total'];
-	$netCash = ($tsale + $receivings + $purchase_returns) - ($sale_returns + $texpense + $payments);
+	$cash = ($tsale + $receivings + $purchase_returns);
+	$deduction = ($sale_returns + $texpense + $payments);
+	$netCash = ($tsale + $receivings + $purchase_returns) - $deduction;
 	?>
 	<table id="resultTable" style="border-collapse: collapse; width: 400px" border="1">
-		<?php foreach ($summerCols as $index => $value) {
-			$key = $footerVals[$index];
-			if ($key != 'netCashSales') {
-
-		?>
-				<tr>
-					<th align="left"><?php echo $value; ?></th>
-					<th align="right"><?php echo number_format($footer[$key], 2); ?></th>
-				</tr>
-		<?php }
-		} ?>
+		<tr>
+			<th align="left">Opening Balance</th>
+			<th align="right"></th>
+		</tr>
+		<tr>
+			<th align="left">Credit Sale</th>
+			<th align="right"><?php echo number_format($footer['netCreditSales'], 2); ?></th>
+		</tr>
 		<?php foreach ($modes as $id => $value) { ?>
 			<tr>
 				<th align="left">Sale via <?php echo $amodesList[$id]['title']; ?></td>
@@ -388,28 +387,23 @@ ob_start();
 			</tr>
 		<?php } ?>
 		<tr>
-			<th align="left">Sale Return</td>
-			<th align="right"><?php echo number_format($sale_returns, 2); ?></td>
+			<th align="left">Receivings</th>
+			<th align="right"><?php echo number_format($receivings, 2); ?></th>
 		</tr>
 		<tr>
-			<th align="left">Purchase Return</td>
-			<th align="right"><?php echo number_format($purchase_returns, 2); ?></td>
+			<th align="left">Purchase Returns</th>
+			<th align="right"><?php echo number_format($purchase_returns, 2); ?></th>
 		</tr>
+
 		<tr>
-			<th align="left">Receivings</td>
-			<th align="right"><?php echo number_format($receivings, 2); ?></td>
+			<th>Total Payment</th>
+			<th><?php echo $deduction; ?></th>
 		</tr>
+
+
 		<tr>
-			<th align="left">Payments</td>
-			<th align="right"><?php echo number_format($payments, 2); ?></td>
-		</tr>
-		<tr>
-			<th align="left">Expenses</td>
-			<th align="right"><?php echo number_format($texpense, 2); ?></td>
-		</tr>
-		<tr>
-			<th align="left">Net Cash</td>
-			<th align="right"><?php echo number_format($netCash, 2); ?></td>
+			<th>Net Total</th>
+			<th><?php echo $cash - $deduction; ?></th>
 		</tr>
 	</table>
 
