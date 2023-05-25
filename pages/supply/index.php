@@ -53,12 +53,12 @@ echo mainHeader();
             </tr>
         </thead>
         <tbody>
-            <tr ng-repeat="row in items">
+            <tr ng-repeat="row in items track by $index" id="product-{{$index + 1}}">
                 <td><input type="text" class="form-control" ng-model="row.barcode" /></td>
                 <td>
                     <input type="text" class="form-control" ng-model="row.full_name" placeholder="Product title" />
                 </td>
-                <td><input type="number" class="form-control" ng-change="calculateSum()" ng-model="row.discount" /></td>
+                <td><input type="number" class="form-control discount-field" ng-change="calculateSum()" ng-model="row.discount" /></td>
                 <td><input type="number" class="form-control" ng-change="calculatePercent(row)" ng-model="row.pprice" /></td>
                 <td width="100"><input type="number" class="form-control" ng-model="row.price" /></td>
                 <td width="100"><input type="number" class="form-control" ng-change="calculateSum()" ng-model="row.qty" ng-keydown="initCheckKeypress($event)" /></td>
@@ -108,7 +108,7 @@ echo mainHeader();
 echo mainFooter();
 ?>
 <script type="text/javascript">
-    app.controller('reportController', function($scope, $http, $window, $httpParamSerializerJQLike) {
+    app.controller('reportController', function($scope, $http, $window, $httpParamSerializerJQLike, $anchorScroll, $timeout, $location) {
 
         $scope.supplierName = "";
         $scope.ref_no = "";
@@ -200,10 +200,12 @@ echo mainFooter();
             }
         }
         $scope.selectProduct = function(p, r) {
+            let currentIndex = 0
             let exists = false;
-            $scope.items.map((pro) => {
+            $scope.items.map((pro, index) => {
                 if (pro.id == p.id) {
                     exists = true;
+                    currentIndex = index + 1;
                     pro.qty++;
                 }
             })
@@ -215,7 +217,15 @@ echo mainFooter();
                     pprice: parseInt(p.pprice || 0),
                     qty: 1
                 });
+                currentIndex = $scope.items.length;
             }
+
+            $timeout(() => {
+                $location.hash('product-' + currentIndex);
+                $anchorScroll();
+                $('#product-' + currentIndex).find('.discount-field').focus();
+            }, 200);
+
             $scope.calculateSum();
 
         }
