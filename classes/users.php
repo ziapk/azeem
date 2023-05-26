@@ -16,6 +16,7 @@ class Users extends Connection
 			$prepare->bindParam(':password', $password, PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $prepare->fetch(PDO::FETCH_ASSOC);
+			print_r($result);
 			if ($result) {
 				$owner = $result['role'] === 'owner' ? $result['id'] : $result['created_by'];
 				return $this->checkContract($owner, $result);
@@ -128,7 +129,10 @@ class Users extends Connection
 			$prepare->bindParam(':owner_id', $owner_id, PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $prepare->fetch(PDO::FETCH_ASSOC);
+			print_r($result);
 			if ($result || $userInfo['role'] === 'superadmin') {
+				print_r($this->getShop($userInfo));
+
 				return ['user' => $userInfo, 'shopInfo' => $result, 'shop' => $this->getShop($userInfo)];
 			} else {
 				return 'Contact expired';
