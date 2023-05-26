@@ -50,7 +50,9 @@ switch ($reportType) {
 		$params['parent_ids'][] = $store['expense'];
 
 		$reportDataRaw = $doubleEntry->getClosingBalanceReport($params);
-
+		if (!empty($reportDataRaw['opening_balance'])) {
+			$ob = $reportDataRaw['opening_balance']['amount'];
+		}
 		$rows = [];
 		$exp = $store['sale_discount'];
 		$expHead = $store['expense'];
@@ -63,7 +65,7 @@ switch ($reportType) {
 		$receivings = 0;
 		$final = [];
 		$modes = [];
-		foreach ($reportDataRaw as $key => $value) {
+		foreach ($reportDataRaw['rows'] as $key => $value) {
 			if ($store['payable'] != $value['parent_id']) { // exclude payments
 				if ($value['account_id'] != $exp && $value['parent_id'] != $expHead) { // exclude expense
 
@@ -377,10 +379,6 @@ ob_start();
 		<tr>
 			<th align="left">Opening Balance</th>
 			<th align="right"><?php echo number_format($ob); ?></th>
-		</tr>
-		<tr>
-			<th align="left">Credit Sale</th>
-			<th align="right"><?php echo number_format($footer['netCreditSales'], 0); ?></th>
 		</tr>
 		<?php foreach ($modes as $id => $value) { ?>
 			<tr>

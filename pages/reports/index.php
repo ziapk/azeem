@@ -45,13 +45,6 @@ echo mainHeader(['page' => 'reports']);
                     } ?>
                 </select>
             </div>
-            <div class="col-sm-4 col-md-3 form-group">
-
-                <div class="form-group">
-                    <label>Today's Opening Balace</label>
-                    <input type="text" name="opening_balance" class="form-control" />
-                </div>
-            </div>
         </div>
         <div class="row" ng-if="reportType == 8 || reportType == 9">
             <?php foreach ($groupNames as $group) { ?>

@@ -17,7 +17,7 @@ class DoubleEntry extends Connection
 	private $table_demandItems = 'demand_items';
 	private $table_ds = 'demand_status';
 	private $table_ds_history = 'demand_status_history';
-
+	private $table_ob = 'opening_balances';
 
 
 	public function getAccounts($shopId = null)
@@ -282,7 +282,8 @@ class DoubleEntry extends Connection
 			$prepare->bindParam(':fromDate', $fromDate, PDO::PARAM_STR);
 			$prepare->bindParam(':toDate', $toDate, PDO::PARAM_STR);
 			$prepare->execute();
-			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
+			$result['rows'] = $prepare->fetchAll(PDO::FETCH_ASSOC);
+			$result['opening_balance'] = $this->getOBForReport($array);
 			return $result;
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
@@ -935,6 +936,90 @@ class DoubleEntry extends Connection
 			} catch (PDOException $e) {
 				die("Error!: " . $e->getMessage() . "<br/>");
 			}
+		}
+	}
+
+	public function getOBForReport($array)
+	{
+		try {
+			$stmt = "SELECT * FROM `{$this->table_ob}` WHERE shop_id=:shop_id and (DATE(sale_date) BETWEEN :fromDate AND :toDate)";
+			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':fromDate', $array['fromDate'], PDO::PARAM_STR);
+			$prepare->bindParam(':toDate', $array['toDate'], PDO::PARAM_STR);
+			$prepare->bindParam(':shop_id', $array['shopId'], PDO::PARAM_STR);
+			$prepare->execute();
+			$result = $prepare->fetch(PDO::FETCH_ASSOC);
+			return $result;
+		} catch (PDOException $e) {
+			die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
+
+	public function getOB($shop_id, $id)
+	{
+		try {
+			$stmt = "SELECT * FROM `{$this->table_ob}` WHERE shop_id=:shop_id and `id`=:id";
+			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':id', $id, PDO::PARAM_STR);
+			$prepare->bindParam(':shop_id', $shop_id, PDO::PARAM_STR);
+			$prepare->execute();
+			$result = $prepare->fetch(PDO::FETCH_ASSOC);
+			return $result;
+		} catch (PDOException $e) {
+			die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
+	public function getOBs($shop_id)
+	{
+		try {
+			$stmt = "SELECT * FROM `{$this->table_ob}` WHERE shop_id=:shop_id";
+			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':shop_id', $shop_id, PDO::PARAM_STR);
+			$prepare->execute();
+			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
+			return $result;
+		} catch (PDOException $e) {
+			die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
+
+	public function insertOB($array)
+	{
+		$sale_date = $array['sale_date'];
+		$shop_id = $array['shop_id'];
+		$owner_id = $array['owner_id'];
+		$amount = $array['amount'];
+		try {
+			$stmt = "INSERT INTO `{$this->table_ob}` (`sale_date`, `shop_id`, `owner_id`, `amount`) VALUES (:sale_date, :shop_id, :owner_id, :amount)";
+			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':sale_date', $sale_date, PDO::PARAM_STR);
+			$prepare->bindParam(':shop_id', $shop_id, PDO::PARAM_STR);
+			$prepare->bindParam(':owner_id', $owner_id, PDO::PARAM_STR);
+			$prepare->bindParam(':amount', $amount, PDO::PARAM_STR);
+			$prepare->execute();
+			$result = $this->dbh->lastInsertId();
+			return $result;
+		} catch (PDOException $e) {
+			die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
+
+	public function updateOB($array)
+	{
+		$id = $array['id'];
+		$sale_date = $array['sale_date'];
+		$amount = $array['amount'];
+		try {
+			$stmt = "UPDATE `{$this->table_ob}` SET `sale_date`=:sale_date, `amount`=:amount WHERE id=:id";
+			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':id', $id, PDO::PARAM_STR);
+			$prepare->bindParam(':sale_date', $sale_date, PDO::PARAM_STR);
+			$prepare->bindParam(':amount', $amount, PDO::PARAM_STR);
+			$prepare->execute();
+			$result = $prepare->rowCount();
+			return $result;
+		} catch (PDOException $e) {
+			die("Error!: " . $e->getMessage() . "<br/>");
 		}
 	}
 
