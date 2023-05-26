@@ -150,14 +150,15 @@ if ($supply_id) {
         }
     }
 
-    $supplier = $supplierObj->getSupplier($data['supplier_id']);
+    $account_id = $_POST['account_id'];
+    $credit_amount = !empty($_POST['payment_with_credit']) ? $_POST['payment_with_credit'] : 0;
     $doubleEntry = new DoubleEntry();
 
     $makeTransaction = [
         'description' => !empty($_POST['summery']) ? $_POST['summery'] : "Supplier Invoice: " . $supply_id . " PLACED",
         'transaction_date' => $storeDATA['sale_date'],
         'reference' => $data['ref_no'],
-        'transaction_type' => 'PURCHASE',
+        'transaction_type' => !empty($credit_amount) ? 'EXCHANGE' : 'PURCHASE',
         'shopId' => $shop['id'],
         'created_by' => $_SESSION['user_credentials']['id'],
         'order_ref' => null,
@@ -191,7 +192,7 @@ if ($supply_id) {
     // payable credit entry
     $entry = [
         'transaction_id' => $makeTransactionId,
-        'account_id' => $supplier['account_id'],
+        'account_id' => $account_id,
         'entry_type' => 'C',
         'description' => '',
         'amount' => $payableAmount,
@@ -214,12 +215,13 @@ if ($supply_id) {
         $a[] = $doubleEntry->makeEntry($entry);
     }
 
+
     if (!empty($cash)) {
         $makeTransactionId = $doubleEntry->makeTransaction($makeTransaction);
         // payable credit entry
         $entry = [
             'transaction_id' => $makeTransactionId,
-            'account_id' => $supplier['account_id'],
+            'account_id' => $account_id,
             'entry_type' => 'D',
             'description' => '',
             'amount' => $cash,

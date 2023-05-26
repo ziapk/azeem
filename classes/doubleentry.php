@@ -277,7 +277,7 @@ class DoubleEntry extends Connection
 				$accountCondition = "and (a.parent_id in (" . implode(',', $parent_ids) . ") or a.id in (" . implode(',', $account_ids) . "))";
 			}
 
-			$stmt = "SELECT e.transaction_id, e.payment_mode, a.parent_id, a.code, e.account_id, a.account_type, a.title, e.entry_type, t.transaction_date, amount FROM `$this->table_transactions` t LEFT JOIN `$this->table_ledger_entries` e ON e.transaction_id = t.id LEFT JOIN `$this->table` a ON a.id = e.account_id and a.status = 1 WHERE (t.flag=1 $shopIdCondition $accountCondition) and (DATE(t.transaction_date) BETWEEN :fromDate AND :toDate)";
+			$stmt = "SELECT t.transsaction_type,  e.transaction_id, e.payment_mode, a.parent_id, a.code, e.account_id, a.account_type, a.title, e.entry_type, t.transaction_date, amount FROM `$this->table_transactions` t LEFT JOIN `$this->table_ledger_entries` e ON e.transaction_id = t.id LEFT JOIN `$this->table` a ON a.id = e.account_id and a.status = 1 WHERE (t.flag=1 $shopIdCondition $accountCondition) and (DATE(t.transaction_date) BETWEEN :fromDate AND :toDate)";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':fromDate', $fromDate, PDO::PARAM_STR);
 			$prepare->bindParam(':toDate', $toDate, PDO::PARAM_STR);
@@ -1027,7 +1027,7 @@ class DoubleEntry extends Connection
 	public function makeTransaction($array)
 	{
 		try {
-			$stmt = "INSERT INTO `{$this->table_transactions}` (`description`, `reference`, `transaction_date`, `created_by`, `shopId`, `order_ref`,`supply_ref`) VALUES (:description, :reference, :transaction_date, :created_by, :shopId, :order_ref, :supply_ref)";
+			$stmt = "INSERT INTO `{$this->table_transactions}` (`description`, `reference`, `transaction_date`, `created_by`, `shopId`, `order_ref`,`supply_ref`, `transsaction_type`) VALUES (:description, :reference, :transaction_date, :created_by, :shopId, :order_ref, :supply_ref, :transaction_type)";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':description', $array['description'], PDO::PARAM_STR);
 			$prepare->bindParam(':reference', $array['reference'], PDO::PARAM_STR);
@@ -1036,6 +1036,7 @@ class DoubleEntry extends Connection
 			$prepare->bindParam(':created_by', $array['created_by'], PDO::PARAM_STR);
 			$prepare->bindParam(':order_ref', $array['order_ref'], PDO::PARAM_STR);
 			$prepare->bindParam(':supply_ref', $array['supply_ref'], PDO::PARAM_STR);
+			$prepare->bindParam(':transaction_type', $array['transaction_type'], PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $this->dbh->lastInsertId();
 			return $result;

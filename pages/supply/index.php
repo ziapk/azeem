@@ -16,7 +16,10 @@ echo mainHeader();
         <div class="col-sm-3 form-group">
             <label>Supplier's Name</label>
             <input type="hidden" class="form-control" ng-model="supplierId">
-            <input type="text" class="form-control" ng-model="supplierName" placeholder="Supplier's Name" typeahead-on-select="selectSupplier($item)" uib-typeahead="address as address.name for address in searchSupplier($viewValue)" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="0">
+            <input ng-if="!toggleForm.searchMode" type="text" class="form-control" ng-model="supplierName" placeholder="Supplier's Name" typeahead-on-select="selectSupplier($item)" uib-typeahead="address as address.name for address in searchSupplier($viewValue)" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="0">
+            <input ng-if="toggleForm.searchMode" type="text" class="form-control" ng-model="supplierName" placeholder="Customer's Name" typeahead-on-select="selectSupplier($item)" uib-typeahead="address as address.name for address in searchCustomer($viewValue)" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="0">
+            <label><input type="checkbox" ng-model="toggleForm.searchMode"> Exchange Supply with Customer</label>
+            <span>Balance: {{supplier.opening_balance | number}} </span>
         </div>
         <div class="col-sm-3 form-group">
             <label>Ref. No</label>
@@ -81,12 +84,16 @@ echo mainHeader();
                 <th colspan="2">{{grandTotal}}</th>
             </tr>
             <tr>
-                <th class="text-right" colspan="5">Pay Amount</th>
+                <th class="text-right" colspan="5">Pay with Credit</th>
+                <th colspan="2" width="200"><input type="number" ng-model="payment_with_credit" class="form-control"></th>
+            </tr>
+            <tr>
+                <th class="text-right" colspan="5">Pay Direct</th>
                 <th colspan="2" width="200"><input type="number" ng-model="payment_amount" class="form-control"></th>
             </tr>
             <tr>
                 <th class="text-right" colspan="5">Balance</th>
-                <th colspan="2" width="200">{{grandTotal - payment_amount}}</th>
+                <th colspan="2" width="200">{{grandTotal - payment_amount - payment_with_credit}}</th>
             </tr>
         </tbody>
         <tbody>
@@ -123,7 +130,13 @@ echo mainFooter();
         $scope.subTotal = 0;
         $scope.grandTotal = 0;
         $scope.discount = 0;
+        $scope.payment_amount = 0;
+        $scope.payment_with_credit = 0;
         $scope.payment_mode = '1';
+
+        $scope.toggleForm = {
+            searchMode: false
+        }
 
 
         $scope.newData = {
@@ -164,8 +177,22 @@ echo mainFooter();
         }
 
         $scope.selectSupplier = function(p) {
-            $scope.supplierId = p.id
-            $scope.supplierName = p.name
+            $http.get("<?php echo SITE_URL ?>api/getOpeningBalance.php", {
+                params: {
+                    account_id: p.account_id
+                }
+            }).then(res => {
+
+                $scope.supplierId = p.id
+                $scope.supplierName = p.full_name || p.name
+                $scope.supplier = {
+                    ...p,
+                    opening_balance: $scope.toggleForm.searchMode ? ((parseFloat(res.data.opening_balance || 0) + parseFloat(res.data.debitAmount || 0)) - parseFloat(res.data.creditAmount || 0)) : ((parseFloat(res.data.opening_balance || 0) + parseFloat(res.data.creditAmount || 0) - parseFloat(res.data.debitAmount || 0)))
+                };
+                $scope.shopId = p.shopId;
+                // $scope.items = [];
+                $scope.calculateSum();
+            })
         }
 
         $scope.addDiscount = function(val, obj) {
@@ -260,14 +287,18 @@ echo mainFooter();
                 });
         }
 
-        $scope.searchCustomer = function(init) {
-            $http.get("<?php echo SITE_URL ?>api/getCustomer.php?term=" + $scope.customerName)
-                .then(function(response) {
-                    $scope.customersList = response.data;
-
-                    if (init) {
-                        $scope.selectSupplier(response.data[0])
+        $scope.searchCustomer = function(term) {
+            return $http.get("<?php echo SITE_URL ?>api/getCustomer.php", {
+                    params: {
+                        term
                     }
+                })
+                .then(function(response) {
+                    return response.data.map(r => ({
+                        ...r,
+                        contact: r.phoneNumber,
+                        name: r.full_name
+                    }));
 
                 });
         }
@@ -301,7 +332,9 @@ echo mainFooter();
                 discount: $scope.discount,
                 items: $scope.items,
                 shopId: $scope.shopId,
-                payment_amount: $scope.payment_amount
+                account_id: $scope.supplier.account_id,
+                payment_amount: $scope.payment_amount,
+                payment_with_credit: $scope.payment_with_credit,
             }
 
 
