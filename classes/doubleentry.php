@@ -20,12 +20,12 @@ class DoubleEntry extends Connection
 	private $table_ob = 'opening_balances';
 
 
-	public function getAccounts($shopId = null)
+	public function getAccounts($shopId = [])
 	{
 		try {
 			$shopIdCond = '';
 			if (!empty($shopId)) {
-				$shopIdCond = "and shopId = $shopId";
+				$shopIdCond = "and shopId IN (" . implode(', ', $shopId) . ")";
 			}
 			$stmt = "SELECT * from `$this->table` where status = 1 $shopIdCond order by code asc";
 			$prepare = $this->dbh->prepare($stmt);
@@ -168,10 +168,10 @@ class DoubleEntry extends Connection
 	}
 
 
-	public function getJournals($arr = [])
+	public function getJournals($arr = [], $id)
 	{
 		try {
-			$where = "where t.flag=1 ";
+			$where = "where t.shopId IN (" . implode(', ', $id) . ") and t.flag=1 ";
 			if (!empty($arr['from']) && !empty($arr['to'])) {
 
 				$to = $arr['to'];

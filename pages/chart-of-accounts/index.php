@@ -2,7 +2,17 @@
 include_once dirname(__FILE__) . '/../../include/settings.php';
 $doubleEntryObj = new DoubleEntry();
 $accountTypes = $doubleEntryObj->getAccountTypes();
-$accounts = $doubleEntryObj->getAccounts($userData['role'] == 'owner' ? null : $shop['id']);
+$ids = [];
+if ($userData['role'] === 'owner') {
+  $storeObj = new Store();
+  $ownerStores = $storeObj->getOwnerStores($shop['owner_id']);
+  foreach ($ownerStores as $v) {
+    $ids[] = $v['id'];
+  }
+} else {
+  $ids[] = $shop['id'];
+}
+$accounts = $doubleEntryObj->getAccounts($ids);
 echo mainHeader(['page' => 'coa']);
 ?>
 <div ng-controller="coaController">

@@ -1,7 +1,18 @@
 <?php
 include_once dirname(__FILE__) . '/../../include/settings.php';
 $doubleEntryObj = new DoubleEntry();
-$demands = $doubleEntryObj->getJournals();
+$ids = [];
+if ($userData['role'] === 'owner') {
+  $storeObj = new Store();
+  $ownerStores = $storeObj->getOwnerStores($shop['owner_id']);
+  foreach ($ownerStores as $v) {
+    $ids[] = $v['id'];
+  }
+} else {
+  $ids[] = $shop['id'];
+}
+
+$demands = $doubleEntryObj->getJournals([], $ids);
 $acd_ids = [];
 $grouping = [];
 foreach ($demands as $value) {

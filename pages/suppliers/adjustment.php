@@ -1,18 +1,18 @@
-<?php 
-include_once dirname(__FILE__).'/../../include/settings.php';
+<?php
+include_once dirname(__FILE__) . '/../../include/settings.php';
 $category = new  Categories();
-$categoryData = $category->getCategories($userData['created_by']);
-echo mainHeader(['page'=> 'supplier']);
+$categoryData = $category->getOwnerCategories($userData['created_by']);
+echo mainHeader(['page' => 'supplier']);
 
 $supplierObj = new Suppliers();
 
-if(empty($_GET['id']) || !is_numeric($_GET['id']) ) {
-    header('location: '.SITE_URL.'');
+if (empty($_GET['id']) || !is_numeric($_GET['id'])) {
+    header('location: ' . SITE_URL . '');
 }
 
 $user = $supplier = $supplierObj->getSupplier($_GET['id']);
-if(empty($supplier)) {
-    header('location: '.SITE_URL.'');
+if (empty($supplier)) {
+    header('location: ' . SITE_URL . '');
 }
 
 $dentry = new DoubleEntry();
@@ -47,28 +47,33 @@ $data = [
             <td width="500">
                 <table width="100%">
                     <tr>
-                        <td>Opening Balance:</td><td width="140"><?php echo number_format($user['account']['opening_balance'], 2);?><br /></td>
+                        <td>Opening Balance:</td>
+                        <td width="140"><?php echo number_format($user['account']['opening_balance'], 2); ?><br /></td>
                     </tr>
                     <tr>
-                        <td>Total Invoices:</td><td><?php echo $summery['total'];?><br /></td>
+                        <td>Total Invoices:</td>
+                        <td><?php echo $summery['total']; ?><br /></td>
                     </tr>
                     <tr>
-                        <td>Total Amount:</td><td><?php echo number_format($amount, 2);?><br /></td>
+                        <td>Total Amount:</td>
+                        <td><?php echo number_format($amount, 2); ?><br /></td>
                     </tr>
                     <tr>
-                        <td>Total Paid:</td><td><?php echo number_format($paid, 2);?><br /></td>
+                        <td>Total Paid:</td>
+                        <td><?php echo number_format($paid, 2); ?><br /></td>
                     </tr>
                     <tr>
-                        <td>Closing Balance:</td><td><?php echo number_format($balance, 2);?></td>
+                        <td>Closing Balance:</td>
+                        <td><?php echo number_format($balance, 2); ?></td>
                     </tr>
                     <tr>
                         <td>
-                        <h3 class="text-danger h3">Going to Pay = {{wallet}}</h3>
-                        <h4 class="text-success">REMAINING BALANCE = {{data.balance - wallet}}</h4>
+                            <h3 class="text-danger h3">Going to Pay = {{wallet}}</h3>
+                            <h4 class="text-success">REMAINING BALANCE = {{data.balance - wallet}}</h4>
                         </td>
                     </tr>
                 </table>
-                
+
             </td>
         </tr>
     </table>
@@ -90,7 +95,7 @@ $data = [
             <input type="number" ng-model="wallet" value={{wallet}} ng-change="changeValue()" class="form-control" />
         </div>
         <div class="col-sm-12 text-right">
-            <strong class="text-danger h3">Going to Pay = {{wallet}}</strong> 
+            <strong class="text-danger h3">Going to Pay = {{wallet}}</strong>
             <div class="btn-group">
                 <label class="btn btn-default" ng-repeat="li in modes">
                     <input type="radio" name="mode" ng-model="payment_mode" ng-value="li.id" ng-change="printValue(li)">
@@ -102,36 +107,46 @@ $data = [
     </div>
 </div>
 <script>
-app.controller('productController', function($scope, $http, $httpParamSerializerJQLike, $filter, $window, $document, $uibModal, $log) {
-    $scope.data = <?php echo json_encode($data);?>; //$scope.data.records;
-    $scope.id = <?php echo json_encode($_GET['id']);?>; //$scope.data.records;
-    $scope.wallet = $scope.data.balance;
+    app.controller('productController', function($scope, $http, $httpParamSerializerJQLike, $filter, $window, $document, $uibModal, $log) {
+        $scope.data = <?php echo json_encode($data); ?>; //$scope.data.records;
+        $scope.id = <?php echo json_encode($_GET['id']); ?>; //$scope.data.records;
+        $scope.wallet = $scope.data.balance;
 
-    $scope.payment_mode = '1';
-    $scope.modes = [];
+        $scope.payment_mode = '1';
+        $scope.modes = [];
 
 
-    $scope.payToWallet = function () {
-        
-        $http.post("<?php echo SITE_URL?>api/payToSupplier.php", $httpParamSerializerJQLike({amount: $scope.wallet, id: $scope.id, summery: $scope.summery, ref_no: $scope.reference, supply_ref: $scope.supply_ref}), {headers: {'Content-Type': 'application/x-www-form-urlencoded'} })
-        .then(function(response) {
-            alert('Amount Paid Successfully, transaction id is '+ response.data.supply.id);
-            $window.location.assign('<?php echo SITE_URL.'pages/suppliers'?>');
-        });
-    }
+        $scope.payToWallet = function() {
 
-    $scope.searchMode = function () {
-        return $http.get("<?php echo SITE_URL?>api/getPaymentModes.php")
-        .then(function(response) {
-            $scope.modes = response.data.records;
-            return response.data
-        });
-    }
+            $http.post("<?php echo SITE_URL ?>api/payToSupplier.php", $httpParamSerializerJQLike({
+                    amount: $scope.wallet,
+                    id: $scope.id,
+                    summery: $scope.summery,
+                    ref_no: $scope.reference,
+                    supply_ref: $scope.supply_ref
+                }), {
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    }
+                })
+                .then(function(response) {
+                    alert('Amount Paid Successfully, transaction id is ' + response.data.supply.id);
+                    $window.location.assign('<?php echo SITE_URL . 'pages/suppliers' ?>');
+                });
+        }
 
-    $scope.searchMode();
+        $scope.searchMode = function() {
+            return $http.get("<?php echo SITE_URL ?>api/getPaymentModes.php")
+                .then(function(response) {
+                    $scope.modes = response.data.records;
+                    return response.data
+                });
+        }
 
-    
-});
+        $scope.searchMode();
+
+
+    });
 </script>
 <?php
 echo mainFooter();

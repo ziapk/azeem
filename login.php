@@ -5,10 +5,10 @@ error_reporting(E_ALL);
 
 $loginPage = true;
 
-include_once dirname(__FILE__).'/include/settings.php';
+include_once dirname(__FILE__) . '/include/settings.php';
 
-if(!empty($_SESSION['user_credentials'])) {
-    
+if (!empty($_SESSION['user_credentials'])) {
+
     header('location: index.php');
 }
 
@@ -16,27 +16,25 @@ if(!empty($_SESSION['user_credentials'])) {
 
 
 $error = "";
-if(!empty($_POST) && isset($_POST['login'] )) {
+if (!empty($_POST) && isset($_POST['login'])) {
     $error = "";
-    if(empty($_POST['email']) || empty($_POST['password'])) {
+    if (empty($_POST['email']) || empty($_POST['password'])) {
         $error = "Please fill all fields";
-    }
-    else {
+    } else {
         $email = $_POST['email'];
         $password = $_POST['password'];
 
         $usersObj = new Users();
 
-        $userData = $usersObj->login($email,$password);
-        if($userData) {
-            if(is_array($userData)) {
+        $userData = $usersObj->login($email, $password);
+        if ($userData) {
+            if (is_array($userData)) {
                 $_SESSION['user_credentials'] = $userData['user'];
                 $_SESSION['shopInfo'] = $userData['shopInfo'];
                 $_SESSION['shop'] = $userData['shop'];
                 $_SESSION['user_logged_in'] = true;
                 header('Location: index.php');
-            }
-            else {
+            } else {
                 $error = $userData;
             }
         } else {
@@ -45,8 +43,8 @@ if(!empty($_POST) && isset($_POST['login'] )) {
     }
 }
 
-include_once dirname(__FILE__).'/include/header.php';
-include_once dirname(__FILE__).'/include/footer.php';
+include_once dirname(__FILE__) . '/include/header.php';
+include_once dirname(__FILE__) . '/include/footer.php';
 echo mainHeader(['bodyClasses' => ['login-screen']]);
 ?>
 <div class="login-screen-inner">
@@ -68,9 +66,9 @@ echo mainHeader(['bodyClasses' => ['login-screen']]);
                 <div class="divider">
                     <span>Sign In with email</span>
                 </div>
-                <?php if(!empty($error)) { ?>
-                    <p class="text-danger"><?php echo $error; ?></p>                    
-                <?php }?>
+                <?php if (!empty($error)) { ?>
+                    <p class="text-danger"><?php echo $error; ?></p>
+                <?php } ?>
                 <div class="form-group">
                     <label for="exampleInputEmail1">Username</label>
                     <input type="text" class="form-control" id="email" name="email" placeholder="Username">

@@ -798,7 +798,7 @@ class Products extends Connection
 	public function createProduct($array)
 	{
 		try {
-			$stmt = "INSERT INTO `{$this->table}` (`full_name`, `owner_id`, `user_id`, `price`, `pprice`, `image`, `code`, `barcode`, `description`, `group`, `board`, `author`, `publisher_id`, `cat_id`) VALUES (:full_name, :owner_id, :user_id, :price, :pprice, :image, :code, :barcode, :description, :group, :board, :author, :publisher_id, :cat_id)";
+			$stmt = "INSERT INTO `{$this->table}` (`full_name`, `owner_id`, `user_id`, `price`, `pprice`, `image`, `code`, `barcode`, `description`, `group`, `board`, `author`, `publisher_id`, `cat_id`, `note`, `product_type`) VALUES (:full_name, :owner_id, :user_id, :price, :pprice, :image, :code, :barcode, :description, :group, :board, :author, :publisher_id, :cat_id, :note, :product_type)";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':full_name', $array['full_name'], PDO::PARAM_STR);
 			$prepare->bindParam(':owner_id', $array['owner_id'], PDO::PARAM_INT);
@@ -814,6 +814,8 @@ class Products extends Connection
 			$prepare->bindParam(':group', $array['group'], PDO::PARAM_STR);
 			$prepare->bindParam(':publisher_id', $array['publisher_id'], PDO::PARAM_STR);
 			$prepare->bindParam(':cat_id', $array['cat_id'], PDO::PARAM_STR);
+			$prepare->bindParam(':note', $array['note'], PDO::PARAM_STR);
+			$prepare->bindParam(':product_type', $array['product_type'], PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $this->dbh->lastInsertId();
 			return $result;

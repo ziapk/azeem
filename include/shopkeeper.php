@@ -5,7 +5,7 @@ $productCls = new Products();
 $ownerId = $userData['role'] == 'owner' ? $userData['id'] : $userData['created_by'];
 $list = $productCls->getOwnerProducts($ownerId);
 $categoryObj = new Categories();
-$categories = $categoryObj->getCategories('pro');
+$categories = $categoryObj->getCategories('pro', $ownerId);
 $ids = [];
 foreach ($categories as $v) {
   $ids[] = $v['id'];

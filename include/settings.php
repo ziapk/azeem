@@ -105,6 +105,11 @@ $accStatusArray = array(
     '1' => 'Active',
     '2' => 'Disable',
 );
+$productTypes = array(
+    '1' => 'Ready Made',
+    '2' => 'Service',
+    '3' => 'Raw Material',
+);
 
 $statusArr = [
     1 => 'Active',

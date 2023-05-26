@@ -8,10 +8,10 @@ $shop = $storeDD->getStore($shop['id']);
 $productCls = new Products();
 $ownerId = $userData['role'] == 'owner' ? $userData['id'] : $userData['created_by'];
 $categoryObj = new Categories();
-$categories = $categoryObj->getCategories('exp');
+$categories = $categoryObj->getCategories('exp', $ownerId);
 $list = $productCls->getOwnerProducts($ownerId);
 
-$categoryList = $categoryObj->getCategories('pro');
+$categoryList = $categoryObj->getCategories('pro', $ownerId);
 $ids = [];
 $productCategories = [];
 foreach ($categoryList as $v) {

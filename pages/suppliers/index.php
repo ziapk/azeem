@@ -1,13 +1,13 @@
-<?php 
-include_once dirname(__FILE__).'/../../include/settings.php';
+<?php
+include_once dirname(__FILE__) . '/../../include/settings.php';
 $category = new  Categories();
-$categoryData = $category->getCategories($userData['created_by']);
-echo mainHeader(['page'=> 'supplier']);
+$categoryData = $category->getOwnerCategories($userData['created_by']);
+echo mainHeader(['page' => 'supplier']);
 ?>
 
 <div class="container" ng-controller="productController">
-    
-    <a href="<?php echo SITE_URL.'pages/supply';?>" class="btn btn-primary btn-xs pull-right">Add Supply</a>
+
+    <a href="<?php echo SITE_URL . 'pages/supply'; ?>" class="btn btn-primary btn-xs pull-right">Add Supply</a>
     <a href="javascript:void(0)" style="margin-right: 10px" ng-click="addSuppliers()" class="btn btn-primary btn-xs pull-right">Add Supplier</a>
     <h4>All Suppliers</h4>
     <div class="form-group">
@@ -23,21 +23,28 @@ echo mainHeader(['page'=> 'supplier']);
             </tr>
         </thead>
         <tbody>
-                <tr ng-repeat="li in list">
-                    <td width="50"><img ng-if="li.image" width="40" class="image" src={{"<?php echo SITE_URL;?>uploads/products/"+li.image}} /></td>
-                    <td><strong>{{li.name}}</strong> <br /> {{li.contact}}</td>
-                    <td><strong>{{li.company}}</strong> - {{li.title}} <br />{{li.address}}</td>
-                    <!-- <td>{{li.wallet}}</td> -->
-                    <td>
-                        <a class="btn btn-primary btn-xs" href="<?php echo SITE_URL."pages/suppliers/update.php?id="?>{{li.id}}">Edit</a>
-                        <?php if($userData['role'] === 'owner' || $userData['role'] === 'manager') {?><a class="btn btn-default btn-xs" href="../chart-of-accounts/summery.php?t=s&id={{li.account_id}}">Ledger</a><?php } ?>
-                        <a class="btn btn-danger btn-xs" href="<?php echo SITE_URL."pages/suppliers/invoices.php?id="?>{{li.id}}">Bills</a>
-                        <a class="btn btn-danger btn-xs" href="<?php echo SITE_URL."pages/suppliers/adjustment.php?id="?>{{li.id}}">Payment</a>
-                    </td>
-                </tr>
+            <tr ng-repeat="li in list">
+                <td width="50"><img ng-if="li.image" width="40" class="image" src={{"<?php echo SITE_URL; ?>uploads/products/"+li.image}} /></td>
+                <td><strong>{{li.name}}</strong> <br /> {{li.contact}}</td>
+                <td><strong>{{li.company}}</strong> - {{li.title}} <br />{{li.address}}</td>
+                <!-- <td>{{li.wallet}}</td> -->
+                <td>
+                    <a class="btn btn-primary btn-xs" href="<?php echo SITE_URL . "pages/suppliers/update.php?id=" ?>{{li.id}}">Edit</a>
+                    <?php if ($userData['role'] === 'owner' || $userData['role'] === 'manager') { ?><a class="btn btn-default btn-xs" href="../chart-of-accounts/summery.php?t=s&id={{li.account_id}}">Ledger</a><?php } ?>
+                    <a class="btn btn-danger btn-xs" href="<?php echo SITE_URL . "pages/suppliers/invoices.php?id=" ?>{{li.id}}">Bills</a>
+                    <a class="btn btn-danger btn-xs" href="<?php echo SITE_URL . "pages/suppliers/adjustment.php?id=" ?>{{li.id}}">Payment</a>
+                </td>
+            </tr>
         </tbody>
     </table>
-    <div style="display: flex; align-items: center; justify-content: space-between"><ul uib-pagination ng-if="data.perPage < data.totalRecords" items-per-page="data.perPage" total-items="data.totalRecords" ng-model="currentPage" ng-change="pageChanged(currentPage)"></ul> <span>Per Page <select ng-change="perPage()" ng-model="data.perPage"><option value="10">10</option><option value="25">25</option><option value="50">50</option><option value="100">100</option></select></span> <span>Total number of Records <strong>{{data.totalRecords}}</strong></span></div>
+    <div style="display: flex; align-items: center; justify-content: space-between">
+        <ul uib-pagination ng-if="data.perPage < data.totalRecords" items-per-page="data.perPage" total-items="data.totalRecords" ng-model="currentPage" ng-change="pageChanged(currentPage)"></ul> <span>Per Page <select ng-change="perPage()" ng-model="data.perPage">
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+            </select></span> <span>Total number of Records <strong>{{data.totalRecords}}</strong></span>
+    </div>
 </div>
 
 <script type="text/ng-template" id="addSupplier.html">
@@ -95,113 +102,136 @@ echo mainHeader(['page'=> 'supplier']);
 
 
 <script>
-app.controller('productController', function($scope, $http, $httpParamSerializerJQLike, $filter, $window, $document, $uibModal, $log) {
-    $scope.data = { perPage: "10" }; //$scope.data.records;
-    console.log($scope.data)
-    $scope.currentPage = 1; 
-    $scope.list = []; //$scope.data.records;
-    $scope.search = ""; //$scope.data.records;
-    $scope.siteUrl = '<?php echo SITE_URL ?>';
-    $scope.getSuppliers = (page) => {
-        $scope.loading = true;
-        $http.get($scope.siteUrl+"api/getSuppliers.php", {params: {page: page || 1, perPage: $scope.data.perPage, search: $scope.search}})
-        .then(function(response) {
-            $scope.loading = false;
-            if(response.status === 200) {
-                $scope.data = response.data;
-                $scope.list = response.data.records;
-            }
-        })
-    }
-
-    $scope.perPage = () => {
-        $scope.getSuppliers($scope.currentPage);
-    } 
-    
-    $scope.searchSupplier = () => {
-        $scope.getSuppliers(1);
-    }
-
-    $scope.getSuppliers($scope.currentPage);
-    $scope.pageChanged = (page) => {
-        $scope.currentPage = page;
-        $scope.getSuppliers(page)
-    }
-    $scope.addToCard = function (id) {
-        if($window.sessionStorage.getItem('shopping')) {
-            const shopCart = JSON.parse($window.sessionStorage.getItem('shopping'));
-            let found = false;
-            shopCart.map(row => {
-                if(row.id == id) {
-                    found = true
-                    row.qty++;
-                }
-            });
-
-            if(!found) {
-                $window.sessionStorage.setItem('shopping', JSON.stringify([...shopCart, ...[{id, qty: 1}] ] ))
-            } else {
-                $window.sessionStorage.setItem('shopping', JSON.stringify([...shopCart]))
-            }
+    app.controller('productController', function($scope, $http, $httpParamSerializerJQLike, $filter, $window, $document, $uibModal, $log) {
+        $scope.data = {
+            perPage: "10"
+        }; //$scope.data.records;
+        console.log($scope.data)
+        $scope.currentPage = 1;
+        $scope.list = []; //$scope.data.records;
+        $scope.search = ""; //$scope.data.records;
+        $scope.siteUrl = '<?php echo SITE_URL ?>';
+        $scope.getSuppliers = (page) => {
+            $scope.loading = true;
+            $http.get($scope.siteUrl + "api/getSuppliers.php", {
+                    params: {
+                        page: page || 1,
+                        perPage: $scope.data.perPage,
+                        search: $scope.search
+                    }
+                })
+                .then(function(response) {
+                    $scope.loading = false;
+                    if (response.status === 200) {
+                        $scope.data = response.data;
+                        $scope.list = response.data.records;
+                    }
+                })
         }
-        else {
-            $window.sessionStorage.setItem('shopping', JSON.stringify([{qty: 1, id}]))
-        }
-    }
 
-    $scope.addSuppliers = function (size, parentSelector) {
-    
-        $uibModal.open({
-            ariaLabelledBy: 'modal-title',
-            ariaDescribedBy: 'modal-body',
-            templateUrl: 'addSupplier.html',
-            controller: 'ModalInstanceCtrl',
-            size: size,
-            resolve: {
-                siteUrl: function() {
-                    return $scope.siteUrl
-                }
-            }
-        }).closed.then(function (selectedItem) {
+        $scope.perPage = () => {
+            $scope.getSuppliers($scope.currentPage);
+        }
+
+        $scope.searchSupplier = () => {
             $scope.getSuppliers(1);
-        });
-    };
-    
-});
+        }
 
+        $scope.getSuppliers($scope.currentPage);
+        $scope.pageChanged = (page) => {
+            $scope.currentPage = page;
+            $scope.getSuppliers(page)
+        }
+        $scope.addToCard = function(id) {
+            if ($window.sessionStorage.getItem('shopping')) {
+                const shopCart = JSON.parse($window.sessionStorage.getItem('shopping'));
+                let found = false;
+                shopCart.map(row => {
+                    if (row.id == id) {
+                        found = true
+                        row.qty++;
+                    }
+                });
 
-
-app.controller('ModalInstanceCtrl', function ($scope, $uibModalInstance, $http, $httpParamSerializerJQLike, siteUrl) {
-    $scope.form = {
-        name: "",
-        contact: "",
-        address: "",
-        wallet: 0
-    }
-    $scope.alert = null;
-    $scope.siteUrl = siteUrl;
-
-    $scope.closeAlert = function(index) {
-        $scope.alert = null;
-    };
-    
-    $scope.ok = function () {
-        $http.post($scope.siteUrl+'api/createSupplier.php', $httpParamSerializerJQLike($scope.form), {headers: {'Content-Type': 'application/x-www-form-urlencoded'} }).then(function(res) {
-            console.log(res)
-            if(res.data.success) {
-                $scope.alert = {type: 'success', message: res.data.message}
+                if (!found) {
+                    $window.sessionStorage.setItem('shopping', JSON.stringify([...shopCart, ...[{
+                        id,
+                        qty: 1
+                    }]]))
+                } else {
+                    $window.sessionStorage.setItem('shopping', JSON.stringify([...shopCart]))
+                }
             } else {
-                $scope.alert = {type: 'danger', message: res.data.message}
+                $window.sessionStorage.setItem('shopping', JSON.stringify([{
+                    qty: 1,
+                    id
+                }]))
             }
-            // $uibModalInstance.close($scope.form);
-        });
-    };
+        }
+
+        $scope.addSuppliers = function(size, parentSelector) {
+
+            $uibModal.open({
+                ariaLabelledBy: 'modal-title',
+                ariaDescribedBy: 'modal-body',
+                templateUrl: 'addSupplier.html',
+                controller: 'ModalInstanceCtrl',
+                size: size,
+                resolve: {
+                    siteUrl: function() {
+                        return $scope.siteUrl
+                    }
+                }
+            }).closed.then(function(selectedItem) {
+                $scope.getSuppliers(1);
+            });
+        };
+
+    });
 
 
-    $scope.cancel = function () {
-        $uibModalInstance.dismiss('cancel');
-    };
-});
+
+    app.controller('ModalInstanceCtrl', function($scope, $uibModalInstance, $http, $httpParamSerializerJQLike, siteUrl) {
+        $scope.form = {
+            name: "",
+            contact: "",
+            address: "",
+            wallet: 0
+        }
+        $scope.alert = null;
+        $scope.siteUrl = siteUrl;
+
+        $scope.closeAlert = function(index) {
+            $scope.alert = null;
+        };
+
+        $scope.ok = function() {
+            $http.post($scope.siteUrl + 'api/createSupplier.php', $httpParamSerializerJQLike($scope.form), {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            }).then(function(res) {
+                console.log(res)
+                if (res.data.success) {
+                    $scope.alert = {
+                        type: 'success',
+                        message: res.data.message
+                    }
+                } else {
+                    $scope.alert = {
+                        type: 'danger',
+                        message: res.data.message
+                    }
+                }
+                // $uibModalInstance.close($scope.form);
+            });
+        };
+
+
+        $scope.cancel = function() {
+            $uibModalInstance.dismiss('cancel');
+        };
+    });
 </script>
 
 <?php
