@@ -72,7 +72,22 @@ $programs = $programObj->getPrograms();
                 <span class="title">{{li.full_name}}</span>
                 <span class="group">{{li.group}} - {{li.publisherName}}</span>
                 <span class="author" ng-if="li.author"><img width="12" height="12" src="<?php echo SITE_URL; ?>assets/img/svg/pen.svg" alt="" /> {{li.author}}</span>
-                <span><img class="fa" width="14" height="14" src="<?php echo SITE_URL; ?>assets/img/svg/qrcode.svg" alt="" /><code>{{li.code || li.id}}</code></span>
+
+                <span class="dropdown" style="padding: 0">
+                    <a href="#" data-toggle="dropdown">
+                        <span><img class="fa" width="14" height="14" src="<?php echo SITE_URL; ?>assets/img/svg/qrcode.svg" alt="" /><code>{{li.code || li.id}}</code></span>
+                    </a>
+                    <form ng-submit="submitCode(li)" class="dropdown-menu" style="padding: 20px; width: 300px">
+                        <div class="input-group">
+                            <input type="text" placeholder="Bar Code" ng-model="li.newBarCode" type="text" class="form-control">
+                            <span class="input-group-btn">
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                            </span>
+                        </div>
+                    </form>
+                </span>
+
+
             </div>
         </li>
     </ul>
@@ -126,6 +141,31 @@ $programs = $programObj->getPrograms();
                         $scope.data.totalRecords = parseInt(response.data.totalRecords);
                         $scope.list = response.data.records;
                         $scope.currentPage = response.data.page;
+                    }
+                })
+        }
+
+        $scope.submitCode = (form) => {
+            $http.post("<?php echo SITE_URL ?>pages/product/update.php?id=" + form.id, $httpParamSerializerJQLike({
+                    code: form.newBarCode,
+                    createCode: true,
+                    json_response: true,
+                }), {
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    }
+                })
+                .then(function(response) {
+                    if (response.data.status === 200) {
+                        toaster.success({
+                            body: response.data.message
+                        });
+                        form.newBarCode = '';
+                    } else {
+                        toaster.success({
+                            body: response.data.message
+                        });
+                        form.newBarCode = '';
                     }
                 })
         }

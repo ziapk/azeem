@@ -26,11 +26,14 @@ if (!empty($_POST) && isset($_POST['createCode'])) {
         ];
 
         $create = $productObj->createProductCode($data);
-
         if ($create) {
             $message = "Successfully Added!";
         } else {
             $message = "Nothing Added";
+        }
+        if (!empty($_POST['json_response'])) {
+            echo json_encode(["status" => 200, "message" => $message]);
+            die();
         }
     }
 }
