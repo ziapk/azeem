@@ -49,7 +49,7 @@ echo mainHeader();
                     <td class="fw-bold"><?php echo $customer['supplier']['name']; ?></td>
                     <td class="fw-bold"><?php echo $value['supply_date']; ?></td>
                     <td class="fw-bold"><?php echo $value['price']; ?></td>
-                    <td><a href="javascipt:void(0)" ng-click="order = <?php echo $value['id']; ?>" class="fa fa-eye"></a></td>
+                    <td><a href="javascipt:void(0)" ng-click="order = order == <?php echo $value['id']; ?> ? '' : <?php echo $value['id']; ?> " class="fa fa-eye"></a></td>
                 </tr>
                 <tr class="text-danger" ng-if="order == <?php echo $value['id']; ?>">
                     <th class="text-danger fw-bold" style="text-align: right">Items <span class="fa fa-arrow-down"></span></th>
