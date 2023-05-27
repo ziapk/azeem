@@ -56,6 +56,12 @@ $list = $productCls->getOwnerProducts($ownerId);
   </nav>
   <div class="sidebar">
     <ul class="nav">
+      <li class="<?php if ($params['page'] == 'recipt') {
+                    echo 'active';
+                  } ?>"><a uib-tooltip="Cash Entry" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/recipt" target="_blank"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/receipt.svg" alt="" /> <span class="nav-menu-text">Recipt Generator</span></a></li>
+      <li class="<?php if ($params['page'] == 'recipt-credit') {
+                    echo 'active';
+                  } ?>"><a uib-tooltip="Credit Entry" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/recipt?credit=1" target="_blank"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/receipt.svg" alt="" /> <span class="nav-menu-text">Credit Entry</span></a></li>
       <li class="<?php if ($params['page'] == 'order') {
                     echo 'active';
                   } ?>"><a uib-tooltip="Sales" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/orders"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/sales.svg" alt="" /> <span class="nav-menu-text">Sales</span></a></li>

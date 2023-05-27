@@ -1,9 +1,11 @@
 <?php
 
 $stores = new Store();
+$ownerStores = $stores->getStores();
+$storeTypesArr = $stores->getStoreTypes();
+
 $productsObj = new Products();
 $categoryObj = new Publishers();
-$storeTypesArr = $stores->getStoreTypes();
 
 
 $storeTypes = [];
@@ -13,7 +15,6 @@ foreach ($storeTypesArr as $key => $value) {
 
 $usersObj = new Users();
 $users = $usersObj->getUsers();
-$ownerStores = $stores->getStores();
 $ownerStoreProducts = $productsObj->getStoreProducts($userData['id']);
 
 $currentStore = [];

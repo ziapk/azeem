@@ -3,7 +3,8 @@ include_once dirname(__FILE__) . '/../../include/settings.php';
 $productCls = new Products();
 $ownerId = $userData['role'] == 'owner' ? $userData['id'] : $userData['created_by'];
 $list = $productCls->getOwnerProducts($ownerId);
-echo mainHeader(['page' => 'recipt']);
+$credit = $_GET["credit"];
+echo mainHeader(['page' => !empty($credit) ? 'recipt-credit' : 'recipt']);
 $ordersObj = new Orders();
 $orders = $ordersObj->userOrders($shop['id'], $shop['sale_date'], null, 1);
 ?>
@@ -418,10 +419,11 @@ echo mainFooter();
                     }
 
                     $scope.items = $scope.list = [];
-                    $scope.subTotal = $scope.discount = $scope.grandTotal = $scope.payment_amount = 0;
+                    $scope.subTotal = $scope.discount = $scope.grandTotal = $scope.payment_amount = $scope.payment_total = 0;
                     $window.sessionStorage.setItem('shopping', JSON.stringify($scope.items))
                     // $window.location.assign('<?php echo SITE_URL ?>')
-                    $scope.selectCustomer($scope.customersList[0]);
+                    $scope.searchCustomer('', true)
+
                 }).catch(err => {
                     $scope.loading = false;
                     alert(err.message)
@@ -465,14 +467,16 @@ echo mainFooter();
             $scope.payment_amount = $scope.subTotal - $scope.discount;
             $scope.grandTotal = $scope.payment_amount = $scope.payment_amount + Math.round($scope.payment_amount * ($scope.gst / 100)) + Math.round($scope.payment_amount * ($scope.service_charges / 100));
             $window.sessionStorage.setItem('shopping', JSON.stringify($scope.items));
-            const pay = Object.values($scope.payWith);
-            pay.map(p => {
-                if (p.is_default == 1) {
-                    $scope.payWith[p.id].amount = $scope.payment_amount;
-                } else {
-                    $scope.payWith[p.id].amount = 0;
-                }
-            });
+            <?php if (empty($credit)) { ?>
+                const pay = Object.values($scope.payWith);
+                pay.map(p => {
+                    if (p.is_default == 1) {
+                        $scope.payWith[p.id].amount = $scope.payment_amount;
+                    } else {
+                        $scope.payWith[p.id].amount = 0;
+                    }
+                });
+            <?php } ?>
 
         }
 

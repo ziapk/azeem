@@ -5,6 +5,9 @@ echo mainHeader(['page' => 'profile']);
 $id = $_GET['id'];
 $users = new Users();
 $userSelected = $users->getUserSelected($id);
+$stores = new Store();
+$ownerStores = $stores->getStores();
+
 ?>
 <div class="container" ng-controller="profileController">
     <div class="alert alert-success" ng-if="message">{{message}}</div>
@@ -39,6 +42,19 @@ $userSelected = $users->getUserSelected($id);
                         <label for="cnic" class="control-label" style="font-size: 0.7em; font-weight: bold; letter-spacing: 1px">CNIC</label>
                         <input type="text" class="form-control" id="cnic" placeholder="CNIC" ng-model="form.cnic">
                     </div>
+                    <div class="form-group">
+                        <label for="role" class="control-label" style="font-size: 0.7em; font-weight: bold; letter-spacing: 1px">Role</label>
+                        <input type="text" class="form-control" id="role" placeholder="role" ng-model="form.role">
+                    </div>
+                    <div class="form-group">
+                        <label for="shopId" class="control-label" style="font-size: 0.7em; font-weight: bold; letter-spacing: 1px">shopId</label>
+                        <select type="text" class="form-control" id="shopId" placeholder="shopId" ng-model="form.shopId">
+                            <?php foreach ($ownerStores as $key => $value) { ?>
+                                <option value="<?php echo $value['id']; ?>"><?php echo $value['full_name']; ?></option>
+                            <?php } ?>
+                        </select>
+                    </div>
+
                 </div>
                 <div class="col-sm-4">
                     <div class="form-group">
@@ -56,6 +72,10 @@ $userSelected = $users->getUserSelected($id);
                     <div class="form-group">
                         <label for="phoneNumber3" class="control-label" style="font-size: 0.7em; font-weight: bold; letter-spacing: 1px">EMG. Number</label>
                         <input type="text" class="form-control" id="phoneNumber3" placeholder="Phone Number" ng-model="form.phoneNumber3">
+                    </div>
+                    <div class="form-group">
+                        <label for="created_by" class="control-label" style="font-size: 0.7em; font-weight: bold; letter-spacing: 1px">created_by</label>
+                        <input type="text" class="form-control" id="created_by" placeholder="created_by" ng-model="form.created_by">
                     </div>
                 </div>
             </div>
