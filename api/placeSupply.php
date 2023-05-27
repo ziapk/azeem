@@ -70,40 +70,6 @@ if (sizeof($_POST['items'])) {
                 'owner_id' => $ownerId,
             ];
         }
-        // else {
-        //     $id = $products->createProduct([
-        //         'full_name' => $item['full_name'],
-        //         'owner_id' => $ownerId,
-        //         'user_id' => $userData['id'],
-        //         'price' => $item['price'],
-        //         'pprice' => $item['pprice'],
-        //         'in_hand' => 0,
-        //         'min_qty' => 0,
-        //         'pack_size' => 0,
-        //         'pack_price' => 0,
-        //         'image' => null,
-        //         'code' => null,
-        //         'description' => "",
-        //         'group' => null,
-        //         'barcode' => !empty($item['barcode']) ? $item['barcode'] : null,
-        //     ]);
-
-        //     if(!empty($item['barcode'])) {
-        //         $products->createProductCode([
-        //             'product_id' => $id,
-        //             'code' => $item['barcode']
-        //         ]);
-        //     }
-
-        //     $items[] = [
-        //         'id' => $id,
-        //         'pprice' => $item['pprice'],
-        //         'price' => $item['price'],
-        //         'barcode' => !empty($item['barcode']) ? $item['barcode'] : null,
-        //         'full_name' => $item['full_name'],
-        //         'qty' => $item['qty'],
-        //     ];
-        // }
     }
 }
 
@@ -140,12 +106,6 @@ if ($supply_id) {
                 'quantity' => $item['qty'],
                 'price' => $item['pprice'],
             ];
-            /*  $items[] = [
-                'qty' => 0,
-                'stock_out' => $item['qty'],
-                'shopId' => $userData['shopId'],
-                'product_id' => $item['id']
-            ]; */
             $supply->createSupplyDetails($d);
         }
     }
@@ -155,7 +115,7 @@ if ($supply_id) {
     $doubleEntry = new DoubleEntry();
 
     $makeTransaction = [
-        'description' => !empty($_POST['summery']) ? $_POST['summery'] : "Supplier Invoice: " . $supply_id . " PLACED",
+        'description' => !empty($_POST['summery']) ? $_POST['summery'] : "Supply Invoice: " . $supply_id . " PLACED",
         'transaction_date' => $storeDATA['sale_date'],
         'reference' => $data['ref_no'],
         'transaction_type' => !empty($credit_amount) ? 'EXCHANGE' : 'PURCHASE',

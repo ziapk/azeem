@@ -33,7 +33,7 @@ try {
         'discount' => $_POST['discount'],
         'gst' => $_POST['gst'],
         'service_charges' => !empty($_POST['service_charges']) ? $_POST['service_charges'] : 0,
-        'shopId' => $userData['shopId'],
+        'shopId' => !empty($_POST['shopId']) ? $_POST['shopId'] : $userData['shopId'],
         'order_date' => $storeDATA['sale_date'],
         'summery' => $_POST['summery'],
         'ref_no' => $_POST['ref_no'],

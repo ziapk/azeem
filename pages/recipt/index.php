@@ -7,6 +7,9 @@ $credit = $_GET["credit"];
 echo mainHeader(['page' => !empty($credit) ? 'recipt-credit' : 'recipt']);
 $ordersObj = new Orders();
 $orders = $ordersObj->userOrders($shop['id'], $shop['sale_date'], null, 1);
+$stores = new Store();
+$userId = $userData['role'] == 'owner' ? $userData['id'] : $userData['created_by'];
+$ownerStores = $stores->getOwnerStores($userId);
 ?>
 <div ng-controller="cartController">
     <div class="container">
@@ -20,8 +23,25 @@ $orders = $ordersObj->userOrders($shop['id'], $shop['sale_date'], null, 1);
                 <a class="btn btn-default" href="./edit.php?id=<?php echo $value['id']; ?>"><?php echo $value['full_name'] . ' - ' . $value['id']; ?></a>
             <?php } ?>
         </span>
+        <div class="clearfix"></div>
         <table class="table">
             <thead>
+                <?php if ($userData['role'] == 'owner') { ?>
+                    <tr>
+                        <th>
+                            <label class="text-danger"><strong>Shop Select</strong></label>
+                        </th>
+                        <th>
+                            <select class="form-control c-select" ng-model="shopId">
+                                <?php foreach ($ownerStores as $value) { ?>
+                                    <option value="<?php echo $value['id']; ?>"><?php echo $value['full_name']; ?></option>
+                                <?php } ?>
+                            </select>
+                        </th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                <?php } ?>
                 <tr>
                     <th style="vertical-align: middle">Customer Name</th>
                     <th style="width: 200px">
@@ -84,6 +104,8 @@ echo mainFooter();
         $scope.priceList = sessionStorage.getItem('list') && JSON.parse(sessionStorage.getItem('list'));;
         $scope.focus = false;
         $scope.qf = false;
+
+        $scope.shopId = '<?php echo $userData['shopId']; ?>';
 
         $scope.customerData = {};
         $scope.summery = '';
@@ -401,7 +423,8 @@ echo mainFooter();
                 ref_no: $scope.ref_no,
                 id: $scope.id,
                 payment_mode: $scope.payment_mode,
-                status: status || 2
+                status: status || 2,
+                shopId: $scope.shopId
             }
 
 
