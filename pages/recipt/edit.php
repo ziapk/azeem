@@ -79,7 +79,7 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
         });
         app.controller('cartController', function($scope, $http, $httpParamSerializerJQLike, $filter, $window, $timeout, $location, $anchorScroll) {
             $scope.mainList = <?php echo safe_json_encode($list); ?>;
-
+            $scope.shopId = '<?php echo $userData['shopId']; ?>';
             $scope.list = [];
             $scope.priceList = sessionStorage.getItem('list') && JSON.parse(sessionStorage.getItem('list'));;
             $scope.focus = false;
@@ -398,7 +398,8 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                 } else {
                     params.term = term;
                     return $http.get("<?php echo SITE_URL ?>api/getStores.php", {
-                            params
+                            params,
+                            shopId: $scope.shopId
                         })
                         .then(function(response) {
 

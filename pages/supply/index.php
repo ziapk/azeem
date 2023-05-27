@@ -116,7 +116,7 @@ echo mainFooter();
 ?>
 <script type="text/javascript">
     app.controller('reportController', function($scope, $http, $window, $httpParamSerializerJQLike, $anchorScroll, $timeout, $location) {
-
+        $scope.shopId = '<?php echo $userData['shopId']; ?>';
         $scope.supplierName = "";
         $scope.ref_no = "";
         $scope.supplierId = "";
@@ -277,7 +277,8 @@ echo mainFooter();
         $scope.searchProduct = function(term) {
             return $http.get("<?php echo SITE_URL ?>api/getStores.php", {
                     params: {
-                        term
+                        termm
+                        shopId: $scope.shopId
                     }
                 })
                 .then(function(response) {

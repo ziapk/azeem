@@ -83,7 +83,7 @@ foreach ($ownerStores as $store) {
 
 <script>
     app.controller('categoryController', function($scope, $http, $httpParamSerializerJQLike, $filter, $window, $document, $uibModal, $log, $location, $anchorScroll, $timeout) {
-
+        $scope.shopId = '<?php echo $userData['shopId']; ?>';
         $scope.deleteDemand = (id) => {
             console.log('id', id)
 
@@ -132,7 +132,8 @@ foreach ($ownerStores as $store) {
         $scope.searchProduct = function(term) {
             return $http.get("<?php echo SITE_URL ?>api/getStores.php", {
                     params: {
-                        term
+                        term,
+                        shopId: $scope.shopId
                     }
                 })
                 .then(function(response) {

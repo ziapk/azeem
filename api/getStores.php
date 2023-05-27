@@ -6,7 +6,7 @@ $shopInfo = [];
 $search = [];
 if (!empty($_SESSION['shopInfo'])) {
     $shopInfo = $_SESSION['shop'];
-    $shopId = $userData['role'] == 'owner' ? null : $shop['id'];
+    $shopId = $userData['role'] == 'owner' ? $_GET['shopId'] : $shop['id'];
     $params = ['page' => 1, 'perPage' => 20, 'searchBy' => !empty($_GET['searchBy']) ? $_GET['searchBy'] : '', 'search' => !empty($_GET['term']) ? $_GET['term'] : ""];
     $search = $products->getOwnerProductsPagination($ownerId, $params, $shopId)['records'];
 };

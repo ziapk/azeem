@@ -86,6 +86,7 @@ if (!empty($_GET['all']) && $_GET['all'] == '1') {
             app.controller('categoryController', function($scope, $http, $httpParamSerializerJQLike, $filter, $window, $document, $uibModal, $log, $location, $anchorScroll, $timeout) {
                 $scope.list = []; //$scope.data.records;
                 $scope.siteUrl = '<?php echo SITE_URL ?>';
+                $scope.shopId = '<?php echo !empty($_GET['shopId']) ? $_GET['shopId'] : $userData['shopId']; ?>';
 
                 $scope.books = <?php echo safe_json_encode($products); ?>;
 
@@ -94,7 +95,6 @@ if (!empty($_GET['all']) && $_GET['all'] == '1') {
                     ...r,
                     qty: parseInt(r.qty)
                 }))?.filter(r => r.qty) || [];
-                $scope.shopId = '<?php echo $_GET['shopId']; ?>';
 
                 $scope.selectProduct = function(p) {
                     let exists = false;
@@ -126,11 +126,11 @@ if (!empty($_GET['all']) && $_GET['all'] == '1') {
                 $scope.searchProduct = function(term) {
                     return $http.get("<?php echo SITE_URL ?>api/getStores.php", {
                             params: {
-                                term
+                                term,
+                                shopId: $scope.shopId
                             }
                         })
                         .then(function(response) {
-
                             $scope.list = response.data;
                             $scope.priceList = response.data;
                             return response.data

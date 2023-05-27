@@ -340,7 +340,8 @@ echo mainFooter();
             } else {
                 params.term = term;
                 return $http.get("<?php echo SITE_URL ?>api/getStores.php", {
-                        params
+                        params,
+                        shopId: $scope.shopId
                     })
                     .then(function(response) {
 

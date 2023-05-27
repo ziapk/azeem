@@ -71,7 +71,7 @@ $storeObj = new Store();
 <script>
     app.controller('categoryController', function($scope, $http, $httpParamSerializerJQLike, $filter, $window, $document, $uibModal, $log, $location, $anchorScroll, $timeout) {
         $scope.list = [];
-
+        $scope.shopId = '<?php echo $userData['shopId']; ?>';
         $scope.form = <?php echo json_encode($demandDetail); ?>;
         const txt = $('title').text();
         $('title').html($scope.form.title + " | " + txt);
@@ -124,7 +124,8 @@ $storeObj = new Store();
                 return $http.get("<?php echo SITE_URL ?>api/getStores.php", {
                         params: {
                             term,
-                            searchBy
+                            searchBy,
+                            shopId: $scope.shopId
                         }
                     })
                     .then(function(response) {
