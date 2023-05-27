@@ -180,7 +180,7 @@ echo mainHeader(['page' => 'coa']);
           async: false,
           success: function(result) {
             form.reset();
-            window.location.href = window.location.href;
+            window.location.reload();
           }
         })
       },

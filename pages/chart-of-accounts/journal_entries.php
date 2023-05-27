@@ -116,7 +116,7 @@ echo mainHeader(['page' => 'coa']);
           })
           .then(res => {
             alert('Transaction Deleted!');
-            window.location.href = window.location.href;
+            window.location.reload();
           });
       }
     }
@@ -178,7 +178,7 @@ echo mainHeader(['page' => 'coa']);
           async: false,
           success: function(result) {
             form.reset();
-            window.location.href = window.location.href;
+            window.location.reload();
           }
         })
       },

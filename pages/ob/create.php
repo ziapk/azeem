@@ -11,7 +11,7 @@ if (empty($_POST['amount']) || empty($_POST['sale_date'])) {
 } else {
 
     $data = [
-        'shop_id' => $shopId,
+        'shop_id' => !empty($_POST['shopId']) ? $_POST['shopId'] : $shop['id'],
         'owner_id' => $ownerId,
         'amount' => $_POST['amount'],
         'sale_date' => $_POST['sale_date'],

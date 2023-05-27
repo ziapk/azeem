@@ -107,7 +107,7 @@ class Products extends Connection
 				}
 			}
 
-			$stmt = "SELECT count(p.id) as count $column FROM `{$this->table}` as p $innerJoin LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id  LEFT JOIN program_books as c ON c.product_id = p.id WHERE p.owner_id=:owner_id $publisher_query $dup $pin $searchQry $catQry $minQry";
+			$stmt = "SELECT count(p.id) as count $column FROM `{$this->table}` as p $innerJoin LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id  LEFT JOIN program_books as c ON c.product_id = p.id WHERE p.owner_id=:owner_id and p.is_active = 1 $publisher_query $dup $pin $searchQry $catQry $minQry";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':owner_id', $owner_id, PDO::PARAM_STR);
 			$prepare->execute();
@@ -129,7 +129,7 @@ class Products extends Connection
 				$mainCols = $allCols;
 			}
 
-			$stmt = "SELECT $mainCols  FROM `{$this->table}` as p $innerJoin LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id LEFT JOIN program_books as c ON c.product_id = p.id LEFT JOIN publishers as pub on p.publisher_id = pub.id  WHERE p.`owner_id`=:owner_id $publisher_query $dup $pin $searchQry $catQry GROUP BY p.id $sortByQry $minQry LIMIT :offset, :perPage";
+			$stmt = "SELECT $mainCols  FROM `{$this->table}` as p $innerJoin LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id LEFT JOIN program_books as c ON c.product_id = p.id LEFT JOIN publishers as pub on p.publisher_id = pub.id  WHERE p.`owner_id`=:owner_id and p.is_active = 1 $publisher_query $dup $pin $searchQry $catQry GROUP BY p.id $sortByQry $minQry LIMIT :offset, :perPage";
 
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':owner_id', $owner_id, PDO::PARAM_STR);
@@ -341,13 +341,13 @@ class Products extends Connection
 
 
 
-			$stmt = "UPDATE `{$this->table}` as p  $innerJoin LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id LEFT JOIN program_books as c ON c.product_id = p.id LEFT JOIN publishers as pub on p.publisher_id = pub.id SET p.publisher_id=:publisher_id WHERE p.`owner_id`=:owner_id $publisher_query  $pin $searchQry";
+			$stmt = "UPDATE `{$this->table}` as p  $innerJoin LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id LEFT JOIN program_books as c ON c.product_id = p.id LEFT JOIN publishers as pub on p.publisher_id = pub.id SET p.publisher_id=:publisher_id WHERE p.`owner_id`=:owner_id and p.is_active = 1  $publisher_query  $pin $searchQry";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':owner_id', $owner_id, PDO::PARAM_STR);
 			$prepare->bindParam(':publisher_id', $params['selectedPublisherId'], PDO::PARAM_INT);
 			$prepare->execute();
 			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
-			return ['page' => $currentPage, 'totalRecords' => $total_rows, 'perPage' => $no_of_records_per_page, 'records' => $result];
+			return ['records' => $result];
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
 		}
@@ -356,7 +356,7 @@ class Products extends Connection
 	public function getOwnerProducts($owner_id)
 	{
 		try {
-			$stmt = "SELECT p.*, concat(p.id, ' | ', p.full_name) as full_name, pub.discount_type, pub.discount_amount, CONVERT(case when (pub.discount_amount > 0) then (p.price * (1 - (pub.discount_amount / 100)) ) else p.price end, DECIMAL) as price FROM `{$this->table}` as p left join publishers as pub on pub.id = p.publisher_id WHERE p.`owner_id`=:owner_id";
+			$stmt = "SELECT p.*, concat(p.id, ' | ', p.full_name) as full_name, pub.discount_type, pub.discount_amount, CONVERT(case when (pub.discount_amount > 0) then (p.price * (1 - (pub.discount_amount / 100)) ) else p.price end, DECIMAL) as price FROM `{$this->table}` as p left join publishers as pub on pub.id = p.publisher_id WHERE p.`owner_id`=:owner_id and p.is_active = 1";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':owner_id', $owner_id, PDO::PARAM_STR);
 			$prepare->execute();
@@ -369,7 +369,7 @@ class Products extends Connection
 	public function searchProducts($shopId, $search)
 	{
 		$searchQuery = "(p.full_name LIKE '%" . $search . "%' OR p.code LIKE '%" . $search . "%' OR p.group LIKE '%" . $search . "%' OR p.description LIKE '%" . $search . "%' OR p.board LIKE '%" . $search . "%' OR p.author LIKE '%" . $search . "%' OR p.price LIKE '%" . $search . "%' OR pc.code LIKE '%" . $search . "%' ) ";
-		$stmt = "SELECT p.*, concat(p.id, ' | ', p.full_name) as full_name, FROM  `{$this->table}` as p LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id WHERE $searchQuery GROUP BY p.id LIMIT 10";
+		$stmt = "SELECT p.*, concat(p.id, ' | ', p.full_name) as full_name, FROM  `{$this->table}` as p LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id WHERE $searchQuery and p.is_active GROUP BY p.id LIMIT 10";
 		$prepare = $this->dbh->prepare($stmt);
 		// $prepare->bindParam(':shopId',$shopId,PDO::PARAM_STR);
 		//$prepare->bindParam(':search',$search,PDO::PARAM_STR);
@@ -380,7 +380,7 @@ class Products extends Connection
 
 	public function searchProductGroups($ownerId, $search)
 	{
-		$stmt = "SELECT `group` FROM  `{$this->table}` WHERE owner_id=:owner_id and `group` LIKE '%" . $search . "%' group by `group` LIMIT 10";
+		$stmt = "SELECT `group` FROM  `{$this->table}` WHERE owner_id=:owner_id and is_active = 1 and `group` LIKE '%" . $search . "%' group by `group` LIMIT 10";
 		$prepare = $this->dbh->prepare($stmt);
 		$prepare->bindParam(':owner_id', $ownerId, PDO::PARAM_STR);
 		//$prepare->bindParam(':search',$search,PDO::PARAM_STR);
@@ -391,7 +391,7 @@ class Products extends Connection
 
 	public function searchProductAuthors($ownerId, $search)
 	{
-		$stmt = "SELECT `author` FROM  `{$this->table}` WHERE owner_id=:owner_id and `author` LIKE '%" . $search . "%' group by `author` LIMIT 10";
+		$stmt = "SELECT `author` FROM  `{$this->table}` WHERE owner_id=:owner_id and is_active = 1 and `author` LIKE '%" . $search . "%' group by `author` LIMIT 10";
 		$prepare = $this->dbh->prepare($stmt);
 		$prepare->bindParam(':owner_id', $ownerId, PDO::PARAM_STR);
 		//$prepare->bindParam(':search',$search,PDO::PARAM_STR);
@@ -402,7 +402,7 @@ class Products extends Connection
 
 	public function searchProductBoards($ownerId, $search)
 	{
-		$stmt = "SELECT `board` FROM  `{$this->table}` WHERE owner_id=:owner_id and `board` LIKE '%" . $search . "%' group by `board` LIMIT 10";
+		$stmt = "SELECT `board` FROM  `{$this->table}` WHERE owner_id=:owner_id and is_active = 1 and `board` LIKE '%" . $search . "%' group by `board` LIMIT 10";
 		$prepare = $this->dbh->prepare($stmt);
 		$prepare->bindParam(':owner_id', $ownerId, PDO::PARAM_STR);
 		//$prepare->bindParam(':search',$search,PDO::PARAM_STR);
@@ -418,7 +418,7 @@ class Products extends Connection
 		}
 
 		try {
-			$stmt = "SELECT st.*, s.code, s.id as product_id, s.full_name, s.group, s.publisher_id, s.author, pub.full_name as publisherName FROM `{$this->table_st}` as st LEFT JOIN `{$this->table}` AS s ON s.id = st.product_id LEFT JOIN publishers as pub on s.publisher_id = pub.id WHERE st.`owner_id`=:owner_id and st.status = 1 " . $shopCondition . " order by s.id";
+			$stmt = "SELECT st.*, s.code, s.id as product_id, s.full_name, s.group, s.publisher_id, s.author, pub.full_name as publisherName FROM `{$this->table_st}` as st LEFT JOIN `{$this->table}` AS s ON s.id = st.product_id LEFT JOIN publishers as pub on s.publisher_id = pub.id WHERE st.`owner_id`=:owner_id and s.is_active = 1  and st.status = 1 " . $shopCondition . " order by s.id";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':owner_id', $owner_id, PDO::PARAM_STR);
 			$prepare->execute();
@@ -445,7 +445,7 @@ class Products extends Connection
 
 		try {
 
-			$stmt1 = "SELECT count(st.id) as count FROM `{$this->table_st}` as st LEFT JOIN `{$this->table}` AS p ON p.id = st.product_id LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id WHERE st.`owner_id`=:owner_id and st.status = 1 $shopCondition $searchQry order by p.id";
+			$stmt1 = "SELECT count(st.id) as count FROM `{$this->table_st}` as st LEFT JOIN `{$this->table}` AS p ON p.id = st.product_id LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id WHERE p.is_active = 1 and st.`owner_id`=:owner_id and st.status = 1 $shopCondition $searchQry order by p.id";
 			$prepare = $this->dbh->prepare($stmt1);
 			$prepare->bindParam(':owner_id', $owner_id, PDO::PARAM_STR);
 			$prepare->execute();
@@ -457,7 +457,7 @@ class Products extends Connection
 			$offset =  ((!empty($currentPage) ? $currentPage : 1) - 1) * $no_of_records_per_page;
 
 
-			$stmt = "SELECT st.*, p.code, p.id as product_id, p.full_name, p.group, p.publisher_id, p.author FROM `{$this->table_st}` as st LEFT JOIN `{$this->table}` AS p ON p.id = st.product_id LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id WHERE st.`owner_id`=:owner_id and st.status = 1 $shopCondition $searchQry order by p.id desc LIMIT :offset, :perPage";
+			$stmt = "SELECT st.*, p.code, p.id as product_id, p.full_name, p.group, p.publisher_id, p.author FROM `{$this->table_st}` as st LEFT JOIN `{$this->table}` AS p ON p.id = st.product_id LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id WHERE p.is_active = 1 and st.`owner_id`=:owner_id and st.status = 1 $shopCondition $searchQry order by p.id desc LIMIT :offset, :perPage";
 			$prepare2 = $this->dbh->prepare($stmt);
 			$prepare2->bindParam(':owner_id', $owner_id, PDO::PARAM_STR);
 			$prepare2->bindParam(':offset', $offset, PDO::PARAM_INT);
@@ -611,6 +611,19 @@ class Products extends Connection
 			$stmt = "UPDATE `{$this->table}` SET `pin`=:pin WHERE id=:id";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':pin', $pin, PDO::PARAM_INT);
+			$prepare->bindParam(':id', $id, PDO::PARAM_INT);
+			$prepare->execute();
+			$result = $prepare->rowCount();
+			return $result;
+		} catch (PDOException $e) {
+			die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
+	public function setInactive($id)
+	{
+		try {
+			$stmt = "UPDATE `{$this->table}` SET `is_active`=0 WHERE id=:id";
+			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':id', $id, PDO::PARAM_INT);
 			$prepare->execute();
 			$result = $prepare->rowCount();

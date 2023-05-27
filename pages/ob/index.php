@@ -10,6 +10,14 @@ foreach ($customersData as $value) {
     }
 }
 
+$stores = new Store();
+$userId = $userData['role'] == 'owner' ? $userData['id'] : $userData['created_by'];
+$ownerStores = $stores->getOwnerStores($userId);
+$shopsData = [];
+foreach ($ownerStores as $value) {
+    $shopsData[$value['id']] = $value['full_name'];
+}
+
 echo mainHeader(['page' => 'customer']);
 ?>
 
@@ -28,12 +36,13 @@ echo mainHeader(['page' => 'customer']);
             </tr>
         </thead>
         <tbody>
-            <?php foreach ($customersData as $value) { ?>
+            <?php
+            foreach ($customersData as $value) { ?>
                 <tr>
                     <td><?php echo $value['amount']; ?></td>
                     <td><?php echo $value['sale_date']; ?></td>
-                    <td><?php echo $shop['full_name']; ?></td>
-                    <td><?php if ($userData['role'] === 'owner' || $userData['role'] === 'manager') { ?><a class="btn btn-default btn-xs" href="<?php echo SITE_URL . 'pages/ob/update.php?id=' . $value['id']; ?>"><span class="fa fa-edit"><span></a><?php } ?></td>
+                    <td><?php echo $shopsData[$value['shop_id']]; ?></td>
+                    <td><?php if (($userData['role'] === 'owner' || $userData['role'] === 'manager') && $value['sale_date'] == $shop['sale_date']) { ?><a class="btn btn-default btn-xs" href="<?php echo SITE_URL . 'pages/ob/update.php?id=' . $value['id']; ?>"><span class="fa fa-edit"><span></a><?php } ?></td>
                 </tr>
             <?php } ?>
         </tbody>
@@ -78,6 +87,7 @@ echo mainFooter();
             sale_date: moment('<?php echo $shop['sale_date']; ?>'),
             amount: 0,
         }
+        $scope.shopId = '<?php echo $userData['shopId']; ?>';
 
         $scope.datePicker = moment('<?php echo $shop['sale_date']; ?>')
 
@@ -90,6 +100,7 @@ echo mainFooter();
         $scope.ok = function() {
             $http.post('create.php', $httpParamSerializerJQLike({
                 amount: $scope.form.amount,
+                shopId: $scope.shopId,
                 sale_date: moment($scope.form.sale_date).format('YYYY-MM-DD')
             }), {
                 headers: {
@@ -126,6 +137,16 @@ echo mainFooter();
         </div>
         <div class="modal-body" id="modal-body">
             <div uib-alert ng-if="alert" ng-class="'alert-'+(alert.type || 'warning')" close="closeAlert()">{{alert.message}}</div>
+            <?php if ($userData['role'] == 'owner') { ?>
+            <div class="form-group">
+                <label>Shop</label>
+                <select class="form-control c-select" ng-model="shopId">
+                    <?php foreach ($ownerStores as $value) { ?>
+                        <option value="<?php echo $value['id']; ?>"><?php echo $value['full_name']; ?></option>
+                    <?php } ?>
+                </select>
+            </div>
+            <?php } ?>
             <div class="form-group">
                 <label>Sale Date</label>
                 <input date-range-picker class="form-control date-picker" type="text" ng-model="form.sale_date" options="{ autoApply: true, singleDatePicker: true, }" ng-change="changeDP(datePicker.date)" />

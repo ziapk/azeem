@@ -180,7 +180,7 @@ echo mainHeader(['page' => 'coa']);
           })
           .then(res => {
             form.reset();
-            window.location.href = window.location.href;
+            window.location.reload();
           });
       },
       highlight: function(element) {
@@ -209,7 +209,7 @@ echo mainHeader(['page' => 'coa']);
           })
           .then(res => {
             form.reset();
-            window.location.href = window.location.href;
+            window.location.reload();
           });
       },
       highlight: function(element) {
@@ -230,7 +230,7 @@ echo mainHeader(['page' => 'coa']);
             }
           })
           .then(res => {
-            window.location.href = window.location.href;
+            window.location.reload();
           });
       }
     }
