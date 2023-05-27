@@ -60,6 +60,7 @@ switch ($reportType) {
 		$expenses = ['total' => 0, 'rows' => []];
 		$payments = 0;
 		$receivings = 0;
+		$cashSale = 0;
 		$sale_returns = 0;
 		$purchase_returns = 0;
 		$receivings = 0;
@@ -87,6 +88,7 @@ switch ($reportType) {
 								$rows[$value['transaction_date']][$value['transaction_id']]['row'] = $value;
 								$modes[$value['payment_mode']] += $value['amount'];
 								$rows[$value['transaction_date']][$value['transaction_id']]['totalPaid'] += $value['amount'];
+								$rows[$value['transaction_date']][$value['transaction_id']]['paid'][$value['payment_mode']] += $value['amount'];
 							}
 						}
 					}
@@ -120,6 +122,12 @@ switch ($reportType) {
 				$final[$date][$transaction['row']['account_id']]['title'] = $transaction['row']['title'];
 				$final[$date][$transaction['row']['account_id']]['grossCredit'] += $transaction['totalCredit'];
 				$final[$date][$transaction['row']['account_id']]['totalCredit'] += $transaction['totalCredit'];
+				foreach ($modesList['records'] as $m) {
+					if ($m['code'] == 'CASH') {
+						$cashSale += $transaction['paid'][$m['id']];
+					}
+					$final[$date][$transaction['row']['account_id']][$m['id']] += $transaction['paid'][$m['id']];
+				}
 				$final[$date][$transaction['row']['account_id']]['totalPaid'] += $transaction['totalPaid'];
 				$final[$date][$transaction['row']['account_id']]['totalDiscount'] += $transaction['discount'];
 				$final[$date][$$transaction['row']['account_id']]['transaction_date'] = $date;
@@ -146,6 +154,11 @@ switch ($reportType) {
 				$reportData[$count]['netCashSales'] = $value['totalPaid'];
 				$reportData[$count]['finalCashSales'] = $value['totalPaid'];
 
+				foreach ($modesList['records'] as $m) {
+					$reportData[$count][$m['id']] = $value[$m['id']];
+					$footer[$m['id']] = $value[$m['id']];
+				}
+
 				$footer['grossCreditSales'] += !empty($value['grossCredit'] - $value['totalPaid']) ? $value['grossCredit'] - $value['totalPaid'] + $value['totalDiscount'] : 0;
 				$footer['grossCashSales'] += !empty($value['totalPaid']) ? $value['totalPaid'] + $value['totalDiscount'] : 0;
 				$footer['discount'] += $value['totalDiscount'];
@@ -161,13 +174,20 @@ switch ($reportType) {
 
 
 		$subtitle = 'Closing Balance' . $subtitle;
-		$headers = ['Date', 'Account Code', 'Account Title', 'Gross Credit Sales', 'Gross Cash Sales', 'Discount', 'Net Credit Sales', 'Net Cash Sales'];
-		$columns = ['transaction_date', 'code', 'title', 'grossCreditSales', 'grossCashSales', 'discount', 'netCreditSales', 'netCashSales'];
+		$kkk = [];
+		$titles = [];
+		foreach ($modesList['records'] as $m) {
+			$kkk[] = $m['id'];
+			$titles[] = $m['title'];
+		}
+
+		$headers = ['Date', 'Account Code', 'Account Title', ...$titles, 'Net Credit Sales', 'Net Cash Sales'];
+		$columns = ['transaction_date', 'code', 'title', ...$kkk, 'netCreditSales', 'netCashSales'];
 
 		$hasFooter = true;
 		$footerCols = ['', 'Date', 'Account Code', 'Account Title'];
-		$summerCols = ['Gross Credit Sales', 'Gross Cash Sales', 'Discount', 'Net Credit Sales', 'Net Cash Sale'];
-		$footerVals = ['grossCreditSales', 'grossCashSales', 'discount', 'netCreditSales', 'netCashSales'];
+		$summerCols = [...$titles, 'Net Credit Sales', 'Net Cash Sale'];
+		$footerVals = [...$kkk, 'netCreditSales', 'netCashSales'];
 
 		break;
 
@@ -367,7 +387,7 @@ ob_start();
 	<h3>Final Summery</h3>
 	<?php
 
-	$tsale = empty($footer['netCashSales']) ? 0 : $footer['netCashSales'];
+	$tsale = $cashSale;
 	$creditsale = empty($footer['netCreditSales']) ? 0 : $footer['netCreditSales'];
 	$texpense = empty($expenses['total']) ? 0 : $expenses['total'];
 	$cash = ($tsale + $receivings + $purchase_returns);
@@ -380,12 +400,10 @@ ob_start();
 			<th align="left">Opening Balance</th>
 			<th align="right"><?php echo number_format($ob); ?></th>
 		</tr>
-		<?php foreach ($modes as $id => $value) { ?>
-			<tr>
-				<th align="left">Sale via <?php echo $amodesList[$id]['title']; ?></td>
-				<th align="right"><?php echo number_format($value, 0); ?></td>
-			</tr>
-		<?php } ?>
+		<tr>
+			<th align="left">Sale via CASH</td>
+			<th align="right"><?php echo number_format($cashSale, 0); ?></td>
+		</tr>
 		<tr>
 			<th align="left">Receivings</th>
 			<th align="right"><?php echo number_format($receivings, 0); ?></th>
@@ -443,7 +461,7 @@ ob_start();
 <?php }
 if (empty($params['pdf'])) { ?>
 	<script>
-		window.print();
+		// window.print();
 	</script>
 
 <?php
