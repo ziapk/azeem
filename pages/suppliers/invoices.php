@@ -48,7 +48,7 @@ echo mainHeader();
                     <td class="fw-bold"><?php echo $value['id']; ?></td>
                     <td class="fw-bold"><?php echo $customer['supplier']['name']; ?></td>
                     <td class="fw-bold"><?php echo $value['supply_date']; ?></td>
-                    <td class="fw-bold"><?php echo $value['price']; ?></td>
+                    <td class="fw-bold"><?php echo number_format($value['price'], 0); ?></td>
                     <td><a href="javascipt:void(0)" ng-click="order = order == <?php echo $value['id']; ?> ? '' : <?php echo $value['id']; ?> " class="fa fa-eye"></a></td>
                 </tr>
                 <tr class="text-danger" ng-if="order == <?php echo $value['id']; ?>">
@@ -67,7 +67,7 @@ echo mainHeader();
                         <td><?php echo $v['product_id']; ?></td>
                         <td><?php echo $v['product_title']; ?></td>
                         <td><?php echo $v['quantity']; ?></td>
-                        <td><?php echo $v['price']; ?></td>
+                        <td><?php echo number_format($v['price'], 0); ?></td>
                     </tr>
                 <?php } ?>
 
