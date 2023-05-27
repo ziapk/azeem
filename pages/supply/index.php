@@ -277,7 +277,7 @@ echo mainFooter();
         $scope.searchProduct = function(term) {
             return $http.get("<?php echo SITE_URL ?>api/getStores.php", {
                     params: {
-                        termm
+                        term,
                         shopId: $scope.shopId
                     }
                 })
