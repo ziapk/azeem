@@ -181,12 +181,12 @@ switch ($reportType) {
 			$titles[] = $m['title'];
 		}
 
-		$headers = ['Date', 'Account Code', 'Account Title', ...$titles, 'Net Credit Sales', 'Net Cash Sales'];
+		$headers = ['Date', 'Account Code', 'Account Title', ...$titles, 'Credit Sales', 'Cash Sales'];
 		$columns = ['transaction_date', 'code', 'title', ...$kkk, 'netCreditSales', 'netCashSales'];
 
 		$hasFooter = true;
 		$footerCols = ['', 'Date', 'Account Code', 'Account Title'];
-		$summerCols = [...$titles, 'Net Credit Sales', 'Net Cash Sale'];
+		$summerCols = [...$titles, 'Credit Sales', 'Cash Sale'];
 		$footerVals = [...$kkk, 'netCreditSales', 'netCashSales'];
 
 		break;
