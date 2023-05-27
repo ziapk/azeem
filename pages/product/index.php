@@ -131,19 +131,21 @@ $programs = $programObj->getPrograms();
         }
 
         $scope.setInactive = function(item) {
-            $http.get("<?php echo SITE_URL ?>api/setInactive.php", {
-                    params: {
-                        id: item.id
-                    }
-                })
-                .then(function(response) {
-                    if (response.status === 200) {
-                        toaster.success({
-                            body: 'Marked In-Active Successfully!'
-                        });
-                        $scope.getProducts();
-                    }
-                })
+            if ($window.confirm('Are you sure?')) {
+                $http.get("<?php echo SITE_URL ?>api/setInactive.php", {
+                        params: {
+                            id: item.id
+                        }
+                    })
+                    .then(function(response) {
+                        if (response.status === 200) {
+                            toaster.success({
+                                body: 'Marked In-Active Successfully!'
+                            });
+                            $scope.getProducts();
+                        }
+                    })
+            }
         }
         $scope.removeDuplicate = function(item) {
             $http.get("<?php echo SITE_URL ?>api/setDuplicate.php", {
