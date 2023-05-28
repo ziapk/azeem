@@ -71,7 +71,7 @@ $ownerStores = $stores->getOwnerStores($userId);
             </thead>
         </table>
 
-        <?php echo include_once dirname(___FILE___) . '/table.php'; ?>
+        <?php echo include_once dirname(___FILE___) . '/table2.php'; ?>
     </div>
 
 </div>
@@ -98,6 +98,11 @@ echo mainFooter();
     });
     app.controller('cartController', function($scope, $http, $httpParamSerializerJQLike, $filter, $window, $timeout, $location, $anchorScroll) {
         $scope.mainList = <?php echo safe_json_encode($list); ?>;
+
+        $scope.minDate = moment().format('YYYY-MM-DD');
+        $scope.expected_delivery_date = moment();
+
+        $scope.status_id = '1';
 
         $scope.pinList = [];
         $scope.list = [];
@@ -179,6 +184,9 @@ echo mainFooter();
                     ...obj,
                     qty: row.qty,
                     show: row.show,
+                    price: row.price,
+                    expected_dates: row.expected_dates,
+                    employeeSelect: row.employeeSelect,
                     description: row.description
                 })
             });
@@ -363,6 +371,17 @@ echo mainFooter();
                     return response.data
                 });
         }
+        $scope.searchEmployee = function(value, onloading) {
+            $scope.employeeName = value;
+            return $http.get("<?php echo SITE_URL ?>api/getEmployees.php?search=" + value)
+                .then(function(response) {
+                    // $scope.customersList = response.data.records;
+                    if (onloading) {
+                        $scope.selectEmployee($scope.customersList[0]);
+                    }
+                    return response.data.records
+                });
+        }
         $scope.searchMode = function() {
             return $http.get("<?php echo SITE_URL ?>api/getPaymentModes.php")
                 .then(function(response) {
@@ -398,19 +417,30 @@ echo mainFooter();
             $scope.calculatePayment($scope.payWith);
             $scope.loading = true;
             $scope.form = {
+                status_id: $scope.status_id,
                 customer_name: $scope.customerName,
                 customerId: $scope.customerData && $scope.customerData.id ? $scope.customerData.id : 1,
                 subTotal: $scope.subTotal,
                 discount: $scope.discount,
+                expected_delivery_date: moment(expected_delivery_date).format('YYYY-MM-DD'),
                 items: $scope.items.map(({
                     id,
                     description,
+                    item_status,
+                    employeeSelect,
+                    expected_dates,
+                    product_type,
                     qty,
                     discount,
-                    price
+                    price,
                 }) => ({
                     id,
+                    start_date: moment(expected_dates.startDate).format('YYYY-MM-DD'),
+                    end_date: moment(expected_dates.endDate).format('YYYY-MM-DD'),
+                    employee_id: employeeSelect?.id,
                     description,
+                    item_status,
+                    product_type,
                     qty,
                     discount,
                     price
@@ -463,20 +493,24 @@ echo mainFooter();
             }
         }
 
+        $scope.onChangePicker = (s, e, row) => {
+            console.log(s, e, row);
+        }
+
         $scope.calculateSum = (c) => {
             const customerData = c || $scope.customerData;
             let subtotal = 0;
             $scope.discountPercentValue = 0;
             $scope.items.map((product) => {
+                console.log(product)
                 let currentRow = null;
+                const price = parseFloat(product.price);
                 if (customerData.discount_array?.length && customerData.discount_array?.filter(r => r.publisher_id == product.publisher_id).length) {
                     const row = customerData.discount_array.find(r => r.publisher_id == product.publisher_id);
-                    const price = parseFloat(product.price);
                     product.discount = price * (parseFloat(row.discount_value) / 100);
                     product.discount_percent = row.discount_value + "%";
                     subtotal += ((product.price - product.discount) * product.qty);
                 } else {
-                    const price = parseFloat(product.price);
                     if (product.discount_value) {
                         product.discount = price * ((product.discount_value || 0) / 100);
                         $scope.discountPercentValue += (product.discount * product.qty);
@@ -517,7 +551,8 @@ echo mainFooter();
 <script type="text/ng-template" id="row.html">
     <a>
       <span ng-bind-html="match.model.full_name | uibTypeaheadHighlight:query"></span>
-      <span class="pull-right">{{match.model.price}}</span>
+      <span class="pull-right">{{match.model.price}}</span><br />
+      <span ng-if="match.model.designation">{{match.model.designation}}</span>
   </a>
 </script>
 <script type="text/ng-template" id="customer.html">
