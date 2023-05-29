@@ -20,6 +20,12 @@ $categoryProducts = $productCls->getCategoryProducts($shop['owner_id'], $ids, $s
 $suppliersList = [];
 $suppliersObj = new Suppliers();
 $suppliersList = $suppliersObj->getSuppliers(['shopId' => $shop['id']]);
+
+$customersList = [];
+$customerObj = new Customers();
+$customersList = $customerObj->getCustomers($shop['id']);
+
+
 ?>
 <div ng-controller="headerController">
   <nav class="navbar navbar-fixed-top">
@@ -36,6 +42,33 @@ $suppliersList = $suppliersObj->getSuppliers(['shopId' => $shop['id']]);
         <div class="pull-left welcome-header-section"><span>Welcome <strong><?php echo $userData['full_name']; ?>!</strong></span></div>
 
         <ul class="list-inline navbar-right navbar-nav nav">
+          <li class="dropdown" style="padding: 0">
+            <a href="#" class="nav-menu-item btn btn-primary" data-toggle="dropdown">
+              + Receiving
+            </a>
+            <form ng-submit="directReceiving()" class="dropdown-menu" style="padding: 20px; width: 300px">
+              <div class="form-group">
+                <select name="id" ng-model="payment.id" class="form-control">
+                  <option value="">Select a customer</option>
+                  <?php foreach ($customersList as $cat) {
+                    if (!empty($cat['account_id'])) {
+
+
+                  ?>
+                      <option value="<?php echo $cat['account_id']; ?>"><?php echo $cat['full_name']; ?></option>
+                  <?php }
+                  } ?>
+                </select>
+              </div>
+              <div class="form-group">
+                <input placeholder="Description" ng-model="payment.summery" type="text" class="form-control">
+              </div>
+              <div class="form-group">
+                <input placeholder="Amount" ng-model="payment.amount" type="text" class="form-control">
+              </div>
+              <input type="submit" value="Submit" class="btn btn-primary">
+            </form>
+          </li>
           <li class="dropdown" style="padding: 0">
             <a href="#" class="nav-menu-item btn btn-primary" data-toggle="dropdown">
               + Payments
@@ -217,6 +250,22 @@ $suppliersList = $suppliersObj->getSuppliers(['shopId' => $shop['id']]);
       console.log($scope.payment);
       if ($scope.payment.id && $scope.payment.amount) {
         $http.post('<?php echo SITE_URL; ?>api/directPayment.php', $httpParamSerializerJQLike($scope.payment), {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }).then((response) => {
+          alert(response.data.message);
+          if (response.data.status == 200) {
+            $scope.payment.summery = '';
+            $scope.payment.amount = '';
+          }
+        })
+      }
+    }
+    $scope.directReceiving = () => {
+      console.log($scope.payment);
+      if ($scope.payment.id && $scope.payment.amount) {
+        $http.post('<?php echo SITE_URL; ?>api/directReceiving.php', $httpParamSerializerJQLike($scope.payment), {
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
           }
