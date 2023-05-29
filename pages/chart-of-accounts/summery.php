@@ -1,17 +1,15 @@
 <?php
 session_start();
-include_once dirname(__FILE__).'/../../include/settings.php';
+include_once dirname(__FILE__) . '/../../include/settings.php';
 $dentry = new DoubleEntry();
 $user = [];
-if($_GET['t'] == 'c') {
+if ($_GET['t'] == 'c') {
     $customers = new Customers();
     $user = $customers->getUserByAccount($_GET['id']);
-}
-elseif($_GET['t'] == 's') {
+} elseif ($_GET['t'] == 's') {
     $suppliers = new Suppliers();
     $user = $suppliers->getUserByAccount($_GET['id']);
-}
-elseif($_GET['t'] == 'e') {
+} elseif ($_GET['t'] == 'e') {
     $expenses = new Categories();
     $user = $expenses->expenseByAccount($_GET['id']);
 }
@@ -19,10 +17,9 @@ elseif($_GET['t'] == 'e') {
 $journel = $dentry->getLedgerByAccount(['account_id' => $_GET['id']]);
 $summery = $journel['summery'];
 
-if($_GET['t'] == 'c') {
+if ($_GET['t'] == 'c') {
     $summery['debit'] += $user['account']['opening_balance'];
-}
-else {
+} else {
     $summery['credit'] += $user['account']['opening_balance'];
 }
 $paid = $_GET['t'] == 's' ? $summery['debit'] : $summery['credit'];
@@ -44,28 +41,34 @@ mainHeader();
             <td width="300">
                 <table width="100%">
                     <tr>
-                        <td>Opening Balance:</td><td width="140"><?php echo number_format($user['account']['opening_balance'], 2);?><br /></td>
+                        <td>Opening Balance:</td>
+                        <td width="140"><?php echo number_format($user['account']['opening_balance'], 2); ?><br /></td>
                     </tr>
                     <tr>
-                        <td>Total Invoices:</td><td><?php echo $summery['total'];?><br /></td>
+                        <td>Total Invoices:</td>
+                        <td><?php echo $summery['total']; ?><br /></td>
                     </tr>
                     <tr>
-                        <td>Total Amount:</td><td><?php echo number_format($amount, 2);?><br /></td>
+                        <td>Total Amount:</td>
+                        <td><?php echo number_format($amount, 2); ?><br /></td>
                     </tr>
                     <tr>
-                        <td>Total Paid:</td><td><?php echo number_format($paid, 2);?><br /></td>
+                        <td>Total Paid:</td>
+                        <td><?php echo number_format($paid, 2); ?><br /></td>
                     </tr>
                     <tr>
-                        <td>Closing Balance:</td><td><?php echo number_format($balance, 2);?></td>
+                        <td>Closing Balance:</td>
+                        <td><?php echo number_format($balance, 2); ?></td>
                     </tr>
                 </table>
-                
+
             </td>
         </tr>
     </table>
     <table width="100%" class="table table-striped">
         <thead>
             <tr>
+                <th>T.ID</th>
                 <th>Date</th>
                 <th>Reference No</th>
                 <th>Description</th>
@@ -77,18 +80,19 @@ mainHeader();
             </tr>
         </thead>
         <tbody>
-            <?php  foreach ($journel['rows'] as $key => $value) {?>
+            <?php foreach ($journel['rows'] as $key => $value) { ?>
                 <tr>
-                    <td><?php echo $value['transaction_date'];?></td>
-                    <td><?php echo $value['reference'];?></td>
-                    <td><?php echo $value['v_description'];?></td>
-                    <td><?php echo $shop['full_name'];?></td>
-                    <td><?php echo $value['entry_type'];?></td>
-                    <td><?php echo number_format($value['entry_type'] == 'D' ? $value['amount'] : null, 2);?></td>
-                    <td><?php echo number_format($value['entry_type'] == 'C' ? $value['amount'] : null, 2);?></td>
-                    <td><?php echo $value['payment_mode'] ? $value['payment_mode'] : 'Cash';?></td>
+                    <td><?php echo $value['transaction_id']; ?></td>
+                    <td><?php echo $value['transaction_date']; ?></td>
+                    <td><?php echo $value['reference']; ?></td>
+                    <td><?php echo $value['v_description']; ?></td>
+                    <td><?php echo $shop['full_name']; ?></td>
+                    <td><?php echo $value['entry_type']; ?></td>
+                    <td><?php echo number_format($value['entry_type'] == 'D' ? $value['amount'] : null, 2); ?></td>
+                    <td><?php echo number_format($value['entry_type'] == 'C' ? $value['amount'] : null, 2); ?></td>
+                    <td><?php echo $value['payment_mode'] ? $value['payment_mode'] : 'Cash'; ?></td>
                 </tr>
-            <?php }?>
+            <?php } ?>
         </tbody>
     </table>
 </div>
