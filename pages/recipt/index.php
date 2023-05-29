@@ -6,7 +6,7 @@ $list = $productCls->getOwnerProducts($ownerId);
 $credit = $_GET["credit"];
 echo mainHeader(['page' => !empty($credit) ? 'recipt-credit' : 'recipt']);
 $ordersObj = new Orders();
-$orders = $ordersObj->userOrders($shop['id'], $shop['sale_date'], null, 1);
+$orders = $ordersObj->userOrders($shop['id'], $shop['sale_date'], null, 1, false);
 $stores = new Store();
 $userId = $userData['role'] == 'owner' ? $userData['id'] : $userData['created_by'];
 $ownerStores = $stores->getOwnerStores($userId);

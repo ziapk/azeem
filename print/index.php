@@ -225,8 +225,8 @@ if ($largeView) {
                                     <th class="text-left thead">Item</th>
                                     <th width="40" class="thead">Qty</th>
                                     <th width="50" class="thead">U. Price</th>
+                                    <th width="50" class="thead">D. %</th>
                                     <th width="50" class="thead">D. Price</th>
-                                    <th width="50" class="thead">D. Total</th>
                                     <th class="text-right thead" width="50">Total</th>
                                 </tr>
                             </thead>
@@ -238,13 +238,13 @@ if ($largeView) {
                                         <td class="text-left"><?php echo $item['product_title']; ?></td>
                                         <td class="text-right"><?php echo abs(($item['quantity'])); ?></td>
                                         <td class="text-right"><?php echo abs(($item['price'])); ?></td>
+                                        <td class="text-right"><?php echo abs(($item['discount'] / $item['price']) * 100) . '%'; ?></td>
                                         <td class="text-right"><?php echo abs(($item['price'] - $item['discount'])); ?></td>
                                         <td class="text-right"><?php
                                                                 $aprice += $item['quantity'] * ($item['price']);
                                                                 $distTotal += $item['quantity'] * ($item['discount']);
                                                                 $qty += $item['quantity'];
                                                                 echo abs(($item['quantity'] * ($item['price'] - $item['discount']))); ?></td>
-                                        <td class="text-right"><?php echo abs(($item['quantity'] * ($item['price']))); ?></td>
                                     </tr>
                                     <?php if (!empty($item['description'])) { ?>
                                         <tr>
