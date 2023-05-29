@@ -324,14 +324,16 @@ class Orders extends Connection
         }
     }
 
-    public function userOrders($shopId, $date, $to = null, $flag = null)
+    public function userOrders($shopId, $date, $to = null, $flag = null, $ignore = true)
     {
         try {
             $toCondition = "";
-            if (!empty($to)) {
-                $toCondition .= " AND DATE(o.order_date) BETWEEN '" . $date . "' AND '" . $to . "'";
-            } else if (!empty($date)) {
-                $toCondition .= " AND DATE(o.order_date) BETWEEN '" . $date . "' AND '" . $date . "'";
+            if ($ignore) {
+                if (!empty($to)) {
+                    $toCondition .= " AND DATE(o.order_date) BETWEEN '" . $date . "' AND '" . $to . "'";
+                } else if (!empty($date)) {
+                    $toCondition .= " AND DATE(o.order_date) BETWEEN '" . $date . "' AND '" . $date . "'";
+                }
             }
             $flagCondition = "";
             if (!empty($flag)) {
