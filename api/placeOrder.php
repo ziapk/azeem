@@ -84,7 +84,7 @@ try {
                     'discount' => $item['discount'],
                     'price' => $item['price'],
                     'status' => $staus,
-                    'item_status' => !empty($item['item_status']) ? $item['item_status'] : null,
+                    'item_status' => !empty($item['item_status']) ? $item['item_status'] : 1,
                     'employee_id' => !empty($item['employee_id']) ? $item['employee_id'] : null,
                     'start_date' => !empty($item['start_date']) ? $item['start_date'] : null,
                     'end_date' => !empty($item['end_date']) ? $item['end_date'] : null,
