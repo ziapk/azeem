@@ -79,6 +79,33 @@ $categoryProducts = $productCls->getCategoryProducts($shop['owner_id'], $ids, $s
           </li>
           <li class="dropdown" style="padding: 0">
             <a href="#" class="nav-menu-item btn btn-primary" data-toggle="dropdown">
+              + Payments
+            </a>
+            <form ng-submit="directPayment()" class="dropdown-menu" style="padding: 20px; width: 300px">
+              <div class="form-group">
+                <select name="id" ng-model="payment.id" class="form-control">
+                  <option value="">Select a category</option>
+                  <?php foreach ($suppliersList as $cat) {
+                    if (!empty($cat['account_id'])) {
+
+
+                  ?>
+                      <option value="<?php echo $cat['account_id']; ?>"><?php echo $cat['name']; ?></option>
+                  <?php }
+                  } ?>
+                </select>
+              </div>
+              <div class="form-group">
+                <input placeholder="Description" ng-model="payment.summery" type="text" class="form-control">
+              </div>
+              <div class="form-group">
+                <input placeholder="Amount" ng-model="payment.amount" type="text" class="form-control">
+              </div>
+              <input type="submit" value="Submit" class="btn btn-primary">
+            </form>
+          </li>
+          <li class="dropdown" style="padding: 0">
+            <a href="#" class="nav-menu-item btn btn-primary" data-toggle="dropdown">
               + Expense
             </a>
             <form ng-submit="createExpense()" class="dropdown-menu" style="padding: 20px; width: 300px">

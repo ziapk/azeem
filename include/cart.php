@@ -76,6 +76,22 @@ $list = $productCls->getOwnerProducts($ownerId);
         })
       }
     }
+    $scope.directPayment = () => {
+      console.log($scope.payment);
+      if ($scope.payment.id && $scope.payment.amount) {
+        $http.post('<?php echo SITE_URL; ?>api/directPayment.php', $httpParamSerializerJQLike($scope.payment), {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }).then((response) => {
+          alert(response.data.message);
+          if (response.data.status == 200) {
+            $scope.payment.summery = '';
+            $scope.payment.amount = '';
+          }
+        })
+      }
+    }
     $scope.refreshList = function() {
       $scope.cart = JSON.parse($window.sessionStorage.getItem('shopping'));
       $scope.totalPrice = 0;
