@@ -4,6 +4,18 @@ global $userData;
 $productCls = new Products();
 $ownerId = $userData['role'] == 'owner' ? $userData['id'] : $userData['created_by'];
 $list = $productCls->getOwnerProducts($ownerId);
+$categoryObj = new Categories();
+$categories = $categoryObj->getCategories('exp', $ownerId);
+$list = $productCls->getOwnerProducts($ownerId);
+
+$categoryList = $categoryObj->getCategories('pro', $ownerId);
+$ids = [];
+$productCategories = [];
+foreach ($categoryList as $v) {
+  $productCategories[] = $v;
+  $ids[] = $v['id'];
+}
+$categoryProducts = $productCls->getCategoryProducts($shop['owner_id'], $ids, $shop['id']);
 ?>
 <div ng-controller="headerController">
   <nav class="navbar navbar-fixed-top">

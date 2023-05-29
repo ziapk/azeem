@@ -3,7 +3,6 @@ global $shopData;
 global $userData;
 global $shop;
 $storeDD = new Store();
-$categoryObj = new Categories();
 $shop = $storeDD->getStore($shop['id']);
 $productCls = new Products();
 $ownerId = $userData['role'] == 'owner' ? $userData['id'] : $userData['created_by'];
