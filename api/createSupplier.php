@@ -1,14 +1,13 @@
-<?php 
-include_once dirname(__FILE__).'/../include/settings.php';
+<?php
+include_once dirname(__FILE__) . '/../include/settings.php';
 
 $suppliers = new Suppliers();
 
-if(empty($_POST['name'])) {
+if (empty($_POST['name'])) {
     echo json_encode(['success' => false, 'message' => 'Please fill all requried fields']);
-}
-else {
+} else {
 
-    $data = [                
+    $data = [
         'name' => $_POST['name'],
         'address' => !empty($_POST['address']) ? $_POST['address'] : "",
         'contact' => !empty($_POST['contact']) ? $_POST['contact'] : "",
@@ -25,23 +24,24 @@ else {
     $payableAccount = $de->getAccount($shop['payable']);
 
     $accountData = [
-        'title' => 'Supplier - '.$_POST['name'].' - '.$_POST['company'],
+        'title' => 'Supplier - ' . $_POST['name'] . ' - ' . $_POST['company'],
         'code' => $payableAccount['code'],
         'account_type' => $payableAccount['account_type'],
         'group_id' => $payableAccount['group_id'],
         'status' => $payableAccount['status'],
         'parent_id' => $payableAccount['id'],
         'created_by' => $userData['id'],
+        'shopId' => $shop['id'],
         'opening_balance' => $_POST['opening_balance'],
     ];
 
-    
+
     $accountId = $de->insertAccount($accountData);
     $data['account_id'] = $accountId;
 
     $create = $suppliers->createSupplier($data);
 
-    if($create) {
+    if ($create) {
         echo json_encode(["success" => true, "message" => "Successfully created!"]);
     } else {
         echo json_encode(["success" => false, "message" => "Check form carefully!"]);

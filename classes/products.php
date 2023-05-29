@@ -594,7 +594,7 @@ class Products extends Connection
 			$prepare->bindParam(':group', $array['group'], PDO::PARAM_STR);
 			$prepare->bindParam(':board', $array['board'], PDO::PARAM_STR);
 			$prepare->bindParam(':author', $array['author'], PDO::PARAM_STR);
-			$prepare->bindParam(':publisher_id', $array['publisher_id'], PDO::PARAM_STR);
+			$prepare->bindParam(':publisher_id', $array['publisher_id'], PDO::PARAM_INT);
 			$prepare->bindParam(':cat_id', $array['cat_id'], PDO::PARAM_STR);
 			$prepare->bindParam(':id', $array['id'], PDO::PARAM_INT);
 			$prepare->bindParam(':owner_id', $array['owner_id'], PDO::PARAM_INT);

@@ -779,7 +779,7 @@ class DoubleEntry extends Connection
 
 
 		try {
-			$stmt = "INSERT INTO `{$this->table}` (`title`, `code`, `account_type`, `group_id`, `status`, `parent_id`, `created_by`, `opening_balance`) VALUES (:title, :code, :account_type, :group_id, :status, :parent_id, :created_by, :opening_balance)";
+			$stmt = "INSERT INTO `{$this->table}` (`title`, `code`, `account_type`, `group_id`, `status`, `parent_id`, `created_by`, `shopId`, `opening_balance`) VALUES (:title, :code, :account_type, :group_id, :status, :parent_id, :created_by, :shopId, :opening_balance)";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':title', $array['title'], PDO::PARAM_STR);
 			$prepare->bindParam(':code', $array['code'], PDO::PARAM_STR);
@@ -788,6 +788,7 @@ class DoubleEntry extends Connection
 			$prepare->bindParam(':status', $array['status'], PDO::PARAM_STR);
 			$prepare->bindParam(':parent_id', $array['parent_id'], PDO::PARAM_STR);
 			$prepare->bindParam(':created_by', $array['created_by'], PDO::PARAM_STR);
+			$prepare->bindParam(':shopId', $array['shopId'], PDO::PARAM_STR);
 			$prepare->bindParam(':opening_balance', $array['opening_balance'], PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $this->dbh->lastInsertId();

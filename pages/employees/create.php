@@ -3,9 +3,9 @@
 include_once dirname(__FILE__) . '/../../include/settings.php';
 
 
-$customerObj = new Customers();
+$customerObj = new Employees();
 
-$ownerId = $userData['role'] == 'owner' ? $userData['id'] : $userData['created_by'];
+$ownerId = $shop['owner_id'];
 $userId = $userData['id'];
 $shopId = $shop['id'];
 
@@ -14,19 +14,23 @@ if (empty($_POST['full_name'])) {
 } else {
 
     $data = [
-        'shopId' => $shopId,
-        'code' => '',
-        'title' => $_POST['title'],
-        'full_name' => $_POST['full_name'],
-        'company' => $_POST['company'],
-        'type' => !empty($_POST['type']) ? 2 : 1,
-        'address' => !empty($_POST['address']) ? $_POST['address'] : "",
-        'phoneNumber' => !empty($_POST['phoneNumber']) ? $_POST['phoneNumber'] : "",
+        'shop_id' => $shopId,
+        'owner_id' => $ownerId,
+        "full_name" => !empty($_POST['full_name']) ? $_POST['full_name'] : null,
+        "email" => !empty($_POST['email']) ? $_POST['email'] : null,
+        "designation" => !empty($_POST['designation']) ? $_POST['designation'] : null,
+        "doj" => !empty($_POST['doj']) ? $_POST['doj'] : null,
+        "contact_1" => !empty($_POST['contact_1']) ? $_POST['contact_1'] : null,
+        "contact_2" => !empty($_POST['contact_2']) ? $_POST['contact_2'] : null,
+        "emg_contact_1" => !empty($_POST['emg_contact_1']) ? $_POST['emg_contact_1'] : null,
+        "emg_contact_2" => !empty($_POST['emg_contact_2']) ? $_POST['emg_contact_2'] : null,
+        "salary" => !empty($_POST['salary']) ? $_POST['salary'] : null,
+        "opening_balance" => !empty($_POST['opening_balance']) ? $_POST['opening_balance'] : null,
     ];
 
     $de = new DoubleEntry();
 
-    $receivableAccount = $de->getAccount($shop['receivable']);
+    $receivableAccount = $de->getAccount($shop['expense']);
 
     $accountData = [
         'title' => 'Customer - ' . $_POST['full_name'] . ' - ' . $_POST['company'],
@@ -43,7 +47,7 @@ if (empty($_POST['full_name'])) {
 
     $accountId = $de->insertAccount($accountData);
     $data['account_id'] = $accountId;
-    $create = $customerObj->createCustomer($data);
+    $create = $customerObj->createEmployee($data);
 
 
     if ($create) {

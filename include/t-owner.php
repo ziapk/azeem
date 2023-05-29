@@ -41,9 +41,9 @@ $list = $productCls->getOwnerProducts($ownerId);
   </nav>
   <div class="sidebar">
     <ul class="nav">
-      <li class="<?php if ($params['page'] == 'recipt') {
+      <li class="<?php if ($params['page'] == 'order') {
                     echo 'active';
-                  } ?>"><a uib-tooltip="Recipt Generator" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/recipt" target="_blank"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/receipt.svg" alt="" /> <span class="nav-menu-text">Create Order</span></a></li>
+                  } ?>"><a uib-tooltip="Order Generator" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/recipt/order.php"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/receipt.svg" alt="" /> <span class="nav-menu-text">Create Order</span></a></li>
       <li class="<?php if ($params['page'] == 'order') {
                     echo 'active';
                   } ?>"><a uib-tooltip="Sales" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/orders"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/sales.svg" alt="" /> <span class="nav-menu-text">Sales</span></a></li>
@@ -53,9 +53,15 @@ $list = $productCls->getOwnerProducts($ownerId);
       <li class="<?php if ($params['page'] == 'product') {
                     echo 'active';
                   } ?>"><a uib-tooltip="Products" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/product"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/product.svg" alt="" /> <span class="nav-menu-text">Products</span></a></li>
+      <li class="<?php if ($params['page'] == 'employees') {
+                    echo 'active';
+                  } ?>"><a uib-tooltip="Employees" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/employees"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/product.svg" alt="" /> <span class="nav-menu-text">Employees</span></a></li>
       <li class="<?php if ($params['page'] == 'running') {
                     echo 'active';
                   } ?>"><a uib-tooltip="Running Items" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/product/running.php"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/lightning-bolt.svg" alt="" /> <span class="nav-menu-text">Running Items</span></a></li>
+      <li class="<?php if ($params['page'] == 'mode') {
+                    echo 'active';
+                  } ?>"><a uib-tooltip="Chart of Accounts" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/modes"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/accounting.png" alt="" /> <span class="nav-menu-text">Payment Modes</span></a></li>
       <li class="<?php if ($params['page'] == 'coa') {
                     echo 'active';
                   } ?>"><a uib-tooltip="Chart of Accounts" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/chart-of-accounts"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/accounting.png" alt="" /> <span class="nav-menu-text">Accounts</span></a></li>

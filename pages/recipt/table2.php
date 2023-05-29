@@ -73,7 +73,8 @@ foreach ($statuses as  $value) {
                 <input type="text" class="form-control" ng-model="cart.employeeSelect" placeholder="Search Employee" uib-typeahead="address as address.full_name for address in searchEmployee($viewValue)" typeahead-on-select="selectEmployee($item)" ng-model-options="{debounce: 500}" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="1">
             </td>
             <td>
-                <select name="item_status" id="item_status" class="form-control" ng-model="cart.item_status">
+                <select name="item_status" id="item_status" class="form-control" ng-model="cart.item_status" placeholder="item_status">
+                    <option value="">-- status --</option>
                     <?php
                     foreach ($itemStatus as $value) { ?>
                         <option value="<?php echo $value['id']; ?>"><?php echo $value['title']; ?></option>
@@ -81,7 +82,16 @@ foreach ($statuses as  $value) {
                     ?>
                 </select>
             </td>
-            <td></td>
+            <td>
+                <select name="priority" id="priority" class="form-control" ng-model="cart.priority" placeholder="priority">
+                    <option value="">-- priority --</option>
+                    <?php
+                    foreach ($orderPriority as $key => $value) { ?>
+                        <option value="<?php echo $key; ?>"><?php echo $value; ?></option>
+                    <?php }
+                    ?>
+                </select>
+            </td>
             <td></td>
         </tr>
         <tr>

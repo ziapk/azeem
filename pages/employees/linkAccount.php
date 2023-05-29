@@ -1,7 +1,7 @@
 <?php
 include_once dirname(__FILE__) . '/../../include/settings.php';
 
-$customerObj = new Categories();
+$customerObj = new Employees();
 
 $ownerId = $userData['role'] == 'owner' ? $userData['id'] : $userData['created_by'];
 $userId = $userData['id'];
@@ -10,16 +10,16 @@ $data = $_POST;
 
 $de = new DoubleEntry();
 
-$payableAccount = $de->getAccount($shop['expense']);
+$receivableAccount = $de->getAccount($shop['receivable']);
 
 $accountData = [
-    'title' => 'Expense - ' . $_POST['full_name'] . ' - ' . $_POST['groupName'],
-    'code' => $payableAccount['code'],
-    'account_type' => $payableAccount['account_type'],
-    'group_id' => $payableAccount['group_id'],
-    'status' => $payableAccount['status'],
-    'parent_id' => $payableAccount['id'],
+    'title' => 'Employee - ' . $_POST['full_name'] . ' - ' . $_POST['company'],
+    'code' => $receivableAccount['code'],
+    'account_type' => $receivableAccount['account_type'],
+    'group_id' => $receivableAccount['group_id'],
+    'status' => $receivableAccount['status'],
     'shopId' => $shop['id'],
+    'parent_id' => $receivableAccount['id'],
     'opening_balance' => 0,
     'created_by' => $userId
 ];
@@ -27,6 +27,7 @@ $accountData = [
 $accountId = $de->insertAccount($accountData);
 $data['account_id'] = $accountId;
 $create = $customerObj->linkAccount($data);
+
 if ($create) {
     echo json_encode(["success" => true, "message" => "Successfully Linked!"]);
 } else {

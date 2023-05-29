@@ -1,6 +1,7 @@
 <?php
 global $shopData;
 global $userData;
+global $shop;
 $productCls = new Products();
 $ownerId = $userData['role'] == 'owner' ? $userData['id'] : $userData['created_by'];
 $list = $productCls->getOwnerProducts($ownerId);
@@ -16,6 +17,9 @@ foreach ($categoryList as $v) {
   $ids[] = $v['id'];
 }
 $categoryProducts = $productCls->getCategoryProducts($shop['owner_id'], $ids, $shop['id']);
+$suppliersList = [];
+$suppliersObj = new Suppliers();
+$suppliersList = $suppliersObj->getSuppliers(['shopId' => $shop['id']]);
 ?>
 <div ng-controller="headerController">
   <nav class="navbar navbar-fixed-top">
@@ -32,6 +36,33 @@ $categoryProducts = $productCls->getCategoryProducts($shop['owner_id'], $ids, $s
         <div class="pull-left welcome-header-section"><span>Welcome <strong><?php echo $userData['full_name']; ?>!</strong></span></div>
 
         <ul class="list-inline navbar-right navbar-nav nav">
+          <li class="dropdown" style="padding: 0">
+            <a href="#" class="nav-menu-item btn btn-primary" data-toggle="dropdown">
+              + Payments
+            </a>
+            <form ng-submit="directPayment()" class="dropdown-menu" style="padding: 20px; width: 300px">
+              <div class="form-group">
+                <select name="id" ng-model="payment.id" class="form-control">
+                  <option value="">Select a category</option>
+                  <?php foreach ($suppliersList as $cat) {
+                    if (!empty($cat['account_id'])) {
+
+
+                  ?>
+                      <option value="<?php echo $cat['account_id']; ?>"><?php echo $cat['name']; ?></option>
+                  <?php }
+                  } ?>
+                </select>
+              </div>
+              <div class="form-group">
+                <input placeholder="Description" ng-model="payment.summery" type="text" class="form-control">
+              </div>
+              <div class="form-group">
+                <input placeholder="Amount" ng-model="payment.amount" type="text" class="form-control">
+              </div>
+              <input type="submit" value="Submit" class="btn btn-primary">
+            </form>
+          </li>
           <li class="dropdown" style="padding: 0">
             <a href="#" class="nav-menu-item btn btn-primary" data-toggle="dropdown">
               + Expense
@@ -165,6 +196,38 @@ $categoryProducts = $productCls->getCategoryProducts($shop['owner_id'], $ids, $s
         })
         $scope.totalPrice += row.qty * obj.price
       })
+    }
+    $scope.exp = {};
+    $scope.createExpense = () => {
+      if ($scope.exp.cat_id && $scope.exp.price) {
+        $http.post('<?php echo SITE_URL; ?>api/createExpense.php', $httpParamSerializerJQLike($scope.exp), {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }).then((response) => {
+          alert(response.data.message);
+          if (response.data.status == 200) {
+            $scope.exp.description = '';
+            $scope.exp.price = '';
+          }
+        })
+      }
+    }
+    $scope.directPayment = () => {
+      console.log($scope.payment);
+      if ($scope.payment.id && $scope.payment.amount) {
+        $http.post('<?php echo SITE_URL; ?>api/directPayment.php', $httpParamSerializerJQLike($scope.payment), {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }).then((response) => {
+          alert(response.data.message);
+          if (response.data.status == 200) {
+            $scope.payment.summery = '';
+            $scope.payment.amount = '';
+          }
+        })
+      }
     }
     $scope.increaseValue = row => {
       const cart = JSON.parse($window.sessionStorage.getItem('shopping'))

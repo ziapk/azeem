@@ -99,7 +99,7 @@ echo mainFooter();
     app.controller('cartController', function($scope, $http, $httpParamSerializerJQLike, $filter, $window, $timeout, $location, $anchorScroll) {
         $scope.mainList = <?php echo safe_json_encode($list); ?>;
 
-        $scope.minDate = moment().format('YYYY-MM-DD');
+        $scope.minDate = moment();
         $scope.expected_delivery_date = moment();
 
         $scope.status_id = '1';
@@ -185,6 +185,8 @@ echo mainFooter();
                     qty: row.qty,
                     show: row.show,
                     price: row.price,
+                    item_status: row.item_status,
+                    priority: row.priority,
                     expected_dates: row.expected_dates,
                     employeeSelect: row.employeeSelect,
                     description: row.description
@@ -422,7 +424,7 @@ echo mainFooter();
                 customerId: $scope.customerData && $scope.customerData.id ? $scope.customerData.id : 1,
                 subTotal: $scope.subTotal,
                 discount: $scope.discount,
-                expected_delivery_date: moment(expected_delivery_date).format('YYYY-MM-DD'),
+                expected_delivery_date: moment($scope.expected_delivery_date).format('YYYY-MM-DD'),
                 items: $scope.items.map(({
                     id,
                     description,

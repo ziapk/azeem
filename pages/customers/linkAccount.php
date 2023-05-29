@@ -1,34 +1,35 @@
 <?php
-    include_once dirname(__FILE__).'/../../include/settings.php';
+include_once dirname(__FILE__) . '/../../include/settings.php';
 
-    $customerObj = new Customers();
+$customerObj = new Customers();
 
-    $ownerId = $userData['role'] == 'owner' ? $userData['id'] : $userData['created_by'];
-    $userId = $userData['id'];
-    $shopId = $shop['id'];
-    $data = $_POST;
-    
-    $de = new DoubleEntry();
+$ownerId = $userData['role'] == 'owner' ? $userData['id'] : $userData['created_by'];
+$userId = $userData['id'];
+$shopId = $shop['id'];
+$data = $_POST;
 
-    $receivableAccount = $de->getAccount($shop['receivable']);
+$de = new DoubleEntry();
 
-    $accountData = [
-        'title' => 'Customer - '.$_POST['full_name'].' - '.$_POST['company'],
-        'code' => $receivableAccount['code'],
-        'account_type' => $receivableAccount['account_type'],
-        'group_id' => $receivableAccount['group_id'],
-        'status' => $receivableAccount['status'],
-        'parent_id' => $receivableAccount['id'],
-        'opening_balance' => 0,
-        'created_by' => $userId
-    ];
+$receivableAccount = $de->getAccount($shop['receivable']);
 
-    $accountId = $de->insertAccount($accountData);
-    $data['account_id'] = $accountId;
-    $create = $customerObj->linkAccountCustomer($data);
+$accountData = [
+    'title' => 'Customer - ' . $_POST['full_name'] . ' - ' . $_POST['company'],
+    'code' => $receivableAccount['code'],
+    'account_type' => $receivableAccount['account_type'],
+    'group_id' => $receivableAccount['group_id'],
+    'status' => $receivableAccount['status'],
+    'parent_id' => $receivableAccount['id'],
+    'shopId' => $shop['id'],
+    'opening_balance' => 0,
+    'created_by' => $userId
+];
 
-    if($create) {
-        echo json_encode(["success" => true, "message" => "Successfully Linked!"]);
-    } else {
-        echo json_encode(["success" => false, "message" => "Check form carefully!"]);
-    }
+$accountId = $de->insertAccount($accountData);
+$data['account_id'] = $accountId;
+$create = $customerObj->linkAccountCustomer($data);
+
+if ($create) {
+    echo json_encode(["success" => true, "message" => "Successfully Linked!"]);
+} else {
+    echo json_encode(["success" => false, "message" => "Check form carefully!"]);
+}

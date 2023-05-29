@@ -59,7 +59,6 @@ $list = $productCls->getOwnerProducts($ownerId);
 
   app.controller('headerController', function($scope, $http, $httpParamSerializerJQLike, $filter, $window, toaster) {
     $scope.list = <?php echo safe_json_encode($list); ?>;
-    sessionStorage
     sessionStorage.setItem('list', JSON.stringify($scope.list));
     $scope.exp = {};
     $scope.createExpense = () => {

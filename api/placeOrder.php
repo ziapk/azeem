@@ -38,6 +38,8 @@ try {
         'summery' => $_POST['summery'],
         'ref_no' => $_POST['ref_no'],
         'id' => $_POST['id'],
+        'status_id' => !empty($_POST['status_id']) ? $_POST['status_id'] : null,
+        'expected_delivery_date' => !empty($_POST['expected_delivery_date']) ? $_POST['expected_delivery_date'] : null,
     ];
 
     $additionalDiscount += $_POST['discount'];
@@ -82,6 +84,11 @@ try {
                     'discount' => $item['discount'],
                     'price' => $item['price'],
                     'status' => $staus,
+                    'item_status' => !empty($item['item_status']) ? $item['item_status'] : null,
+                    'employee_id' => !empty($item['employee_id']) ? $item['employee_id'] : null,
+                    'start_date' => !empty($item['start_date']) ? $item['start_date'] : null,
+                    'end_date' => !empty($item['end_date']) ? $item['end_date'] : null,
+                    'priority' => !empty($item['priority']) ? $item['priority'] : 1,
                 ];
                 $totalDiscount += $item['discount'];
                 $c[] = $orders->createOrderDetails($d);

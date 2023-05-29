@@ -38,6 +38,7 @@ if (empty($_POST['supplierId']) && !empty($_POST['supplierName'])) {
         'status' => $payableAccount['status'],
         'parent_id' => $payableAccount['id'],
         'created_by' => $userData['id'],
+        'shopId' => $shop['id'],
         'opening_balance' => 0,
     ];
 
