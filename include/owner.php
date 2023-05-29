@@ -20,6 +20,28 @@ $list = $productCls->getOwnerProducts($ownerId);
         <div class="pull-left welcome-header-section"><span>Welcome <strong><?php echo $userData['full_name']; ?>!</strong></span></div>
 
         <ul class="list-inline navbar-right navbar-nav nav">
+          <li class="dropdown" style="padding: 0">
+            <a href="#" class="nav-menu-item btn btn-primary" data-toggle="dropdown">
+              + Expense
+            </a>
+            <form ng-submit="createExpense()" class="dropdown-menu" style="padding: 20px; width: 300px">
+              <div class="form-group">
+                <select name="cat_id" ng-model="exp.cat_id" class="form-control">
+                  <option value="">Select a category</option>
+                  <?php foreach ($categories as $cat) { ?>
+                    <option value="<?php echo $cat['id']; ?>"><?php echo $cat['full_name']; ?></option>
+                  <?php } ?>
+                </select>
+              </div>
+              <div class="form-group">
+                <input placeholder="Description" ng-model="exp.description" type="text" class="form-control">
+              </div>
+              <div class="form-group">
+                <input placeholder="Amount" ng-model="exp.price" type="text" class="form-control">
+              </div>
+              <input type="submit" value="Submit" class="btn btn-primary">
+            </form>
+          </li>
           <li class="dropdown" style="padding: 0; margin-right: -1px">
             <a class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
               Returns
