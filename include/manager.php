@@ -67,8 +67,8 @@ $customersList = $customerObj->getCustomers($shop['id']);
             </ul>
           </li>
           <li class="dropdown" style="padding: 0">
-            <a href="#" class="nav-menu-item btn btn-primary" data-toggle="dropdown">
-              Calculator
+            <a href="#" class="nav-menu-item btn btn-primary" data-toggle="dropdown" uib-tooltip="Calculator" tooltip-placement="bottom" title="">
+              Calc
             </a>
             <form ng-submit="" class="dropdown-menu" style="padding: 20px; width: 300px">
               <div class="row">
@@ -87,8 +87,8 @@ $customersList = $customerObj->getCustomers($shop['id']);
             </form>
           </li>
           <li class="dropdown" style="padding: 0">
-            <a href="#" class="nav-menu-item btn btn-primary" data-toggle="dropdown">
-              + Receiving
+            <a href="#" class="nav-menu-item btn btn-primary" data-toggle="dropdown" uib-tooltip="Receivings" tooltip-placement="bottom" title="">
+              Re.
             </a>
             <form ng-submit="directReceiving()" class="dropdown-menu" style="padding: 20px; width: 300px">
               <div class="form-group">
@@ -114,8 +114,8 @@ $customersList = $customerObj->getCustomers($shop['id']);
             </form>
           </li>
           <li class="dropdown" style="padding: 0">
-            <a href="#" class="nav-menu-item btn btn-primary" data-toggle="dropdown">
-              + Payments
+            <a href="#" class="nav-menu-item btn btn-primary" data-toggle="dropdown" uib-tooltip="Payments" tooltip-placement="bottom" title="">
+              Pay
             </a>
             <form ng-submit="directPayment()" class="dropdown-menu" style="padding: 20px; width: 300px">
               <div class="form-group">
@@ -141,8 +141,8 @@ $customersList = $customerObj->getCustomers($shop['id']);
             </form>
           </li>
           <li class="dropdown" style="padding: 0">
-            <a href="#" class="nav-menu-item btn btn-primary" data-toggle="dropdown">
-              + Expense
+            <a href="#" class="nav-menu-item btn btn-primary" data-toggle="dropdown" uib-tooltip="Expenses" tooltip-placement="bottom" title="">
+              Exp
             </a>
             <form ng-submit="createExpense()" class="dropdown-menu" style="padding: 20px; width: 300px">
               <div class="form-group">

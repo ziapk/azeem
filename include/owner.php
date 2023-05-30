@@ -43,8 +43,8 @@ $customersList = $customerObj->getCustomers($shop['id']);
 
         <ul class="list-inline navbar-right navbar-nav nav">
           <li class="dropdown" style="padding: 0">
-            <a href="#" class="nav-menu-item btn btn-primary" data-toggle="dropdown">
-              + Receiving
+            <a href="#" class="nav-menu-item btn btn-primary" data-toggle="dropdown" uib-tooltip="Receivings" tooltip-placement="bottom" title="">
+              Re.
             </a>
             <form ng-submit="directReceiving()" class="dropdown-menu" style="padding: 20px; width: 300px">
               <div class="form-group">
@@ -70,13 +70,13 @@ $customersList = $customerObj->getCustomers($shop['id']);
             </form>
           </li>
           <li class="dropdown" style="padding: 0">
-            <a href="#" class="nav-menu-item btn btn-primary" data-toggle="dropdown">
-              + Payments
+            <a href="#" class="nav-menu-item btn btn-primary" data-toggle="dropdown" uib-tooltip="Payments" tooltip-placement="bottom" title="">
+              Pay
             </a>
             <form ng-submit="directPayment()" class="dropdown-menu" style="padding: 20px; width: 300px">
               <div class="form-group">
                 <select name="id" ng-model="payment.id" class="form-control">
-                  <option value="">Select a category</option>
+                  <option value="">Select a supplier</option>
                   <?php foreach ($suppliersList as $cat) {
                     if (!empty($cat['account_id'])) {
 
@@ -97,8 +97,8 @@ $customersList = $customerObj->getCustomers($shop['id']);
             </form>
           </li>
           <li class="dropdown" style="padding: 0">
-            <a href="#" class="nav-menu-item btn btn-primary" data-toggle="dropdown">
-              + Expense
+            <a href="#" class="nav-menu-item btn btn-primary" data-toggle="dropdown" uib-tooltip="Expenses" tooltip-placement="bottom" title="">
+              Exp
             </a>
             <form ng-submit="createExpense()" class="dropdown-menu" style="padding: 20px; width: 300px">
               <div class="form-group">
