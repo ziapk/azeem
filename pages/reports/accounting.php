@@ -58,54 +58,67 @@ switch ($reportType) {
 		$expHead = $store['expense'];
 		$count = 0;
 		$expenses = ['total' => 0, 'rows' => []];
+		$otherList = [];
+		$otherTotals = [];
+		$purchaseReturnsList = [];
+		$exchange = 0;
 		$payments = 0;
 		$receivings = 0;
 		$cashSale = 0;
 		$sale_returns = 0;
 		$purchase_returns = 0;
-		$receivings = 0;
+		$receivingList = 0;
 		$final = [];
 		$modes = [];
 		foreach ($reportDataRaw['rows'] as $key => $value) {
-			if ($store['payable'] != $value['parent_id']) { // exclude payments
-				if ($value['account_id'] != $exp && $value['parent_id'] != $expHead) { // exclude expense
-
+			if ($value['transsaction_type'] == 'SALE' || $value['transsaction_type'] == 'EXPENSE') {
+				if ($value['parent_id'] == $store['receivable']) { // exclude expense
 					if ($value['entry_type'] == 'D') {
-						if ($value['account_id'] == $shop['receiving']) {
-							$receivings += $value['amount'];
-							$rows[$value['transaction_date']][$value['transaction_id']]['isReceving'] = true;
-						} else {
-							$rows[$value['transaction_date']][$value['transaction_id']]['row'] = $value;
-							$rows[$value['transaction_date']][$value['transaction_id']]['totalCredit'] += $value['amount'];
-						}
+						$rows[$value['account_id']]['row'] = $value;
+						$rows[$value['account_id']]['totalCredit'] += $value['amount'];
 					} else {
-						if (empty($rows[$value['transaction_date']][$value['transaction_id']]['isReceving'])) {
-							if ($value['account_id'] == $shop['sale_returns']) {
-								$sale_returns += $value['amount'];
-								$modes[$value['payment_mode']] -= $value['amount'];
-								unset($rows[$value['transaction_date']][$value['transaction_id']]);
-							} else {
-								$rows[$value['transaction_date']][$value['transaction_id']]['row'] = $value;
-								$modes[$value['payment_mode']] += $value['amount'];
-								$rows[$value['transaction_date']][$value['transaction_id']]['totalPaid'] += $value['amount'];
-								$rows[$value['transaction_date']][$value['transaction_id']]['paid'][$value['payment_mode']] += $value['amount'];
-							}
-						}
+						$rows[$value['account_id']]['row'] = $value;
+						$modes[$value['payment_mode']] += $value['amount'];
+						$rows[$value['account_id']]['totalPaid'] += $value['amount'];
+						$rows[$value['account_id']]['paid'][$value['payment_mode']] += $value['amount'];
 					}
-				} else if ($value['account_id'] == $exp) {
-					$rows[$value['transaction_date']][$value['transaction_id']]['discount'] += $value['amount'];
 				} else if ($value['parent_id'] == $expHead) {
-					$expenses['rows'][$value['transaction_date']]['row'][$value['account_id']] = $value;
+					if (empty($expenses['rows'][$value['transaction_date']]['row'][$value['account_id']])) {
+						$expenses['rows'][$value['transaction_date']]['row'][$value['account_id']] = $value;
+					} else {
+						$expenses['rows'][$value['transaction_date']]['row'][$value['account_id']]['amount'] += $value['amount'];
+					}
 					$expenses['rows'][$value['transaction_date']]['total'] += $value['amount'];
 					$expenses['total'] += $value['amount'];
 				}
+			} elseif (in_array($value['transsaction_type'], ['DIRECT_RECEIVING', 'CASH_RECEIVED'])) {
+				$receivings += $value['amount'];
+				if (empty($receivingList[$value['account_id']])) {
+					$receivingList[$value['account_id']] = $value;
+				} else {
+					$receivingList[$value['account_id']]['amount'] += $value['amount'];
+				}
 			} else {
-				if ($value['entry_type'] == 'D') {
+
+				$otherTotals['accounts'][$value['account_id']][$value['transsaction_type']] += $value['amount'];
+				$otherTotals['totals'][$value['transsaction_type']] += $value['amount'];
+
+
+				if (in_array($value['transsaction_type'], ['PURCHASE', 'PURCHASE_PAYMENT', 'DIRECT_PAYMENT'])) {
 					$payments += $value['amount'];
+					// exit;
+				}
+				if (in_array($value['transsaction_type'], ['EXCHANGE'])) {
+					$exchange += $value['amount'];
+				}
+
+				if (empty($otherList[$value['account_id']][$value['transsaction_type']])) {
+					$otherList[$value['account_id']][$value['transsaction_type']] = $value;
+				} else {
+					$otherList[$value['account_id']][$value['transsaction_type']]['amount'] += $value['amount'];
 				}
 			}
 
-			// $rows[$value['transaction_date']][$value['transaction_id']][$value['entry_type']]['total'] += $value['amount'];
 			$count++;
 		}
 
@@ -114,30 +127,33 @@ switch ($reportType) {
 		$totals = ['expense' => 0, 'gross' => 0, 'net' => 0];
 		$count = 0;
 		$reportData1 = [];
-		foreach ($rows as $date => $transactions) {
-			foreach ($transactions as $transactionId => $transaction) {
-				// if(empty($transactions['isReceiving'])) {
-				$final[$date][$transaction['row']['account_id']]['id'] = $transaction['row']['transaction_id'];
-				$final[$date][$transaction['row']['account_id']]['code'] = $transaction['row']['code'];
-				$final[$date][$transaction['row']['account_id']]['title'] = $transaction['row']['title'];
-				$final[$date][$transaction['row']['account_id']]['grossCredit'] += $transaction['totalCredit'];
-				$final[$date][$transaction['row']['account_id']]['totalCredit'] += $transaction['totalCredit'];
-				foreach ($modesList['records'] as $m) {
-					if ($m['code'] == 'CASH') {
-						$cashSale += $transaction['paid'][$m['id']];
-					}
-					$final[$date][$transaction['row']['account_id']][$m['id']] += $transaction['paid'][$m['id']];
+		foreach ($rows as $accountId => $transaction) {
+			// if(empty($transactions['isReceiving'])) {
+			$final[$accountId]['id'] = $transaction['row']['transaction_id'];
+			$final[$accountId]['code'] = $transaction['row']['code'];
+			$final[$accountId]['title'] = $transaction['row']['title'];
+			$final[$accountId]['grossCredit'] += $transaction['totalCredit'];
+			$final[$accountId]['totalCredit'] += $transaction['totalCredit'];
+			foreach ($modesList['records'] as $m) {
+				if ($m['code'] == 'CASH') {
+					$cashSale += $transaction['paid'][$m['id']];
 				}
-				$final[$date][$transaction['row']['account_id']]['totalPaid'] += $transaction['totalPaid'];
-				$final[$date][$transaction['row']['account_id']]['totalDiscount'] += $transaction['discount'];
-				$final[$date][$$transaction['row']['account_id']]['transaction_date'] = $date;
-				// }
+				$final[$accountId][$m['id']] += $transaction['paid'][$m['id']];
 			}
-			if (!empty($final[$date])) {
-				$reportData1 = array_values($final[$date]);
+
+
+			$final[$accountId]['totalPaid'] += $transaction['totalPaid'];
+			$final[$accountId]['totalDiscount'] += $transaction['discount'];
+			// }
+			if (!empty($final)) {
+				$reportData1 = array_values($final);
 			}
 		}
 		$reportData = [];
+
+		// echo '<pre>';
+		// var_dump($cashSale);
+		// exit;
 
 		$count = 0;
 		$footer = [];
@@ -149,14 +165,14 @@ switch ($reportType) {
 				$reportData[$count] = $value;
 				$reportData[$count]['grossCreditSales'] = !empty($value['grossCredit'] - $value['totalPaid']) ? $value['grossCredit'] - $value['totalPaid'] + $value['totalDiscount'] : 0;
 				$reportData[$count]['grossCashSales'] = !empty($value['totalPaid']) ? $value['totalPaid'] + $value['totalDiscount'] : 0;
-				$reportData[$count]['discount'] = $value['totalDiscount'];
+				// $reportData[$count]['discount'] = $value['totalDiscount'];
 				$reportData[$count]['netCreditSales'] = $value['totalCredit'] - $value['totalPaid'];
 				$reportData[$count]['netCashSales'] = $value['totalPaid'];
 				$reportData[$count]['finalCashSales'] = $value['totalPaid'];
 
 				foreach ($modesList['records'] as $m) {
 					$reportData[$count][$m['id']] = $value[$m['id']];
-					$footer[$m['id']] = $value[$m['id']];
+					$footer[$m['id']] += $value[$m['id']];
 				}
 
 				$footer['grossCreditSales'] += !empty($value['grossCredit'] - $value['totalPaid']) ? $value['grossCredit'] - $value['totalPaid'] + $value['totalDiscount'] : 0;
@@ -224,6 +240,9 @@ switch ($reportType) {
 	default:
 		break;
 }
+// echo '<pre>';
+// print_r($otherList);
+// exit;
 ob_start();
 ?>
 <style>
@@ -361,7 +380,7 @@ ob_start();
 </table>
 <?php if ($reportType == '10') {
 	if (!empty($expenses['rows'])) { ?>
-		<h3>Expenses Summery</h3>
+		<h4 style="margin: 10px 0">Expenses Summery</h4>
 		<table class="table" id="resultTable" width="100%" style="border-collapse: collapse" border="1">
 			<?php foreach ($expenses['rows'] as $date => $value) {
 				$total = 0;
@@ -384,7 +403,33 @@ ob_start();
 			<?php } ?>
 		</table>
 	<?php } ?>
-	<h3>Final Summery</h3>
+	<h5 style="margin: 5px 0">Other Totals</h5>
+	<table id="resultTable" class="table" style="border-collapse: collapse;" border="1">
+		<tr>
+			<th align="left" style="width: 50%">Account</th>
+			<?php foreach (array_keys($otherTotals['totals']) as $key) { ?>
+				<th align="left"><?php echo $key; ?></th>
+			<?php } ?>
+			<!-- <th align="right"><?php echo number_format($cash + $ob, 0); ?></th> -->
+		</tr>
+		<?php foreach ($otherList as $accountId => $value) {
+
+		?>
+			<tr>
+				<th align="left"><?php echo array_values($value)[0]['title']; ?></th>
+				<?php foreach (array_keys($otherTotals['totals']) as $key) { ?>
+					<th align="left"><?php echo $value[$key]['amount']; ?></th>
+				<?php } ?>
+			</tr>
+		<?php } ?>
+		<tr>
+			<th align="left">Total</th>
+			<?php foreach ($otherTotals['totals'] as $val) { ?>
+				<th align="left"><?php echo $val; ?></th>
+			<?php } ?>
+		</tr>
+
+	</table>
 	<?php
 
 	$tsale = $cashSale;
@@ -394,19 +439,35 @@ ob_start();
 	$deduction = ($sale_returns + $texpense + $payments);
 	$netCash = ($tsale + $receivings + $purchase_returns) - $deduction;
 	?>
-	<h5 style="margin: 5px 0">Sale</h5>
-	<table id="resultTable" style="border-collapse: collapse; width: 400px" border="1">
+
+	<h5 style="margin: 5px 0"></h5>
+	<table id="resultTable" class="table" style="border-collapse: collapse;" border="1">
+		<tr>
+			<th colspan="2" style="width: 50%">
+				<h5 style="margin: 5px 0; font-size: 1.4em">Sale</h5>
+			</th>
+			<th colspan="2" style="width: 50%">
+				<h5 style="margin: 5px 0; font-size: 1.4em">Deductions</h5>
+			</th>
+		</tr>
 		<tr>
 			<th align="left">Opening Balance</th>
 			<th align="right"><?php echo number_format($ob); ?></th>
+			<th align="left">Sale Return</td>
+			<th align="right"><?php echo number_format($sale_returns, 0); ?></td>
 		</tr>
 		<tr>
-			<th align="left">Sale via CASH</td>
+			<th align="left">Sale via CASH
+				</td>
 			<th align="right"><?php echo number_format($cashSale, 0); ?></td>
+			<th align="left">Payments</td>
+			<th align="right"><?php echo number_format($payments, 0); ?></td>
 		</tr>
 		<tr>
 			<th align="left">Receivings</th>
 			<th align="right"><?php echo number_format($receivings, 0); ?></th>
+			<th align="left">Expenses</td>
+			<th align="right"><?php echo number_format($texpense, 0); ?></td>
 		</tr>
 		<tr>
 			<th align="left">Purchase Returns</th>
@@ -416,34 +477,13 @@ ob_start();
 		<tr>
 			<th align="left">Total</th>
 			<th align="right"><?php echo number_format($cash + $ob, 0); ?></th>
-		</tr>
-
-
-
-	</table>
-	<h5 style="margin: 5px 0">Deductions</h5>
-	<table id="resultTable" style="border-collapse: collapse; width: 400px" border="1">
-
-		<tr>
-			<th align="left">Sale Return</td>
-			<th align="right"><?php echo number_format($sale_returns, 0); ?></td>
-		</tr>
-		<tr>
-			<th align="left">Payments</td>
-			<th align="right"><?php echo number_format($payments, 0); ?></td>
-		</tr>
-		<tr>
-			<th align="left">Expenses</td>
-			<th align="right"><?php echo number_format($texpense, 0); ?></td>
-		</tr>
-		<tr>
 			<th align="left">Total</th>
 			<th align="right"><?php echo number_format($deduction, 0); ?></th>
 		</tr>
-
 	</table>
+
 	<h5 style="margin: 5px 0">Totals</h5>
-	<table id="resultTable" style="border-collapse: collapse; width: 400px" border="1">
+	<table id="resultTable" class="table" style="border-collapse: collapse;" border="1">
 		<tr>
 			<th align="left">Total Sale</th>
 			<th align="right"><?php echo number_format($cash + $ob, 0); ?></th>
@@ -457,6 +497,7 @@ ob_start();
 			<th align="right"><?php echo number_format(($cash + $ob) - $deduction, 0); ?></th>
 		</tr>
 	</table>
+
 
 <?php }
 if (empty($params['pdf'])) { ?>
