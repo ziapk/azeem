@@ -92,11 +92,20 @@ switch ($reportType) {
 					$expenses['total'] += $value['amount'];
 				}
 			} elseif (in_array($value['transsaction_type'], ['DIRECT_RECEIVING', 'CASH_RECEIVED'])) {
-				$receivings += $value['amount'];
-				if (empty($receivingList[$value['account_id']])) {
-					$receivingList[$value['account_id']] = $value;
-				} else {
-					$receivingList[$value['account_id']]['amount'] += $value['amount'];
+				if ($store['receivable'] == $value['parent_id']) {
+
+					$k = "RECEIVING";
+
+					$otherTotals['accounts'][$value['account_id']][$k] += $value['amount'];
+					$otherTotals['totals'][$k] += $value['amount'];
+
+					if (empty($otherList[$value['account_id']][$k])) {
+						$otherList[$value['account_id']][$k] = $value;
+					} else {
+						$otherList[$value['account_id']][$k]['amount'] += $value['amount'];
+					}
+
+					$receivings += $value['amount'];
 				}
 			} else {
 
