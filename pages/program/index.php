@@ -70,7 +70,7 @@ echo mainHeader(['page' => 'program']);
     <script>
         app.controller('programController', function($scope, $http, $httpParamSerializerJQLike, $filter, $window, $document, $uibModal, $log) {
             $scope.currentPage = 1;
-            $scope.catTypes = <?php echo json_encode($catTypesArr); ?>
+            $scope.catTypes = <?php echo json_encode($catTypesArr); ?>;
             $scope.data = {
                 perPage: "10"
             }; //$scope.data.records;
