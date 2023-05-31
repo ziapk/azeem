@@ -65,7 +65,7 @@ echo mainHeader();
                 <td><input type="number" class="form-control" ng-change="calculatePercent(row)" ng-model="row.pprice" /></td>
                 <td width="100"><input type="number" class="form-control" ng-model="row.price" /></td>
                 <td width="100"><input type="number" class="form-control" ng-change="calculateSum()" ng-model="row.qty" ng-keydown="initCheckKeypress($event)" /></td>
-                <td width="100">{{row.total}}</td>
+                <td width="100">{{row.total | number: 0}}</td>
                 <td width="60"><a href="#" class="btn btn-xs btn-danger pull-right" ng-click="remove(cart)">Delete</a></td>
             </tr>
         </tbody>
@@ -356,9 +356,9 @@ echo mainFooter();
         $scope.calculateSum = () => {
             let subtotal = 0;
             $scope.items.map((product) => {
-                product.pprice = product.price * ((100 - (parseFloat(product.discount || 0))) / 100);
-                subtotal += (product.pprice * product.qty);
-                product.total = (product.pprice * product.qty)
+                product.pprice = Math.round(product.price * ((100 - (parseFloat(product.discount || 0))) / 100));
+                subtotal += Math.round(product.pprice * product.qty);
+                product.total = Math.round(product.pprice * product.qty)
 
                 return Object.assign({}, product);
             })
@@ -367,7 +367,7 @@ echo mainFooter();
         }
 
         $scope.calculatePercent = product => {
-            product.discount = parseFloat(((1 - (product.pprice / product.price)) * 100).toFixed(1))
+            product.discount = Math.round(((1 - (product.pprice / product.price)) * 100).toFixed(1))
         }
 
 
