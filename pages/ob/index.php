@@ -29,6 +29,7 @@ echo mainHeader(['page' => 'customer']);
     <table class="table">
         <thead>
             <tr>
+                <th>ID</th>
                 <th>Amount</th>
                 <th>Balance</th>
                 <th>Shop</th>
@@ -39,6 +40,7 @@ echo mainHeader(['page' => 'customer']);
             <?php
             foreach ($customersData as $value) { ?>
                 <tr>
+                    <td><?php echo $value['id']; ?></td>
                     <td><?php echo $value['amount']; ?></td>
                     <td><?php echo $value['sale_date']; ?></td>
                     <td><?php echo $shopsData[$value['shop_id']]; ?></td>
