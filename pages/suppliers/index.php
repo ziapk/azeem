@@ -19,6 +19,7 @@ echo mainHeader(['page' => 'supplier']);
                 <th></th>
                 <th>Contact</th>
                 <th>Company / Title / Address</th>
+                <th>Balance</th>
                 <th width="300"></th>
             </tr>
         </thead>
@@ -27,6 +28,7 @@ echo mainHeader(['page' => 'supplier']);
                 <td width="50"><img ng-if="li.image" width="40" class="image" src={{"<?php echo SITE_URL; ?>uploads/products/"+li.image}} /></td>
                 <td><strong>{{li.name}}</strong> <br /> {{li.contact}}</td>
                 <td><strong>{{li.company}}</strong> - {{li.title}} <br />{{li.address}}</td>
+                <td>{{li.closing_balance}}</td>
                 <!-- <td>{{li.wallet}}</td> -->
                 <td>
                     <a class="btn btn-primary btn-xs" href="<?php echo SITE_URL . "pages/suppliers/update.php?id=" ?>{{li.id}}">Edit</a>

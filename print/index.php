@@ -9,7 +9,7 @@ $largeView = !empty($_GET['largeView']) && $_GET['largeView'] == 'large' ? true 
 $ordersObj = new Orders();
 $order = $ordersObj->getOrder($id, true);
 $customers = new DoubleEntry();
-$blc = $customers->getOpeningBalance($order['customer']['account_id']);
+$blc = $customers->getOpeningBalance($order['customer']['account_id'], 'c');
 
 $gst = 0;
 $service_charges = 0;

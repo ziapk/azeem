@@ -1,12 +1,10 @@
-<?php 
-include_once dirname(__FILE__).'/../../include/settings.php';
-$customers = new  Customers();
-$customersData = $customers->getCustomers($shop['id']);
-echo mainHeader(['page'=> 'customer']);
+<?php
+include_once dirname(__FILE__) . '/../../include/settings.php';
+echo mainHeader(['page' => 'customer']);
 ?>
 
 <div class="container" ng-controller="customerController">
-    <a href="javascript:void(0)" ng-click="addCustomer()" class="btn btn-primary btn-xs pull-right">Add New</a>    
+    <a href="javascript:void(0)" ng-click="addCustomer()" class="btn btn-primary btn-xs pull-right">Add New</a>
     <h4 class="section-title">Customers</h4>
     <div class="form-group">
         <input class="form-control" ng-change="searchCustomer()" ng-model="search" placeholder="Type here for search..." />
@@ -17,6 +15,7 @@ echo mainHeader(['page'=> 'customer']);
                 <th>Id</th>
                 <th>Contact</th>
                 <th>Title / Company / Address</th>
+                <th>Balance</th>
                 <th></th>
             </tr>
         </thead>
@@ -25,192 +24,240 @@ echo mainHeader(['page'=> 'customer']);
                 <td>{{li.id}}</td>
                 <td><strong>{{li.full_name}}</strong> <br /> {{li.phoneNumber}}</td>
                 <td><strong>{{li.company}}</strong> - {{li.title}} <br />{{li.address}}</td>
+                <td>{{li.closing_balance}}</td>
                 <td>
-                    <?php if($userData['role'] === 'owner' || $userData['role'] === 'manager') {?><a class="btn btn-info btn-xs" href="javascript:void(0)" ng-click="assignBooks(li)">Disc.</a><?php } ?>
-                    <?php if($userData['role'] === 'owner' || $userData['role'] === 'manager') {?><a class="btn btn-default btn-xs" href="../chart-of-accounts/summery.php?t=c&id={{li.account_id}}">Ledger</a><?php } ?>
-                    <?php if($userData['role'] === 'owner' || $userData['role'] === 'manager') {?><a class="btn btn-xs btn-primary" href="adjustment.php?id={{li.account_id}}">Receiving</a><?php } ?>
-                    <?php if($userData['role'] === 'manager') {?><a class="btn btn-danger btn-xs" href="<?php echo SITE_URL;?>pages/orders/customerOrders.php?id={{li.id}}">Orders</a><?php }?>
-                    <?php if($userData['role'] === 'owner' || $userData['role'] === 'manager') {?><a class="btn btn-default btn-xs" href="<?php echo SITE_URL;?>pages/customers/update.php?id={{li.id}}"><span class="fa fa-edit"><span></a><?php }?>
-                    <?php if($userData['role'] === 'manager') {?><a ng-click="deleteCustomer(li.id)" class="btn btn-danger btn-xs" href="javascript:void(0)"><span class="fa fa-remove"><span></a><?php }?>
+                    <?php if ($userData['role'] === 'owner' || $userData['role'] === 'manager') { ?><a class="btn btn-info btn-xs" href="javascript:void(0)" ng-click="assignBooks(li)">Disc.</a><?php } ?>
+                    <?php if ($userData['role'] === 'owner' || $userData['role'] === 'manager') { ?><a class="btn btn-default btn-xs" href="../chart-of-accounts/summery.php?t=c&id={{li.account_id}}">Ledger</a><?php } ?>
+                    <?php if ($userData['role'] === 'owner' || $userData['role'] === 'manager') { ?><a class="btn btn-xs btn-primary" href="adjustment.php?id={{li.account_id}}">Receiving</a><?php } ?>
+                    <?php if ($userData['role'] === 'manager') { ?><a class="btn btn-danger btn-xs" href="<?php echo SITE_URL; ?>pages/orders/customerOrders.php?id={{li.id}}">Orders</a><?php } ?>
+                    <?php if ($userData['role'] === 'owner' || $userData['role'] === 'manager') { ?><a class="btn btn-default btn-xs" href="<?php echo SITE_URL; ?>pages/customers/update.php?id={{li.id}}"><span class="fa fa-edit"><span></a><?php } ?>
+                    <?php if ($userData['role'] === 'manager') { ?><a ng-click="deleteCustomer(li.id)" class="btn btn-danger btn-xs" href="javascript:void(0)"><span class="fa fa-remove"><span></a><?php } ?>
                 </td>
             </tr>
         </tbody>
     </table>
 
-    <div style="display: flex; align-items: center; justify-content: space-between"><ul uib-pagination ng-if="data.perPage < data.totalRecords" items-per-page="data.perPage" total-items="data.totalRecords" ng-model="currentPage" ng-change="pageChanged(currentPage)"></ul> <span>Per Page <select ng-change="perPage()" ng-model="data.perPage"><option value="10">10</option><option value="25">25</option><option value="50">50</option><option value="100">100</option></select></span> <span>Total number of Records <strong>{{data.totalRecords}}</strong></span></div>
+    <div style="display: flex; align-items: center; justify-content: space-between">
+        <ul uib-pagination ng-if="data.perPage < data.totalRecords" items-per-page="data.perPage" total-items="data.totalRecords" ng-model="currentPage" ng-change="pageChanged(currentPage)"></ul> <span>Per Page <select ng-change="perPage()" ng-model="data.perPage">
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+            </select></span> <span>Total number of Records <strong>{{data.totalRecords}}</strong></span>
+    </div>
 
 </div>
 <?php
 echo mainFooter();
 ?>
 <script type="text/javascript">
-function createCustomer () {
-    window.open("<?php echo SITE_URL;?>pages/customers/create.php", "", "width=300,height=400"); 
-}
-
-
-app.controller('customerController', function($scope, $http, $httpParamSerializerJQLike, $uibModal, $window, $log) {
-    $scope.currentPage = 1; 
-    $scope.data = { perPage: "10" }; //$scope.data.records;
-    $scope.list = []; //$scope.data.records;
-    $scope.search = ""; //$scope.data.records;
-    $scope.siteUrl = '<?php echo SITE_URL ?>';
-    
-    $scope.getCustomers = (page) => {
-        $scope.loading = true;
-        $http.get($scope.siteUrl+"api/getCustomers.php", {params: {page: page || 1, perPage: $scope.data.perPage, search: $scope.search}})
-        .then(function(response) {
-            $scope.loading = false;
-            if(response.status === 200) {
-                $scope.data = response.data;
-                $scope.list = response.data.records;
-            }
-        })
-    }
-
-    $scope.deleteCustomer = function (id) {
-        if(window.confirm('Are you sure ?')) {
-            window.open("<?php echo SITE_URL;?>pages/customers/delete.php?id="+id, "", "width=300,height=400"); 
-            window.location.reload();
-        }
+    function createCustomer() {
+        window.open("<?php echo SITE_URL; ?>pages/customers/create.php", "", "width=300,height=400");
     }
 
 
-    $scope.searchCustomer = () => {
-        $scope.getCustomers(1);
-    }
+    app.controller('customerController', function($scope, $http, $httpParamSerializerJQLike, $uibModal, $window, $log) {
+        $scope.currentPage = 1;
+        $scope.data = {
+            perPage: "10"
+        }; //$scope.data.records;
+        $scope.list = []; //$scope.data.records;
+        $scope.search = ""; //$scope.data.records;
+        $scope.siteUrl = '<?php echo SITE_URL ?>';
 
-    $scope.perPage = () => {
-        $scope.getCustomers($scope.currentPage);
-    }
-
-    $scope.getCustomers($scope.currentPage);
-
-    $scope.pageChanged = (page) => {
-        $scope.currentPage = page;
-        $scope.getCustomers(page)
-    }
-
-    $scope.addCustomer = function (size, parentSelector) {
-        $scope.form = null
-        $uibModal.open({
-            ariaLabelledBy: 'modal-title',
-            ariaDescribedBy: 'modal-body',
-            templateUrl: 'addCustomer.html',
-            controller: 'ModalInstanceCtrl',
-            size: size
-        }).closed.then(function() {
-            $scope.getCustomers(1);
-        });
-    };
-
-    $scope.assignBooks = function (item) {
-        $uibModal.open({
-            ariaLabelledBy: 'modal-title',
-            ariaDescribedBy: 'modal-body',
-            templateUrl: 'assignBooks.html',
-            controller: 'AssignBooksModalInstanceCtrl',
-            resolve: {
-                parentData: function() {
-                    return item
-                }
-            }
-        }).result.then(function (response) {
-            $http.post($scope.siteUrl+'api/assignDiscount.php', $httpParamSerializerJQLike(response), {headers: {'Content-Type': 'application/x-www-form-urlencoded'} }).then(function() {
-                //$scope.getPrograms(1);
-            });
-        }, function () {
-            $log.info('Modal dismissed at: ' + new Date());
-        });
-    };
-});
-
-app.controller('ModalInstanceCtrl', function ($scope, $uibModalInstance, $http, $httpParamSerializerJQLike) {
-    $scope.form = {
-        full_name: "",
-        phoneNumber: "",
-        address: "",
-        type: false
-    }
-
-    $scope.alert = null;
-
-    $scope.closeAlert = function(index) {
-        $scope.alert = null;
-    };
-    
-    $scope.ok = function () {
-        $http.post('create.php', $httpParamSerializerJQLike($scope.form), {headers: {'Content-Type': 'application/x-www-form-urlencoded'} }).then(function(res) {
-            if(res.data.success) {
-                $scope.alert = {type: 'success', message: res.data.message}
-            } else {
-                $scope.alert = {type: 'danger', message: res.data.message}
-            }
-            // $uibModalInstance.close($scope.form);
-        });
-    };
-
-    
-
-    $scope.cancel = function () {
-        $uibModalInstance.dismiss('cancel');
-    };
-});
-
-
-app.controller('AssignBooksModalInstanceCtrl', function ($scope, $http, $uibModalInstance, parentData) {
-    $scope.books = {}
-    $scope.final = []
-    $scope.parentInfo = parentData
-
-
-    $scope.remove = function (row) {
-        delete $scope.books[row.id];
-        $scope.final = Object.values($scope.books);
-    }
-    
-    $scope.getBooks = () => {
-        return $http.get("<?php echo SITE_URL?>api/getCustomerDiscounts.php", {params: {id: parentData.id}})
-        .then(function(response) {
-            console.log('response', response);
-            if(response.data && response.data.length) {
-                console.log('response.data', response.data);
-                $scope.books = {}
-                response.data.map(row => {
-                    $scope.books[row.id] = { ...row, discount_value: parseFloat(row.discount_value) };
-                    $scope.final = Object.values($scope.books);
+        $scope.getCustomers = (page) => {
+            $scope.loading = true;
+            $http.get($scope.siteUrl + "api/getCustomers.php", {
+                    params: {
+                        page: page || 1,
+                        perPage: $scope.data.perPage,
+                        search: $scope.search
+                    }
                 })
+                .then(function(response) {
+                    $scope.loading = false;
+                    if (response.status === 200) {
+                        $scope.data = response.data;
+                        $scope.list = response.data.records;
+                    }
+                })
+        }
+
+        $scope.deleteCustomer = function(id) {
+            if (window.confirm('Are you sure ?')) {
+                window.open("<?php echo SITE_URL; ?>pages/customers/delete.php?id=" + id, "", "width=300,height=400");
+                window.location.reload();
             }
-            return response.data
-        });
-    }
+        }
 
-    $scope.getBooks();
 
-    
-    $scope.searchProduct = function (search) {
-        return $http.get("<?php echo SITE_URL?>api/getPublishers.php", {params: {search}})
-        .then(function(response) {
-            return response.data.records
-        });
-    }
+        $scope.searchCustomer = () => {
+            $scope.getCustomers(1);
+        }
 
-    $scope.selectProduct = (item) => {
-        $scope.books[item.id] = { ...item, discount_value: parseFloat(item.discount_amount), discount_type: '1' }
-        $scope.final = Object.values($scope.books)
-        $scope.book = null
-    }
+        $scope.perPage = () => {
+            $scope.getCustomers($scope.currentPage);
+        }
 
-    
-    
-    $scope.ok = function () {
-        $uibModalInstance.close({books: $scope.final, customer_id: parentData.id});
-    };
+        $scope.getCustomers($scope.currentPage);
 
-    $scope.cancel = function () {
-        $uibModalInstance.dismiss('cancel');
-    };
-});
+        $scope.pageChanged = (page) => {
+            $scope.currentPage = page;
+            $scope.getCustomers(page)
+        }
+
+        $scope.addCustomer = function(size, parentSelector) {
+            $scope.form = null
+            $uibModal.open({
+                ariaLabelledBy: 'modal-title',
+                ariaDescribedBy: 'modal-body',
+                templateUrl: 'addCustomer.html',
+                controller: 'ModalInstanceCtrl',
+                size: size
+            }).closed.then(function() {
+                $scope.getCustomers(1);
+            });
+        };
+
+        $scope.assignBooks = function(item) {
+            $uibModal.open({
+                ariaLabelledBy: 'modal-title',
+                ariaDescribedBy: 'modal-body',
+                templateUrl: 'assignBooks.html',
+                controller: 'AssignBooksModalInstanceCtrl',
+                resolve: {
+                    parentData: function() {
+                        return item
+                    }
+                }
+            }).result.then(function(response) {
+                $http.post($scope.siteUrl + 'api/assignDiscount.php', $httpParamSerializerJQLike(response), {
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    }
+                }).then(function() {
+                    //$scope.getPrograms(1);
+                });
+            }, function() {
+                $log.info('Modal dismissed at: ' + new Date());
+            });
+        };
+    });
+
+    app.controller('ModalInstanceCtrl', function($scope, $uibModalInstance, $http, $httpParamSerializerJQLike) {
+        $scope.form = {
+            full_name: "",
+            phoneNumber: "",
+            address: "",
+            type: false
+        }
+
+        $scope.alert = null;
+
+        $scope.closeAlert = function(index) {
+            $scope.alert = null;
+        };
+
+        $scope.ok = function() {
+            $http.post('create.php', $httpParamSerializerJQLike($scope.form), {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            }).then(function(res) {
+                if (res.data.success) {
+                    $scope.alert = {
+                        type: 'success',
+                        message: res.data.message
+                    }
+                } else {
+                    $scope.alert = {
+                        type: 'danger',
+                        message: res.data.message
+                    }
+                }
+                // $uibModalInstance.close($scope.form);
+            });
+        };
+
+
+
+        $scope.cancel = function() {
+            $uibModalInstance.dismiss('cancel');
+        };
+    });
+
+
+    app.controller('AssignBooksModalInstanceCtrl', function($scope, $http, $uibModalInstance, parentData) {
+        $scope.books = {}
+        $scope.final = []
+        $scope.parentInfo = parentData
+
+
+        $scope.remove = function(row) {
+            delete $scope.books[row.id];
+            $scope.final = Object.values($scope.books);
+        }
+
+        $scope.getBooks = () => {
+            return $http.get("<?php echo SITE_URL ?>api/getCustomerDiscounts.php", {
+                    params: {
+                        id: parentData.id
+                    }
+                })
+                .then(function(response) {
+                    console.log('response', response);
+                    if (response.data && response.data.length) {
+                        console.log('response.data', response.data);
+                        $scope.books = {}
+                        response.data.map(row => {
+                            $scope.books[row.id] = {
+                                ...row,
+                                discount_value: parseFloat(row.discount_value)
+                            };
+                            $scope.final = Object.values($scope.books);
+                        })
+                    }
+                    return response.data
+                });
+        }
+
+        $scope.getBooks();
+
+
+        $scope.searchProduct = function(search) {
+            return $http.get("<?php echo SITE_URL ?>api/getPublishers.php", {
+                    params: {
+                        search
+                    }
+                })
+                .then(function(response) {
+                    return response.data.records
+                });
+        }
+
+        $scope.selectProduct = (item) => {
+            $scope.books[item.id] = {
+                ...item,
+                discount_value: parseFloat(item.discount_amount),
+                discount_type: '1'
+            }
+            $scope.final = Object.values($scope.books)
+            $scope.book = null
+        }
+
+
+
+        $scope.ok = function() {
+            $uibModalInstance.close({
+                books: $scope.final,
+                customer_id: parentData.id
+            });
+        };
+
+        $scope.cancel = function() {
+            $uibModalInstance.dismiss('cancel');
+        };
+    });
 </script>
 
 <script type="text/ng-template" id="addCustomer.html">
@@ -256,7 +303,7 @@ app.controller('AssignBooksModalInstanceCtrl', function ($scope, $http, $uibModa
 </script>
 
 <script type="text/ng-template" id="book.html">
-  <a>
+    <a>
       <strong ng-bind-html="match.model.full_name | uibTypeaheadHighlight:query"></strong><br>
       <span>Books: {{match.model.total}}</span>
   </a>

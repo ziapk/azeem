@@ -179,7 +179,8 @@ echo mainFooter();
         $scope.selectSupplier = function(p) {
             $http.get("<?php echo SITE_URL ?>api/getOpeningBalance.php", {
                 params: {
-                    account_id: p.account_id
+                    account_id: p.account_id,
+                    type: $scope.toggleForm.searchMode ? 'c' : 's'
                 }
             }).then(res => {
 

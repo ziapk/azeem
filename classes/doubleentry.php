@@ -243,7 +243,7 @@ class DoubleEntry extends Connection
 		}
 	}
 
-	public function getOpeningBalance($account_id)
+	public function getOpeningBalance($account_id, $type = '')
 	{
 		try {
 
@@ -252,6 +252,18 @@ class DoubleEntry extends Connection
 			$prepare->bindParam(':account_id', $account_id, PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $prepare->fetch(PDO::FETCH_ASSOC);
+
+			if ($type == 'c') {
+				$debit = $result['creditAmount'] + $result['opening_balance'];
+				$credit = $result['debitAmount'] + $result['opening_balance'];
+			} else {
+				$debit = $result['debitAmount'] + $result['opening_balance'];
+				$credit = $result['creditAmount'] + $result['opening_balance'];
+			}
+			$result['paid'] = $type == 's' ? $debit : $credit;
+			$result['amount'] = $type == 's' ? $credit : $debit;
+			$result['balance'] = ($result['amount'] - $result['paid']);
+
 			return $result;
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");

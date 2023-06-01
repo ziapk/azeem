@@ -6,4 +6,3 @@ $perPage = !empty($_GET['perPage']) ? $_GET['perPage'] : 1;
 $search = !empty($_GET['search']) ? $_GET['search'] : "";
 $result = $customers->getCustomersPagination(['page' => $page, 'perPage' => $perPage, 'search' => $search, 'shopId' => $shop['id']]);
 echo json_encode($result);
-?>
