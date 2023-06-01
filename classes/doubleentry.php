@@ -255,10 +255,10 @@ class DoubleEntry extends Connection
 
 			if ($type == 'c') {
 				$debit = $result['creditAmount'] + $result['opening_balance'];
-				$credit = $result['debitAmount'] + $result['opening_balance'];
+				$credit = $result['debitAmount'];
 			} else {
 				$debit = $result['debitAmount'] + $result['opening_balance'];
-				$credit = $result['creditAmount'] + $result['opening_balance'];
+				$credit = $result['creditAmount'];
 			}
 			$result['paid'] = $type == 's' ? $debit : $credit;
 			$result['amount'] = $type == 's' ? $credit : $debit;
