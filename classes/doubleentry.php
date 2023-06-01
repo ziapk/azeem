@@ -254,16 +254,17 @@ class DoubleEntry extends Connection
 			$result = $prepare->fetch(PDO::FETCH_ASSOC);
 
 			if ($type == 'c') {
-				$debit = $result['creditAmount'] + $result['opening_balance'];
-				$credit = $result['debitAmount'];
+				$result['debitAmount'] += $result['opening_balance'];
 			} else {
-				$debit = $result['debitAmount'] + $result['opening_balance'];
-				$credit = $result['creditAmount'];
+				$result['creditAmount'] += $result['opening_balance'];
 			}
-			$result['paid'] = $type == 's' ? $debit : $credit;
-			$result['amount'] = $type == 's' ? $credit : $debit;
-			$result['balance'] = ($result['amount'] - $result['paid']);
 
+			$paid = $_GET['t'] == 's' ? $result['debitAmount'] : $result['creditAmount'];
+			$amount = $_GET['t'] == 's' ? $result['creditAmount'] : $result['debitAmount'];
+
+			$result['paid'] = $paid;
+			$result['amount'] = $amount;
+			$result['balance'] = ($amount - $paid);
 			return $result;
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
