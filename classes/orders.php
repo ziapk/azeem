@@ -180,7 +180,7 @@ class Orders extends Connection
     public function getOrderItemsByProductIds($productIds, $customer_id)
     {
         try {
-            $stmt = "SELECT i.* FROM `{$this->table_sub}` as i left join `{$this->table}` as o on o.id=i.order_id where o.status IN (2, 5, 6, 7, 8, 9) and o.customer_id = :custoemr_id and i.product_id IN (" . implode(', ', $productIds) . ")";
+            $stmt = "SELECT i.* FROM `{$this->table_sub}` as i left join `{$this->table}` as o on o.id=i.order_id where o.status IN (2, 5, 6, 7, 8, 9) and o.customer_id = :customer_id and i.product_id IN (" . implode(', ', $productIds) . ")";
             $prepare = $this->dbh->prepare($stmt);
             $prepare->bindParam(':customer_id', $customer_id, PDO::PARAM_STR);
             $prepare->execute();

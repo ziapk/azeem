@@ -52,23 +52,28 @@ function mainHeader($params = null)
         <!--[if lt IE 7]>
                 <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.</p>
             <![endif]-->
+        <?php
+        if (empty($params['hideheader'])) {
+            if (!empty($_SESSION['user_credentials']) && $_SESSION['user_credentials']['role'] == 'owner') {
+                include_once dirname(__FILE__) . '/owner.php';
+        ?>
+                <div class="display: none;">
+                    <?php include_once dirname(__FILE__) . '/cart.php'; ?>
+                </div>
     <?php
-    if (empty($params['hideheader'])) {
-        if (!empty($_SESSION['user_credentials']) && $_SESSION['user_credentials']['role'] == 'owner') {
-            include_once dirname(__FILE__) . '/owner.php';
+            }
+            if (!empty($_SESSION['user_credentials']) && $_SESSION['user_credentials']['role'] == 'manager') {
+                include_once dirname(__FILE__) . '/manager.php';
+            }
+            if (!empty($_SESSION['user_credentials']) && $_SESSION['user_credentials']['id'] == 12) {
+                include_once dirname(__FILE__) . '/t-owner.php';
+            }
+            if (!empty($_SESSION['user_credentials']) && $_SESSION['user_credentials']['role'] == 'shopkeeper') {
+                include_once dirname(__FILE__) . '/shopkeeper.php';
+            }
+            if (!empty($_SESSION['user_credentials']) && $_SESSION['user_credentials']['role'] == 'superadmin') {
+                include_once dirname(__FILE__) . '/superadmin.php';
+            }
         }
-        if (!empty($_SESSION['user_credentials']) && $_SESSION['user_credentials']['role'] == 'manager') {
-            include_once dirname(__FILE__) . '/manager.php';
-        }
-        if (!empty($_SESSION['user_credentials']) && $_SESSION['user_credentials']['id'] == 12) {
-            include_once dirname(__FILE__) . '/t-owner.php';
-        }
-        if (!empty($_SESSION['user_credentials']) && $_SESSION['user_credentials']['role'] == 'shopkeeper') {
-            include_once dirname(__FILE__) . '/shopkeeper.php';
-        }
-        if (!empty($_SESSION['user_credentials']) && $_SESSION['user_credentials']['role'] == 'superadmin') {
-            include_once dirname(__FILE__) . '/superadmin.php';
-        }
+        ob_get_flush();
     }
-    ob_get_flush();
-}
