@@ -13,9 +13,9 @@ echo mainHeader(['page' => 'recipt', 'title' => (!empty($_GET['dup']) ? "Duplica
 if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
 
     $allowCustomer = true;
-    if (in_array($order['order']['status'], [1]) || !empty($_GET['dup'])) {
-        $allowCustomer = false;
-    }
+    // if (in_array($order['order']['status'], [1]) || !empty($_GET['dup'])) {
+    //     $allowCustomer = false;
+    // }
 ?>
     <div ng-controller="cartController">
         <div class="container">
