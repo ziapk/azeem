@@ -116,6 +116,9 @@ switch ($reportType) {
 				if (in_array($value['transsaction_type'], ['EXCHANGE'])) {
 					$exchange += $value['amount'];
 				}
+				if (in_array($value['transsaction_type'], ['SALE_RETURN'])) {
+					$sale_returns += $value['amount'];
+				}
 
 				if (in_array($value['transsaction_type'], ['PURCHASE'])) {
 					if ($value['entry_type'] == 'D') {
