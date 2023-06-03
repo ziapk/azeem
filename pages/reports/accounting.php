@@ -117,6 +117,7 @@ switch ($reportType) {
 					$exchange += $value['amount'];
 				}
 				if (in_array($value['transsaction_type'], ['SALE_RETURN'])) {
+					print_r($value);
 					$sale_returns += $value['amount'];
 				}
 
