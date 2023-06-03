@@ -108,7 +108,7 @@ switch ($reportType) {
 					$receivings += $value['amount'];
 				}
 			} else {
-
+				$consider = true;
 
 				if (in_array($value['transsaction_type'], ['PURCHASE_PAYMENT', 'DIRECT_PAYMENT'])) {
 					$payments += $value['amount'];
@@ -117,22 +117,22 @@ switch ($reportType) {
 					$exchange += $value['amount'];
 				}
 				if (in_array($value['transsaction_type'], ['SALE_RETURN'])) {
-					print_r($value);
-					$sale_returns += $value['amount'];
+					if ($store['receivable'] == $value['parent_id'] && $value['entry_type'] == 'D') {
+						$sale_returns += $value['amount'];
+					} else {
+						$consider = false;
+					}
 				}
 
 				if (in_array($value['transsaction_type'], ['PURCHASE'])) {
 					if ($value['entry_type'] == 'D') {
 						$payments += $value['amount'];
-						$otherTotals['accounts'][$value['account_id']][$value['transsaction_type']] += $value['amount'];
-						$otherTotals['totals'][$value['transsaction_type']] += $value['amount'];
-						if (empty($otherList[$value['account_id']][$value['transsaction_type']])) {
-							$otherList[$value['account_id']][$value['transsaction_type']] = $value;
-						} else {
-							$otherList[$value['account_id']][$value['transsaction_type']]['amount'] += $value['amount'];
-						}
+					} else {
+						$consider = false;
 					}
-				} else {
+				}
+
+				if ($consider) {
 					$otherTotals['accounts'][$value['account_id']][$value['transsaction_type']] += $value['amount'];
 					$otherTotals['totals'][$value['transsaction_type']] += $value['amount'];
 					if (empty($otherList[$value['account_id']][$value['transsaction_type']])) {
