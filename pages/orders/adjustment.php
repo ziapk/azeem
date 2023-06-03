@@ -387,10 +387,10 @@ echo mainFooter();
                 })
                 .then(function(response) {
                     // window.open("<?php echo SITE_URL; ?>print?id="+response.data.order.id, "", "width=300,height=300"); 
-                    // $scope.items = $scope.list = [];
-                    // $scope.subTotal = $scope.discount = $scope.grandTotal = $scope.payment_amount = 0;
+                    $scope.items = $scope.list = [];
+                    $scope.subTotal = $scope.discount = $scope.grandTotal = $scope.payment_amount = 0;
                     alert(response.data.message);
-                    $window.location.reload()
+                    // $window.location.reload()
                 });
         }
 
