@@ -75,7 +75,7 @@ mainHeader();
                 <th>Entry Type</th>
                 <th>Debit</th>
                 <th>Credit</th>
-                <th>Payment Method</th>
+                <th>Running Balance</th>
             </tr>
         </thead>
         <tbody>
@@ -88,7 +88,9 @@ mainHeader();
                     <td><?php echo $value['transsaction_type']; ?></td>
                     <td><?php echo number_format($value['debitAmount'], 2); ?></td>
                     <td><?php echo number_format($value['creditAmount'], 2); ?></td>
-                    <td><?php echo $value['balance']; ?></td>
+                    <td style="<?php if ($value['balance'] < 0) {
+                                    echo "color: 'red'";
+                                } ?>"><?php echo $value['balance']; ?></td>
                 </tr>
             <?php } ?>
         </tbody>
