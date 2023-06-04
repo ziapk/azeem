@@ -16,7 +16,7 @@ if (empty($user)) {
 }
 
 $dentry = new DoubleEntry();
-$journel = $dentry->getLedgerByAccount(['account_id' => $user['account_id']]);
+$journel = $dentry->getLedgerByAccount(['account_id' => $user['account_id'], 'type' => 'c']);
 $summery = $journel['summery'];
 
 $summery['debit'] += $user['account']['opening_balance'];

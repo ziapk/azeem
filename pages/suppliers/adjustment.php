@@ -17,7 +17,7 @@ if (empty($supplier)) {
 
 $dentry = new DoubleEntry();
 
-$journel = $dentry->getLedgerByAccount(['account_id' => $supplier['account_id']]);
+$journel = $dentry->getLedgerByAccount(['account_id' => $supplier['account_id'], 'type' => 's']);
 $summery = $journel['summery'];
 
 

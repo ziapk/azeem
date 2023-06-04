@@ -3,7 +3,9 @@ session_start();
 include_once dirname(__FILE__) . '/../../include/settings.php';
 $dentry = new DoubleEntry();
 $user = [];
+$type = 's';
 if ($_GET['t'] == 'c') {
+    $type = 'c';
     $customers = new Customers();
     $user = $customers->getUserByAccount($_GET['id']);
 } elseif ($_GET['t'] == 's') {
@@ -14,7 +16,7 @@ if ($_GET['t'] == 'c') {
     $user = $expenses->expenseByAccount($_GET['id']);
 }
 
-$journel = $dentry->getLedgerByAccount(['account_id' => $_GET['id']]);
+$journel = $dentry->getLedgerByAccount(['account_id' => $_GET['id'], 'type' => $type]);
 $summery = $journel['summery'];
 
 if ($_GET['t'] == 'c') {
@@ -90,7 +92,7 @@ mainHeader();
                     <td><?php echo number_format($value['creditAmount'], 2); ?></td>
                     <td style="<?php if ($value['balance'] < 0) {
                                     echo "color: red";
-                                } ?>"><?php echo $value['balance']; ?></td>
+                                } ?>"><?php echo number_format($value['balance'], 2); ?></td>
                 </tr>
             <?php } ?>
         </tbody>
