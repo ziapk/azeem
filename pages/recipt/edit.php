@@ -455,62 +455,61 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
             }
 
             $scope.checkout = function(status) {
-                $scope.calculatePayment($scope.payWith);
-                $scope.loading = true;
-                $scope.form = {
-                    customerId: $scope.customerData && $scope.customerData.id ? $scope.customerData.id : 1,
-                    customer_name: $scope.customerName,
-                    subTotal: $scope.subTotal,
-                    discount: $scope.discount,
-                    items: $scope.items.map(({
-                        id,
-                        description,
-                        qty,
-                        discount,
-                        price
-                    }) => ({
-                        id,
-                        description,
-                        qty,
-                        discount,
-                        price
-                    })),
-                    payment_amount: $scope.payment_total,
-                    payment_with: $scope.payWith,
-                    gst: $scope.gst,
-                    service_charges: $scope.service_charges,
-                    summery: $scope.summery,
-                    show_discount: $scope.show_discount,
-                    ref_no: $scope.ref_no,
-                    id: $scope.data.order.id,
-                    payment_mode: $scope.payment_mode,
-                    status: status || 2
+                if ($scope.items.length) {
+                    $scope.calculatePayment($scope.payWith);
+                    $scope.loading = true;
+                    $scope.form = {
+                        customerId: $scope.customerData && $scope.customerData.id ? $scope.customerData.id : 1,
+                        customer_name: $scope.customerName,
+                        subTotal: $scope.subTotal,
+                        discount: $scope.discount,
+                        items: $scope.items.map(({
+                            id,
+                            description,
+                            qty,
+                            discount,
+                            price
+                        }) => ({
+                            id,
+                            description,
+                            qty,
+                            discount,
+                            price
+                        })),
+                        payment_amount: $scope.payment_total,
+                        payment_with: $scope.payWith,
+                        gst: $scope.gst,
+                        service_charges: $scope.service_charges,
+                        summery: $scope.summery,
+                        show_discount: $scope.show_discount,
+                        ref_no: $scope.ref_no,
+                        id: $scope.data.order.id,
+                        payment_mode: $scope.payment_mode,
+                        status: status || 2
+                    }
+
+                    $http.post("<?php echo SITE_URL ?>api/placeOrder.php", $httpParamSerializerJQLike($scope.form), {
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded'
+                            }
+                        })
+                        .then(function(response) {
+                            $scope.loading = false;
+                            if (status == 1) {
+                                alert(response.data.message);
+                            } else {
+                                window.open("<?php echo SITE_URL; ?>print?id=" + response.data.order.id, "", "width=300,height=300");
+                                $scope.items = $scope.list = [];
+                                $scope.subTotal = $scope.discount = $scope.grandTotal = $scope.payment_amount = 0;
+                                // $window.sessionStorage.setItem('shopping', JSON.stringify($scope.items))
+                                $window.location.assign('<?php echo SITE_URL ?>')
+                                $scope.selectCustomer($scope.customersList[0]);
+                            }
+                        }).catch(err => {
+                            $scope.loading = false;
+                            alert(err.message)
+                        });
                 }
-
-                console.log($scope.form);
-
-
-                $http.post("<?php echo SITE_URL ?>api/placeOrder.php", $httpParamSerializerJQLike($scope.form), {
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded'
-                        }
-                    })
-                    .then(function(response) {
-                        $scope.loading = false;
-                        if (status == 1) {
-                            alert(response.data.message);
-                        } else {
-                            window.open("<?php echo SITE_URL; ?>print?id=" + response.data.order.id, "", "width=300,height=300");
-                            $scope.items = $scope.list = [];
-                            $scope.subTotal = $scope.discount = $scope.grandTotal = $scope.payment_amount = 0;
-                            // $window.sessionStorage.setItem('shopping', JSON.stringify($scope.items))
-                            $window.location.assign('<?php echo SITE_URL ?>')
-                            $scope.selectCustomer($scope.customersList[0]);
-                        }
-                    }).catch(err => {
-                        $scope.loading = false;
-                        alert(err.message)
-                    });
             }
 
         })

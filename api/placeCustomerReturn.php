@@ -38,7 +38,6 @@ $payment_amount -= $discount;
 
 $storeDATA = $storeObj->getStore($shopId);
 
-
 $productIds = [];
 foreach ($_POST['items'] as $key => $value) {
     $productIds[$value['id']] = $value['qty'];
@@ -48,6 +47,9 @@ if (empty($_POST['order_id'])) {
 } else {
     $orderDetails = $_POST['items'];
 }
+
+
+
 $or = [];
 $oi = [];
 foreach ($productIds as $id => $qty) {
@@ -72,13 +74,14 @@ foreach ($productIds as $id => $qty) {
         }
     }
 }
+
 $res = [];
 foreach ($oi as $id => $row) {
     $t = $row['total'];
     $t -= $row['full'];
 
     if ($t == 0) {
-        echo 'full';
+        // echo 'full';
         if (!empty($row['full_items'])) {
             foreach ($row['full_items'] as $product_id => $value) {
                 $data = [
@@ -95,7 +98,7 @@ foreach ($oi as $id => $row) {
         }
         // full return here
     } else {
-        echo 'partial';
+        // echo 'partial';
         // partial
         if (!empty($row['partial_items'])) {
             foreach ($row['partial_items'] as $product_id => $value) {
