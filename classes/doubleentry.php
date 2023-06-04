@@ -287,6 +287,41 @@ class DoubleEntry extends Connection
 			die("Error!: " . $e->getMessage() . "<br/>");
 		}
 	}
+	public function getOpeningBalances($account_ids, $type = '')
+	{
+		try {
+			$account_ids = implode(',', $account_ids);
+			$stmt = "SELECT a.opening_balance, a.id, SUM(CASE WHEN e.entry_type = 'D' THEN e.amount ELSE 0 END) AS debitAmount, SUM(CASE WHEN e.entry_type = 'C' THEN e.amount ELSE 0 END) AS creditAmount FROM `$this->table_ledger_entries` as e LEFT JOIN `$this->table` as a ON a.id = e.account_id and a.status = 1 left join `{$this->table_transactions}` as t on t.id=e.transaction_id WHERE t.flag = 1 and a.id IN ($account_ids) GROUP BY a.id";
+			$prepare = $this->dbh->prepare($stmt);
+			// $prepare->bindParam(':account_id', $account_id, PDO::PARAM_STR);
+			$prepare->execute();
+			$results = $prepare->fetchAll(PDO::FETCH_ASSOC);
+
+			$arr = [];
+
+			foreach ($results as $key => $result) {
+
+
+				if ($type == 'c') {
+					$result['debitAmount'] += $result['opening_balance'];
+				} else {
+					$result['creditAmount'] += $result['opening_balance'];
+				}
+
+				$paid = $_GET['t'] == 's' ? $result['debitAmount'] : $result['creditAmount'];
+				$amount = $_GET['t'] == 's' ? $result['creditAmount'] : $result['debitAmount'];
+
+				$result['paid'] = $paid;
+				$result['amount'] = $amount;
+				$result['balance'] = ($amount - $paid);
+
+				$arr[$result['id']] = $result;
+			}
+			return $arr;
+		} catch (PDOException $e) {
+			die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
 	public function getClosingBalanceReport($array)
 	{
 		try {
