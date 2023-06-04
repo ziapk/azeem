@@ -228,7 +228,9 @@ echo mainFooter();
                     if (init && !$scope.order.customer) {
                         $scope.selectSupplier(response.data[0])
                     }
-                    $scope.selectSupplier($scope.order.customer);
+                    if ($scope.order.customer) {
+                        $scope.selectSupplier($scope.order.customer);
+                    }
                     return response.data
                 });
         }
