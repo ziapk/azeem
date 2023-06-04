@@ -70,10 +70,9 @@ mainHeader();
             <tr>
                 <th>T.ID</th>
                 <th>Date</th>
-                <th>Reference No</th>
+                <th>Order ID</th>
                 <th>Description</th>
-                <th>Location</th>
-                <th>Payment Status</th>
+                <th>Entry Type</th>
                 <th>Debit</th>
                 <th>Credit</th>
                 <th>Payment Method</th>
@@ -84,13 +83,12 @@ mainHeader();
                 <tr>
                     <td><?php echo $value['transaction_id']; ?></td>
                     <td><?php echo $value['transaction_date']; ?></td>
-                    <td><?php echo $value['reference']; ?></td>
+                    <td><?php echo $value['order_ref']; ?></td>
                     <td><?php echo $value['v_description']; ?></td>
-                    <td><?php echo $shop['full_name']; ?></td>
-                    <td><?php echo $value['entry_type']; ?></td>
-                    <td><?php echo number_format($value['entry_type'] == 'D' ? $value['amount'] : null, 2); ?></td>
-                    <td><?php echo number_format($value['entry_type'] == 'C' ? $value['amount'] : null, 2); ?></td>
-                    <td><?php echo $value['payment_mode'] ? $value['payment_mode'] : 'Cash'; ?></td>
+                    <td><?php echo $value['transsaction_type']; ?></td>
+                    <td><?php echo number_format($value['debitAmount'], 2); ?></td>
+                    <td><?php echo number_format($value['creditAmount'], 2); ?></td>
+                    <td><?php echo $value['balance']; ?></td>
                 </tr>
             <?php } ?>
         </tbody>

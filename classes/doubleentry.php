@@ -197,6 +197,7 @@ class DoubleEntry extends Connection
 	public function getLedgerByAccount($arr = [])
 	{
 		try {
+			$countwhere = "where t.flag=1 ";
 			$where = "where t.flag=1 ";
 			$account_id = $arr['account_id'];
 			if (!empty($arr['from']) && !empty($arr['to'])) {
@@ -204,20 +205,36 @@ class DoubleEntry extends Connection
 				$to = $arr['to'];
 				$from = $arr['from'];
 				$where .= " and t.transaction_date between '$from' AND '$to'";
+				$countwhere .= " and t.transaction_date between '$from' AND '$to'";
 			}
 
 			if (!empty($account_id)) {
-				$where .= " and a.account_id = $account_id";
+				$where .= " and a.id = $account_id";
+				$countwhere .= " and e.account_id = $account_id";
 			}
 
 
-			$stmt = "SELECT SUM(CASE WHEN a.entry_type = 'D' THEN a.amount ELSE 0 END) AS debit, SUM(CASE WHEN a.entry_type = 'C' THEN a.amount ELSE 0 END) AS credit, count(a.id) as total from `$this->table_ledger_entries` as a left join `$this->table_transactions` as t on t.id = a.transaction_id $where";
+			$stmt = "SELECT SUM(CASE WHEN e.entry_type = 'D' THEN e.amount ELSE 0 END) AS debit, SUM(CASE WHEN e.entry_type = 'C' THEN e.amount ELSE 0 END) AS credit, count(e.id) as total from `$this->table_ledger_entries` as e left join `$this->table_transactions` as t on t.id = e.transaction_id $countwhere";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->execute();
 			$summery = $prepare->fetch(PDO::FETCH_ASSOC);
 
 
-			$stmt = "SELECT a.*, t.transaction_date, t.reference, a.description, t.description as v_description, m.title as payment_mode from `$this->table_ledger_entries` as a left join `$this->table_transactions` as t on t.id = a.transaction_id left join `$this->table_modes` as m on m.id = a.payment_mode $where order by id";
+			$stmt = "SELECT transaction_id, transaction_date, order_ref, transsaction_type, v_description, debitAmount, creditAmount, balance  FROM
+			(SELECT
+			*
+			,COALESCE(debitAmount)  as debits
+			,COALESCE(creditAmount) as credits
+			,(@running_balance := IF(@curr_account_id < account_id,         opening_balance,@running_balance)) prev_runnng_bal
+			,(@curr_account_id := IF(@curr_account_id < account_id,account_id,@curr_account_id)) curr_account_id
+			,(@running_balance := @running_balance + (acc_account_transactions.debitAmount - acc_account_transactions.creditAmount)) as balance
+			FROM (SELECT t.transsaction_type, e.transaction_id, e.payment_mode, a.parent_id, a.code, e.account_id, a.opening_balance, a.account_type, a.title, e.entry_type, t.transaction_date, amount, t.order_ref,  t.description as v_description, (CASE WHEN e.entry_type = 'D' THEN e.amount ELSE 0 END) AS debitAmount, (CASE WHEN e.entry_type = 'C' THEN e.amount ELSE 0 END) AS creditAmount FROM `$this->table_transactions` t LEFT JOIN `$this->table_ledger_entries` e ON e.transaction_id = t.id LEFT JOIN `$this->table` a ON a.id = e.account_id and a.status = 1 $where) as acc_account_transactions,(SELECT @running_balance := 0,@curr_account_id := 0) r
+			ORDER BY transaction_id) A";
+
+
+
+
+			// $stmt = "SELECT a.*, t.transaction_date, t.reference, a.description, t.description as v_description, m.title as payment_mode from `$this->table_ledger_entries` as a left join `$this->table_transactions` as t on t.id = a.transaction_id left join `$this->table_modes` as m on m.id = a.payment_mode $where order by id";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->execute();
 			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
