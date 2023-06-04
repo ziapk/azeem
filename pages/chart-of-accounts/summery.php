@@ -89,7 +89,7 @@ mainHeader();
                     <td><?php echo number_format($value['debitAmount'], 2); ?></td>
                     <td><?php echo number_format($value['creditAmount'], 2); ?></td>
                     <td style="<?php if ($value['balance'] < 0) {
-                                    echo "color: 'red'";
+                                    echo "color: red";
                                 } ?>"><?php echo $value['balance']; ?></td>
                 </tr>
             <?php } ?>
