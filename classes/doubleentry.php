@@ -246,7 +246,7 @@ class DoubleEntry extends Connection
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->execute();
 			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
-			return ['rows' => $result, 'summery' => $summery];
+			return ['rows' => $result, 'summery' => $summery, 'query' => $stmt, 'params' => $arr];
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
 		}
