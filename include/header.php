@@ -27,6 +27,7 @@ function mainHeader($params = null)
         <link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/vendors/daterangepicker/daterangepicker.css">
         <link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/vendors/angular-daterangepicker/daterangepicker.css">
         <link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/vendors/angularjs-toaster/toaster.min.css">
+        <link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/vendor/select2/select.min.css">
         <link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/css/style.css">
         <link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/css/tree.css">
         <link rel="preconnect" href="https://fonts.gstatic.com">
@@ -36,10 +37,12 @@ function mainHeader($params = null)
         <script src="<?php echo SITE_URL; ?>assets/js/jquery-3.4.1.slim.min.js"></script>
         <script src="<?php echo SITE_URL; ?>assets/vendors/daterangepicker/moment.min.js"></script>
         <script type="text/javascript" src="<?php echo SITE_URL ?>assets/js/angular.min.js"></script>
+        <script src="<?php echo SITE_URL; ?>assets/vendor/select2/select.min.js"></script>
+        <script src="<?php echo SITE_URL; ?>assets/vendor/angular-sanitize.min.js"></script>
         <script type="text/javascript" src="<?php echo SITE_URL; ?>assets/js/ui-bootstrap-tpls-2.5.0.min.js"></script>
     </head>
     <script>
-        var app = angular.module('mainApp', ['ui.bootstrap', 'daterangepicker', 'toaster']);
+        var app = angular.module('mainApp', ['ui.bootstrap', 'daterangepicker', 'toaster', 'ui.select', 'ngSanitize']);
     </script>
 
     <body ng-app="mainApp" class="<?php if (!empty($params['bodyClasses'])) {

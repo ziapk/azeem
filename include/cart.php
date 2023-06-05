@@ -52,7 +52,6 @@ $list = $productCls->getOwnerProducts($ownerId);
     </div>
   </div>
 </li>
-
 <script>
   // Create the event
   var event = new CustomEvent("ProdcutAdded");
@@ -61,6 +60,12 @@ $list = $productCls->getOwnerProducts($ownerId);
     $scope.list = <?php echo safe_json_encode($list); ?>;
     sessionStorage.setItem('list', JSON.stringify($scope.list));
     $scope.exp = {};
+    $scope.supplier = {};
+    $scope.customer = {};
+    $scope.customersList = <?php echo json_encode($customersList); ?>;
+    $scope.ocustomersList = <?php echo json_encode($customersList); ?>;
+    $scope.suppliersList = <?php echo json_encode($suppliersList); ?>;
+    $scope.osuppliersList = <?php echo json_encode($suppliersList); ?>;
     $scope.createExpense = () => {
       if ($scope.exp.cat_id && $scope.exp.price) {
         $http.post('<?php echo SITE_URL; ?>api/createExpense.php', $httpParamSerializerJQLike($scope.exp), {
@@ -76,10 +81,20 @@ $list = $productCls->getOwnerProducts($ownerId);
         })
       }
     }
-    $scope.directPayment = () => {
-      console.log($scope.payment);
-      if ($scope.payment.id && $scope.payment.amount) {
-        $http.post('<?php echo SITE_URL; ?>api/directPayment.php', $httpParamSerializerJQLike($scope.payment), {
+
+    $scope.refreshCustomers = search => {
+      $scope.customersList = $scope.ocustomersList.filter(r => r.full_name.toLowerCase().includes(search.toLowerCase()));
+    }
+    $scope.refreshSuppliers = search => {
+      $scope.suppliersList = $scope.osuppliersList.filter(r => r.name.toLowerCase().includes(search.toLowerCase()));
+    }
+    $scope.directPayment = (type) => {
+      const id = $scope.supplier.selected.account_id;
+      if (id && $scope.payment.amount) {
+        $http.post('<?php echo SITE_URL; ?>api/directPayment.php', $httpParamSerializerJQLike({
+          ...$scope.payment,
+          id,
+        }), {
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
           }
@@ -93,9 +108,12 @@ $list = $productCls->getOwnerProducts($ownerId);
       }
     }
     $scope.directReceiving = () => {
-      console.log($scope.payment);
-      if ($scope.payment.id && $scope.payment.amount) {
-        $http.post('<?php echo SITE_URL; ?>api/directReceiving.php', $httpParamSerializerJQLike($scope.payment), {
+      const id = $scope.customer.selected.account_id;
+      if (id && $scope.payment.amount) {
+        $http.post('<?php echo SITE_URL; ?>api/directReceiving.php', $httpParamSerializerJQLike({
+          ...$scope.payment,
+          id
+        }), {
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
           }

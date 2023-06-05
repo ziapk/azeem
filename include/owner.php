@@ -69,19 +69,15 @@ $customersList = $customerObj->getCustomers($shop['id']);
             <a href="#" class="nav-menu-item btn btn-primary" data-toggle="dropdown" uib-tooltip="Receivings" tooltip-placement="bottom" title="">
               Re.
             </a>
-            <form ng-submit="directReceiving()" class="dropdown-menu" style="padding: 20px; width: 300px">
+            <form ng-submit="directReceiving('c')" class="dropdown-menu" style="padding: 20px; width: 300px">
+              {{payment}}
               <div class="form-group">
-                <select name="id" ng-model="payment.id" class="form-control">
-                  <option value="">Select a customer</option>
-                  <?php foreach ($customersList as $cat) {
-                    if (!empty($cat['account_id'])) {
-
-
-                  ?>
-                      <option value="<?php echo $cat['account_id']; ?>"><?php echo $cat['full_name']; ?></option>
-                  <?php }
-                  } ?>
-                </select>
+                <ui-select ng-model="customer.selected" title="Choose an address">
+                  <ui-select-match placeholder="Enter an address...">{{$select.selected.full_name}}</ui-select-match>
+                  <ui-select-choices repeat="address in customersList track by $index" refresh="refreshCustomers($select.search)" refresh-delay="0" position='down'>
+                    <div ng-bind-html="address.full_name | highlight: $select.search"></div>
+                  </ui-select-choices>
+                </ui-select>
               </div>
               <div class="form-group">
                 <input placeholder="Description" ng-model="payment.summery" type="text" class="form-control">
@@ -96,19 +92,14 @@ $customersList = $customerObj->getCustomers($shop['id']);
             <a href="#" class="nav-menu-item btn btn-primary" data-toggle="dropdown" uib-tooltip="Payments" tooltip-placement="bottom" title="">
               Pay
             </a>
-            <form ng-submit="directPayment()" class="dropdown-menu" style="padding: 20px; width: 300px">
+            <form ng-submit="directPayment('s')" class="dropdown-menu" style="padding: 20px; width: 300px">
               <div class="form-group">
-                <select name="id" ng-model="payment.id" class="form-control">
-                  <option value="">Select a supplier</option>
-                  <?php foreach ($suppliersList as $cat) {
-                    if (!empty($cat['account_id'])) {
-
-
-                  ?>
-                      <option value="<?php echo $cat['account_id']; ?>"><?php echo $cat['name']; ?></option>
-                  <?php }
-                  } ?>
-                </select>
+                <ui-select ng-model="supplier.selected" title="Choose an address">
+                  <ui-select-match placeholder="Enter an address...">{{$select.selected.name}}</ui-select-match>
+                  <ui-select-choices repeat="address in suppliersList track by $index" refresh="refreshSuppliers($select.search)" refresh-delay="0" position='down'>
+                    <div ng-bind-html="address.name | highlight: $select.search"></div>
+                  </ui-select-choices>
+                </ui-select>
               </div>
               <div class="form-group">
                 <input placeholder="Description" ng-model="payment.summery" type="text" class="form-control">
