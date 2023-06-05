@@ -52,7 +52,7 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
             <?php
             $mode = 'edit';
 
-            echo include_once dirname(___FILE___) . '/table.php'; ?>
+            echo include_once dirname(__FILE__) . '/table.php'; ?>
         </div>
 
     </div>

@@ -71,7 +71,7 @@ $ownerStores = $stores->getOwnerStores($userId);
             </thead>
         </table>
 
-        <?php echo include_once dirname(___FILE___) . '/table2.php'; ?>
+        <?php echo include_once dirname(__FILE__) . '/table2.php'; ?>
     </div>
 
 </div>
