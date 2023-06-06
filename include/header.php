@@ -60,7 +60,7 @@ function mainHeader($params = null)
             if (!empty($_SESSION['user_credentials']) && $_SESSION['user_credentials']['role'] == 'owner') {
                 include_once dirname(__FILE__) . '/owner.php';
         ?>
-                <div class="display: none;">
+                <div style="display: none;">
                     <?php include_once dirname(__FILE__) . '/cart.php'; ?>
                 </div>
     <?php

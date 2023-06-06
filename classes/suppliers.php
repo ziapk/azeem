@@ -176,6 +176,7 @@ class Suppliers extends Connection
 			foreach ($result as $key => $supplier) {
 				if (!empty($supplier['account_id'])) {
 					$closing = $de->getOpeningBalance($supplier['account_id'], 's');
+					$result[$key]['closing'] = $closing;
 					$result[$key]['closing_balance'] = $closing['balance'];
 				}
 			}

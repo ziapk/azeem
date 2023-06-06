@@ -70,7 +70,6 @@ $customersList = $customerObj->getCustomers($shop['id']);
               Re.
             </a>
             <form ng-submit="directReceiving('c')" class="dropdown-menu" style="padding: 20px; width: 300px">
-              {{payment}}
               <div class="form-group">
                 <ui-select ng-model="customer.selected" title="Choose an address">
                   <ui-select-match placeholder="Enter an address...">{{$select.selected.full_name}}</ui-select-match>
