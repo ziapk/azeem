@@ -22,8 +22,7 @@ if (!empty($order['order']['price'])) {
     $price = $order['order']['price'] + $gst + $service_charges;
 }
 
-
-$currentBalance = ($blc['debitAmount'] + $blc['opening_balance']) - $blc['creditAmount'];
+$currentBalance = $blc['balance'];
 $balance = ($price - $order['order']['discount']) - $order['order']['paid_amount'];
 
 ?>
