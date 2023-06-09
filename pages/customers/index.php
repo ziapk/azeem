@@ -5,7 +5,7 @@ echo mainHeader(['page' => 'customer']);
 
 <div class="container" ng-controller="customerController">
     <a href="javascript:void(0)" ng-click="addCustomer()" class="btn btn-primary btn-xs pull-right">Add New</a>
-    <h4 class="section-title">Customers</h4>
+    <h4 class="section-title">Customers <a class="btn btn-primary" href="<?php echo 'summeryDownload.php' . $url; ?>" target="_blank">Generate PDF</a></h4>
     <h5 class="section-title">Total Receivable Amount: {{data.closing_total | number}}</h5>
     <div class="form-group">
         <input class="form-control" ng-change="searchCustomer()" ng-model="search" placeholder="Type here for search..." />
