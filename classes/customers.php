@@ -196,14 +196,14 @@ class Customers extends Connection
 	{
 		try {
 
-			$stmt = "SELECT COUNT(id) as total FROM `{$this->table}` where shopId=:shopId and flag=1";
-			$prepare = $this->dbh->prepare($stmt);
-			$prepare->bindParam(':shopId', $params['shopId'], PDO::PARAM_INT);
-			$prepare->execute();
-			$result = $prepare->fetch(PDO::FETCH_ASSOC);
+			$stmt2 = "SELECT COUNT(id) as total, GROUP_CONCAT(account_id) as ids FROM `{$this->table}` where shopId=:shopId and flag=1";
+			$prepare2 = $this->dbh->prepare($stmt2);
+			$prepare2->bindParam(':shopId', $params['shopId'], PDO::PARAM_INT);
+			$prepare2->execute();
+			$resultTotal = $prepare2->fetch(PDO::FETCH_ASSOC);
 
 			$no_of_records_per_page = !empty($params['perPage']) ? $params['perPage'] : 10;
-			$total_rows = $result['total'];
+			$total_rows = $resultTotal['total'];
 			$total_pages = ceil($total_rows / $no_of_records_per_page);
 			$currentPage = $total_pages >= $params['page'] ? $params['page'] : $total_pages;
 			$offset = (($currentPage - 1) < 0 ? 0 : ($currentPage - 1)) * $no_of_records_per_page;
@@ -218,14 +218,24 @@ class Customers extends Connection
 
 			$de = new DoubleEntry();
 
+			// $ids = [];
+
+			$closing = $de->getOpeningBalances(explode(',', $resultTotal['ids']), 'c');
+
 			foreach ($result as $key => $customer) {
 				if (!empty($customer['account_id'])) {
-					$closing = $de->getOpeningBalance($customer['account_id'], 'c');
-					$result[$key]['closing_balance'] = $closing['balance'];
+					// $ids[] = $customer['account_id'];
+					// $closing = $de->getOpeningBalance($customer['account_id'], 'c');
+					$result[$key]['closing_balance'] = $closing[$customer['account_id']]['balance'];
 				}
 			}
 
-			return ['page' => $currentPage, 'totalRecords' => $total_rows, 'perPage' => $no_of_records_per_page, 'records' => $result];
+			$closingTotal = 0;
+			foreach ($closing as $c) {
+				$closingTotal += $c['balance'];
+			}
+
+			return ['page' => $currentPage, 'closing_total' => $closingTotal, 'totalRecords' => $total_rows, 'perPage' => $no_of_records_per_page, 'records' => $result];
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
 		}
