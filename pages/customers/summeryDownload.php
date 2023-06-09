@@ -70,11 +70,11 @@ $header = ob_get_contents();
 ob_clean();
 // echo $html;
 $footer = 'Today: ' . date('d-m-Y h:i:s');
-$mpdf = new mPDF('c', 'A4', null, 10, 10, 10, '65');
+$mpdf = new mPDF('c', 'A4', null, 10, 10, 10, '40');
 $mpdf->setHeader($header);
 $mpdf->setFooter($footer);
 $mpdf->WriteHTML($html);
 
-$mpdf->Output($user['full_name'] . '-Ledger.pdf', 'D');
+$mpdf->Output($shop['full_name'] . '-Balances.pdf', 'D');
 exit;
 ?>
