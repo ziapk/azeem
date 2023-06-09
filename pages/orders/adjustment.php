@@ -58,7 +58,7 @@ echo mainHeader();
                 <td>
                     <input type="text" class="form-control" ng-model="row.full_name" placeholder="Product title" />
                 </td>
-                <td width="100"><input type="number" class="form-control" ng-model="row.price" /></td>
+                <td width="100"><input type="number" class="form-control" ng-model="row.price" ng-change="calculateSum()" /></td>
                 <td width="100">
                     <input type="number" class="form-control" ng-change="isValid(row,  calculateSum)" max="row.maxQty" ng-model="row.qty" ng-keydown="initCheckKeypress($event)" />
                 </td>
@@ -237,11 +237,12 @@ echo mainFooter();
 
         $scope.isValid = (row, cb) => {
             // console.log(row.qty, row.maxQty)
-            if (parseFloat(row.qty) < parseFloat(row.maxQty)) {
-                cb();
-            } else {
-                row.qty = parseFloat(row.maxQty);
-            }
+            // if (parseFloat(row.qty) < parseFloat(row.maxQty)) {
+            //     cb();
+            // } else {
+            // row.qty = parseFloat(row.maxQty);
+            // }
+            cb()
         }
 
         $scope.selectSupplier = function(p) {
@@ -331,7 +332,7 @@ echo mainFooter();
         }
 
         $scope.searchProduct = function(search) {
-            return $http.get("<?php echo SITE_URL ?>api/getProductFromOrders.php", {
+            return $http.get("<?php echo SITE_URL ?>api/getProducts.php", {
                     params: {
                         search,
                         customerId: $scope.supplierId,

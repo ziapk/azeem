@@ -43,7 +43,7 @@ foreach ($_POST['items'] as $key => $value) {
     $productIds[$value['id']] = $value['qty'];
 }
 if (empty($_POST['order_id'])) {
-    $orderDetails = $orders->getOrderItemsByProductIds(array_keys($productIds), $supplierId);
+    $orderDetails = []; // $orders->getOrderItemsByProductIds(array_keys($productIds), $supplierId);
 } else {
     $orderDetails = $_POST['items'];
 }
@@ -85,7 +85,7 @@ foreach ($oi as $id => $row) {
         if (!empty($row['full_items'])) {
             foreach ($row['full_items'] as $product_id => $value) {
                 $data = [
-                    'order_id' => $id,
+                    'order_id' => empty($_POST['order_id']) ? 0 : $id,
                     'shopId' => $shopId,
                     'type' => 1, // back to inventory
                     'user_id' => $userData['id'],
@@ -103,7 +103,7 @@ foreach ($oi as $id => $row) {
         if (!empty($row['partial_items'])) {
             foreach ($row['partial_items'] as $product_id => $value) {
                 $data = [
-                    'order_id' => $id,
+                    'order_id' => empty($_POST['order_id']) ? 0 : $id,
                     'shopId' => $shopId,
                     'type' => 1, // back to inventory
                     'user_id' => $userData['id'],
@@ -118,7 +118,7 @@ foreach ($oi as $id => $row) {
         if (!empty($row['full_items'])) {
             foreach ($row['full_items'] as $product_id => $value) {
                 $data = [
-                    'order_id' => $id,
+                    'order_id' => empty($_POST['order_id']) ? 0 : $id,
                     'shopId' => $shopId,
                     'type' => 1, // back to inventory
                     'user_id' => $userData['id'],
