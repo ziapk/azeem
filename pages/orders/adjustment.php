@@ -49,7 +49,7 @@ echo mainHeader();
                 <th></th>
             </tr>
             <tr>
-                <td colspan="7"><input type="text" class="form-control" id="searchProduct" ng-model="product" placeholder="Search Product to add" typeahead-on-select="selectProduct($item, row)" uib-typeahead="address as address.full_name for address in searchProduct($viewValue)" typeahead-template-url="row2.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="0" class="form-control" ng-model="row.product_name" /></td>
+                <td colspan="7"><input type="text" class="form-control" id="searchProduct" ng-model="product" placeholder="Search Product to add" typeahead-on-select="selectProduct($item, row)" uib-typeahead="address as address.full_name for address in searchProduct($viewValue)" typeahead-template-url="row2.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="0" ng-model-options="{debounce: 500}" class="form-control" ng-model="row.product_name" /></td>
             </tr>
         </thead>
         <tbody>
