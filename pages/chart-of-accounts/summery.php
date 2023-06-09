@@ -29,13 +29,19 @@ $amount = $_GET['t'] == 's' ? $summery['credit'] : $summery['debit'];
 // $amount = ($user['account']['opening_balance'] + $amount);
 $balance = ($amount - $paid);
 
+$url = '?';
+
+foreach ($_GET as $key => $value) {
+    $url .= $key . "=" . $value . "&";
+}
+
 mainHeader();
 ?>
 <div class="container">
     <table width="100%">
         <tr>
             <td>
-                <h2>Account Summary</h2>
+                <h2>Account Summary <a class="btn btn-primary" href="<?php echo SITE_URL . '/pages/chart-of-accounts/summeryDownload.php' . $url; ?>" target="_blank">Generate PDF</a></h2>
                 <p><?php echo $user['full_name']; ?></p>
                 <p><?php echo $user['address']; ?> (<?php echo $user['company']; ?>) </p>
                 <p>Contact No: <?php echo $user['phoneNumber']; ?></p>
