@@ -41,6 +41,7 @@ mainHeader();
     <table width="100%">
         <tr>
             <td>
+                <?php var_dump(SITE_URL); ?>
                 <h2>Account Summary <a class="btn btn-primary" href="<?php echo SITE_URL . '/pages/chart-of-accounts/summeryDownload.php' . $url; ?>" target="_blank">Generate PDF</a></h2>
                 <p><?php echo $user['full_name']; ?></p>
                 <p><?php echo $user['address']; ?> (<?php echo $user['company']; ?>) </p>
