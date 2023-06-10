@@ -92,17 +92,12 @@ $customersList = $customerObj->getCustomers($shop['id']);
             </a>
             <form ng-submit="directReceiving()" class="dropdown-menu" style="padding: 20px; width: 300px">
               <div class="form-group">
-                <select name="id" ng-model="payment.id" class="form-control">
-                  <option value="">Select a customer</option>
-                  <?php foreach ($customersList as $cat) {
-                    if (!empty($cat['account_id'])) {
-
-
-                  ?>
-                      <option value="<?php echo $cat['account_id']; ?>"><?php echo $cat['full_name']; ?></option>
-                  <?php }
-                  } ?>
-                </select>
+                <ui-select custom-dropdown ng-model="payment.customer" theme="bootstrap" ng-disabled="disabled" reset-search-input="false" title="Choose a customer">
+                  <ui-select-match placeholder="Enter a customer...">{{$select.selected.full_name}}</ui-select-match>
+                  <ui-select-choices repeat="address in customersList track by $index" refresh="refreshCustomers($select.search)" refresh-delay="0">
+                    <div style="white-space: wrap;" ng-bind-html="address.full_name | highlight: $select.search"></div>
+                  </ui-select-choices>
+                </ui-select>
               </div>
               <div class="form-group">
                 <input placeholder="Description" ng-model="payment.summery" type="text" class="form-control">
@@ -119,17 +114,14 @@ $customersList = $customerObj->getCustomers($shop['id']);
             </a>
             <form ng-submit="directPayment()" class="dropdown-menu" style="padding: 20px; width: 300px">
               <div class="form-group">
-                <select name="id" ng-model="payment.id" class="form-control">
-                  <option value="">Select a supplier</option>
-                  <?php foreach ($suppliersList as $cat) {
-                    if (!empty($cat['account_id'])) {
-
-
-                  ?>
-                      <option value="<?php echo $cat['account_id']; ?>"><?php echo $cat['name']; ?></option>
-                  <?php }
-                  } ?>
-                </select>
+                <div class="form-group">
+                  <ui-select custom-dropdown ng-model="payment.supplier" theme="bootstrap" ng-disabled="disabled" reset-search-input="false" title="Choose a supplier">
+                    <ui-select-match placeholder="Enter a supplier...">{{$select.selected.name}}</ui-select-match>
+                    <ui-select-choices repeat="address in suppliersList track by $index" refresh="refreshSuppliers($select.search)" refresh-delay="0">
+                      <div style="white-space: wrap;" ng-bind-html="address.name | highlight: $select.search"></div>
+                    </ui-select-choices>
+                  </ui-select>
+                </div>
               </div>
               <div class="form-group">
                 <input placeholder="Description" ng-model="payment.summery" type="text" class="form-control">
@@ -146,12 +138,12 @@ $customersList = $customerObj->getCustomers($shop['id']);
             </a>
             <form ng-submit="createExpense()" class="dropdown-menu" style="padding: 20px; width: 300px">
               <div class="form-group">
-                <select name="cat_id" ng-model="exp.cat_id" class="form-control">
-                  <option value="">Select a category</option>
-                  <?php foreach ($categories as $cat) { ?>
-                    <option value="<?php echo $cat['id']; ?>"><?php echo $cat['full_name']; ?></option>
-                  <?php } ?>
-                </select>
+                <ui-select custom-dropdown ng-model="exp.expense" theme="bootstrap" ng-disabled="disabled" reset-search-input="false" title="Choose an expense">
+                  <ui-select-match placeholder="Enter a expense...">{{$select.selected.full_name}}</ui-select-match>
+                  <ui-select-choices repeat="address in expensesList track by $index" refresh="refreshExpenses($select.search)" refresh-delay="0">
+                    <div style="white-space: wrap;" ng-bind-html="address.full_name | highlight: $select.search"></div>
+                  </ui-select-choices>
+                </ui-select>
               </div>
               <div class="form-group">
                 <input placeholder="Description" ng-model="exp.description" type="text" class="form-control">

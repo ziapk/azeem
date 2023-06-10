@@ -43,6 +43,16 @@ function mainHeader($params = null)
     </head>
     <script>
         var app = angular.module('mainApp', ['ui.bootstrap', 'daterangepicker', 'toaster', 'ui.select', 'ngSanitize']);
+        app.directive('customDropdown', function() {
+            return {
+                restrict: 'A',
+                link: function(scope, element) {
+                    element.on('click', function(event) {
+                        event.stopPropagation();
+                    });
+                }
+            };
+        });
     </script>
 
     <body ng-app="mainApp" class="<?php if (!empty($params['bodyClasses'])) {

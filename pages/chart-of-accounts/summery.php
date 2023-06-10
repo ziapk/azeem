@@ -91,7 +91,7 @@ mainHeader();
                 <tr>
                     <td><?php echo $value['transaction_id']; ?></td>
                     <td><?php echo $value['transaction_date']; ?></td>
-                    <td><?php echo $value['order_ref']; ?></td>
+                    <td><a href="javascript:void(0)" onclick="openRecipt(<?php echo $value['order_ref']; ?>)"><?php echo $value['order_ref']; ?></a></td>
                     <td><?php echo $value['v_description']; ?></td>
                     <td><?php echo $value['transsaction_type']; ?></td>
                     <td><?php echo number_format($value['debitAmount'], 2); ?></td>
@@ -104,3 +104,15 @@ mainHeader();
         </tbody>
     </table>
 </div>
+
+
+<?php
+
+mainFooter();
+?>
+
+<script>
+    function openRecipt(id) {
+        window.open("<?php echo SITE_URL; ?>print?id=" + id + "&detail=true&largeView=large", "", "width=800,height=600");
+    }
+</script>

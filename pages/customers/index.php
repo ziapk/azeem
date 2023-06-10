@@ -16,6 +16,7 @@ echo mainHeader(['page' => 'customer']);
                 <th>Id</th>
                 <th>Contact</th>
                 <th>Title / Company / Address</th>
+                <th>On Closing Report</th>
                 <th>Balance</th>
                 <th></th>
             </tr>
@@ -25,6 +26,7 @@ echo mainHeader(['page' => 'customer']);
                 <td>{{li.id}}</td>
                 <td><strong>{{li.full_name}}</strong> <br /> {{li.phoneNumber}}</td>
                 <td><strong>{{li.company}}</strong> - {{li.title}} <br />{{li.address}}</td>
+                <td>{{li.type == '2' ? 'NO': 'YES'}}</td>
                 <td ng-class="{'text-danger': li.closing_balance < 0}">{{li.closing_balance}}</td>
                 <td>
                     <?php if ($userData['role'] === 'owner' || $userData['role'] === 'manager') { ?><a class="btn btn-info btn-xs" href="javascript:void(0)" ng-click="assignBooks(li)">Disc.</a><?php } ?>
@@ -293,7 +295,7 @@ echo mainFooter();
                 <input id="sopening_balance" type="text" ng-model="form.opening_balance" class="form-control" placeholder="Customer's Opening Balance">
             </div>
             <div class="form-group">
-            <label><small><input name="type" ng-model="form.type" type="checkbox"> Select this if you want your invoices to show this customer’s basic information</small></label>
+            <label><small><input name="type" ng-model="form.type" type="checkbox"> Select this if you want your customer's balance on closing report</small></label>
             </div>
         </div>
         <div class="modal-footer">

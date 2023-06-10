@@ -62,19 +62,29 @@ $list = $productCls->getOwnerProducts($ownerId);
     $scope.exp = {};
     $scope.supplier = {};
     $scope.customer = {};
+    $scope.payment = {
+      id: null
+    }
     $scope.customersList = <?php echo json_encode($customersList); ?>;
     $scope.ocustomersList = <?php echo json_encode($customersList); ?>;
+    $scope.expensesList = <?php echo json_encode($categories); ?>;
+    $scope.oexpensesList = <?php echo json_encode($categories); ?>;
     $scope.suppliersList = <?php echo json_encode($suppliersList); ?>;
     $scope.osuppliersList = <?php echo json_encode($suppliersList); ?>;
     $scope.createExpense = () => {
-      if ($scope.exp.cat_id && $scope.exp.price) {
-        $http.post('<?php echo SITE_URL; ?>api/createExpense.php', $httpParamSerializerJQLike($scope.exp), {
+      const cat_id = $scope.exp.expense.id;
+      if (cat_id && $scope.exp.price) {
+        $http.post('<?php echo SITE_URL; ?>api/createExpense.php', $httpParamSerializerJQLike({
+          ...$scope.exp,
+          cat_id
+        }), {
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
           }
         }).then((response) => {
           alert(response.data.message);
           if (response.data.status == 200) {
+            $scope.exp.expense = '';
             $scope.exp.description = '';
             $scope.exp.price = '';
           }
@@ -85,11 +95,14 @@ $list = $productCls->getOwnerProducts($ownerId);
     $scope.refreshCustomers = search => {
       $scope.customersList = $scope.ocustomersList.filter(r => r.full_name.toLowerCase().includes(search.toLowerCase()));
     }
+    $scope.refreshExpenses = search => {
+      $scope.expensesList = $scope.oexpensesList.filter(r => r.full_name.toLowerCase().includes(search.toLowerCase()));
+    }
     $scope.refreshSuppliers = search => {
       $scope.suppliersList = $scope.osuppliersList.filter(r => r.name.toLowerCase().includes(search.toLowerCase()));
     }
     $scope.directPayment = (type) => {
-      const id = $scope.supplier.selected.account_id;
+      const id = $scope.payment.supplier.account_id;
       if (id && $scope.payment.amount) {
         $http.post('<?php echo SITE_URL; ?>api/directPayment.php', $httpParamSerializerJQLike({
           ...$scope.payment,
@@ -108,7 +121,7 @@ $list = $productCls->getOwnerProducts($ownerId);
       }
     }
     $scope.directReceiving = () => {
-      const id = $scope.customer.selected.account_id;
+      const id = $scope.payment.customer.account_id;
       if (id && $scope.payment.amount) {
         $http.post('<?php echo SITE_URL; ?>api/directReceiving.php', $httpParamSerializerJQLike({
           ...$scope.payment,
@@ -120,6 +133,7 @@ $list = $productCls->getOwnerProducts($ownerId);
         }).then((response) => {
           alert(response.data.message);
           if (response.data.status == 200) {
+            $scope.payment.customer = '';
             $scope.payment.summery = '';
             $scope.payment.amount = '';
           }

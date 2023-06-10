@@ -48,6 +48,13 @@ switch ($reportType) {
 		$params['account_ids'][] = $store['sale_returns'];
 		$params['account_ids'][] = $store['purchase_returns'];
 		$params['parent_ids'][] = $store['expense'];
+		$customers = new  Customers();
+		$page = !empty($_GET['page']) ? $_GET['page'] : 1;
+		$perPage = !empty($_GET['perPage']) ? $_GET['perPage'] : 1000;
+		$search = !empty($_GET['search']) ? $_GET['search'] : "";
+		$balances = $customers->getCustomersPagination(['page' => $page, 'perPage' => $perPage, 'search' => $search, 'shopId' => $shop['id']]);
+
+
 
 		$reportDataRaw = $doubleEntry->getClosingBalanceReport($params);
 		if (!empty($reportDataRaw['opening_balance'])) {
@@ -523,6 +530,18 @@ ob_start();
 	</table>
 
 
+	<h5 style="margin: 5px 0">Customers's Balances</h5>
+	<table id="resultTable" class="table" style="border-collapse: collapse;" border="1">
+		<?php foreach ($balances['records'] as $key => $value) {
+			if ($value['type'] == 1) {
+		?>
+				<tr>
+					<th align="left"><?php echo $value['full_name']; ?></th>
+					<th align="right"><?php echo number_format($value['closing_balance']); ?></th>
+				</tr>
+		<?php }
+		} ?>
+	</table>
 <?php }
 if (empty($params['pdf'])) { ?>
 	<script>
