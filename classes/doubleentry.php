@@ -299,7 +299,7 @@ class DoubleEntry extends Connection
 	{
 		try {
 			$account_ids = implode(',', $account_ids);
-			$stmt = "SELECT a.opening_balance, a.id, SUM(CASE WHEN e.entry_type = 'D' THEN e.amount ELSE 0 END) AS debitAmount, SUM(CASE WHEN e.entry_type = 'C' THEN e.amount ELSE 0 END) AS creditAmount FROM `$this->table_ledger_entries` as e LEFT JOIN `$this->table` as a ON a.id = e.account_id and a.status = 1 left join `{$this->table_transactions}` as t on t.id=e.transaction_id WHERE t.flag = 1 and a.id IN ($account_ids) GROUP BY a.id";
+			$stmt = "SELECT a.opening_balance, a.id, SUM(CASE WHEN e.entry_type = 'D' THEN e.amount ELSE 0 END) AS debitAmount, SUM(CASE WHEN e.entry_type = 'C' THEN e.amount ELSE 0 END) AS creditAmount FROM `$this->table` as a LEFT JOIN `$this->table_ledger_entries` as e ON a.id = e.account_id and a.status = 1 left join `{$this->table_transactions}` as t on t.id=e.transaction_id WHERE  (a.id IN ($account_ids) and t.flag is null) or (a.id IN ($account_ids) and t.flag = 1) GROUP BY a.id";
 			$prepare = $this->dbh->prepare($stmt);
 			// $prepare->bindParam(':account_id', $account_id, PDO::PARAM_STR);
 			$prepare->execute();

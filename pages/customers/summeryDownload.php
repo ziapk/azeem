@@ -54,8 +54,7 @@ ob_start();
     <tr>
         <td style="padding-top: 10px">
             <span style="font-size: 20px; font-weight: bold"><?php echo strtoupper($shop['full_name']); ?></span><br />
-            <?php echo $shop['location']; ?>, <?php echo $shop['city']; ?> <br>
-            <strong><small><?php echo implode(", ", $result); ?></small></strong>
+            <?php echo $shop['location']; ?>, <?php echo $shop['city']; ?>
         </td>
         <td style="text-align: right"><img width="120" height="60" style="vertical-align: middle; margin-right: 5px; filter: grayscale(100%);" src="<?php echo SITE_URL; ?>assets/clients/<?php echo $shop['image']; ?>" /></td>
     </tr>
