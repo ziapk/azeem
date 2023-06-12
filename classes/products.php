@@ -20,6 +20,12 @@ class Products extends Connection
 				$prefix = "";
 			}
 
+			$type = "";
+
+			if (!empty($params['type'])) {
+				$type = " AND p.product_type = " . $params['type'] . " ";
+			}
+
 			$pin = "";
 			if (!empty($params['pin'])) {
 				$pin .= " AND p.pin > 0";
@@ -107,7 +113,7 @@ class Products extends Connection
 				}
 			}
 
-			$stmt = "SELECT count(p.id) as count $column FROM `{$this->table}` as p $innerJoin LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id  LEFT JOIN program_books as c ON c.product_id = p.id WHERE p.owner_id=:owner_id and p.is_active = 1 $publisher_query $dup $pin $searchQry $catQry $minQry";
+			$stmt = "SELECT count(p.id) as count $column FROM `{$this->table}` as p $innerJoin LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id  LEFT JOIN program_books as c ON c.product_id = p.id WHERE p.owner_id=:owner_id and p.is_active = 1 $publisher_query $dup $pin $type $searchQry $catQry $minQry";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':owner_id', $owner_id, PDO::PARAM_STR);
 			$prepare->execute();
@@ -129,7 +135,7 @@ class Products extends Connection
 				$mainCols = $allCols;
 			}
 
-			$stmt = "SELECT $mainCols  FROM `{$this->table}` as p $innerJoin LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id LEFT JOIN program_books as c ON c.product_id = p.id LEFT JOIN publishers as pub on p.publisher_id = pub.id  WHERE p.`owner_id`=:owner_id and p.is_active = 1 $publisher_query $dup $pin $searchQry $catQry GROUP BY p.id $sortByQry $minQry LIMIT :offset, :perPage";
+			$stmt = "SELECT $mainCols  FROM `{$this->table}` as p $innerJoin LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id LEFT JOIN program_books as c ON c.product_id = p.id LEFT JOIN publishers as pub on p.publisher_id = pub.id  WHERE p.`owner_id`=:owner_id and p.is_active = 1 $publisher_query $dup $type $pin $searchQry $catQry GROUP BY p.id $sortByQry $minQry LIMIT :offset, :perPage";
 
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':owner_id', $owner_id, PDO::PARAM_STR);

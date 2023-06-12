@@ -106,6 +106,7 @@ $customersList = $customerObj->getCustomers($shop['id']);
                 <input placeholder="Amount" ng-model="payment.amount" type="text" class="form-control">
               </div>
               <input type="submit" value="Submit" class="btn btn-primary">
+              <label class="pull-right"><input type="checkbox" name="adjustment" ng-model="payment.adjustment"> Adjustment</label>
             </form>
           </li>
           <li class="dropdown" style="padding: 0">
@@ -130,6 +131,7 @@ $customersList = $customerObj->getCustomers($shop['id']);
                 <input placeholder="Amount" ng-model="payment.amount" type="text" class="form-control">
               </div>
               <input type="submit" value="Submit" class="btn btn-primary">
+              <label class="pull-right"><input type="checkbox" name="adjustment" ng-model="payment.adjustment"> Adjustment</label>
             </form>
           </li>
           <li class="dropdown" style="padding: 0">
@@ -220,6 +222,9 @@ $customersList = $customerObj->getCustomers($shop['id']);
       <li class="<?php if ($params['page'] == 'assign') {
                     echo 'active';
                   } ?>"><a uib-tooltip="Assign Publishers to Products at Once" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/product/correction.php"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/product.svg" alt="" /> <span class="nav-menu-text">Assign Publishers</span></a></li>
+      <li class="<?php if ($params['page'] == 'shop_accounts') {
+                    echo 'active';
+                  } ?>"><a uib-tooltip="Shop Accounts" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/shop_accounts"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/accounting.png" alt="" /> <span class="nav-menu-text">Shop Accounts</span></a></li>
       <li class="<?php if ($params['page'] == 'demand') {
                     echo 'active';
                   } ?>"><a uib-tooltip="Demands" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/demand"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/justice-hammer.svg" alt="" /> <span class="nav-menu-text">Demands</span></a></li>

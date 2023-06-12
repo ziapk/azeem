@@ -1,6 +1,6 @@
-<?php 
-include_once dirname(__FILE__).'/../include/settings.php';
+<?php
+include_once dirname(__FILE__) . '/../include/settings.php';
 $publishers = new  Publishers();
-$search = $publishers->searchPublisher($ownerId, !empty($_GET['term']) ? $_GET['term'] : "");
-echo json_encode($search);
-?>
+$search = !empty($_GET['term']) ? $_GET['term'] : "";
+$data = $publishers->getPublishersPagination(['page' => 1, 'perPage' => 30, 'search' => $search, 'shopId' => $shop['id']]);
+echo json_encode($data);

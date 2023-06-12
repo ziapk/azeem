@@ -9,8 +9,14 @@ $shopId = $shop['id'];
 $data = $_POST;
 
 $de = new DoubleEntry();
+$shopAccounts = new ShopAccounts();
+$accountsData = $shopAccounts->getSAs($shop['id']);
+$storeAccounts = [];
+foreach ($accountsData as $a) {
+    $storeAccounts[$a['key_value']] = $a['account_id'];
+}
 
-$receivableAccount = $de->getAccount($shop['receivable']);
+$receivableAccount = $de->getAccount($storeAccounts['salary']);
 
 $accountData = [
     'title' => 'Employee - ' . $_POST['full_name'] . ' - ' . $_POST['company'],

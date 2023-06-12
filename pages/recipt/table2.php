@@ -3,6 +3,7 @@ $statusObj = new Statuses();
 $statuses = $statusObj->getOwnerStatus($shop['id']);
 $itemStatus = [];
 $orderStatus = [];
+$serviceStatus = [];
 
 foreach ($statuses as  $value) {
     if ($value['type'] == 'ORDER') {
@@ -10,6 +11,9 @@ foreach ($statuses as  $value) {
     }
     if ($value['type'] == 'ITEM') {
         $itemStatus[] = $value;
+    }
+    if ($value['type'] == 'SERVICE') {
+        $serviceStatus[] = $value;
     }
 }
 
@@ -44,8 +48,8 @@ foreach ($statuses as  $value) {
                 <span ng-if="cart.discount">
                     {{cart.discount_percent ? cart.discount_percent : ''}}
                     <del class="text-danger">{{cart.price | number: 0}}</del> / </span>
-                <span class="text-success" ng-if="cart.product_type != 2">{{(cart.price - cart.discount) | number: 0}}</span>
-                <input style="max-width: 120px" ng-model="cart.price" ng-if="cart.product_type == 2" ng-change="calculateSum()" class="form-control" />
+                <span class="text-success" ng-if="cart.product_type == 1">{{(cart.price - cart.discount) | number: 0}}</span>
+                <input style="max-width: 120px" ng-model="cart.price" ng-if="cart.product_type == 2 || cart.product_type == 3" ng-change="calculateSum()" class="form-control" />
             </td>
             <td width="100"><input type="search" ng-model="newqty" class="form-control input-qty" on-enter-press="addMoreQty(cart, newqty, $event)"></td>
             <td>
@@ -63,14 +67,65 @@ foreach ($statuses as  $value) {
                 <a href="#" class="btn btn-xs btn-danger pull-right" ng-click="remove(cart)">Delete</a>
             </td>
         </tr>
+        <tr ng-if="cart.product_type == 2">
+            <td colspan="2"><strong>Services Items</strong></td>
+            <td>
+                <input type="text" class="form-control" ng-model="cart.service" placeholder="Add Service" uib-typeahead="address as address.full_name for address in searchServices($viewValue)" typeahead-on-select="selectService($item, cart)" ng-model-options="{debounce: 500}" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="1">
+            </td>
+            <td colspan="2">
+                <input type="text" class="form-control" ng-model="cart.raw" placeholder="Add Raw material" uib-typeahead="address as address.full_name for address in searchProduct($viewValue, 3)" typeahead-on-select="selectRaw($item, cart)" ng-model-options="{debounce: 500}" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="1">
+            </td>
+            <td colspan="2"></td>
+        </tr>
+        <tr ng-repeat="service in cart.services track by $index">
+            <td>S.#{{$index + 1}}</td>
+            <td>
+                <input type="text" class="form-control" ng-model="service.service" placeholder="Search Service" uib-typeahead="address as address.full_name for address in searchServices($viewValue)" typeahead-on-select="selectService($item)" ng-model-options="{debounce: 500}" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="1">
+            </td>
+            <td>
+                <input type="text" class="form-control" ng-model="service.employeeSelect" placeholder="Search Employee" uib-typeahead="address as address.full_name for address in searchEmployee($viewValue)" typeahead-on-select="selectEmployee($item)" ng-model-options="{debounce: 500}" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="1">
+            </td>
+            <td>
+                <input type="text" class="form-control" ng-model="service.cost" placeholder="COST" />
+            </td>
+            <td>
+                <input type="text" class="form-control" ng-model="service.price" placeholder="PRICE" />
+            </td>
+            <td>
+                <select class="form-control" ng-model="service.status" placeholder="status">
+                    <option value="">-- status --</option>
+                    <?php
+                    foreach ($serviceStatus as $value) { ?>
+                        <option value="<?php echo $value['id']; ?>"><?php echo $value['title']; ?></option>
+                    <?php }
+                    ?>
+                </select>
+            </td>
+        </tr>
+        <tr ng-repeat="service in cart.raw_items track by $index">
+            <td>Raw #{{$index + 1}}</td>
+            <td>
+                <input type="text" class="form-control" ng-model="service.product" placeholder="Search Raw" uib-typeahead="address as address.full_name for address in searchProduct($viewValue, 3)" typeahead-on-select="selectService($item)" ng-model-options="{debounce: 500}" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="1">
+            </td>
+            <td>
+                <input type="text" class="form-control" ng-model="service.price" placeholder="Price" />
+            </td>
+            <td>
+                <input type="text" class="form-control" ng-model="service.qty" placeholder="QTY" />
+            </td>
+            <td>
+                {{service.price * service.qty | number: 2 }}
+            </td>
+        </tr>
         <tr ng-if="cart.product_type == 2" ng-repeat-end="cart in items track by $index" id="product-{{$index + 1}}">
             <td>
+                Delivery
             </td>
             <td>
                 <input placeholder="Expected Dates" min="minDate" type="text" date-range-picker class="form-control" ng-model="cart.expected_dates" options="{ autoApply: true, changeCallback: calculateSum(), startDate: minDate }">
             </td>
-            <td colspan=" 2">
-                <input type="text" class="form-control" ng-model="cart.employeeSelect" placeholder="Search Employee" uib-typeahead="address as address.full_name for address in searchEmployee($viewValue)" typeahead-on-select="selectEmployee($item)" ng-model-options="{debounce: 500}" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="1">
+            <td colspan="2">
+                <input type="text" class="form-control" ng-model="cart.description" placeholder="Instructions">
             </td>
             <td>
                 <select name="item_status" id="item_status" class="form-control" ng-model="cart.item_status" placeholder="item_status">

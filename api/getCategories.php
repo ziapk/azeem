@@ -9,4 +9,3 @@ if(!empty($_SESSION['shopInfo'])) {
     $search = $categories->getCategoriesPagination(['page' => $page, 'perPage' => $perPage, 'search' => $search, 'owner_id' => $ownerId]);
 };
 echo json_encode($search);
-?>

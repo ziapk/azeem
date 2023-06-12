@@ -5,6 +5,8 @@ include_once dirname(__FILE__) . '/../../include/settings.php';
 $storeObj = new Store();
 $doubleentryObj = new DoubleEntry();
 $accountList = $doubleentryObj->getAccounts([$_GET['id']]);
+$sa = new ShopAccounts();
+$accounts = $sa->getSAs($_GET['id']);
 
 $error = "";
 $message = "";
@@ -140,90 +142,9 @@ $storeTypesArr = $storeObj->getStoreTypes();
                 <h3 class="section-title">Accounts to automate process</h3>
                 <hr>
             </div>
-            <div class="col-sm-4 form-group">
-                <label>Inventory</label>
-                <select class="form-control c-select" ng-model="account.assets">
-                    <option ng-repeat="acc in accountsList" ng-value="acc.id">
-                        {{acc.title}} - ({{acc.code}} - {{ (acc.account_type == '1' ? 'ASSETS' : acc.account_type == '2' ? 'LIABILITIES' : acc.account_type == '3' ? 'EQUITY' : acc.account_type == '4' ? 'INCOME' : 'EXPENSES' ) }})
-                    </option>
-                </select>
-            </div>
-            <div class="col-sm-4 form-group">
-                <label>Cash/Sale</label>
-                <!-- <input type="text" class="type-ahead-input form-control" ng-model="account.cash" placeholder="Account Name" typeahead-on-select="selectAccount(account.cash, $item)" uib-typeahead="address as address.title for address in searchGroup($viewValue)" typeahead-template-url="row.html" typeahead-show-hint="true" typeahead-min-length="0"> -->
-                <select class="form-control c-select" ng-model="account.cash">
-                    <option ng-repeat="acc in accountsList" ng-value="acc.id">
-                        {{acc.title}} - ({{acc.code}} - {{ (acc.account_type == '1' ? 'ASSETS' : acc.account_type == '2' ? 'LIABILITIES' : acc.account_type == '3' ? 'EQUITY' : acc.account_type == '4' ? 'INCOME' : 'EXPENSES' ) }})
-                    </option>
-                </select>
-            </div>
-            <div class="col-sm-4 form-group">
-                <label>Expense</label>
-                <!-- <input type="text" class="type-ahead-input form-control" ng-model="account.expense" placeholder="Account Name" typeahead-on-select="selectAccount(account.expense, $item)" uib-typeahead="address as address.title for address in searchGroup($viewValue)" typeahead-template-url="row.html" typeahead-show-hint="true" typeahead-min-length="0"> -->
-                <select class="form-control c-select" ng-model="account.expense">
-                    <option ng-repeat="acc in accountsList" ng-value="acc.id">
-                        {{acc.title}} - ({{acc.code}} - {{ (acc.account_type == '1' ? 'ASSETS' : acc.account_type == '2' ? 'LIABILITIES' : acc.account_type == '3' ? 'EQUITY' : acc.account_type == '4' ? 'INCOME' : 'EXPENSES' ) }})
-                    </option>
-                </select>
-            </div>
-            <div class="col-sm-4 form-group">
-                <label>Receivings Account</label>
-                <!-- <input type="text" class="type-ahead-input form-control" ng-model="account.receiving" placeholder="Account Name" typeahead-on-select="selectAccount(account.receiving, $item)" uib-typeahead="address as address.title for address in searchGroup($viewValue)" typeahead-template-url="row.html" typeahead-show-hint="true" typeahead-min-length="0"> -->
-                <select class="form-control c-select" ng-model="account.receiving">
-                    <option ng-repeat="acc in accountsList" ng-value="acc.id">
-                        {{acc.title}} - ({{acc.code}} - {{ (acc.account_type == '1' ? 'ASSETS' : acc.account_type == '2' ? 'LIABILITIES' : acc.account_type == '3' ? 'EQUITY' : acc.account_type == '4' ? 'INCOME' : 'EXPENSES' ) }})
-                    </option>
-                </select>
-            </div>
-            <div class="col-sm-4 form-group">
-                <label>Receivable - for customer</label>
-                <!-- <input type="text" class="type-ahead-input form-control" ng-model="account.receivable" placeholder="Account Name" typeahead-on-select="selectAccount(account.receivable, $item)" uib-typeahead="address as address.title for address in searchGroup($viewValue)" typeahead-template-url="row.html" typeahead-show-hint="true" typeahead-min-length="0"> -->
-                <select class="form-control c-select" ng-model="account.receivable">
-                    <option ng-repeat="acc in accountsList" ng-value="acc.id">
-                        {{acc.title}} - ({{acc.code}} - {{ (acc.account_type == '1' ? 'ASSETS' : acc.account_type == '2' ? 'LIABILITIES' : acc.account_type == '3' ? 'EQUITY' : acc.account_type == '4' ? 'INCOME' : 'EXPENSES' ) }})
-                    </option>
-                </select>
-            </div>
-            <div class="col-sm-4 form-group">
-                <label>Payable - for supplier</label>
-                <!-- <input type="text" class="type-ahead-input form-control" ng-model="account.payable" placeholder="Account Name" typeahead-on-select="selectAccount(account.payable, $item)" uib-typeahead="address as address.title for address in searchGroup($viewValue)" typeahead-template-url="row.html" typeahead-show-hint="true" typeahead-min-length="0"> -->
-                <select class="form-control c-select" ng-model="account.payable">
-                    <option ng-repeat="acc in accountsList" ng-value="acc.id">
-                        {{acc.title}} - ({{acc.code}} - {{ (acc.account_type == '1' ? 'ASSETS' : acc.account_type == '2' ? 'LIABILITIES' : acc.account_type == '3' ? 'EQUITY' : acc.account_type == '4' ? 'INCOME' : 'EXPENSES' ) }})
-                    </option>
-                </select>
-            </div>
-            <div class="col-sm-4 form-group">
-                <label>Sale - Discount</label>
-                <!-- <input type="text" class="type-ahead-input form-control" ng-model="account.sale_discount" placeholder="Account Name" typeahead-on-select="selectAccount(account.sale_discount, $item)" uib-typeahead="address as address.title for address in searchGroup($viewValue)" typeahead-template-url="row.html" typeahead-show-hint="true" typeahead-min-length="0"> -->
-                <select class="form-control c-select" ng-model="account.sale_discount">
-                    <option ng-repeat="acc in accountsList" ng-value="acc.id">
-                        {{acc.title}} - ({{acc.code}} - {{ (acc.account_type == '1' ? 'ASSETS' : acc.account_type == '2' ? 'LIABILITIES' : acc.account_type == '3' ? 'EQUITY' : acc.account_type == '4' ? 'INCOME' : 'EXPENSES' ) }})
-                    </option>
-                </select>
-            </div>
-            <div class="col-sm-4 form-group">
-                <label>Purchase - Discount</label>
-                <!-- <input type="text" class="type-ahead-input form-control" ng-model="account.purchase_discount" placeholder="Account Name" typeahead-on-select="selectAccount(account.purchase_discount, $item)" uib-typeahead="address as address.title for address in searchGroup($viewValue)" typeahead-template-url="row.html" typeahead-show-hint="true" typeahead-min-length="0"> -->
-                <select class="form-control c-select" ng-model="account.purchase_discount">
-                    <option ng-repeat="acc in accountsList" ng-value="acc.id">
-                        {{acc.title}} - ({{acc.code}} - {{ (acc.account_type == '1' ? 'ASSETS' : acc.account_type == '2' ? 'LIABILITIES' : acc.account_type == '3' ? 'EQUITY' : acc.account_type == '4' ? 'INCOME' : 'EXPENSES' ) }})
-                    </option>
-                </select>
-            </div>
-            <div class="col-sm-4 form-group">
-                <label>Sale - Returns</label>
-                <!-- <input type="text" class="type-ahead-input form-control" ng-model="account.sale_returns" placeholder="Account Name" typeahead-on-select="selectAccount(account.sale_returns, $item)" uib-typeahead="address as address.title for address in searchGroup($viewValue)" typeahead-template-url="row.html" typeahead-show-hint="true" typeahead-min-length="0"> -->
-                <select class="form-control c-select" ng-model="account.sale_returns">
-                    <option ng-repeat="acc in accountsList" ng-value="acc.id">
-                        {{acc.title}} - ({{acc.code}} - {{ (acc.account_type == '1' ? 'ASSETS' : acc.account_type == '2' ? 'LIABILITIES' : acc.account_type == '3' ? 'EQUITY' : acc.account_type == '4' ? 'INCOME' : 'EXPENSES' ) }})
-                    </option>
-                </select>
-            </div>
-            <div class="col-sm-4 form-group">
-                <label>Purchase - Returns</label>
-                <!-- <input type="text" class="type-ahead-input form-control" ng-model="account.purchase_returns" placeholder="Account Name" typeahead-on-select="selectAccount(account.purchase_returns, $item)" uib-typeahead="address as address.title for address in searchGroup($viewValue)" typeahead-template-url="row.html" typeahead-show-hint="true" typeahead-min-length="0"> -->
-                <select class="form-control c-select" ng-model="account.purchase_returns">
+            <div class="col-sm-4 form-group" ng-repeat="ac in accountList">
+                <label>{{ac.label_value}}</label>
+                <select class="form-control c-select" ng-model="ac.account_id">
                     <option ng-repeat="acc in accountsList" ng-value="acc.id">
                         {{acc.title}} - ({{acc.code}} - {{ (acc.account_type == '1' ? 'ASSETS' : acc.account_type == '2' ? 'LIABILITIES' : acc.account_type == '3' ? 'EQUITY' : acc.account_type == '4' ? 'INCOME' : 'EXPENSES' ) }})
                     </option>
@@ -240,6 +161,7 @@ $storeTypesArr = $storeObj->getStoreTypes();
 <script type="text/javascript">
     app.controller('accountingController', function($scope, $http, $httpParamSerializerJQLike, $window) {
         $scope.account = <?php echo json_encode($storeData); ?>;
+        $scope.accountList = <?php echo json_encode($accounts); ?>;
         $scope.accountsList = <?php echo json_encode($accountList); ?>;
         $scope.searchGroup = function(term) {
             return $scope.accountsList.filter((row) => row.title.toLowerCase().includes(term.toLowerCase()) || row.code.toLowerCase().includes(term.toLowerCase()))
@@ -249,18 +171,8 @@ $storeTypesArr = $storeObj->getStoreTypes();
         }
 
         $scope.updateAccounts = (accounts) => {
-            return $http.post("../chart-of-accounts/updateAccounts.php", $httpParamSerializerJQLike({
-                    cash: accounts.cash.id || accounts.cash,
-                    payable: accounts.payable.id || accounts.payable,
-                    receiving: accounts.receiving.id || accounts.receiving,
-                    receivable: accounts.receivable.id || accounts.receivable,
-                    expense: accounts.expense.id || accounts.expense,
-                    sale_discount: accounts.sale_discount.id || accounts.sale_discount,
-                    purchase_discount: accounts.purchase_discount.id || accounts.purchase_discount,
-                    sale_returns: accounts.sale_returns.id || accounts.sale_returns,
-                    purchase_returns: accounts.purchase_returns.id || accounts.purchase_returns,
-                    assets: accounts.assets.id || accounts.assets,
-                    shopId: <?php echo $_GET['id']; ?>
+            return $http.post("../chart-of-accounts/updateAccountAll.php", $httpParamSerializerJQLike({
+                    accounts: $scope.accountList
                 }), {
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded'

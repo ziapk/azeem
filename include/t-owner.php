@@ -50,6 +50,9 @@ $list = $productCls->getOwnerProducts($ownerId);
       <li class="<?php if ($params['page'] == 'product-create') {
                     echo 'active';
                   } ?>"><a uib-tooltip="Add New Product" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/product/create.php"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/product.svg" alt="" /> <span class="nav-menu-text">New Product</span></a></li>
+      <li class="<?php if ($params['page'] == 'status') {
+                    echo 'active';
+                  } ?>"><a uib-tooltip="Status" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/status/"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/product.svg" alt="" /> <span class="nav-menu-text">Statuses</span></a></li>
       <li class="<?php if ($params['page'] == 'product') {
                     echo 'active';
                   } ?>"><a uib-tooltip="Products" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/product"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/product.svg" alt="" /> <span class="nav-menu-text">Products</span></a></li>
@@ -65,12 +68,18 @@ $list = $productCls->getOwnerProducts($ownerId);
       <li class="<?php if ($params['page'] == 'coa') {
                     echo 'active';
                   } ?>"><a uib-tooltip="Chart of Accounts" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/chart-of-accounts"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/accounting.png" alt="" /> <span class="nav-menu-text">Accounts</span></a></li>
+      <li class="<?php if ($params['page'] == 'shop_accounts') {
+                    echo 'active';
+                  } ?>"><a uib-tooltip="Shop Accounts" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/shop_accounts"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/accounting.png" alt="" /> <span class="nav-menu-text">Shop Accounts</span></a></li>
       <li class="<?php if ($params['page'] == 'customers') {
                     echo 'active';
                   } ?>"><a uib-tooltip="Customers" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/customers/"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/customer.svg" alt="" /><span class="nav-menu-text">Customers</span></a></li>
       <li class="<?php if ($params['page'] == 'category') {
                     echo 'active';
                   } ?>"><a uib-tooltip="Categories" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/category/"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/category.svg" alt="" /><span class="nav-menu-text">Categories</span></a></li>
+      <li class="<?php if ($params['page'] == 'services') {
+                    echo 'active';
+                  } ?>"><a uib-tooltip="Services" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/services/"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/category.svg" alt="" /><span class="nav-menu-text">Services</span></a></li>
     </ul>
     <a href="javascript:void(0)" ng-click="toggleSidebar()" class="toggle-sidebar"><img width="16" height="16" src="<?php echo SITE_URL; ?>assets/img/svg/left-arrow.svg" alt="" /></a>
   </div>

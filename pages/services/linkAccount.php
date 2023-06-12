@@ -9,14 +9,12 @@ $shopId = $shop['id'];
 $data = $_POST;
 
 $de = new DoubleEntry();
-
 $shopAccounts = new ShopAccounts();
 $accountsData = $shopAccounts->getSAs($shop['id']);
 $storeAccounts = [];
 foreach ($accountsData as $a) {
     $storeAccounts[$a['key_value']] = $a['account_id'];
 }
-
 
 $payableAccount = $de->getAccount($storeAccounts['expense']);
 

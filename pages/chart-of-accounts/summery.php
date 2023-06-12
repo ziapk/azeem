@@ -11,6 +11,9 @@ if ($_GET['t'] == 'c') {
 } elseif ($_GET['t'] == 's') {
     $suppliers = new Suppliers();
     $user = $suppliers->getUserByAccount($_GET['id']);
+} elseif ($_GET['t'] == 'emp') {
+    $employees = new Employees();
+    $user = $employees->getUserByAccount($_GET['id']);
 } elseif ($_GET['t'] == 'e') {
     $expenses = new Categories();
     $user = $expenses->expenseByAccount($_GET['id']);

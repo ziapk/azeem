@@ -23,7 +23,7 @@ class Employees extends Connection
 	public function createEmployee($array)
 	{
 		try {
-			$stmt = "INSERT INTO `{$this->table}` (`shop_id`, `owner_id`,`full_name`, `email`, `designation`, `doj`, `contact_1`, `contact_2`, `emg_contact_1`, `emg_contact_2`, `salary`) VALUES (:shop_id, :owner_id, :full_name, :email, :designation, :doj, :contact_1, :contact_2, :emg_contact_1, :emg_contact_2, :salary)";
+			$stmt = "INSERT INTO `{$this->table}` (`shop_id`, `owner_id`,`full_name`, `email`, `designation`, `doj`, `contact_1`, `contact_2`, `emg_contact_1`, `emg_contact_2`, `salary`, `account_id`) VALUES (:shop_id, :owner_id, :full_name, :email, :designation, :doj, :contact_1, :contact_2, :emg_contact_1, :emg_contact_2, :salary, :account_id)";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':shop_id', $array['shop_id'], PDO::PARAM_STR);
 			$prepare->bindParam(':owner_id', $array['owner_id'], PDO::PARAM_STR);
@@ -36,6 +36,7 @@ class Employees extends Connection
 			$prepare->bindParam(':emg_contact_1', $array['emg_contact_1'], PDO::PARAM_STR);
 			$prepare->bindParam(':emg_contact_2', $array['emg_contact_2'], PDO::PARAM_STR);
 			$prepare->bindParam(':salary', $array['salary'], PDO::PARAM_STR);
+			$prepare->bindParam(':account_id', $array['account_id'], PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $this->dbh->lastInsertId();
 			return $result;

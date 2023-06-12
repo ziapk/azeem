@@ -168,6 +168,11 @@ echo mainFooter();
                 })
         }
 
+        $scope.addService = cart => {
+            cart.services = (cart.services || []).concat({});
+            console.log('cart.services', cart.services)
+        }
+
         $scope.getPinProducts();
 
         $scope.printValue = o => {
@@ -266,6 +271,9 @@ echo mainFooter();
 
         $scope.selectProduct = function(p, sep) {
             let currentIndex = 0
+            if (p.product_type == 2) {
+                sep = true;
+            }
             if (sep) {
                 $scope.items.push({
                     ...p,
@@ -336,7 +344,7 @@ echo mainFooter();
             }
         }
 
-        $scope.searchProduct = function(term) {
+        $scope.searchProduct = function(term, type) {
             const params = {};
             if ($scope.focus === true) {
                 params.searchBy = 'id';
@@ -349,9 +357,10 @@ echo mainFooter();
                 return [];
             } else {
                 params.term = term;
+                params.type = type;
                 return $http.get("<?php echo SITE_URL ?>api/getStores.php", {
                         params,
-                        shopId: $scope.shopId
+                        shopId: $scope.shopId,
                     })
                     .then(function(response) {
 
@@ -371,6 +380,13 @@ echo mainFooter();
                         $scope.selectCustomer($scope.customersList[0]);
                     }
                     return response.data
+                });
+        }
+        $scope.searchServices = function(value, onloading) {
+            $scope.employeeName = value;
+            return $http.get("<?php echo SITE_URL ?>api/getServices.php?search=" + value)
+                .then(function(response) {
+                    return response.data.records
                 });
         }
         $scope.searchEmployee = function(value, onloading) {
@@ -497,6 +513,23 @@ echo mainFooter();
 
         $scope.onChangePicker = (s, e, row) => {
             console.log(s, e, row);
+        }
+
+        $scope.selectService = (item, row) => {
+            row.services = row.services || [];
+            row.services.push({
+                service: item
+            });
+            row.service = '';
+        }
+        $scope.selectRaw = (item, row) => {
+            row.raw_items = row.raw_items || [];
+            row.raw_items.push({
+                product: item,
+                price: item.price,
+                qty: 1
+            });
+            row.raw = '';
         }
 
         $scope.calculateSum = (c) => {

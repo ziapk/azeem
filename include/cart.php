@@ -103,6 +103,7 @@ $list = $productCls->getOwnerProducts($ownerId);
     }
     $scope.directPayment = (type) => {
       const id = $scope.payment.supplier.account_id;
+      $scope.payment.supplier.account_id;
       if (id && $scope.payment.amount) {
         $http.post('<?php echo SITE_URL; ?>api/directPayment.php', $httpParamSerializerJQLike({
           ...$scope.payment,

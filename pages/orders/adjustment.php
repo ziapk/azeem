@@ -335,6 +335,7 @@ echo mainFooter();
             return $http.get("<?php echo SITE_URL ?>api/getProducts.php", {
                     params: {
                         search,
+                        perPage: 30,
                         customerId: $scope.supplierId,
                         shopId: $scope.shopId
                     }

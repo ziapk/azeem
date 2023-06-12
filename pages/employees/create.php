@@ -29,11 +29,19 @@ if (empty($_POST['full_name'])) {
     ];
 
     $de = new DoubleEntry();
+    $shopAccounts = new ShopAccounts();
+    $accountsData = $shopAccounts->getSAs($shop['id']);
+    $storeAccounts = [];
+    foreach ($accountsData as $a) {
+        $storeAccounts[$a['key_value']] = $a['account_id'];
+    }
 
-    $receivableAccount = $de->getAccount($shop['expense']);
+    $receivableAccount = $de->getAccount($storeAccounts['salary']);
+
+
 
     $accountData = [
-        'title' => 'Customer - ' . $_POST['full_name'] . ' - ' . $_POST['company'],
+        'title' => 'Employee - ' . $_POST['full_name'] . ' - ' . $_POST['company'],
         'code' => $receivableAccount['code'],
         'account_type' => $receivableAccount['account_type'],
         'group_id' => $receivableAccount['group_id'],
@@ -43,7 +51,6 @@ if (empty($_POST['full_name'])) {
         'opening_balance' => $_POST['opening_balance'],
         'created_by' => $userId
     ];
-
 
     $accountId = $de->insertAccount($accountData);
     $data['account_id'] = $accountId;

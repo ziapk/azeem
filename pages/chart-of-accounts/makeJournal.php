@@ -1,6 +1,6 @@
-<?php 
+<?php
 session_start();
-include_once dirname(__FILE__).'/../../include/settings.php';
+include_once dirname(__FILE__) . '/../../include/settings.php';
 $_POST = json_decode(file_get_contents('php://input'), true);
 
 $makeTransaction = [
@@ -19,8 +19,8 @@ $transaction_id = $obj->makeTransaction($makeTransaction);
 //print_r($_POST);
 
 // prepare journal entries
-foreach($_POST['accounts'] as $account) {
-    if(!empty($account['amount']) && !empty($account['type'])) {
+foreach ($_POST['accounts'] as $account) {
+    if (!empty($account['amount']) && !empty($account['type'])) {
         $entry = [
             'transaction_id' => $transaction_id,
             'account_id' => $account['account_id'],
