@@ -26,12 +26,12 @@
         ?>
             <tr>
                 <td><?php echo $count; ?></td>
-                <td><?php echo $s['product_id']; ?></td>
+                <td><?php echo $s['id']; ?></td>
                 <td><?php echo $s['full_name']; ?>
                     <?php echo $s['author'] . " - " . $s['group'] . " - " . $s['publisherName']; ?>
                 </td>
                 <td><?php echo $in_hand; ?></td>
-                <td><?php echo $s['sale_price']; ?></td>
+                <td><?php echo $s['price']; ?></td>
                 <td><?php echo $s['location']; ?></td>
             </tr>
         <?php $count++;

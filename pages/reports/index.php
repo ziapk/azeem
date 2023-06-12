@@ -4,6 +4,9 @@ include_once dirname(__FILE__) . '/../../include/settings.php';
 
 $cat = new Categories();
 $stores = new Store();
+$publisherObj = new Publishers();
+
+$publishers = $publisherObj->getPublishersPagination(['page' => 1, 'perPage' => 100000, 'shopId' => $shop['id']]);
 
 $groupNames = $cat->getGroupNames($shop['owner_id']);
 $ownerStores = $stores->getOwnerStores($userData['id']);
@@ -33,6 +36,21 @@ echo mainHeader(['page' => 'reports']);
                         <?php } ?>
                     </select>
                 </div>
+            <?php } ?>
+            <?php
+
+            if ($userData['role'] == 'owner' || $userData['role'] == 'manager') { ?>
+                <div class="col-sm-4 col-md-3 form-group">
+                    <label>Select Publisher</label>
+                    <ui-select custom-dropdown ng-model="publisher.selected" theme="bootstrap" ng-disabled="disabled" reset-search-input="false" title="Choose a publisher">
+                        <ui-select-match placeholder="Enter a customer...">{{$select.selected.full_name}}</ui-select-match>
+                        <ui-select-choices repeat="address in publisherList track by $index" refresh="refreshPublishers($select.search)" refresh-delay="0">
+                            <div style="white-space: wrap;" ng-bind-html="address.full_name | highlight: $select.search"></div>
+                        </ui-select-choices>
+                    </ui-select>{{publisher.selected.id}}
+                    <input type="hidden" name="publisher_id" value="{{publisher.selected.id}}">
+                </div>
+
             <?php } ?>
             <div class="col-sm-4 col-md-3 form-group">
                 <label>Select Report</label>
@@ -79,6 +97,12 @@ echo mainHeader(['page' => 'reports']);
         });
         $('#from').val(moment(a.data().daterangepicker.startDate).format('YYYY-MM-DD'));
         $('#to').val(moment(a.data().daterangepicker.endDate).format('YYYY-MM-DD'));
+        $scope.publisher = {};
+        $scope.publisherList = <?php echo json_encode($publishers['records']); ?>;
+        $scope.opublishersList = <?php echo json_encode($publishers['records']); ?>;
+        $scope.refreshPublishers = search => {
+            $scope.publisherList = $scope.opublishersList.filter(r => r.full_name.toLowerCase().includes(search.toLowerCase()));
+        }
     });
 </script>
 <?php echo mainFooter(); ?>
