@@ -75,10 +75,10 @@ foreach ($statuses as  $value) {
             <td colspan="2">
                 <input type="text" class="form-control" ng-model="cart.raw" placeholder="Add Raw material" uib-typeahead="address as address.full_name for address in searchProduct($viewValue, 3)" typeahead-on-select="selectRaw($item, cart)" ng-model-options="{debounce: 500}" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="1">
             </td>
-            <td colspan="2"></td>
+            <td colspan="6"></td>
         </tr>
-        <tr ng-repeat="service in cart.services track by $index">
-            <td>S.#{{$index + 1}}</td>
+        <tr ng-repeat="service in cart.services track by $index" class="row-service">
+            <td style="padding-left: 40px; text-align: right">S.#{{$index + 1}}</td>
             <td>
                 <input type="text" class="form-control" ng-model="service.service" placeholder="Search Service" uib-typeahead="address as address.full_name for address in searchServices($viewValue)" typeahead-on-select="selectService($item)" ng-model-options="{debounce: 500}" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="1">
             </td>
@@ -89,7 +89,7 @@ foreach ($statuses as  $value) {
                 <input type="text" class="form-control" ng-model="service.cost" placeholder="COST" />
             </td>
             <td>
-                <input type="text" class="form-control" ng-model="service.price" placeholder="PRICE" />
+                <input type="text" class="form-control" ng-change="calculateSum()" ng-model="service.price" placeholder="PRICE" />
             </td>
             <td>
                 <select class="form-control" ng-model="service.status" placeholder="status">
@@ -101,23 +101,25 @@ foreach ($statuses as  $value) {
                     ?>
                 </select>
             </td>
+            <td colspan="4"></td>
         </tr>
-        <tr ng-repeat="service in cart.raw_items track by $index">
-            <td>Raw #{{$index + 1}}</td>
+        <tr ng-repeat="service in cart.raw_items track by $index" class="row-raw">
+            <td style="padding-left: 40px; text-align: right">Raw #{{$index + 1}}</td>
             <td>
                 <input type="text" class="form-control" ng-model="service.product" placeholder="Search Raw" uib-typeahead="address as address.full_name for address in searchProduct($viewValue, 3)" typeahead-on-select="selectService($item)" ng-model-options="{debounce: 500}" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="1">
             </td>
             <td>
-                <input type="text" class="form-control" ng-model="service.price" placeholder="Price" />
+                <input type="text" class="form-control" ng-change="calculateSum()" ng-model="service.price" placeholder="Price" />
             </td>
             <td>
-                <input type="text" class="form-control" ng-model="service.qty" placeholder="QTY" />
+                <input type="text" class="form-control" ng-change="calculateSum()" ng-model="service.qty" placeholder="QTY" />
             </td>
             <td>
                 {{service.price * service.qty | number: 2 }}
             </td>
+            <td colspan="6"></td>
         </tr>
-        <tr ng-if="cart.product_type == 2" ng-repeat-end="cart in items track by $index" id="product-{{$index + 1}}">
+        <tr ng-if="cart.product_type == 2" ng-repeat-end="cart in items track by $index" id="product-{{$index + 1}}" class="row-expected">
             <td>
                 Delivery
             </td>

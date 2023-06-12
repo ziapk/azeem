@@ -190,6 +190,9 @@ echo mainFooter();
                     qty: row.qty,
                     show: row.show,
                     price: row.price,
+                    services: row.services,
+                    raw_items: row.raw_items,
+                    item_status: row.item_status,
                     item_status: row.item_status,
                     priority: row.priority,
                     expected_dates: row.expected_dates,
@@ -447,6 +450,8 @@ echo mainFooter();
                     item_status,
                     employeeSelect,
                     expected_dates,
+                    services,
+                    raw_items,
                     product_type,
                     qty,
                     discount,
@@ -459,6 +464,8 @@ echo mainFooter();
                     description,
                     item_status,
                     product_type,
+                    services,
+                    raw_items,
                     qty,
                     discount,
                     price
@@ -521,6 +528,7 @@ echo mainFooter();
                 service: item
             });
             row.service = '';
+            $scope.calculateSum();
         }
         $scope.selectRaw = (item, row) => {
             row.raw_items = row.raw_items || [];
@@ -530,6 +538,7 @@ echo mainFooter();
                 qty: 1
             });
             row.raw = '';
+            $scope.calculateSum();
         }
 
         $scope.calculateSum = (c) => {
@@ -537,23 +546,33 @@ echo mainFooter();
             let subtotal = 0;
             $scope.discountPercentValue = 0;
             $scope.items.map((product) => {
-                console.log(product)
-                let currentRow = null;
-                const price = parseFloat(product.price);
-                if (customerData.discount_array?.length && customerData.discount_array?.filter(r => r.publisher_id == product.publisher_id).length) {
-                    const row = customerData.discount_array.find(r => r.publisher_id == product.publisher_id);
-                    product.discount = price * (parseFloat(row.discount_value) / 100);
-                    product.discount_percent = row.discount_value + "%";
-                    subtotal += ((product.price - product.discount) * product.qty);
-                } else {
-                    if (product.discount_value) {
-                        product.discount = price * ((product.discount_value || 0) / 100);
-                        $scope.discountPercentValue += (product.discount * product.qty);
+                if (product.product_type == 1 || product.product_type != 1 && !product.services?.length && !product.raw_items?.length) {
+                    let currentRow = null;
+                    const price = parseFloat(product.price);
+                    if (customerData.discount_array?.length && customerData.discount_array?.filter(r => r.publisher_id == product.publisher_id).length) {
+                        const row = customerData.discount_array.find(r => r.publisher_id == product.publisher_id);
+                        product.discount = price * (parseFloat(row.discount_value) / 100);
+                        product.discount_percent = row.discount_value + "%";
+                        subtotal += ((product.price - product.discount) * product.qty);
                     } else {
-                        product.discount_percent = '';
-                        product.discount = 0;
+                        if (product.discount_value) {
+                            product.discount = price * ((product.discount_value || 0) / 100);
+                            $scope.discountPercentValue += (product.discount * product.qty);
+                        } else {
+                            product.discount_percent = '';
+                            product.discount = 0;
+                        }
+                        subtotal += ((product.price - product.discount) * product.qty);
                     }
-                    subtotal += ((product.price - product.discount) * product.qty);
+                } else {
+                    product.price = 0;
+                    product.services?.forEach(row => {
+                        product.price += (row.price || 0) * (row.qty || 1)
+                    })
+                    product.raw_items?.forEach(row => {
+                        product.price += (row.price || 0) * (row.qty || 1)
+                    })
+                    subtotal += product.price * product.qty;
                 }
             })
             $scope.subTotal = subtotal;

@@ -46,6 +46,18 @@ include_once dirname(__FILE__) . '/header.php';
 include_once dirname(__FILE__) . '/footer.php';
 
 
+function delimitArray($array, $address, $delimiter = "_")
+{
+    $address = explode($delimiter, $address);
+    $num_args = count($address);
+
+    $val = $array;
+    for ($i = 0; $i < $num_args; $i++) {
+        // every iteration brings us closer to the truth
+        $val = $val[$address[$i]];
+    }
+    return $val;
+}
 
 function safe_json_encode($value, $options = 0, $depth = 512, $utfErrorFlag = false)
 {
@@ -140,6 +152,13 @@ $orderStatusArr = [
     7 => ['id' => 7, 'full_name' => 'Return as Partial'],
     8 => ['id' => 8, 'full_name' => 'Partial Paid'],
     9 => ['id' => 9, 'full_name' => 'Not Paid']
+];
+$orderPriority = [
+    1 => 'No Priority',
+    2 => 'Low',
+    3 => 'Medium',
+    4 => 'High',
+    5 => 'Urgent'
 ];
 
 $reportsArray = [

@@ -5,6 +5,7 @@ class Orders extends Connection
 
     private $table = 'orders';
     private $table_sub = 'order_items';
+    private $table_oservice = 'order_services';
     private $table_pro = 'products';
     private $table_rp = 'product_returns';
     private $table_transaction = 'transaction';
@@ -176,6 +177,19 @@ class Orders extends Connection
             die("Error!: " . $e->getMessage() . "<br/>");
         }
     }
+    public function deleteOrderServices($order_id)
+    {
+        try {
+            $stmt = "DELETE FROM `{$this->table_oservice}` where `order_id` = :order_id";
+            $prepare = $this->dbh->prepare($stmt);
+            $prepare->bindParam(':order_id', $order_id, PDO::PARAM_STR);
+            $prepare->execute();
+            $result = $prepare->rowCount();
+            return $result;
+        } catch (PDOException $e) {
+            die("Error!: " . $e->getMessage() . "<br/>");
+        }
+    }
 
     public function getOrderItemsByProductIds($productIds, $customer_id)
     {
@@ -185,6 +199,31 @@ class Orders extends Connection
             $prepare->bindParam(':customer_id', $customer_id, PDO::PARAM_STR);
             $prepare->execute();
             $result = $prepare->fetchAll(PDO::FETCH_ASSOC);
+            return $result;
+        } catch (PDOException $e) {
+            die("Error!: " . $e->getMessage() . "<br/>");
+        }
+    }
+    public function createOrderService($array)
+    {
+        try {
+            $stmt = "INSERT INTO `{$this->table_oservice}` (`order_id`, `order_item_id`, `service_id`, `status_id`, `employee_id`, `cost`, `price`, `flag`) VALUES (:order_id,:order_item_id,:service_id,:status_id,:employee_id,:cost,:price,:flag)";
+            $prepare = $this->dbh->prepare($stmt);
+            $prepare->bindParam(':order_id', $array['order_id'], PDO::PARAM_STR);
+            $prepare->bindParam(':order_item_id', $array['order_item_id'], PDO::PARAM_STR);
+            $prepare->bindParam(':service_id', $array['service_id'], PDO::PARAM_STR);
+            $prepare->bindParam(':status_id', $array['status_id'], PDO::PARAM_STR);
+            $prepare->bindParam(':employee_id', $array['employee_id'], PDO::PARAM_STR);
+            $prepare->bindParam(':cost', $array['cost'], PDO::PARAM_STR);
+            $prepare->bindParam(':price', $array['price'], PDO::PARAM_STR);
+            $prepare->bindParam(':flag', $array['flag'], PDO::PARAM_STR);
+            $prepare->execute();
+            $result = $this->dbh->lastInsertId();
+            if ($array['flag'] == 2) {
+                $array['product_id'] = $array['service_id'];
+                $prod = new Products();
+                $prod->subProductQty($array);
+            }
             return $result;
         } catch (PDOException $e) {
             die("Error!: " . $e->getMessage() . "<br/>");
@@ -209,6 +248,39 @@ class Orders extends Connection
             $prepare->bindParam(':priority', $array['priority'], PDO::PARAM_STR);
             $prepare->execute();
             $result = $this->dbh->lastInsertId();
+            foreach ($array['services'] as $value) {
+                $dd = [
+                    'order_id' => $array['order_id'],
+                    'order_item_id' => $result,
+                    'service_id' => !empty($value['service']) ? $value['service']['id'] : null,
+                    'status_id' => !empty($value['status']) ? $value['status'] : null,
+                    'employee_id' => !empty($value['employeeSelect']) ? $value['employeeSelect']['id'] : null,
+                    'assign_date' => !empty($value['employeeSelect']) ? date('Y-m-d') : null,
+                    'cost' => $value['cost'],
+                    'price' => $value['price'],
+                    'quantity' => 1,
+                    'flag' => 1,
+                ];
+                $this->createOrderService($dd);
+            }
+            foreach ($array['raw_items'] as $value) {
+                $dd = [
+                    'order_id' => $array['order_id'],
+                    'order_item_id' => $result,
+                    'service_id' => !empty($value['product']) ? $value['product']['id'] : null,
+                    'status_id' => !empty($value['status']) ? $value['status'] : null,
+                    'employee_id' => null,
+                    'assign_date' => null,
+                    'cost' => $value['cost'],
+                    'price' => $value['price'],
+                    'quantity' => $value['qty'],
+                    'flag' => 2,
+                    'shopId' => $array['shopId'],
+                    'owner_id' => $array['shopId'],
+                    'product_id' => !empty($value['product']) ? $value['product']['id'] : null,
+                ];
+                $this->createOrderService($dd);
+            }
             if ($array['status'] != 1) {
                 $prod = new Products();
                 $prod->subProductQty($array);
