@@ -6,6 +6,13 @@ try {
     $storeObj = new Store();
     $customersObj = new Customers();
     $storeDATA = $storeObj->getStore($shop['id']);
+    $shopAccounts = new ShopAccounts();
+    $accountsData = $shopAccounts->getSAs($shop['id']);
+    $storeAccounts = [];
+    foreach ($accountsData as $a) {
+        $storeAccounts[$a['key_value']] = $a['account_id'];
+    }
+
     $status = 9;
     $totalDiscount = 0;
     $additionalDiscount = 0;
@@ -126,17 +133,6 @@ try {
             // assets debit entry - credit
             // assets receivable entry - debit
             // expense discount entry - debit
-            $entry = [
-                'transaction_id' => $makeTransactionId,
-                'account_id' => $shop['assets'],
-                'entry_type' => 'C',
-                'description' => '',
-                'amount' => $assetPrice, // 2000
-                'payment_mode' => $defaultId,
-                'user_id' => $_SESSION['user_credentials']['id'],
-            ];
-
-            $a[] = $doubleEntry->makeEntry($entry);
 
             // receivable credit entry
             $entry = [
@@ -154,7 +150,7 @@ try {
                 // saleDiscount credit entry
                 $entry = [
                     'transaction_id' => $makeTransactionId,
-                    'account_id' => $shop['sale_discount'],
+                    'account_id' => $storeAccounts['sale_discount'],
                     'entry_type' => 'D',
                     'description' => '',
                     'amount' => $saleDiscount, // 200 @ 10%
@@ -164,6 +160,18 @@ try {
                 $a[] = $doubleEntry->makeEntry($entry);
             }
 
+            $entry = [
+                'transaction_id' => $makeTransactionId,
+                'account_id' => $storeAccounts['assets'],
+                'entry_type' => 'C',
+                'description' => '',
+                'amount' => $assetPrice, // 2000
+                'payment_mode' => $defaultId,
+                'user_id' => $_SESSION['user_credentials']['id'],
+            ];
+
+            $a[] = $doubleEntry->makeEntry($entry);
+
             if (!empty($cash)) {
                 $makeTransactionId = $doubleEntry->makeTransaction($makeTransaction);
                 foreach ($_POST['payment_with'] as $value) {
@@ -171,7 +179,7 @@ try {
                         // cash credit entry
                         $entry = [
                             'transaction_id' => $makeTransactionId,
-                            'account_id' => $shop['cash'],
+                            'account_id' => $storeAccounts['cash'],
                             'entry_type' => 'D',
                             'description' => '',
                             'amount' => $value['amount'], // 200 @ 10%
@@ -195,15 +203,6 @@ try {
                 }
             }
         }
-
-
-
-        // $manageWallet = $orders->manageWallet($wallet);
-        /* $productUpdated = [];
-        foreach ($items as $value) {
-            $productUpdated[] = $products->assignProduct($value);
-        }
-    */
 
         echo json_encode(['status' => 200, 'message' => 'successfully done', 'order' => ['id' => $order_id]]);
     }

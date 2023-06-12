@@ -13,13 +13,34 @@ if (empty($order) || empty($action) || empty($_GET['id'])) {
 $o = $order['order'];
 $oitems = $order['order_items'];
 
+$shopId = $shop['id'];
+$shopAccounts = new ShopAccounts();
+$accountsData = $shopAccounts->getSAs($shopId);
+$storeAccounts = [];
+foreach ($accountsData as $a) {
+    $storeAccounts[$a['key_value']] = $a['account_id'];
+}
+
+// payable credit entry
+$entry = [
+    'transaction_id' => $makeTransactionId,
+    'account_id' => $storeAccounts['cash'],
+    'entry_type' => 'D',
+    'description' => '',
+    'amount' => $amount,
+    'payment_mode' => $_POST['payment_mode'],
+    'user_id' => $_SESSION['user_credentials']['id'],
+];
+
+$a[] = $doubleEntry->makeEntry($entry);
+
 $amount = 0;
 if ($action == 1 || $action == 2) {
     echo $action;
     foreach ($oitems as $row) {
         $data = [
             'order_id' => $row['order_id'],
-            'shopId' => $o['shopId'],
+            'shopId' => $shopId,
             'type' => $action,
             'user_id' => $userData['id'],
             'product_id' => $row['product_id'],
@@ -102,7 +123,7 @@ if ($action == 3) {
 
         $entry = [
             'transaction_id' => $makeTransactionId,
-            'account_id' => $storeDATA['assets'],
+            'account_id' => $storeAccounts['assets'],
             'entry_type' => 'D',
             'description' => '',
             'amount' => $assetPrice, // 2000
@@ -129,7 +150,7 @@ if ($action == 3) {
             // saleDiscount credit entry
             $entry = [
                 'transaction_id' => $makeTransactionId,
-                'account_id' => $storeDATA['sale_discount'],
+                'account_id' => $storeAccounts['sale_discount'],
                 'entry_type' => 'C',
                 'description' => '',
                 'amount' => $saleDiscount, // 200 @ 10%
@@ -161,7 +182,7 @@ if ($action == 3) {
             // cash credit entry
             $entry = [
                 'transaction_id' => $makeTransactionId,
-                'account_id' => $storeDATA['sale_returns'],
+                'account_id' => $storeAccounts['sale_returns'],
                 'entry_type' => 'C',
                 'description' => '',
                 'amount' => $payment_amount, // 200 @ 10%

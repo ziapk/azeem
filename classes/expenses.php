@@ -118,6 +118,12 @@ class Expenses extends Connection
 			$doubleEntry = new DoubleEntry();
 			$store = new Store();
 			$storeDATA = $store->getStore($array['shop_id']);
+			$shopAccounts = new ShopAccounts();
+			$accountsData = $shopAccounts->getSAs($array['shop_id']);
+			$storeAccounts = [];
+			foreach ($accountsData as $a) {
+				$storeAccounts[$a['key_value']] = $a['account_id'];
+			}
 
 			$makeTransaction = [
 				'description' => $array['title'] . ' - ' . $array['description'],
@@ -146,7 +152,7 @@ class Expenses extends Connection
 
 			$entry = [
 				'transaction_id' => $makeTransactionId,
-				'account_id' => $storeDATA['cash'],
+				'account_id' => $storeAccounts['cash'],
 				'entry_type' => 'C',
 				'description' => '',
 				'amount' => $array['price'], // 2000

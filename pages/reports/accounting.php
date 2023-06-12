@@ -1,9 +1,6 @@
 <?php
 
 include_once dirname(__FILE__) . '/../../include/settings.php';
-// include_once dirname(__FILE__).'/../../mpdf/mpdf.php';
-
-
 
 $doubleEntry = new DoubleEntry();
 
@@ -28,8 +25,14 @@ $orientation 	= 'P';
 $largeFont 		= false;
 $srNo 			= true;
 $mediumFont		= false;
-$storeObj = new Store();
-$store = $storeObj->getStore($params['shopId']);
+
+$shopAccounts = new ShopAccounts();
+$accountsData = $shopAccounts->getSAs($params['shopId']);
+$store = [];
+foreach ($accountsData as $a) {
+	$store[$a['key_value']] = $a['account_id'];
+}
+
 $reportTitle = $shop['full_name'] . ' - ' . $shop['city'];
 
 $subtitle = " Between " . $params['fromDate'] . " and " . $params['toDate'];
@@ -53,9 +56,6 @@ switch ($reportType) {
 		$perPage = !empty($_GET['perPage']) ? $_GET['perPage'] : 1000;
 		$search = !empty($_GET['search']) ? $_GET['search'] : "";
 		$balances = $customers->getCustomersPagination(['page' => $page, 'perPage' => $perPage, 'search' => $search, 'shopId' => $shop['id']]);
-
-
-
 		$reportDataRaw = $doubleEntry->getClosingBalanceReport($params);
 		if (!empty($reportDataRaw['opening_balance'])) {
 			$ob = $reportDataRaw['opening_balance']['amount'];
@@ -248,14 +248,10 @@ switch ($reportType) {
 		break;
 
 	case '12':
-		// $params['parent_ids'][] = $store['receivable'];
-		// $params['parent_ids'][] = $store['payable'];
 		$params['account_ids'][] = $store['sale_discount'];
 		$params['account_ids'][] = $store['sale_returns'];
 		$params['account_ids'][] = $store['purchase_discount'];
 		$params['account_ids'][] = $store['purchase_returns'];
-		// $params['account_ids'][] = $store['receiving'];
-		// $params['account_ids'][] = $store['cash'];
 		$params['account_ids'][] = $store['assets'];
 		$params['parent_ids'][] = $store['expense'];
 		$reportData = $doubleEntry->getPLStatementReport($params);
@@ -271,9 +267,6 @@ switch ($reportType) {
 	default:
 		break;
 }
-// echo '<pre>';
-// print_r($otherList);
-// exit;
 ob_start();
 ?>
 <style>
@@ -297,19 +290,23 @@ ob_start();
 
 	td {
 		padding: 5px 5px;
-		<?php if ($report == 'dataCollection' || $report == 'idcards_list') { ?>height: 32px;
-		white-space: nowrap;
-		<?php } ?>
 	}
 
-	<?php if ($largeFont) { ?>td {
+	<?php if ($report == 'dataCollection' || $report == 'idcards_list') { ?>td {
+		height: 32px;
+		white-space: nowrap;
+	}
+
+	<?php }
+	if ($largeFont) { ?>td {
 		font-size: 25px;
 		padding: 7px 15px;
 		font-family: Calibri, sans-serif;
 		white-space: nowrap;
 	}
 
-	<?php } ?><?php if ($mediumFont) { ?>td {
+	<?php }
+	if ($mediumFont) { ?>td {
 		font-size: 15px;
 		padding: 4px 5px;
 		font-family: Calibri, sans-serif;

@@ -11,7 +11,12 @@ try {
     $storeObj = new Store();
     $storeDATA = $storeObj->getStore($shop['id']);
 
-
+    $shopAccounts = new ShopAccounts();
+    $accountsData = $shopAccounts->getSAs($shop['id']);
+    $storeAccounts = [];
+    foreach ($accountsData as $a) {
+        $storeAccounts[$a['key_value']] = $a['account_id'];
+    }
 
     $doubleEntry = new DoubleEntry();
 
@@ -47,7 +52,7 @@ try {
     // payable credit entry
     $entry = [
         'transaction_id' => $makeTransactionId,
-        'account_id' => $storeDATA['cash'],
+        'account_id' => $storeAccounts['cash'],
         'entry_type' => 'C',
         'description' => '',
         'amount' => $amount,

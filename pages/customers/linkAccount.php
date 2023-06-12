@@ -10,7 +10,15 @@ $data = $_POST;
 
 $de = new DoubleEntry();
 
-$receivableAccount = $de->getAccount($shop['receivable']);
+$shopAccounts = new ShopAccounts();
+$accountsData = $shopAccounts->getSAs($shopId);
+$storeAccounts = [];
+foreach ($accountsData as $a) {
+    $storeAccounts[$a['key_value']] = $a['account_id'];
+}
+
+
+$receivableAccount = $de->getAccount($storeAccounts['receivable']);
 
 $accountData = [
     'title' => 'Customer - ' . $_POST['full_name'] . ' - ' . $_POST['company'],

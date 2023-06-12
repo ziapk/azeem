@@ -54,7 +54,14 @@ if (empty($_POST['full_name'])) {
 
         $de = new DoubleEntry();
 
-        $receivableAccount = $de->getAccount($shop['expense']);
+        $shopAccounts = new ShopAccounts();
+        $accountsData = $shopAccounts->getSAs($shop['id']);
+        $storeAccounts = [];
+        foreach ($accountsData as $a) {
+            $storeAccounts[$a['key_value']] = $a['account_id'];
+        }
+
+        $receivableAccount = $de->getAccount($storeAccounts['expense']);
 
         $accountData = [
             'title' => 'Expense - ' . $_POST['full_name'] . ' - ' . $data['groupName'],

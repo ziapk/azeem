@@ -14,6 +14,12 @@ $supplierId = 1;
 $supplierObj = new Suppliers();
 $storeObj = new Store();
 $storeDATA = $storeObj->getStore($shop['id']);
+$shopAccounts = new ShopAccounts();
+$accountsData = $shopAccounts->getSAs($shop['id']);
+$storeAccounts = [];
+foreach ($accountsData as $a) {
+    $storeAccounts[$a['key_value']] = $a['account_id'];
+}
 if (empty($_POST['supplierId']) && !empty($_POST['supplierName'])) {
     $data = [
         'name' => $_POST['supplierName'],
@@ -28,7 +34,15 @@ if (empty($_POST['supplierId']) && !empty($_POST['supplierName'])) {
 
     $de = new DoubleEntry();
 
-    $payableAccount = $de->getAccount($shop['payable']);
+    $shopAccounts = new ShopAccounts();
+    $accountsData = $shopAccounts->getSAs($shop['id']);
+    $storeAccounts = [];
+    foreach ($accountsData as $a) {
+        $storeAccounts[$a['key_value']] = $a['account_id'];
+    }
+
+
+    $payableAccount = $de->getAccount($storeAccounts['payable']);
 
     $accountData = [
         'title' => 'Supplier - ' . $_POST['supplierName'] . ' - ' . $_POST['company'],
@@ -140,7 +154,7 @@ if ($supply_id) {
     // purchase discount entry - credit
     $entry = [
         'transaction_id' => $makeTransactionId,
-        'account_id' => $shop['assets'],
+        'account_id' => $storeAccounts['assets'],
         'entry_type' => 'D',
         'description' => '',
         'amount' => $assetPrice, // 2000
@@ -166,7 +180,7 @@ if ($supply_id) {
         // saleDiscount credit entry
         $entry = [
             'transaction_id' => $makeTransactionId,
-            'account_id' => $shop['purchase_discount'],
+            'account_id' => $storeAccounts['purchase_discount'],
             'entry_type' => 'C',
             'description' => '',
             'amount' => $purchaseDiscount, // 200 @ 10%
@@ -193,7 +207,7 @@ if ($supply_id) {
         // cash credit entry
         $entry = [
             'transaction_id' => $makeTransactionId,
-            'account_id' => $shop['cash'],
+            'account_id' => $storeAccounts['cash'],
             'entry_type' => 'C',
             'description' => '',
             'amount' => $cash, // 200 @ 10%
@@ -202,32 +216,6 @@ if ($supply_id) {
         ];
         $a[] = $doubleEntry->makeEntry($entry);
     }
-    // $transaction = [
-    //     'supplier_id' => !empty($supplierId) ? $supplierId : 1,
-    //     'user_id' => $userData['id'],
-    //     'amount' => !empty($_POST['payment_amount']) ? $_POST['payment_amount'] : 0,
-    //     'payment_date' => date('Y-m-d H:i:s'),
-    //     'transaction_type' => 1,        
-    //     'supply_id' => $supply_id,
-    //     'shopId' => $userData['shopId']
-    // ];
-
-    // $transactionId = $supply->makeTransaction($transaction);
-
-    // $amount = !empty($_POST['payment_amount']) ? $_POST['payment_amount'] : 0;
-
-    // $wallet = [
-    //     'id' => !empty($supplierId) ? $supplierId : 1,
-    //     'wallet' => $amount - ($_POST['subTotal'] - $_POST['discount'])
-    // ];
-
-
-    // $manageWallet = $supply->manageWallet($wallet);
-    /* $productUpdated = [];
-    foreach ($items as $value) {
-        $productUpdated[] = $products->assignProduct($value);
-    }
- */
 
     echo json_encode(['status' => 200, 'message' => 'successfully done', 'supply' => ['id' => $supply_id]]);
 }

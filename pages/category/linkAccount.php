@@ -10,7 +10,15 @@ $data = $_POST;
 
 $de = new DoubleEntry();
 
-$payableAccount = $de->getAccount($shop['expense']);
+$shopAccounts = new ShopAccounts();
+$accountsData = $shopAccounts->getSAs($shopId);
+$storeAccounts = [];
+foreach ($accountsData as $a) {
+    $storeAccounts[$a['key_value']] = $a['account_id'];
+}
+
+
+$payableAccount = $de->getAccount($storeAccounts['expense']);
 
 $accountData = [
     'title' => 'Expense - ' . $_POST['full_name'] . ' - ' . $_POST['groupName'],

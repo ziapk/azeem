@@ -38,6 +38,13 @@ $payment_amount -= $discount;
 
 $storeDATA = $storeObj->getStore($shopId);
 
+$shopAccounts = new ShopAccounts();
+$accountsData = $shopAccounts->getSAs($shop['id']);
+$storeAccounts = [];
+foreach ($accountsData as $a) {
+    $storeAccounts[$a['key_value']] = $a['account_id'];
+}
+
 $productIds = [];
 foreach ($_POST['items'] as $key => $value) {
     $productIds[$value['id']] = $value['qty'];
@@ -131,37 +138,8 @@ foreach ($oi as $id => $row) {
         }
     }
 }
-// echo 'Opening Balance';
-// print_r($opening_balance);
-// echo '<br />';
-// echo '<br />';
-// echo 'Remaining Balance';
-// print_r($remaining_balance);
-// echo '<br />';
-// echo '<br />';
-// echo 'Paid Amount';
-// print_r($purchaseValue);
-// echo '<br />';
-// echo '<br />';
-// echo 'Assets Amount';
-// print_r($productsValue);
-// echo '<br />';
-// echo '<br />';
-// echo 'Given Discount';
-// print_r($discount);
-// echo '<br />';
-// echo '<br />';
-// echo 'Products';
-// print_r($productsForReturn);
+
 $supplier = $supplierObj->getCustomer($supplierId);
-// echo '<br />';
-// echo '<br />';
-// echo 'Products';
-// print_r($supplier);
-// echo '<br />';
-// echo '<br />';
-// echo 'Products';
-// print_r($storeDATA);
 
 $doubleEntry = new DoubleEntry();
 
@@ -185,7 +163,7 @@ $returnAmount = $purchaseValue - $discount; // C 800
 
 $entry = [
     'transaction_id' => $makeTransactionId,
-    'account_id' => $storeDATA['assets'],
+    'account_id' => $storeAccounts['assets'],
     'entry_type' => 'D',
     'description' => '',
     'amount' => $assetPrice, // 2000
@@ -212,7 +190,7 @@ if (!empty($saleDiscount)) {
     // saleDiscount credit entry
     $entry = [
         'transaction_id' => $makeTransactionId,
-        'account_id' => $storeDATA['sale_discount'],
+        'account_id' => $storeAccounts['sale_discount'],
         'entry_type' => 'C',
         'description' => '',
         'amount' => $saleDiscount, // 200 @ 10%
@@ -244,7 +222,7 @@ if (!empty($payment_amount)) {
     // cash credit entry
     $entry = [
         'transaction_id' => $makeTransactionId,
-        'account_id' => $storeDATA['sale_returns'],
+        'account_id' => $storeAccounts['sale_returns'],
         'entry_type' => 'C',
         'description' => '',
         'amount' => $payment_amount, // 200 @ 10%

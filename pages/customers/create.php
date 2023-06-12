@@ -9,6 +9,13 @@ $ownerId = $userData['role'] == 'owner' ? $userData['id'] : $userData['created_b
 $userId = $userData['id'];
 $shopId = $shop['id'];
 
+$shopAccounts = new ShopAccounts();
+$accountsData = $shopAccounts->getSAs($shopId);
+$storeAccounts = [];
+foreach ($accountsData as $a) {
+    $storeAccounts[$a['key_value']] = $a['account_id'];
+}
+
 if (empty($_POST['full_name'])) {
     echo json_encode(['success' => false, 'message' => 'Please fill all requried fields']);
 } else {
@@ -26,7 +33,7 @@ if (empty($_POST['full_name'])) {
 
     $de = new DoubleEntry();
 
-    $receivableAccount = $de->getAccount($shop['receivable']);
+    $receivableAccount = $de->getAccount($storeAccounts['receivable']);
 
     $accountData = [
         'title' => 'Customer - ' . $_POST['full_name'] . ' - ' . $_POST['company'],

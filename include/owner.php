@@ -85,6 +85,7 @@ $customersList = $customerObj->getCustomers($shop['id']);
                 <input placeholder="Amount" ng-model="payment.amount" type="text" class="form-control">
               </div>
               <input type="submit" value="Submit" class="btn btn-primary">
+              <label class="pull-right"><input type="checkbox" name="adjustment" ng-model="payment.adjustment"> Adjustment</label>
             </form>
           </li>
           <li class="dropdown" style="padding: 0">
@@ -109,6 +110,7 @@ $customersList = $customerObj->getCustomers($shop['id']);
                 <input placeholder="Amount" ng-model="payment.amount" type="text" class="form-control">
               </div>
               <input type="submit" value="Submit" class="btn btn-primary">
+              <label class="pull-right"><input type="checkbox" name="adjustment" ng-model="payment.adjustment"> Adjustment</label>
             </form>
           </li>
           <li class="dropdown" style="padding: 0">
