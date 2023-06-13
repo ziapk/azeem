@@ -62,6 +62,7 @@ body {
   padding-left: 220px;
   background: none;
   transition: padding-left 0.4s ease;
+  font-size: inherit;
 }
 
 .container {
@@ -524,13 +525,11 @@ th.active .sort-icon {
 .table > thead > tr > th {
   border-bottom-width: 1px;
   font-weight: 700;
-  font-size: 13px;
 }
 
 .table > tbody > tr > td,
 .table > tbody > tr > th {
   border-color: #fff;
-  font-size: 12px;
   height: 44px;
   vertical-align: middle;
 }
@@ -813,7 +812,6 @@ body.no-padding {
 
 .sale-date {
   font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
-  font-size: 14px;
   font-weight: bold;
 }
 .sale-date .btn {

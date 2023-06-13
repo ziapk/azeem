@@ -28,6 +28,14 @@ $customersList = $customerObj->getCustomers($shop['id']);
 
 ?>
 <div ng-controller="headerController">
+  <table width="50%" style="margin: auto">
+    <tr>
+      <td>
+        <input type="range" ng-model="fontsize" min="13" max="40" ng-change="updateFont(fontsize)" />
+      </td>
+      <td>{{fontsize}}</td>
+    </tr>
+  </table>
   <nav class="navbar navbar-fixed-top">
     <div class="container-fluid">
       <!-- Brand and toggle get grouped for better mobile display -->
@@ -187,15 +195,18 @@ $customersList = $customerObj->getCustomers($shop['id']);
       <li class="<?php if ($params['page'] == 'product') {
                     echo 'active';
                   } ?>"><a uib-tooltip="Products" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/product"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/product.svg" alt="" /> <span class="nav-menu-text">Products</span></a></li>
+      <li class="<?php if ($params['page'] == 'product-create') {
+                    echo 'active';
+                  } ?>"><a uib-tooltip="Today's Transactions" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/chart-of-accounts/ledger_transactions.php"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/accounting.png" alt="" /> <span class="nav-menu-text">Today Entries</span></a></li>
       <li class="<?php if ($params['page'] == 'coa') {
                     echo 'active';
                   } ?>"><a uib-tooltip="Chart of Accounts" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/chart-of-accounts"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/accounting.png" alt="" /> <span class="nav-menu-text">Accounts</span></a></li>
       <!-- <li class="<?php if ($params['page'] == 'demand') {
                         echo 'active';
                       } ?>"><a uib-tooltip="Demands" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/demand/create.php"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/justice-hammer.svg" alt="" /> <span class="nav-menu-text">Invoicing</span></a></li> -->
-      <li class="<?php if ($params['page'] == 'shop_accounts') {
-                    echo 'active';
-                  } ?>"><a uib-tooltip="Shop Accounts" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/shop_accounts"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/accounting.png" alt="" /> <span class="nav-menu-text">Shop Accounts</span></a></li>
+      <!-- <li class="<?php if ($params['page'] == 'shop_accounts') {
+                        echo 'active';
+                      } ?>"><a uib-tooltip="Shop Accounts" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/shop_accounts"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/accounting.png" alt="" /> <span class="nav-menu-text">Shop Accounts</span></a></li> -->
       <li class="<?php if ($params['page'] == 'demand') {
                     echo 'active';
                   } ?>"><a uib-tooltip="Demands" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/demand"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/justice-hammer.svg" alt="" /> <span class="nav-menu-text">Demands</span></a></li>

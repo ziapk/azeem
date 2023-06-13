@@ -81,6 +81,7 @@ body {
     padding-left: $sidebarWidth;
     background: none;
     transition: padding-left 0.4s ease;
+    font-size: inherit;
 }
 
 .container {
@@ -555,13 +556,13 @@ th {
 .table>thead>tr>th {
     border-bottom-width: 1px;
     font-weight: 700;
-    font-size: 13px;
+    // font-size: 13px;
 }
 
 .table>tbody>tr>td,
 .table>tbody>tr>th {
     border-color: $tableHeadBg;
-    font-size: 12px;
+    // font-size: 12px;
     height: 44px;
     vertical-align: middle;
 }
@@ -839,7 +840,7 @@ body.no-padding {
 
 .sale-date {
     font-family: Menlo,Monaco,Consolas,"Courier New",monospace;
-    font-size: 14px;
+    // font-size: 14px;
     font-weight: bold;
     .btn {
         margin-left: 10px;
@@ -850,6 +851,17 @@ body.no-padding {
 }
 .blink {
     animation: 2s linear infinite condemned_blink_effect;
+}
+
+.row-raw {
+    background-color: rgba(green, 0.25) !important;
+}
+.row-service {
+    background-color: rgba(navy, 0.25) !important;
+}
+
+.row-expected {
+    background-color: rgba(red, 0.25) !important;
 }
 
 @keyframes condemned_blink_effect {

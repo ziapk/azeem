@@ -171,7 +171,13 @@ class DoubleEntry extends Connection
 	public function getJournals($arr = [], $id)
 	{
 		try {
-			$where = "where t.shopId IN (" . implode(', ', $id) . ") and t.flag=1 ";
+			$type = "";
+
+			if (!empty($arr['type'])) {
+				$type .= 'AND t.transsaction_type IN ("' . implode('","', $arr['type']) . '") ';
+			}
+
+			$where = "where t.shopId IN (" . implode(', ', $id) . ") and t.flag=1 " . $type;
 			if (!empty($arr['from']) && !empty($arr['to'])) {
 
 				$to = $arr['to'];
@@ -695,6 +701,22 @@ class DoubleEntry extends Connection
 			$prepare->bindParam(':code', $code, PDO::PARAM_STR);
 			$prepare->bindParam(':sortorder', $sortorder, PDO::PARAM_STR);
 			$prepare->bindParam(':id', $id, PDO::PARAM_INT);
+			$prepare->execute();
+			$result = $prepare->rowCount();
+			return $result;
+		} catch (PDOException $e) {
+			die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
+	public function updateTransactions($array)
+	{
+		$amount = $array['amount'];
+		$transaction_id = $array['transaction_id'];
+		try {
+			$stmt = "UPDATE `{$this->table_ledger_entries}` SET `amount`=:amount WHERE `transaction_id` = :transaction_id";
+			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':amount', $amount, PDO::PARAM_STR);
+			$prepare->bindParam(':transaction_id', $transaction_id, PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $prepare->rowCount();
 			return $result;

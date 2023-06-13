@@ -6,6 +6,15 @@ $ownerId = $userData['role'] == 'owner' ? $userData['id'] : $userData['created_b
 $list = $productCls->getOwnerProducts($ownerId);
 ?>
 <div ng-controller="headerController">
+  <table width="50%" style="margin: auto">
+    <tr>
+      <td>
+        <input type="range" ng-model="fontsize" min="13" max="40" ng-change="updateFont(fontsize)" />
+      </td>
+      <td>{{fontsize}}</td>
+    </tr>
+  </table>
+
   <nav class="navbar navbar-fixed-top">
     <div class="container-fluid">
       <!-- Brand and toggle get grouped for better mobile display -->

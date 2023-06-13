@@ -57,6 +57,14 @@ $list = $productCls->getOwnerProducts($ownerId);
   var event = new CustomEvent("ProdcutAdded");
 
   app.controller('headerController', function($scope, $http, $httpParamSerializerJQLike, $filter, $window, toaster) {
+    $scope.fontsize = 13;
+
+    $('html').css('font-size', $scope.fontsize + 'px');
+
+    $scope.updateFont = size => {
+      $('html').css('font-size', size + 'px');
+    }
+
     $scope.list = <?php echo safe_json_encode($list); ?>;
     sessionStorage.setItem('list', JSON.stringify($scope.list));
     $scope.exp = {};
