@@ -73,11 +73,11 @@ try {
     if ($status == 1 && !empty($_POST['id'])) { // when edit a parked entry
         $order_id = $_POST['id'];
     }
-
     if ($order_id) {
         $items = [];
         if (sizeof($_POST['items'])) {
             $orders->deleteOrderItems($order_id);
+            $orders->deleteOrderServices($order_id);
 
             $c = [];
             foreach ($_POST['items'] as $item) {
@@ -88,8 +88,10 @@ try {
                     'order_id' => $order_id,
                     'description' => $item['description'],
                     'quantity' => $item['qty'],
-                    'discount' => $item['discount'],
+                    'discount' => !empty($item['discount']) ? $item['discount'] : 0,
                     'price' => $item['price'],
+                    'services' => $item['services'],
+                    'raw_items' => $item['raw_items'],
                     'status' => $staus,
                     'item_status' => !empty($item['item_status']) ? $item['item_status'] : 1,
                     'employee_id' => !empty($item['employee_id']) ? $item['employee_id'] : null,

@@ -331,6 +331,7 @@ echo mainFooter();
                 supplierId: $scope.supplierId,
                 ref_no: $scope.ref_no,
                 subTotal: $scope.subTotal,
+                payable: $scope.grandTotal,
                 discount: $scope.discount,
                 items: $scope.items,
                 shopId: $scope.shopId,

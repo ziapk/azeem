@@ -103,7 +103,7 @@ $data = [
     'supplier_id' => !empty($supplierId) ? $supplierId : 1,
     'status' => 2,
     'ref_no' => $_POST['ref_no'],
-    'price' => $_POST['subTotal'],
+    'price' => $_POST['payable'],
     'discount' => $_POST['discount'],
     'shopId' => $userData['shopId'],
     'supply_date' => date('Y-m-d')
@@ -146,8 +146,8 @@ if ($supply_id) {
 
     $assetPrice = $productsValue;
     $cash = !empty($_POST['payment_amount']) ? $_POST['payment_amount'] : 0;
-    $purchaseDiscount = $totalDiscount;
-    $payableAmount = $purchaseValue;
+    $purchaseDiscount = $totalDiscount + $data['discount'];
+    $payableAmount = $purchaseValue - $data['discount'];
 
     // assets debit entry - debit
     // liability payable entry - credit
