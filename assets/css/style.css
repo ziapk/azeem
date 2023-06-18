@@ -381,6 +381,7 @@ body {
   right: 0;
 }
 
+.feature-product .btn-priority,
 .feature-product .btn-dup,
 .feature-product .btn-bookmark,
 .feature-product .btn-edit,
@@ -397,6 +398,7 @@ body {
   right: 10px;
 }
 
+.feature-product .btn-priority,
 .feature-product .btn-dup,
 .feature-product .btn-bookmark {
   bottom: 50px;
@@ -404,6 +406,10 @@ body {
   padding: 0;
   font-size: 20px;
   background: none;
+}
+
+.feature-product .btn-priority {
+  bottom: -90px;
 }
 
 .feature-product .btn-dup {

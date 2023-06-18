@@ -65,6 +65,8 @@ $programs = $programObj->getPrograms();
                 <a ng-if="li.dup == 1" href="javascript:void(0)" ng-click="removeDuplicate(li)" class="btn btn-dup" uib-tooltip="Remove from duplicate"><span class="fa fa-copy text-danger"></span></a>
                 <a ng-if="li.pin != '1'" href="javascript:void(0)" ng-click="addBookmark(li)" class="btn-bookmark" uib-tooltip="Pin as running"><span class="fa fa-heart-o"></span></a>
                 <a ng-if="li.pin == '1'" href="javascript:void(0)" ng-click="removeBookmark(li)" class="btn-bookmark" uib-tooltip="Added in Running list"><span class="fa fa-heart"></span></a>
+                <a ng-if="li.priority == '1'" href="javascript:void(0)" ng-click="setPriority(li)" class="btn btn-priority" uib-tooltip="Mark No Priority"><span class="fa fa-2x fa-check-circle text-success"></span></a>
+                <a ng-if="li.priority != '1'" href="javascript:void(0)" ng-click="setPriority(li)" class="btn btn-priority" uib-tooltip="Mark Priority"><span class="fa fa-2x fa-check-circle-o text-mute"></span></a>
                 <span class="price">{{li.price}} <em>{{li.currency || 'PKR'}}</em> <?php if ($userData['role'] === 'owner') { ?><span style="color: #888; font-size: 0.75em">| {{li.pprice}} <em>{{li.currency || 'PKR'}}</em></span> <?php } ?></span>
 
                 <span class="qty"><strong>{{li.qty < 0 ? 0 : li.qty}}</strong> Available</span>
@@ -142,6 +144,23 @@ $programs = $programObj->getPrograms();
                     if (response.status === 200) {
                         toaster.success({
                             body: 'Successfully Marked!'
+                        });
+                        $scope.getProducts();
+                    }
+                })
+        }
+        $scope.setPriority = function(item) {
+            console.log(parseInt(item.priority));
+            $http.get("<?php echo SITE_URL ?>api/setPriority.php", {
+                    params: {
+                        id: item.id,
+                        action: parseInt(item.priority)
+                    }
+                })
+                .then(function(response) {
+                    if (response.status === 200) {
+                        toaster.success({
+                            body: 'Successfully Updated!'
                         });
                         $scope.getProducts();
                     }

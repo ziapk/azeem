@@ -109,7 +109,7 @@ class Products extends Connection
 			if (!empty($shopId)) {
 				$column = ", (sp.qty - sp.stock_out) as qty, sp.min_qty ";
 				if (!empty($params['minQty'])) {
-					$minQry = " HAVING qty <= sp.min_qty";
+					$minQry = " HAVING qty <= sp.min_qty order by p.priority desc";
 				}
 			}
 
@@ -604,6 +604,20 @@ class Products extends Connection
 			$prepare->bindParam(':cat_id', $array['cat_id'], PDO::PARAM_STR);
 			$prepare->bindParam(':id', $array['id'], PDO::PARAM_INT);
 			$prepare->bindParam(':owner_id', $array['owner_id'], PDO::PARAM_INT);
+			$prepare->execute();
+			$result = $prepare->rowCount();
+			return $result;
+		} catch (PDOException $e) {
+			die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
+	public function setPriority($id, $priority)
+	{
+		try {
+			$stmt = "UPDATE `{$this->table}` SET `priority`=:priority WHERE id=:id";
+			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':priority', $priority, PDO::PARAM_INT);
+			$prepare->bindParam(':id', $id, PDO::PARAM_INT);
 			$prepare->execute();
 			$result = $prepare->rowCount();
 			return $result;
