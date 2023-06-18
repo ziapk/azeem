@@ -26,7 +26,7 @@ foreach ($recevingEntry as $row) {
     } else {
         $configs['title'] = 'Payment Invoice';
         $configs['label'] = 'Supplier\'s Name';
-        if ($row['parent_id'] == $storeAccounts['payable']) {
+        if (in_array($row['parent_id'], [$storeAccounts['payable'], $storeAccounts['receivable']])) {
             $userEntry = $row;
             $userEntry['creditAmount'] = $row['amount'];
         }
