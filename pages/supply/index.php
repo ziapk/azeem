@@ -1,12 +1,16 @@
 <?php
 include_once dirname(__FILE__) . '/../../include/settings.php';
 
-$ordersObj = new Orders();
-$dateLabel = "Sales for ";
-$start = $end = date('Y-m-d');
+$supplyObj = new Supply();
 $stores = new Store();
 $userId = $userData['role'] == 'owner' ? $userData['id'] : $userData['created_by'];
 $ownerStores = $stores->getOwnerStores($userId);
+
+$order = [];
+$id = !empty($_GET['id']) ? $_GET['id'] : 0;
+if (!empty($id)) {
+    $order = $supplyObj->getOrder($id);
+}
 
 echo mainHeader();
 ?>
@@ -38,78 +42,9 @@ echo mainHeader();
             <a href="javascript:void(0)" title="Add Fresh Product" ng-click="addFreshProduct()" class="btn btn-danger">Add Fresh Product</a>
         </div>
     </div>
+    <?php
+    include_once dirname(__FILE__) . '/table.php' ?>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th width="200">Product Id</th>
-                <th>Product Name</th>
-                <th width="100">Dist %</th>
-                <th width="100">P. Price</th>
-                <th width="100">S. Price</th>
-                <th width="100">Qty</th>
-                <th width="100">Total</th>
-                <th></th>
-            </tr>
-            <tr>
-                <td colspan="8"><input type="text" id="searchProduct" class="form-control" ng-model="product" placeholder="Search Product to add" typeahead-on-select="selectProduct($item, row)" uib-typeahead="address as address.full_name for address in searchProduct($viewValue)" typeahead-template-url="row2.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="0" class="form-control" ng-model="row.product_name" /></td>
-            </tr>
-        </thead>
-        <tbody>
-            <tr ng-repeat="row in items track by $index" id="product-{{$index + 1}}">
-                <td><input type="text" class="form-control" ng-model="row.barcode" /></td>
-                <td>
-                    <input type="text" class="form-control" ng-model="row.full_name" placeholder="Product title" />
-                </td>
-                <td><input type="number" class="form-control discount-field" ng-change="calculateSum()" ng-model="row.discount" /></td>
-                <td><input type="number" class="form-control" ng-change="calculatePercent(row)" ng-model="row.pprice" /></td>
-                <td width="100"><input type="number" class="form-control" ng-model="row.price" /></td>
-                <td width="100"><input type="number" class="form-control" ng-change="calculateSum()" ng-model="row.qty" ng-keydown="initCheckKeypress($event)" /></td>
-                <td width="100">{{row.total | number: 0}}</td>
-                <td width="60"><a href="#" class="btn btn-xs btn-danger pull-right" ng-click="remove(cart)">Delete</a></td>
-            </tr>
-        </tbody>
-        <tbody>
-            <tr>
-                <th rowspan="6"></th>
-                <th class="text-right" colspan="5">Sub Total</th>
-                <th colspan="2">{{subTotal}}</th>
-            </tr>
-            <tr>
-                <th class="text-right" colspan="5">Disc.</th>
-                <th colspan="2" width="200"><input type="number" ng-model="discount" class="form-control" ng-change="addDiscount(discount)"></th>
-            </tr>
-            <tr>
-                <th class="text-right" colspan="5">Grand Total</th>
-                <th colspan="2">{{grandTotal}}</th>
-            </tr>
-            <tr>
-                <th class="text-right" colspan="5">Pay with Credit</th>
-                <th colspan="2" width="200"><input type="number" ng-model="payment_with_credit" class="form-control"></th>
-            </tr>
-            <tr>
-                <th class="text-right" colspan="5">Pay Direct</th>
-                <th colspan="2" width="200"><input type="number" ng-model="payment_amount" class="form-control"></th>
-            </tr>
-            <tr>
-                <th class="text-right" colspan="5">Balance</th>
-                <th colspan="2" width="200">{{grandTotal - payment_amount - payment_with_credit}}</th>
-            </tr>
-        </tbody>
-        <tbody>
-            <tr>
-                <th colspan="8" class="text-right">
-                    <div class="btn-group">
-                        <label class="btn btn-default" ng-repeat="li in modes">
-                            <input type="radio" name="mode" ng-model="payment_mode" ng-value="li.id" ng-change="printValue(li)">
-                            {{li.title}}
-                        </label>
-                    </div>
-                    <a href="#" class="btn btn-primary" ng-click="checkout()"><img width="24" height="24" src="<?php echo SITE_URL; ?>assets/img/svg/001-checkout.svg" alt="" /> Checkout</a>
-                </th>
-            </tr>
-        </tbody>
-    </table>
 </div>
 <?php
 echo mainFooter();
@@ -123,19 +58,52 @@ echo mainFooter();
         $scope.product = "";
         $scope.shopId = '4';
 
+        $scope.selectSupplier = function(p) {
+            $http.get("<?php echo SITE_URL ?>api/getOpeningBalance.php", {
+                params: {
+                    account_id: p.account_id,
+                    type: $scope.toggleForm.searchMode ? 'c' : 's'
+                }
+            }).then(res => {
+
+                $scope.supplierId = p.id
+                $scope.supplierName = p.full_name || p.name
+                $scope.supplier = {
+                    ...p,
+                    opening_balance: $scope.toggleForm.searchMode ? ((parseFloat(res.data.opening_balance || 0) + parseFloat(res.data.debitAmount || 0)) - parseFloat(res.data.creditAmount || 0)) : ((parseFloat(res.data.opening_balance || 0) + parseFloat(res.data.creditAmount || 0) - parseFloat(res.data.debitAmount || 0)))
+                };
+                $scope.shopId = p.shopId;
+                // $scope.items = [];
+                $scope.calculateSum();
+            })
+        }
+
+        $scope.orderData = <?php echo json_encode($order); ?>;
         $scope.list = [];
         $scope.priceList = [];
-        $scope.items = [];
+        $scope.items = $scope.orderData?.order_items?.map(item => ({
+            ...item,
+            price: parseFloat(item.price),
+            quantity: parseFloat(item.quantity),
+            qty: parseFloat(item.quantity),
+            discount: parseFloat(item.discount)
+        })) || [];
         $scope.customerData = {};
-        $scope.subTotal = 0;
-        $scope.grandTotal = 0;
-        $scope.discount = 0;
-        $scope.payment_amount = 0;
-        $scope.payment_with_credit = 0;
+
+        $scope.subTotal = $scope.orderData?.order?.price + $scope.orderData?.order?.discount || 0;
+        $scope.grandTotal = $scope.orderData?.order?.price || 0;
+        $scope.discount = parseFloat($scope.orderData?.order?.discount || 0);
+        $scope.payment_amount = parseFloat($scope.orderData?.order?.payment_amount || 0);
+        $scope.payment_with_credit = parseFloat($scope.orderData?.order?.payment_with_credit || 0);
         $scope.payment_mode = '1';
 
         $scope.toggleForm = {
-            searchMode: false
+            searchMode: $scope.orderData?.customer ? true : false
+        }
+
+        if ($scope.orderData?.customer || $scope.orderData?.supplier) {
+            $scope.selectSupplier($scope.orderData.customer || $scope.orderData.supplier);
+
         }
 
 
@@ -176,25 +144,6 @@ echo mainFooter();
                 });
         }
 
-        $scope.selectSupplier = function(p) {
-            $http.get("<?php echo SITE_URL ?>api/getOpeningBalance.php", {
-                params: {
-                    account_id: p.account_id,
-                    type: $scope.toggleForm.searchMode ? 'c' : 's'
-                }
-            }).then(res => {
-
-                $scope.supplierId = p.id
-                $scope.supplierName = p.full_name || p.name
-                $scope.supplier = {
-                    ...p,
-                    opening_balance: $scope.toggleForm.searchMode ? ((parseFloat(res.data.opening_balance || 0) + parseFloat(res.data.debitAmount || 0)) - parseFloat(res.data.creditAmount || 0)) : ((parseFloat(res.data.opening_balance || 0) + parseFloat(res.data.creditAmount || 0) - parseFloat(res.data.debitAmount || 0)))
-                };
-                $scope.shopId = p.shopId;
-                // $scope.items = [];
-                $scope.calculateSum();
-            })
-        }
 
         $scope.addDiscount = function(val, obj) {
             if (val > 0) {
@@ -258,11 +207,6 @@ echo mainFooter();
 
         }
 
-        $scope.selectCustomer = function(p) {
-            $scope.customerName = p.full_name;
-            $scope.customerData = p;
-
-        }
 
         $scope.addQty = function(row) {
             row.qty++;
@@ -314,8 +258,9 @@ echo mainFooter();
         }
 
         $scope.searchMode();
-
-        $scope.searchSupplier('', true);
+        if (!$scope.orderData) {
+            $scope.searchSupplier('', true);
+        }
 
         $scope.clearSearch = () => {
             $scope.product = "";
@@ -325,8 +270,11 @@ echo mainFooter();
             $scope.customersList = [];
         }
 
-        $scope.checkout = function() {
-            console.log('yes');
+        $scope.park = () => {
+            $scope.checkout(1)
+        }
+
+        $scope.checkout = function(status) {
             $scope.form = {
                 supplierId: $scope.supplierId,
                 ref_no: $scope.ref_no,
@@ -335,8 +283,11 @@ echo mainFooter();
                 discount: $scope.discount,
                 items: $scope.items,
                 shopId: $scope.shopId,
+                id: '<?php echo $_GET['id']; ?>' || 0,
+                status: status || 2,
                 account_id: $scope.supplier.account_id,
                 payment_amount: $scope.payment_amount,
+                supplier_type: $scope.toggleForm.searchMode ? 2 : 1,
                 payment_with_credit: $scope.payment_with_credit,
             }
 

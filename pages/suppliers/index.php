@@ -25,7 +25,7 @@ echo mainHeader(['page' => 'supplier']);
         </thead>
         <tbody>
             <tr ng-repeat="li in list">
-                <td width="50"><img ng-if="li.image" width="40" class="image" src={{"<?php echo SITE_URL; ?>uploads/products/"+li.image}} /></td>
+                <td width="50">{{li.id}}</td>
                 <td><strong>{{li.name}}</strong> <br /> {{li.contact}}</td>
                 <td><strong>{{li.company}}</strong> - {{li.title}} <br />{{li.address}}</td>
                 <td ng-class="{'text-danger': li.closing_balance < 0}">{{li.closing_balance}}</td>

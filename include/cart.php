@@ -125,6 +125,7 @@ $list = $productCls->getOwnerProducts($ownerId);
           if (response.data.status == 200) {
             $scope.payment.summery = '';
             $scope.payment.amount = '';
+            $scope.printRecipt(response.data.supply.id);
           }
         })
       }
@@ -142,12 +143,23 @@ $list = $productCls->getOwnerProducts($ownerId);
         }).then((response) => {
           alert(response.data.message);
           if (response.data.status == 200) {
+            $scope.printRecipt(response.data.supply.id);
             $scope.payment.customer = '';
             $scope.payment.summery = '';
             $scope.payment.amount = '';
           }
+
+
         })
       }
+    }
+    $scope.printRecipt = (id, detail, largeView) => {
+      if (detail) {
+        detail = true
+      } else {
+        detail = false
+      }
+      $window.open("<?php echo SITE_URL; ?>print/receiving.php?id=" + id + "&detail=" + detail + '&largeView=' + largeView, "", "width=600,height=900");
     }
     $scope.refreshList = function() {
       $scope.cart = JSON.parse($window.sessionStorage.getItem('shopping'));

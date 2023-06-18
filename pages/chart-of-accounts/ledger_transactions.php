@@ -78,6 +78,7 @@ echo mainHeader(['page' => 'coa']);
                             <?php echo $rows[0]['reference']; ?> [ <?php echo $rows['0']['v_description']; ?> ]
                             <?php if ($userData['role'] === 'owner') { ?><a href="javascript:void(0)" class="text-danger" ng-click="deleteTransaction(<?php echo $id; ?>)">Delete Transaction</a><?php } ?>
                             <?php if ($userData['role'] === 'owner') { ?><a href="javascript:void(0)" class="text-danger" ng-click='addCustomer(<?php echo json_encode($rows['0']); ?>)'>EDIT</a><?php } ?>
+                            <?php if ($userData['role'] === 'owner') { ?><a href="javascript:void(0)" class="text-danger" ng-click='printRecipt(<?php echo $id; ?>)'>Print</a><?php } ?>
                         </td>
                     </tr>
                     <?php foreach ($rows as $key => $product) { ?>
@@ -139,6 +140,15 @@ echo mainHeader(['page' => 'coa']);
                         window.location.reload();
                     });
             }
+        }
+
+        $scope.printRecipt = (id, detail, largeView) => {
+            if (detail) {
+                detail = true
+            } else {
+                detail = false
+            }
+            $window.open("<?php echo SITE_URL; ?>print/receiving.php?id=" + id + "&detail=" + detail + '&largeView=' + largeView, "", "width=600,height=900");
         }
 
         $scope.addCustomer = function(item) {

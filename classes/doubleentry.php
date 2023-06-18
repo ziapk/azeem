@@ -48,7 +48,7 @@ class DoubleEntry extends Connection
 		}
 	}
 
-	public function searchAccounts($shopId = null, $search)
+	public function searchAccounts($shopId = null, $search = "")
 	{
 		try {
 			$shopIdCond = '';
@@ -168,7 +168,7 @@ class DoubleEntry extends Connection
 	}
 
 
-	public function getJournals($arr = [], $id)
+	public function getJournals($arr = [], $id = null)
 	{
 		try {
 			$type = "";
@@ -253,6 +253,20 @@ class DoubleEntry extends Connection
 			$prepare->execute();
 			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
 			return ['rows' => $result, 'summery' => $summery];
+		} catch (PDOException $e) {
+			die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
+	public function getLedgerByTID($id)
+	{
+		try {
+
+			$stmt = "SELECT t.transaction_date, t.transsaction_type, m.title as pay_via, e.transaction_id, e.payment_mode, a.parent_id, a.code, e.account_id, a.opening_balance, a.account_type, a.title, e.entry_type, t.transaction_date, amount, t.order_ref,  t.description as v_description, (CASE WHEN e.entry_type = 'D' THEN e.amount ELSE 0 END) AS debitAmount, (CASE WHEN e.entry_type = 'C' THEN e.amount ELSE 0 END) AS creditAmount FROM `$this->table_transactions` t LEFT JOIN `$this->table_ledger_entries` e ON e.transaction_id = t.id LEFT JOIN `$this->table` a ON a.id = e.account_id and a.status = 1 left join `{$this->table_modes}` as m on m.id=e.payment_mode where t.id = :id";
+			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':id', $id, PDO::PARAM_STR);
+			$prepare->execute();
+			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
+			return $result;
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
 		}
@@ -1024,6 +1038,21 @@ class DoubleEntry extends Connection
 		if (!empty($id)) {
 			try {
 				$stmt = "UPDATE `{$this->table_transactions}` SET flag=2 where order_ref=:id";
+				$prepare = $this->dbh->prepare($stmt);
+				$prepare->bindParam(':id', $id, PDO::PARAM_INT);
+				$prepare->execute();
+				$result = $prepare->rowCount();
+				return $result;
+			} catch (PDOException $e) {
+				die("Error!: " . $e->getMessage() . "<br/>");
+			}
+		}
+	}
+	public function deleteTransactionBySupplyId($id)
+	{
+		if (!empty($id)) {
+			try {
+				$stmt = "UPDATE `{$this->table_transactions}` SET flag=2 where supply_ref=:id";
 				$prepare = $this->dbh->prepare($stmt);
 				$prepare->bindParam(':id', $id, PDO::PARAM_INT);
 				$prepare->execute();

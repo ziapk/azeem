@@ -1,0 +1,298 @@
+<?php
+include_once dirname(__FILE__) . '/../include/settings.php';
+$id = !empty($_GET['id']) ? $_GET['id'] : 0;
+if (empty($id)) {
+    echo "Invalid data";
+}
+$details = !empty($_GET['detail']) && $_GET['detail'] == 'true' ? true : false;
+$largeView = !empty($_GET['largeView']) && $_GET['largeView'] == 'large' ? true : false;
+$customers = new Customers();
+$de = new DoubleEntry();
+$id = $_GET['id'];
+
+$shopAccounts = new ShopAccounts();
+$accountsData = $shopAccounts->getSAs($shop['id']);
+$storeAccounts = [];
+foreach ($accountsData as $a) {
+    $storeAccounts[$a['key_value']] = $a['account_id'];
+}
+
+$recevingEntry = $de->getLedgerByTID($id);
+$userEntry = [];
+$configs = ['title' => 'Receiving Invoice', 'label' => 'Customer\'s Name'];
+foreach ($recevingEntry as $row) {
+    if ($row['entry_type'] == 'C' && $row['transsaction_type'] == 'DIRECT_RECEIVING') {
+        $userEntry = $row;
+    } else {
+        $configs['title'] = 'Payment Invoice';
+        $configs['label'] = 'Supplier\'s Name';
+        if ($row['parent_id'] == $storeAccounts['payable']) {
+            $userEntry = $row;
+            $userEntry['creditAmount'] = $row['amount'];
+        }
+    }
+}
+
+$gst = 0;
+$service_charges = 0;
+$price = $userEntry['creditAmount'];
+$aprice = 0;
+$largeView = true;
+$currentBalance = $blc['balance'];
+$balance = $price - $order['order']['payment_amount'] - $order['order']['payment_with_credit'];
+?>
+<link href="https://fonts.googleapis.com/css?family=Courgette&display=swap" rel="stylesheet">
+<?php
+
+$foodpanda = $order['customer'];
+
+$a = [];
+if (!empty($shop['phoneNumber1'])) {
+    array_push($a, $shop['phoneNumber1']);
+}
+if (!empty($shop['phoneNumber2'])) {
+    array_push($a, $shop['phoneNumber2']);
+}
+if (!empty($shop['phoneNumber3'])) {
+    array_push($a, $shop['phoneNumber3']);
+}
+$result = array_filter($a, 'strlen');
+$distTotal = 0;
+$qty = 0; ?>
+<style>
+    body {
+        margin: 0;
+    }
+
+    .recipt>table {
+        font-size: 12px;
+        font-family: inherit;
+    }
+
+    .recipt {
+        font-family: Tahoma;
+        text-align: center;
+        line-height: 1.5;
+        padding-top: 0;
+        width: 260px;
+        margin: 0 auto;
+        font-size: 12px;
+    }
+
+    .recipt.large {
+        width: auto;
+    }
+
+    h3 {
+        margin: 0;
+        line-height: 1
+    }
+
+    .recipt-table {
+        border-collapse: collapse;
+        font-family: Tahoma;
+        font-size: inherit;
+    }
+
+    .recipt-table th,
+    .recipt-table td {
+        border: 1px solid;
+    }
+
+    p {
+        font-family: Tahoma;
+        font-style: normal;
+        line-height: 1.3
+    }
+
+    .no-border {
+        border: 0;
+    }
+
+    th {
+        padding: 4px 5px;
+    }
+
+    td {
+        padding: 4px 5px;
+        text-align: center;
+    }
+
+    .text-left {
+        text-align: left;
+    }
+
+    .text-right {
+        text-align: right;
+    }
+
+    .thead {
+        font-weight: 600
+    }
+
+    footer {
+        position: fixed;
+        bottom: 0;
+        right: 0;
+        left: 0;
+        font-size: 12px;
+    }
+
+    .mt-5 {
+        margin-top: 5px;
+        margin-bottom: 5px;
+    }
+
+    .mt-0 {
+        margin-top: 0;
+    }
+
+    .head h3 {
+        font-family: 'Courgette', cursive;
+    }
+
+    .ref,
+    .date,
+    .head p {}
+
+    .head {
+        margin: 0;
+    }
+
+    .pull-left {
+        float: left;
+    }
+
+    .pull-right {
+        float: right;
+    }
+
+    .border {
+        border-bottom: 1px solid #333;
+    }
+
+    .table th {
+        padding-right: 10px;
+        /* height: 30px; */
+    }
+
+    .table {
+        text-align: left;
+        margin-bottom: 20px;
+        font-size: inherit;
+    }
+
+    @page {
+        @bottom-left {
+            content: counter(page) "/" counter(pages);
+        }
+    }
+</style>
+<div class="recipt large">
+    <table width="100%">
+        <thead>
+            <tr>
+                <th>
+                    <div class="head text-left">
+                        <span class="pull-right">
+                            <img width="120" height="60" style="vertical-align: middle; margin-right: 5px; filter: grayscale(100%);" src="<?php echo SITE_URL; ?>assets/clients/<?php echo $shop['image']; ?>" />
+                        </span>
+                        <h3>
+                            <div style="padding-top: 10px"><?php echo strtoupper($shop['full_name']); ?>
+                                <p class="mt-0"><?php echo $shop['location']; ?>, <?php echo $shop['city']; ?> <br>
+                                    <strong><small><?php echo implode(", ", $result); ?></small></strong>
+                                </p>
+                                <div>
+                        </h3>
+                        <h2 style="text-align: center"><?php echo $configs['title']; ?></h2>
+                    </div>
+                    <?php $net = abs(($price)); ?>
+                    <table class="table" style="width: 100%">
+                        <tr>
+                            <td width="140" class="text-right"><?php echo $configs['label']; ?>:</td>
+                            <th><?php echo $userEntry['title']; ?></th>
+                            <td width="120" class="text-right">Bill Ref.</td>
+                            <th>0000<?php echo $_GET['id']; ?></th>
+                        </tr>
+                        <tr>
+                            <td class="text-right">Contact No.</td>
+                            <th><?php if (!empty($foodpanda['phoneNumber'])) { ?><?php echo $foodpanda['phoneNumber']; ?><?php } ?></th>
+                            <td width="120" class="text-right">Date Time:</td>
+                            <th><?php echo date('d/m/Y', strtotime($userEntry['transaction_date'])); ?></th>
+                        </tr>
+                        <span class="ref"><strong></strong> </span>
+                        <span class="date"></span>
+                        <span class="ref"><strong></strong> </span>
+                    </table>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    <table class="recipt-table" width="100%" cellpadding="0" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th width="40" class="text-left thead">Sr.#</th>
+                                <th class="text-left thead">Description</th>
+                                <th width="40" class="thead">MODE</th>
+                                <th width="40" class="thead">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="text-left"><?php echo 1; ?></td>
+                                <td class="text-left" style="padding: 0 6px"><?php echo $userEntry['v_description']; ?></td>
+                                <td class="text-left"><?php echo $userEntry['pay_via']; ?></td>
+                                <td class="text-right" style="font-size: 20px;"><?php echo number_format(($userEntry['creditAmount'])); ?></td>
+                            </tr>
+                            <tr class="no-border">
+                                <th style="border: 0;" valign="middle" colspan="4" class="text-left">
+                                    Net in words: <?php echo convertNumberToWord($userEntry['creditAmount']); ?>
+                                </th>
+                            </tr>
+                            <tr>
+                                <th colspan="4" style="border: 0; height: 100px">
+                                </th>
+                            <tr>
+                                <th colspan="4" style="border: 0">
+                                    <table border="0" class="table" width="100%" style="border-collapse: collapse; border: 0">
+                                        <tr>
+                                            <td width="40%" style="border: 0; text-align: left" align="left">
+                                                Owner's Sign
+
+                                            </td>
+                                            <td style="border: 0"></td>
+                                            <td style="border: 0; text-align: left">
+                                                Customer's Sign
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="border: 0">
+                                            </td>
+                                            <td style="border: 0"></td>
+                                            <td style="border: 0; text-align: left">
+                                                <strong><?php echo $userEntry['title']; ?></strong>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </th>
+                            </tr>
+                            </tfoot>
+                    </table>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <footer>
+        Power by: Zia ur Rehman Ph.# <strong>03245120412</strong>
+    </footer>
+</div>
+<?php if (!$details) { ?>
+    <script>
+        window.print();
+        window.onafterprint = function() {
+            // window.close();
+        }
+    </script>
+<?php } ?>

@@ -17,6 +17,9 @@ $storeDATA = $storeObj->getStore($shop['id']);
 $shopAccounts = new ShopAccounts();
 $accountsData = $shopAccounts->getSAs($shop['id']);
 $storeAccounts = [];
+$cash = !empty($_POST['payment_amount']) ? $_POST['payment_amount'] : 0;
+$payment_with_credit = !empty($_POST['payment_with_credit']) ? $_POST['payment_with_credit'] : 0;
+$de = new DoubleEntry();
 foreach ($accountsData as $a) {
     $storeAccounts[$a['key_value']] = $a['account_id'];
 }
@@ -32,7 +35,6 @@ if (empty($_POST['supplierId']) && !empty($_POST['supplierName'])) {
         'shopId' => $shop['id'],
     ];
 
-    $de = new DoubleEntry();
 
     $shopAccounts = new ShopAccounts();
     $accountsData = $shopAccounts->getSAs($shop['id']);
@@ -68,7 +70,7 @@ if (empty($_POST['supplierId']) && !empty($_POST['supplierName'])) {
 $products = new Products();
 
 $items = [];
-
+$status = $_POST['status'] ? $_POST['status'] : 2;
 $purchaseValue = 0;
 $productsValue = 0;
 if (sizeof($_POST['items'])) {
@@ -78,6 +80,8 @@ if (sizeof($_POST['items'])) {
             $productsValue += ($item['price'] * $item['qty']);
             $items[] = [
                 'pprice' => $item['pprice'],
+                'price' => $item['price'],
+                'discount' => $item['discount'],
                 'qty' => $item['qty'],
                 'stock_out' => 0,
                 'product_id' => $item['id'],
@@ -87,8 +91,6 @@ if (sizeof($_POST['items'])) {
         }
     }
 }
-
-
 
 if (sizeof($items)) {
 
@@ -101,120 +103,129 @@ $supply = new Supply();
 $data = [
     'user_id' => $userData['id'],
     'supplier_id' => !empty($supplierId) ? $supplierId : 1,
-    'status' => 2,
+    'status' => $status,
     'ref_no' => $_POST['ref_no'],
     'price' => $_POST['payable'],
+    'payment_amount' => $cash,
+    'payment_with_credit' => $payment_with_credit,
     'discount' => $_POST['discount'],
+    'supplier_type' => $_POST['supplier_type'],
+    'id' => $_POST['id'],
     'shopId' => $userData['shopId'],
-    'supply_date' => date('Y-m-d')
+    'supply_date' => $shop['sale_date']
 ];
 
+if (!empty($_POST['id'])) {
+    $de->deleteTransactionBySupplyId($_POST['id']);
+}
 $supply_id = $supply->createSupply($data);
 
 if ($supply_id) {
-
     if (sizeof($items)) {
+        $supply->deleteSupplyDetails($supply_id);
         foreach ($items as $item) {
             $d = [
                 'supply_id' => $supply_id,
                 'product_id' => $item['product_id'],
                 'quantity' => $item['qty'],
-                'price' => $item['pprice'],
+                'discount' => $item['discount'],
+                'price' => $item['price'],
             ];
             $supply->createSupplyDetails($d);
         }
     }
 
-    $account_id = $_POST['account_id'];
-    $credit_amount = !empty($_POST['payment_with_credit']) ? $_POST['payment_with_credit'] : 0;
-    $doubleEntry = new DoubleEntry();
+    if ($status != 1) {
 
-    $makeTransaction = [
-        'description' => !empty($_POST['summery']) ? $_POST['summery'] : "Supply Invoice: " . $supply_id . " PLACED",
-        'transaction_date' => $storeDATA['sale_date'],
-        'reference' => $data['ref_no'],
-        'transaction_type' => !empty($credit_amount) ? 'EXCHANGE' : 'PURCHASE',
-        'shopId' => $shop['id'],
-        'created_by' => $_SESSION['user_credentials']['id'],
-        'order_ref' => null,
-        'supply_ref' => $supply_id,
-    ];
+        $account_id = $_POST['account_id'];
+        $credit_amount = !empty($_POST['payment_with_credit']) ? $_POST['payment_with_credit'] : 0;
 
-    $makeTransactionId = $doubleEntry->makeTransaction($makeTransaction);
+        $makeTransaction = [
+            'description' => !empty($_POST['summery']) ? $_POST['summery'] : "Supply Invoice: " . $supply_id . " PLACED",
+            'transaction_date' => $storeDATA['sale_date'],
+            'reference' => $data['ref_no'],
+            'transaction_type' => !empty($credit_amount) ? 'EXCHANGE' : 'PURCHASE',
+            'shopId' => $shop['id'],
+            'created_by' => $_SESSION['user_credentials']['id'],
+            'order_ref' => null,
+            'supply_ref' => $supply_id,
+        ];
 
-    $totalDiscount = $productsValue - $purchaseValue;
+        $makeTransactionId = $de->makeTransaction($makeTransaction);
 
-    $assetPrice = $productsValue;
-    $cash = !empty($_POST['payment_amount']) ? $_POST['payment_amount'] : 0;
-    $purchaseDiscount = $totalDiscount + $data['discount'];
-    $payableAmount = $purchaseValue - $data['discount'];
+        $totalDiscount = $productsValue - $purchaseValue;
 
-    // assets debit entry - debit
-    // liability payable entry - credit
-    // purchase discount entry - credit
-    $entry = [
-        'transaction_id' => $makeTransactionId,
-        'account_id' => $storeAccounts['assets'],
-        'entry_type' => 'D',
-        'description' => '',
-        'amount' => $assetPrice, // 2000
-        'payment_mode' => $_POST['payment_mode'],
-        'user_id' => $_SESSION['user_credentials']['id'],
-    ];
+        $assetPrice = $productsValue;
+        $purchaseDiscount = $totalDiscount + $data['discount'];
+        $payableAmount = $purchaseValue - $data['discount'];
 
-    $a[] = $doubleEntry->makeEntry($entry);
-
-    // payable credit entry
-    $entry = [
-        'transaction_id' => $makeTransactionId,
-        'account_id' => $account_id,
-        'entry_type' => 'C',
-        'description' => '',
-        'amount' => $payableAmount,
-        'payment_mode' => $_POST['payment_mode'],
-        'user_id' => $_SESSION['user_credentials']['id'],
-    ];
-    $a[] = $doubleEntry->makeEntry($entry);
-
-    if (!empty($purchaseDiscount)) {
-        // saleDiscount credit entry
+        // assets debit entry - debit
+        // liability payable entry - credit
+        // purchase discount entry - credit
         $entry = [
             'transaction_id' => $makeTransactionId,
-            'account_id' => $storeAccounts['purchase_discount'],
-            'entry_type' => 'C',
+            'account_id' => $storeAccounts['assets'],
+            'entry_type' => 'D',
             'description' => '',
-            'amount' => $purchaseDiscount, // 200 @ 10%
+            'amount' => $assetPrice, // 2000
             'payment_mode' => $_POST['payment_mode'],
             'user_id' => $_SESSION['user_credentials']['id'],
         ];
-        $a[] = $doubleEntry->makeEntry($entry);
-    }
 
+        $a[] = $de->makeEntry($entry);
 
-    if (!empty($cash)) {
-        $makeTransactionId = $doubleEntry->makeTransaction($makeTransaction);
         // payable credit entry
         $entry = [
             'transaction_id' => $makeTransactionId,
             'account_id' => $account_id,
-            'entry_type' => 'D',
-            'description' => '',
-            'amount' => $cash,
-            'payment_mode' => $_POST['payment_mode'],
-            'user_id' => $_SESSION['user_credentials']['id'],
-        ];
-        $a[] = $doubleEntry->makeEntry($entry);
-        // cash credit entry
-        $entry = [
-            'transaction_id' => $makeTransactionId,
-            'account_id' => $storeAccounts['cash'],
             'entry_type' => 'C',
             'description' => '',
-            'amount' => $cash, // 200 @ 10%
+            'amount' => $payableAmount,
             'payment_mode' => $_POST['payment_mode'],
             'user_id' => $_SESSION['user_credentials']['id'],
         ];
-        $a[] = $doubleEntry->makeEntry($entry);
+        $a[] = $de->makeEntry($entry);
+
+        if (!empty($purchaseDiscount)) {
+            // saleDiscount credit entry
+            $entry = [
+                'transaction_id' => $makeTransactionId,
+                'account_id' => $storeAccounts['purchase_discount'],
+                'entry_type' => 'C',
+                'description' => '',
+                'amount' => $purchaseDiscount, // 200 @ 10%
+                'payment_mode' => $_POST['payment_mode'],
+                'user_id' => $_SESSION['user_credentials']['id'],
+            ];
+            $a[] = $de->makeEntry($entry);
+        }
+
+
+        if (!empty($cash)) {
+            $makeTransactionId = $de->makeTransaction($makeTransaction);
+            // payable credit entry
+            $entry = [
+                'transaction_id' => $makeTransactionId,
+                'account_id' => $account_id,
+                'entry_type' => 'D',
+                'description' => '',
+                'amount' => $cash,
+                'payment_mode' => $_POST['payment_mode'],
+                'user_id' => $_SESSION['user_credentials']['id'],
+            ];
+            $a[] = $de->makeEntry($entry);
+            // cash credit entry
+            $entry = [
+                'transaction_id' => $makeTransactionId,
+                'account_id' => $storeAccounts['cash'],
+                'entry_type' => 'C',
+                'description' => '',
+                'amount' => $cash, // 200 @ 10%
+                'payment_mode' => $_POST['payment_mode'],
+                'user_id' => $_SESSION['user_credentials']['id'],
+            ];
+            $a[] = $de->makeEntry($entry);
+        }
     }
 
     echo json_encode(['status' => 200, 'message' => 'successfully done', 'supply' => ['id' => $supply_id]]);
