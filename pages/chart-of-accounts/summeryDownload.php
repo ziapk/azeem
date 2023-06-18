@@ -130,6 +130,6 @@ $mpdf->setHeader($header);
 $mpdf->setFooter($footer);
 $mpdf->WriteHTML($html);
 
-$mpdf->Output($user['full_name'] . '-Ledger.pdf', 'D');
+$mpdf->Output($user['full_name'] . '-Ledger.pdf', 'I');
 exit;
 ?>

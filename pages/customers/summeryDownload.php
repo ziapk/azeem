@@ -74,6 +74,6 @@ $mpdf->setHeader($header);
 $mpdf->setFooter($footer);
 $mpdf->WriteHTML($html);
 
-$mpdf->Output($shop['full_name'] . '-Balances.pdf', 'D');
+$mpdf->Output($shop['full_name'] . '-Balances.pdf', 'I');
 exit;
 ?>
