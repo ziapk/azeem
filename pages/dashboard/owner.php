@@ -92,7 +92,17 @@ foreach ($publishersArr as $key => $value) {
     </table> -->
     <a href="<?php echo SITE_URL . "pages/product/create.php" ?>" class="btn btn-primary btn-xs pull-right" style="margin-left: 12px">Create Product</a> <a href="<?php echo SITE_URL . "pages/product/assign.php" ?>" class="btn btn-primary btn-xs pull-right">Assign Product</a>
     <h4>Products in stores </h4>
-    <input class="form-control" ng-change="searchProducts(search)" ng-model="search" placeholder="Type here for search..." />
+    <div class="row">
+        <div class="form-group col-sm-8">
+            <input class="form-control" ng-change="searchProducts(search, searchShop)" ng-model="search" placeholder="Type here for search..." />
+        </div>
+        <div class="form-group col-sm-4">
+            <select class="form-control" ng-model="searchShop" ng-change="searchProducts(search, searchShop)">
+                <option value="">All Shops</option>
+                <option ng-repeat="store in shopData track by $index" ng-value="store.id">{{store.full_name}}</option>
+            </select>
+        </div>
+    </div>
     <table class="table">
         <thead>
             <tr>
@@ -253,6 +263,7 @@ foreach ($publishersArr as $key => $value) {
                         author: $scope.author,
                         board: $scope.board,
                         searchBy: $scope.searchBy,
+                        shopId: $scope.shopId,
                         courceId: $scope.courceId
                     }
                 })
@@ -268,14 +279,10 @@ foreach ($publishersArr as $key => $value) {
                 })
         }
 
-        $scope.searchProducts = (search, courceId, full_name, group, author, board) => {
+        $scope.searchProducts = (search, shopId) => {
             $scope.currentPage = 1;
             $scope.search = search;
-            $scope.full_name = full_name;
-            $scope.group = group;
-            $scope.author = author;
-            $scope.board = board;
-            $scope.courceId = courceId;
+            $scope.shopId = shopId;
             $scope.getProducts(1);
         }
 

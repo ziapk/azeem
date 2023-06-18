@@ -1,5 +1,5 @@
-<?php 
-include_once dirname(__FILE__).'/../include/settings.php';
+<?php
+include_once dirname(__FILE__) . '/../include/settings.php';
 $ownerId = $userData['role'] == 'owner' ? $userData['id'] : $userData['created_by'];
 $products = new  Products();
 $page = !empty($_GET['page']) ? $_GET['page'] : 1;
@@ -15,9 +15,8 @@ $sortByField = !empty($_GET['sortByField']) ? $_GET['sortByField'] : "";
 $sortByOrder = !empty($_GET['sortByOrder']) ? $_GET['sortByOrder'] : "";
 $pin = !empty($_GET['bookmark']) ? $_GET['bookmark'] : "";
 
-$shopId = $userData['role'] == 'owner' ? null : $userData['shopId'];
-if(!empty($_SESSION['shopInfo'])) {
+$shopId = $userData['role'] == 'owner' ? (!empty($_GET['shopId']) ? $_GET['shopId'] : null) : $userData['shopId'];
+if (!empty($_SESSION['shopInfo'])) {
     $search = $products->getStoreProductsPagination($ownerId, ['page' => (int)$page, 'perPage' => (int)$perPage, 'search' => $search, 'searchBy' => $searchBy, 'courceId' => $courceId, 'group' => $group, 'board' => $board, 'full_name' => $full_name, 'author' => $author, 'sortByField' => $sortByField, 'sortByOrder' => $sortByOrder, 'pin' => $pin], $shopId);
 };
 echo json_encode($search);
-?>
