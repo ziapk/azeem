@@ -37,6 +37,10 @@ if (!empty($_GET['all']) && $_GET['all'] == '1') {
 
     <form action="print.php" method="post" target="_blank">
         <label><input type="checkbox" name="hidePrice" style="margin-right: 10px">Hide Price</label>
+        <label><input type="checkbox" name="hideBarcode" style="margin-right: 10px">Hide Code</label>
+        <label><input type="checkbox" name="hideCompany" style="margin-right: 10px">Hide Company</label>
+        <label><input type="checkbox" name="showRackNo" style="margin-right: 10px">Show Rack No</label>
+        <label><input type="checkbox" name="showPageNo" style="margin-right: 10px">Show Counter</label>
         <table class="table">
             <?php if ($userData['role'] == 'owner') { ?>
                 <thead>

@@ -1,6 +1,6 @@
 <?php
-include_once dirname(__FILE__).'/../../include/settings.php';
-include_once dirname(__FILE__).'/../../vendor/autoload.php';
+include_once dirname(__FILE__) . '/../../include/settings.php';
+include_once dirname(__FILE__) . '/../../vendor/autoload.php';
 
 // print_r($shop);exit;
 
@@ -43,17 +43,31 @@ $linear = array(
 foreach ($_POST['full_name'] as $index => $full_name) {
     $code = $_POST['id'][$index];
     $price = $_POST['price'][$index];
-    $price = $_POST['price'][$index];
     $qty = $_POST['qty'][$index];
-    // $bobj = $barcode->getBarcodeObj('C128', $code , -1, -30, 'black', array(0, 0, 0, 0));
-    $bobj = $barcode->getBarcodeObj('C128', $code , -2, -14, 'black', array(0, 0, 0, 0));
+    $rackNo = $_POST['rackNo'][$index];
+    $bobj = $barcode->getBarcodeObj('C128', $code, -2, -14, 'black', array(0, 0, 0, 0));
     $priceText = "";
-    if(empty($_POST['hidePrice'])) {
-        $priceText ='<strong style="font-size: 14px;font-family: sans-serif">'.number_format($price).'/-</strong>';
+    $codeText = "";
+    $companyText = "";
+    $divider = ' | ';
+    $pageNo = false;
+    if (empty($_POST['hidePrice'])) {
+        $priceText = '<strong style="font-size: 14px;font-family: sans-serif">' . number_format($price) . '/-</strong>';
     }
-    for($row = 0; $row < $qty; $row++) {
-        // $examples .= '<table style="width: 1.2in; table-layout: fixed; border: 0;page-break-before: always; margin-bottom: 20px" cellpadding="0" cellspacing="0"><tr><td colspan="2"><strong style="white-space: nowrap;">'.$shop['full_name'].'</strong></td></tr><tr><td colspan="2"><div style="white-space: nowrap; font-size: 10px">'.$full_name.'</div><td></tr><tr><td colspan="2">'.$bobj->getSvgCode().'</td></tr><tr><td style="white-space: nowrap">'.$priceText.'<small style="font-size: 14px;font-family: sans-serif; margin-left: 6px">'.$code.'</small></td></tr></table>';
-        $examples .= '<table style="text-align: center; width: 1.4in; table-layout: fixed; border: 0;page-break-before: always; margin-bottom: 20px; font-family: sans-serif" cellpadding="0" cellspacing="0"><tr><td><strong>'.$shop['full_name'].'</strong></td></tr><tr><td><div style="font-size: 10px; font-weight: 600">'.$full_name.'</div></td></tr><tr><td>'.$bobj->getSvgCode().'</td></tr><tr><td>'.$priceText.'<small style="font-size: 14px;font-family: sans-serif; margin-left: 6px">'.$code.'</small></td></tr></table>';
+    if (empty($_POST['hideCompany'])) {
+        $companyText = '<strong>' . $shop['full_name'] . '</strong>';
+    }
+    if (empty($_POST['hideBarcode'])) {
+        $codeText = '<small style="font-size: 14px;font-family: sans-serif; margin-left: 6px">' . $code . '</small>';
+    }
+    if (!empty($_POST['showPageNo'])) {;
+        $pageNo = true;
+    }
+    if (!empty($_POST['showRackNo'])) {;
+        $rackNo = '<strong style="font-size: 14px;font-family: sans-serif">R#' . $rackNo . '</strong>';
+    }
+    for ($row = 0; $row < $qty; $row++) {
+        $examples .= '<div style="display:flex; height: 0.9in; align-items: center; justify-content: center;"><table class="printable-page" style="text-align: center; width: 1.4in; table-layout: fixed; border: 0;page-break-before: always; font-family: sans-serif" cellpadding="0" cellspacing="0"><tr><td>' . $companyText . '</td></tr><tr><td><div style="font-size: 10px; font-weight: 600">' . $full_name . '</div></td></tr><tr><td>' . $bobj->getSvgCode() . '</td></tr><tr><td>' . $rackNo . $codeText . $divider . $priceText . (!empty($pageNo) ? $pageNo = $divider . '<small class="page_no">C#' . $row + 1 . '</small>' : '') . '</td></tr></table></div>';
     }
 }
 ?>
@@ -64,35 +78,7 @@ foreach ($_POST['full_name'] as $index => $full_name) {
         height: auto;
     }
 </style>
-<?php 
+<?php
 
 echo $examples;
 exit;
-
-    if(empty($_POST['full_name']) ) {
-        $error = "Please fill all fields";
-    }
-    else {
-        $data = [                
-            'id' => $_POST['id'],
-            'full_name' => $_POST['full_name'],
-            'groupName' => $_POST['groupName'],
-            'cat_type' => $_POST['cat_type']
-        ];
-
-        $update = $categoryObj->updateCategory($data);
-
-        if($update) {
-            $message = "Successfully Assigned!";
-        } else {
-            $message = "Nothing change";
-        }
-    }
-
-    if(!empty($error)) {
-        echo json_encode(['success' => false, 'error' => $error]);
-    }
-    if(!empty($message)) {
-        echo json_encode(['success' => true, 'message' => $message]);
-    }
-
