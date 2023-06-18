@@ -336,8 +336,8 @@ class DoubleEntry extends Connection
 					$result['creditAmount'] += $result['opening_balance'];
 				}
 
-				$paid = $_GET['t'] == 's' ? $result['debitAmount'] : $result['creditAmount'];
-				$amount = $_GET['t'] == 's' ? $result['creditAmount'] : $result['debitAmount'];
+				$paid = $type == 's' ? $result['debitAmount'] : $result['creditAmount'];
+				$amount = $type == 's' ? $result['creditAmount'] : $result['debitAmount'];
 
 				$result['paid'] = $paid;
 				$result['amount'] = $amount;

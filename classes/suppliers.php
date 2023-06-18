@@ -152,6 +152,12 @@ class Suppliers extends Connection
 	{
 		try {
 
+			$stmt2 = "SELECT COUNT(id) as total, GROUP_CONCAT(account_id) as ids FROM `{$this->table}` where shopId=:shopId and flag=1";
+			$prepare2 = $this->dbh->prepare($stmt2);
+			$prepare2->bindParam(':shopId', $params['shopId'], PDO::PARAM_INT);
+			$prepare2->execute();
+			$resultTotal = $prepare2->fetch(PDO::FETCH_ASSOC);
+
 			$stmt = "SELECT COUNT(id) as total FROM `{$this->table}` where flag=1 and shopId=:shopId";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':shopId', $params['shopId'], PDO::PARAM_INT);
@@ -173,14 +179,20 @@ class Suppliers extends Connection
 			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
 			$de = new DoubleEntry();
 
+			$closing = $de->getOpeningBalances(explode(',', $resultTotal['ids']), 's');
+
 			foreach ($result as $key => $supplier) {
 				if (!empty($supplier['account_id'])) {
-					$closing = $de->getOpeningBalance($supplier['account_id'], 's');
-					$result[$key]['closing'] = $closing;
-					$result[$key]['closing_balance'] = $closing['balance'];
+					$result[$key]['closing_balance'] = (!empty($closing[$supplier['account_id']]['balance'])) ? $closing[$supplier['account_id']]['balance'] : 0;
 				}
 			}
-			return ['page' => $currentPage, 'totalRecords' => $total_rows, 'perPage' => $no_of_records_per_page, 'records' => $result];
+
+			$closingTotal = 0;
+			foreach ($closing as $c) {
+				$closingTotal += $c['balance'];
+			}
+
+			return ['page' => $currentPage, 'closing_total' => $closingTotal, 'totalRecords' => $total_rows, 'perPage' => $no_of_records_per_page, 'records' => $result];
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
 		}
