@@ -154,12 +154,14 @@ $categories = $categoryObj->getCategories('pro', $ownerId);
                 </div>
                 <div class="col-sm-3 form-group">
                     <label>Publisher</label>
-                    <select class="form-control" name="publisher_id" ng-model="form.publisher_id">
-                        <option value="">-- Select a Publisher --</option>
-                        <?php foreach ($publishers as $publisher) {
-                            echo "<option value='$publisher[id]'>$publisher[full_name]</option>";
-                        } ?>
-                    </select>
+                    <ui-select custom-dropdown ng-model="form.publisher" theme="bootstrap" ng-disabled="disabled" reset-search-input="false" title="Choose a publisher">
+                        <ui-select-match placeholder="Enter a publisher...">{{$select.selected.full_name}}</ui-select-match>
+                        <ui-select-choices repeat="address in publishers track by $index" refresh="refreshPublishers($select.search)" refresh-delay="0">
+                            <div style="white-space: wrap;" ng-bind-html="address.full_name | highlight: $select.search"></div>
+                        </ui-select-choices>
+                    </ui-select>
+
+                    <input type="hidden" name="publisher_id" value={{form.publisher.id}} />
                 </div>
                 <div class="col-sm-3 form-group">
                     <label>Category</label>
@@ -223,6 +225,8 @@ $categories = $categoryObj->getCategories('pro', $ownerId);
         $scope.grandTotal = 0;
         $scope.discount = 0;
         $scope.form = <?php echo json_encode($product); ?> || {};
+        $scope.opublishers = <?php echo !empty($publishers) ? json_encode($publishers) : json_encode([]); ?>;
+        $scope.publishers = <?php echo !empty($publishers) ? json_encode($publishers) : json_encode([]); ?>;
         $scope.form.product_type = $scope.form.product_type || '1';
 
         $scope.selectProduct = function(p) {
@@ -241,6 +245,10 @@ $categories = $categoryObj->getCategories('pro', $ownerId);
                 });
             }
 
+        }
+
+        $scope.refreshPublishers = search => {
+            $scope.publishers = $scope.opublishers.filter(r => r.full_name.toLowerCase().includes(search.toLowerCase()));
         }
 
         $scope.searchGroup = function(term) {
@@ -267,17 +275,6 @@ $categories = $categoryObj->getCategories('pro', $ownerId);
 
         $scope.searchBoard = function(term) {
             return $http.get("<?php echo SITE_URL ?>api/getBoards.php", {
-                    params: {
-                        term
-                    }
-                })
-                .then(function(response) {
-                    return response.data
-                });
-        }
-
-        $scope.searchPublisher = function(term) {
-            return $http.get("<?php echo SITE_URL ?>api/searchPublisher.php", {
                     params: {
                         term
                     }
