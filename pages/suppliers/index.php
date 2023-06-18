@@ -9,7 +9,8 @@ echo mainHeader(['page' => 'supplier']);
 
     <a href="<?php echo SITE_URL . 'pages/supply'; ?>" class="btn btn-primary btn-xs pull-right">Add Supply</a>
     <a href="javascript:void(0)" style="margin-right: 10px" ng-click="addSuppliers()" class="btn btn-primary btn-xs pull-right">Add Supplier</a>
-    <h4>All Suppliers</h4>
+    <h4 class="section-title">All Suppliers</h4>
+    <h5 class="section-title">Total Payable Amount: {{data.closing_total | number}}</h5>
     <div class="form-group">
         <input class="form-control" ng-change="searchSupplier()" ng-model="search" placeholder="Type here for search..." />
     </div>
