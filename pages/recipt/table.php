@@ -6,7 +6,7 @@
         <tr>
             <th>Sr.# 111</th>
             <th>Description</th>
-            <th ng-if="show_discount">Discount %</th>
+            <th ng-if="show_discount">Discount</th>
             <th>Unit Price</th>
             <th>Add Qty</th>
             <th>Qty</th>
@@ -21,8 +21,20 @@
                 {{cart.full_name}}
                 <input type="text" ng-change="calculateSum()" ng-model="cart.description" placeholder="Description" ng-if="cart.show" class="form-control">
             </td>
-            <td width="100" ng-if="show_discount">
-                <input type="number" class="form-control input-add-dist" ng-model="cart.discount_value" ng-change="calculateSum()">
+            <td width="120" ng-if="show_discount">
+
+                <div class="input-group">
+                    <input type="number" class="form-control input-add-dist" ng-model="cart.discount_value" ng-change="calculateSum()" style="padding-right: 6px">
+                    <span class="dropdown input-group-btn">
+                        <button class="dropdown-toggle btn btn-default" data-toggle="dropdown" style="padding-inline: 8px">{{cart.discount_type == 2 ? 'FIX' : '%'}}</button>
+                        <ul class="dropdown-menu">
+                            <li><a href="javascript:void(0)" ng-click="cart.discount_type = 1; calculateSum()">%</a></li>
+                            <li><a href="javascript:void(0)" ng-click="cart.discount_type = 2; calculateSum()">Fix</a></li>
+                        </ul>
+                    </span>
+                </div>
+
+
             </td>
             <td>
                 <span ng-if="cart.discount">

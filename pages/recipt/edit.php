@@ -158,7 +158,10 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                 $scope.discountPercentValue = 0;
                 $scope.items.map((product) => {
                     let currentRow = null;
-                    if (customerData.discount_array?.length && customerData.discount_array?.filter(r => r.publisher_id == product.publisher_id).length) {
+                    if (product.discount_type == 2) {
+                        product.discount = parseFloat(product.discount_value)
+                        subtotal += ((product.price - product.discount) * product.qty);
+                    } else if (customerData.discount_array?.length && customerData.discount_array?.filter(r => r.publisher_id == product.publisher_id).length) {
                         const row = customerData.discount_array.find(r => r.publisher_id == product.publisher_id);
                         const price = parseFloat(product.price);
                         product.discount = price * (parseFloat(row.discount_value) / 100);
@@ -204,6 +207,7 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                 $scope.payment_mode = o.id;
             }
             const shopCart = $scope.data.order_items;
+            console.log(' row.discount_type', $scope.data.order_items);
 
             shopCart.map(function(row) {
                 const obj = $scope.mainList.find(function(e) {
@@ -217,7 +221,8 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                     show: true,
                     description: row.description,
                     discount: row.discount,
-                    discount_value: (parseFloat(row.discount || 0) / row.price) * 100
+                    discount_type: row.discount_type,
+                    discount_value: row.discount_type == 2 ? parseFloat(row.discount) : (parseFloat(row.discount || 0) / row.price) * 100
                 })
             });
             if ($window.sessionStorage.getItem('shopping')) {
@@ -259,7 +264,7 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                         show: true,
                         description: row.description,
                         discount: row.discount,
-                        discount_value: (parseFloat(row.discount || 0) / row.price) * 100
+                        discount_value: row.discount_type == 2 ? row.discount : (parseFloat(row.discount || 0) / row.price) * 100
                     })
                 });
 
@@ -468,12 +473,14 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                             description,
                             qty,
                             discount,
+                            discount_type,
                             price
                         }) => ({
                             id,
                             description,
                             qty,
                             discount,
+                            discount_type,
                             price
                         })),
                         payment_amount: $scope.payment_total,
@@ -503,7 +510,7 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                                 $scope.subTotal = $scope.discount = $scope.grandTotal = $scope.payment_amount = 0;
                                 // $window.sessionStorage.setItem('shopping', JSON.stringify($scope.items))
                                 $window.location.assign('<?php echo SITE_URL ?>')
-                                $scope.selectCustomer($scope.customersList[0]);
+                                $scope.customersList.length && $scope.selectCustomer($scope.customersList[0]);
                             }
                         }).catch(err => {
                             $scope.loading = false;

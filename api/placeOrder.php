@@ -89,6 +89,7 @@ try {
                     'description' => $item['description'],
                     'quantity' => $item['qty'],
                     'discount' => !empty($item['discount']) ? $item['discount'] : 0,
+                    'discount_type' => !empty($item['discount_type']) ? $item['discount_type'] : 1,
                     'price' => $item['price'],
                     'services' => $item['services'],
                     'raw_items' => $item['raw_items'],

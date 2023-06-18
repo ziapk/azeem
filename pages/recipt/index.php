@@ -409,12 +409,14 @@ echo mainFooter();
                         description,
                         qty,
                         discount,
+                        discount_type,
                         price
                     }) => ({
                         id,
                         description,
                         qty,
                         discount,
+                        discount_type,
                         price
                     })),
                     payment_amount: $scope.payment_total,
@@ -473,7 +475,10 @@ echo mainFooter();
             $scope.discountPercentValue = 0;
             $scope.items.map((product) => {
                 let currentRow = null;
-                if (customerData.discount_array?.length && customerData.discount_array?.filter(r => r.publisher_id == product.publisher_id).length) {
+                if (product.discount_type == 2) {
+                    product.discount = product.discount_value
+                    subtotal += ((product.price - product.discount) * product.qty);
+                } else if (customerData.discount_array?.length && customerData.discount_array?.filter(r => r.publisher_id == product.publisher_id).length) {
                     const row = customerData.discount_array.find(r => r.publisher_id == product.publisher_id);
                     const price = parseFloat(product.price);
                     product.discount = price * (parseFloat(row.discount_value) / 100);

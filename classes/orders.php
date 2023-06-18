@@ -233,7 +233,7 @@ class Orders extends Connection
     public function createOrderDetails($array)
     {
         try {
-            $stmt = "INSERT INTO `{$this->table_sub}` (`order_id`, `product_id`, `quantity`, `price`, `discount`, `description`, `item_status`, `employee_id`, `start_date`, `end_date`, `priority`) VALUES (:order_id, :product_id, :quantity, :price, :discount, :description, :item_status,:employee_id,:start_date,:end_date, :priority)";
+            $stmt = "INSERT INTO `{$this->table_sub}` (`order_id`, `product_id`, `quantity`, `price`, `discount`, `discount_type`, `description`, `item_status`, `employee_id`, `start_date`, `end_date`, `priority`) VALUES (:order_id, :product_id, :quantity, :price, :discount, :discount_type, :description, :item_status,:employee_id,:start_date,:end_date, :priority)";
             $prepare = $this->dbh->prepare($stmt);
             $prepare->bindParam(':order_id', $array['order_id'], PDO::PARAM_STR);
             $prepare->bindParam(':product_id', $array['product_id'], PDO::PARAM_STR);
@@ -241,6 +241,7 @@ class Orders extends Connection
             $prepare->bindParam(':description', $array['description'], PDO::PARAM_STR);
             $prepare->bindParam(':price', $array['price'], PDO::PARAM_STR);
             $prepare->bindParam(':discount', $array['discount'], PDO::PARAM_STR);
+            $prepare->bindParam(':discount_type', $array['discount_type'], PDO::PARAM_STR);
             $prepare->bindParam(':item_status', $array['item_status'], PDO::PARAM_STR);
             $prepare->bindParam(':employee_id', $array['employee_id'], PDO::PARAM_STR);
             $prepare->bindParam(':start_date', $array['start_date'], PDO::PARAM_STR);
