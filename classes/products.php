@@ -447,11 +447,16 @@ class Products extends Connection
 		if (!empty($params["search"])) {
 			$searchQry = "AND (p.id = '" . $params["search"] . "' OR p.code = '" . $params["search"] . "' OR p.full_name LIKE '%" . $params["search"] . "%' OR p.group LIKE '%" . $params["search"] . "%' OR p.description LIKE '%" . $params["search"] . "%' OR p.board LIKE '%" . $params["search"] . "%' OR p.author LIKE '%" . $params["search"] . "%' OR p.price LIKE '%" . $params["search"] . "%' OR pc.code LIKE '" . $params["search"] . "' ) ";
 		}
+		$publisher_query = "";
+
+		if (!empty($params["publisher_id"])) {
+			$publisher_query = " AND p.publisher_id = '" . $params["publisher_id"] . "'";
+		}
 
 
 		try {
 
-			$stmt1 = "SELECT count(st.id) as count FROM `{$this->table_st}` as st LEFT JOIN `{$this->table}` AS p ON p.id = st.product_id LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id WHERE p.is_active = 1 and st.`owner_id`=:owner_id and st.status = 1 $shopCondition $searchQry order by p.id";
+			$stmt1 = "SELECT count(st.id) as count FROM `{$this->table_st}` as st LEFT JOIN `{$this->table}` AS p ON p.id = st.product_id LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id WHERE p.is_active = 1 and st.`owner_id`=:owner_id and st.status = 1 $shopCondition $searchQry $publisher_query order by p.id";
 			$prepare = $this->dbh->prepare($stmt1);
 			$prepare->bindParam(':owner_id', $owner_id, PDO::PARAM_STR);
 			$prepare->execute();
@@ -463,7 +468,7 @@ class Products extends Connection
 			$offset =  ((!empty($currentPage) ? $currentPage : 1) - 1) * $no_of_records_per_page;
 
 
-			$stmt = "SELECT st.*, p.code, p.id as product_id, p.full_name, p.group, p.publisher_id, p.author FROM `{$this->table_st}` as st LEFT JOIN `{$this->table}` AS p ON p.id = st.product_id LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id WHERE p.is_active = 1 and st.`owner_id`=:owner_id and st.status = 1 $shopCondition $searchQry order by p.id desc LIMIT :offset, :perPage";
+			$stmt = "SELECT st.*, p.code, p.id as product_id, p.full_name, p.group, p.publisher_id, p.author FROM `{$this->table_st}` as st LEFT JOIN `{$this->table}` AS p ON p.id = st.product_id LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id WHERE p.is_active = 1 and st.`owner_id`=:owner_id and st.status = 1 $shopCondition $searchQry $publisher_query order by p.id desc LIMIT :offset, :perPage";
 			$prepare2 = $this->dbh->prepare($stmt);
 			$prepare2->bindParam(':owner_id', $owner_id, PDO::PARAM_STR);
 			$prepare2->bindParam(':offset', $offset, PDO::PARAM_INT);

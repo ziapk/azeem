@@ -13,10 +13,11 @@ $board = !empty($_GET['board']) ? $_GET['board'] : "";
 $courceId = !empty($_GET['courceId']) ? $_GET['courceId'] : "";
 $sortByField = !empty($_GET['sortByField']) ? $_GET['sortByField'] : "";
 $sortByOrder = !empty($_GET['sortByOrder']) ? $_GET['sortByOrder'] : "";
+$publisher_id = !empty($_GET['publisher_id']) ? $_GET['publisher_id'] : "";
 $pin = !empty($_GET['bookmark']) ? $_GET['bookmark'] : "";
 
 $shopId = $userData['role'] == 'owner' ? (!empty($_GET['shopId']) ? $_GET['shopId'] : null) : $userData['shopId'];
 if (!empty($_SESSION['shopInfo'])) {
-    $search = $products->getStoreProductsPagination($ownerId, ['page' => (int)$page, 'perPage' => (int)$perPage, 'search' => $search, 'searchBy' => $searchBy, 'courceId' => $courceId, 'group' => $group, 'board' => $board, 'full_name' => $full_name, 'author' => $author, 'sortByField' => $sortByField, 'sortByOrder' => $sortByOrder, 'pin' => $pin], $shopId);
+    $search = $products->getStoreProductsPagination($ownerId, ['page' => (int)$page, 'perPage' => (int)$perPage, 'search' => $search, 'searchBy' => $searchBy, 'courceId' => $courceId, 'group' => $group, 'board' => $board, 'full_name' => $full_name, 'author' => $author, 'sortByField' => $sortByField, 'sortByOrder' => $sortByOrder, 'pin' => $pin, 'publisher_id' => $publisher_id], $shopId);
 };
 echo json_encode($search);

@@ -2,7 +2,7 @@
 
 $stores = new Store();
 $productsObj = new Products();
-$categoryObj = new Publishers();
+$publisherObj = new Publishers();
 $storeTypesArr = $stores->getStoreTypes();
 
 
@@ -27,8 +27,7 @@ foreach ($ownerStores as $store) {
 
 
 $products = $productsObj->getOwnerProducts($currentStore['owner_id']);
-
-$publishersArr = $categoryObj->getPublishers($currentStore['owner_id']);
+$publishersArr = $publisherObj->getPublishers($currentStore['owner_id']);
 $publishers = [];
 foreach ($publishersArr as $key => $value) {
     $publishers[$value['id']] = $value;
@@ -93,8 +92,18 @@ foreach ($publishersArr as $key => $value) {
     <a href="<?php echo SITE_URL . "pages/product/create.php" ?>" class="btn btn-primary btn-xs pull-right" style="margin-left: 12px">Create Product</a> <a href="<?php echo SITE_URL . "pages/product/assign.php" ?>" class="btn btn-primary btn-xs pull-right">Assign Product</a>
     <h4>Products in stores </h4>
     <div class="row">
-        <div class="form-group col-sm-8">
+        <div class="form-group col-sm-5">
             <input class="form-control" ng-change="searchProducts(search, searchShop)" ng-model="search" placeholder="Type here for search..." />
+        </div>
+        <div class="col-sm-3 form-group">
+            <ui-select custom-dropdown ng-model="form.publisher" theme="bootstrap" ng-disabled="disabled" reset-search-input="false" title="Choose a publisher" ng-change="selectPublisher()">
+                <ui-select-match placeholder="Enter a publisher...">{{$select.selected.full_name}}</ui-select-match>
+                <ui-select-choices repeat="address in publishers track by $index" refresh="refreshPublishers($select.search)" refresh-delay="0">
+                    <div style="white-space: wrap;" ng-bind-html="address.full_name | highlight: $select.search"></div>
+                </ui-select-choices>
+            </ui-select>
+
+            <input type="hidden" name="publisher_id" value={{form.publisher.id}} />
         </div>
         <div class="form-group col-sm-4">
             <select class="form-control" ng-model="searchShop" ng-change="searchProducts(search, searchShop)">
@@ -250,7 +259,18 @@ foreach ($publishersArr as $key => $value) {
         $scope.maxSize = 5;
         $scope.checkbox = {}
         $scope.showPicker = {};
+        $scope.form = {
+
+        }
         $scope.url = '<?php echo SITE_URL ?>';
+        $scope.opublishers = <?php echo !empty($publishersArr) ? json_encode($publishersArr) : json_encode([]); ?>;
+        $scope.publishers = <?php echo !empty($publishersArr) ? json_encode($publishersArr) : json_encode([]); ?>;
+        $scope.refreshPublishers = search => {
+            $scope.publishers = $scope.opublishers.filter(r => r.full_name.toLowerCase().includes(search.toLowerCase()));
+        }
+        $scope.selectPublisher = () => {
+            $scope.getProducts(1);
+        }
         $scope.getProducts = (page) => {
             $scope.loading = true;
             $http.get("<?php echo SITE_URL ?>api/getStoreProducts.php", {
@@ -264,7 +284,8 @@ foreach ($publishersArr as $key => $value) {
                         board: $scope.board,
                         searchBy: $scope.searchBy,
                         shopId: $scope.shopId,
-                        courceId: $scope.courceId
+                        courceId: $scope.courceId,
+                        publisher_id: $scope.form.publisher?.id
                     }
                 })
                 .then(function(response) {
