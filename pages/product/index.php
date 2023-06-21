@@ -61,9 +61,11 @@ $programs = $programObj->getPrograms();
                 <img ng-if="li.image" class="image" src={{'<?php echo SITE_URL; ?>uploads/products/'+li.image}} />
                 <a href="<?php echo SITE_URL; ?>pages/product/update.php?id={{li.id}}" class="btn-edit" uib-tooltip="Edit"><img width="18" height="18" src="<?php echo SITE_URL; ?>assets/img/svg/edit.svg" alt="" /></a>
                 <a href="javascript:void(0)" ng-click="addToCart(li)" class="btn-cart" uib-tooltip="Add to cart"><img width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/002-add-to-cart-red.svg" alt="" /></a>
-                <a ng-if="li.priority == '1'" href="javascript:void(0)" ng-click="setPriority(li)" class="btn btn-priority" uib-tooltip="Mark No Priority"><span class="fa fa-2x fa-check-circle text-success"></span></a>
-                <a ng-if="li.priority != '1'" href="javascript:void(0)" ng-click="setPriority(li)" class="btn btn-priority" uib-tooltip="Mark Priority"><span class="fa fa-2x fa-check-circle-o text-mute"></span></a>
-                <a href="javascript:void(0)" ng-click="setInactive(li)" class="btn btn-dup" uib-tooltip="Mark Inactive"><span class="fa fa-remove text-danger"></span></a>
+                <?php if ($userData['role'] === 'owner' || $userData['role'] === 'manager') { ?>
+                    <a ng-if="li.priority == '1'" href="javascript:void(0)" ng-click="setPriority(li)" class="btn btn-priority" uib-tooltip="Mark No Priority"><span class="fa fa-2x fa-check-circle text-success"></span></a>
+                    <a ng-if="li.priority != '1'" href="javascript:void(0)" ng-click="setPriority(li)" class="btn btn-priority" uib-tooltip="Mark Priority"><span class="fa fa-2x fa-check-circle-o text-mute"></span></a>
+                    <a href="javascript:void(0)" ng-click="setInactive(li)" class="btn btn-dup" uib-tooltip="Mark Inactive"><span class="fa fa-remove text-danger"></span></a>
+                <?php } ?>
                 <a ng-if="li.pin != '1'" href="javascript:void(0)" ng-click="addBookmark(li)" class="btn-bookmark" uib-tooltip="Pin as running"><span class="fa fa-heart-o"></span></a>
                 <a ng-if="li.pin == '1'" href="javascript:void(0)" ng-click="removeBookmark(li)" class="btn-bookmark" uib-tooltip="Added in Running list"><span class="fa fa-heart"></span></a>
                 <span class="price">{{li.price}} <em>{{li.currency || 'PKR'}}</em> <?php if ($userData['role'] === 'owner') { ?><span style="color: #888; font-size: 0.75em">| {{li.pprice}} <em>{{li.currency || 'PKR'}}</em></span> <?php } ?></span>

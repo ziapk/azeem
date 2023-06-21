@@ -98,11 +98,13 @@ $programs = $programObj->getPrograms();
                     <a style="padding-left: 0; padding-right: 5px" ng-if="li.dup == 1" href="javascript:void(0)" ng-click="removeDuplicate(li)" class="btn btn-bookmark" uib-tooltip="Remove from duplicate"><span class="fa fa-copy text-danger"></span></a>
                     <a style="padding-left: 0; padding-right: 0" ng-if="li.pin != 1" href="javascript:void(0)" ng-click="addBookmark(li)" class="btn btn-bookmark" uib-tooltip="Pin as running items"><span class="fa fa-heart-o"></span></a>
                     <a style="padding-left: 0; padding-right: 0" ng-if="li.pin == 1" href="javascript:void(0)" ng-click="removeBookmark(li)" class="btn btn-bookmark" uib-tooltip="Remove from Running items list"><span class="fa fa-heart"></span></a>
-                    <a ng-if="li.priority == '1'" href="javascript:void(0)" ng-click="setPriority(li)" class="btn btn-priority" uib-tooltip="Mark No Priority"><span class="fa fa-2x fa-check-circle text-success"></span></a>
-                    <a ng-if="li.priority != '1'" href="javascript:void(0)" ng-click="setPriority(li)" class="btn btn-priority" uib-tooltip="Mark Priority"><span class="fa fa-2x fa-check-circle-o text-mute"></span></a>
+                    <?php if ($userData['role'] === 'owner' || $userData['role'] === 'manager') { ?>
+                        <a ng-if="li.priority == '1'" href="javascript:void(0)" ng-click="setPriority(li)" class="btn btn-priority" uib-tooltip="Mark No Priority"><span class="fa fa-2x fa-check-circle text-success"></span></a>
+                        <a ng-if="li.priority != '1'" href="javascript:void(0)" ng-click="setPriority(li)" class="btn btn-priority" uib-tooltip="Mark Priority"><span class="fa fa-2x fa-check-circle-o text-mute"></span></a>
+                        <a href="javascript:void(0)" ng-click="setInactive(li)" class="btn btn-dup" uib-tooltip="Mark Inactive"><span class="fa fa-remove text-danger"></span></a>
+                    <?php } ?>
                     <a uib-tooltip="Add to Cart" ng-click="addToCart(li)" class="btn btn-xs"><img width="18" height="18" src="<?php echo SITE_URL; ?>assets/img/svg/002-add-to-cart.svg" alt="" /></a>
                     <a class="btn btn-primary btn-xs" href="<?php echo SITE_URL . "pages/product/update.php?id=" ?>{{li.id}}"><span class="fa fa-edit"></span></a> <a class="btn btn-danger btn-xs" href="<?php echo SITE_URL . "pages/product/create.php?id=" ?>{{li.id}}"><span class="fa fa-copy"></span></a>
-                    <a href="javascript:void(0)" ng-click="setInactive(li)" class="btn btn-dup" uib-tooltip="Mark Inactive"><span class="fa fa-remove text-danger"></span></a>
                 </td>
             </tr>
         </tbody>
