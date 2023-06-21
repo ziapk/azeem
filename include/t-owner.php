@@ -93,44 +93,4 @@ $list = $productCls->getOwnerProducts($ownerId);
   function createCustomer() {
     window.open("<?php echo SITE_URL; ?>pages/customers/create.php", "", "width=300,height=400");
   }
-
-  app.controller('headerController', function($scope, $http, $httpParamSerializerJQLike, $filter, $window) {
-    $scope.list = <?php echo safe_json_encode($list); ?>;
-    $scope.refreshList = function() {
-      $scope.cart = JSON.parse($window.sessionStorage.getItem('shopping'));
-      $scope.totalPrice = 0;
-      $scope.finalList = [];
-      $scope.cart.map(row => {
-        const obj = $scope.list.find(r => r.id === row.id);
-        $scope.finalList.push({
-          ...obj,
-          qty: row.qty
-        })
-        $scope.totalPrice += row.qty * obj.price
-      })
-    }
-    $scope.increaseValue = row => {
-      const cart = JSON.parse($window.sessionStorage.getItem('shopping'))
-      cart.map(r => {
-        if (row.id == r.id) {
-          r.qty++
-        }
-      })
-      $window.sessionStorage.setItem('shopping', JSON.stringify(cart));
-      $scope.refreshList();
-    }
-
-    $scope.decreaseValue = (row) => {
-      const cart = JSON.parse($window.sessionStorage.getItem('shopping'))
-
-      cart.map(r => {
-        if (row.id == r.id) {
-          r.qty > 1 ? r.qty-- : r.qty
-        }
-      })
-      console.log(cart);
-      $window.sessionStorage.setItem('shopping', JSON.stringify(cart));
-      $scope.refreshList()
-    }
-  });
 </script>

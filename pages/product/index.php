@@ -120,6 +120,7 @@ $programs = $programObj->getPrograms();
         const search = $window.location.search;
         const url = new URLSearchParams(search);
         $scope.publisher_id = url.get('publisher_id') || '';
+        $scope.status = url.get('status') || '';
         $scope.maxSize = 5;
         $scope.getProducts = (page) => {
             $scope.loading = true;
@@ -134,7 +135,8 @@ $programs = $programObj->getPrograms();
                         board: $scope.board,
                         searchBy: $scope.searchBy,
                         courceId: $scope.courceId,
-                        publisher_id: $scope.publisher_id
+                        publisher_id: $scope.publisher_id,
+                        status: $scope.status ? true : false
                     }
                 })
                 .then(function(response) {
@@ -175,10 +177,12 @@ $programs = $programObj->getPrograms();
         }
 
         $scope.setInactive = function(item) {
+            console.log('item', item);
             if ($window.confirm('Are you sure?')) {
                 $http.get("<?php echo SITE_URL ?>api/setInactive.php", {
                         params: {
-                            id: item.id
+                            id: item.id,
+                            action: item.is_active == 1 ? 0 : 1
                         }
                     })
                     .then(function(response) {
