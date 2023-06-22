@@ -39,13 +39,14 @@ class Products extends Connection
 				$publisher_query = " AND p.publisher_id = '" . $params['publisher_id'] . "' ";
 			}
 
-			$status_query = "";
-			if ($params['status'] == 0) {
-				$status_query = " AND p.is_active = 0 ";
-			} else {
+			// $status_query = "";
+			// if ($params['status'] == 0) {
+			// 	$status_query = " AND p.is_active = 0 ";
+			// } else {
 
-				$status_query = ' AND p.is_active = 1';
-			}
+			// 	$status_query = ' AND p.is_active = 1';
+			// }
+			$status_query = ' AND p.is_active = 1';
 			if ($params['searchBy'] == 'id' && !empty($params["search"])) {
 				$searchQry = "AND (p.id = " . $params["search"] . " OR p.code = " . $params["search"] . ")";
 			} else if ($params['searchBy'] == 'cource' && !empty($params["courceId"])) {
