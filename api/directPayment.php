@@ -25,18 +25,10 @@ try {
         'type' => 'C'
     ];
 
-    if (!empty($_POST['adjustment']) && $amount < 0) {
-        $amount *= -1;
-        $settings = [
-            'summery' => 'ADJUSTMENT',
-            'title' => 'ADJUSTMENT',
-            'sup' => 'C',
-            'acc' => $storeAccounts['adjustment'],
-            'type' => 'D'
-        ];
-    }
+
 
     if (!empty($type) && $type == 2 && $amount < 0) {
+        $amount *= -1;
         $settings = [
             'summery' => 'ROYALTY PAYMENT',
             'title' => 'ROYALTY PAYMENT',
@@ -55,6 +47,17 @@ try {
             'sup' => 'D',
             'acc' => $storeAccounts['royalty'],
             'type' => 'C'
+        ];
+    }
+
+    if (!empty($_POST['adjustment']) && $amount < 0) {
+        $amount *= -1;
+        $settings = [
+            'summery' => 'ADJUSTMENT',
+            'title' => 'ADJUSTMENT',
+            'sup' => 'C',
+            'acc' => $storeAccounts['adjustment'],
+            'type' => 'D'
         ];
     }
 
