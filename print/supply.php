@@ -204,7 +204,12 @@ if ($largeView) {
                                 <td width="140" class="text-right">Supplier Name:</td>
                                 <th><?php echo $foodpanda['full_name']; ?></th>
                                 <td width="120" class="text-right">Bill Ref.</td>
-                                <th>0000<?php echo $_GET['id']; ?></th>
+                                <th>0000<?php echo $_GET['id'];
+                                        if ($order['order']['ref_no']) {
+                                        ?> | R:
+                                <?php echo $order['order']['ref_no'];
+                                        } ?>
+                                </th>
                             </tr>
                             <tr>
                                 <td class="text-right">Contact No.</td>

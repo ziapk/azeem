@@ -45,7 +45,7 @@ echo mainHeader();
                 <th></th>
             </tr>
             <tr>
-                <td colspan="7"><input type="text" class="form-control" id="searchProduct" ng-model="product" placeholder="Search Product to add" typeahead-on-select="selectProduct($item, row)" uib-typeahead="address as address.full_name for address in searchProduct($viewValue)" typeahead-template-url="row2.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="0" class="form-control" ng-model="row.product_name" ng-model-options="{debounce: 500}" /></td>
+                <td colspan="7"><input type="text" class="form-control" id="searchProduct" ng-model="product" placeholder="Search Product to add" typeahead-on-select="selectProduct($item, row)" uib-typeahead="address as address.full_name for address in searchProduct($viewValue)" typeahead-template-url="row2.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="1" class="form-control" ng-model="row.product_name" ng-model-options="{debounce: 100}" /></td>
             </tr>
         </thead>
         <tbody>
@@ -276,18 +276,11 @@ echo mainFooter();
         }
 
         $scope.searchProduct = function(search) {
-            return $http.get("<?php echo SITE_URL ?>api/getProductFromSupply.php", {
-                    params: {
-                        search,
-                        supplierId: $scope.supplierId,
-                        shopId: $scope.shopId
-                    }
-                })
-                .then(function(response) {
-                    $scope.list = response.data.records;
-                    $scope.priceList = response.data.records;
-                    return response.data.records
-                });
+
+            const regex = new RegExp(search, 'i');
+            const filteredArray = window.mainList.records.filter(obj => regex.test(obj.searchString));
+
+            return filteredArray.slice(0, 30);
         }
 
         $scope.searchMode = function() {

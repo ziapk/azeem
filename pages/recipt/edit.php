@@ -42,7 +42,7 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                         </th>
                         <th width="100">
                             <div class="dropdown-wrapper align-right">
-                                <input type="text" class="form-control" id="searchProduct" ng-model="product" placeholder="Search Products" uib-typeahead="address as address.full_name for address in searchProduct($viewValue)" typeahead-on-select="selectProduct($item)" ng-model-options="{debounce: 500}" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="1">
+                                <input type="text" class="form-control" id="searchProduct" ng-model="product" placeholder="Search Products" uib-typeahead="address as address.full_name for address in searchProduct($viewValue)" typeahead-on-select="selectProduct($item)" ng-model-options="{debounce: 100}" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="1">
                             </div>
                         </th>
                     </tr>
@@ -401,18 +401,11 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                     $scope.selectProduct(item);
                     return [];
                 } else {
-                    params.term = term;
-                    return $http.get("<?php echo SITE_URL ?>api/getStores.php", {
-                            params,
-                            shopId: $scope.shopId
-                        })
-                        .then(function(response) {
+                    // params.term = term;
+                    const regex = new RegExp(term, 'i');
+                    const filteredArray = window.mainList.records.filter(obj => regex.test(obj.searchString));
 
-                            // $scope.list = response.data;
-                            // $scope.priceList = response.data;
-                            return response.data
-
-                        });
+                    return filteredArray.slice(0, 30);
                 }
             }
 

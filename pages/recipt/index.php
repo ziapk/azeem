@@ -58,7 +58,7 @@ $ownerStores = $stores->getOwnerStores($userId);
                     </th>
                     <th width="100">
                         <div class="dropdown-wrapper align-right">
-                            <input type="text" class="form-control" id="searchProduct" ng-model="product" placeholder="Search Products" uib-typeahead="address as address.full_name for address in searchProduct($viewValue)" typeahead-on-select="selectProduct($item)" ng-model-options="{debounce: 500}" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="1">
+                            <input type="text" class="form-control" id="searchProduct" ng-model="product" placeholder="Search Products" uib-typeahead="address as address.full_name for address in searchProduct($viewValue)" typeahead-on-select="selectProduct($item)" ng-model-options="{debounce: 100}" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="1">
                             <!-- <div class="list-group recipt-search-dropdown">
                         <a ng-click="selectProduct(l)" class="list-group-item" ng-repeat="l in list">
                             <h4 class="list-group-item-heading">{{l.full_name}} <span>{{l.price}}</span></h4>
@@ -338,18 +338,12 @@ echo mainFooter();
                 $scope.selectProduct(item);
                 return [];
             } else {
-                params.term = term;
-                return $http.get("<?php echo SITE_URL ?>api/getStores.php", {
-                        params,
-                        shopId: $scope.shopId
-                    })
-                    .then(function(response) {
+                // params.term = term;
 
-                        // $scope.list = response.data;
-                        // $scope.priceList = response.data;
-                        return response.data
+                const regex = new RegExp(term, 'i');
+                const filteredArray = window.mainList.records.filter(obj => regex.test(obj.searchString));
 
-                    });
+                return filteredArray.slice(0, 30);
             }
         }
         $scope.searchCustomer = function(value, onloading) {

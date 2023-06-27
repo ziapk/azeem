@@ -46,6 +46,7 @@ ob_start();
             <th>T.ID</th>
             <th>Date</th>
             <th>Order ID</th>
+            <th>Ref.#</th>
             <th>Description</th>
             <th>Entry Type</th>
             <th>Debit</th>
@@ -59,6 +60,7 @@ ob_start();
                 <td><?php echo $value['transaction_id']; ?></td>
                 <td><?php echo $value['transaction_date']; ?></td>
                 <td><?php echo $value['order_ref']; ?></td>
+                <td><?php echo $value['reference']; ?></td>
                 <td><?php echo $value['v_description']; ?></td>
                 <td><?php echo $value['transsaction_type']; ?></td>
                 <td><?php echo number_format($value['debitAmount'], 2); ?></td>

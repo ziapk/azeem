@@ -220,17 +220,10 @@ echo mainFooter();
         }
 
         $scope.searchProduct = function(term) {
-            return $http.get("<?php echo SITE_URL ?>api/getStores.php", {
-                    params: {
-                        term,
-                        shopId: $scope.shopId
-                    }
-                })
-                .then(function(response) {
-                    $scope.list = response.data;
-                    $scope.priceList = response.data;
-                    return response.data
-                });
+            const regex = new RegExp(term, 'i');
+            const filteredArray = window.mainList.records.filter(obj => regex.test(obj.searchString));
+
+            return filteredArray.slice(0, 30);
         }
 
         $scope.searchCustomer = function(term) {

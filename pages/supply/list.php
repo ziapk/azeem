@@ -22,6 +22,7 @@ echo mainHeader(['page' => 'supplies']);
             <tr>
                 <th>Sr.#</th>
                 <th>Order Number</th>
+                <th>Ref.#</th>
                 <th>Customer</th>
                 <th>Price</th>
                 <th>Status</th>
@@ -33,6 +34,7 @@ echo mainHeader(['page' => 'supplies']);
             <tr ng-repeat="row in data.records">
                 <td>{{$index + 1}}</td>
                 <td>{{row.id}}</td>
+                <td>{{row.ref_no}}</td>
                 <td>{{row.customer_name || row.full_name}}</td>
                 <td>{{row.price - row.discount}}</td>
                 <td>{{statusArr[row.status].full_name}}</td>
@@ -52,7 +54,7 @@ echo mainHeader(['page' => 'supplies']);
         </tbody>
         <tfoot>
             <tr>
-                <th colspan="7">
+                <th colspan="8">
                     <table style="text-align: right" width="100%" cellspacing="0" cellpadding="0">
                         <tr>
                             <th style="text-align: right">Number of Orders</th>

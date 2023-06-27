@@ -135,7 +135,7 @@ class Products extends Connection
 
 
 			$mobileCols = "p.id,p.full_name";
-			$allCols = "p.*, concat(p.id, ' | ', p.full_name) as full_name, pub.full_name as publisherName, pub.discount_type, pub.discount_amount, CONVERT(case when (pub.discount_amount > 0) then (p.price * (1 - (pub.discount_amount / 100)) ) else p.price end, DECIMAL) as price $column";
+			$allCols = "group_concat(pc.code) as other_codes, p.author, p.barcode, p.code, p.cat_id, p.board, p.group, p.id, p.pprice, p.publisher_id, concat(p.id, ' | ', p.full_name) as full_name, pub.full_name as publisherName, pub.discount_type, pub.discount_amount, CONVERT(case when (pub.discount_amount > 0) then (p.price * (1 - (pub.discount_amount / 100)) ) else p.price end, DECIMAL) as price $column";
 
 			$mainCols = "";
 			if (!empty($mobileCol)) {
@@ -143,8 +143,8 @@ class Products extends Connection
 			} else {
 				$mainCols = $allCols;
 			}
-
-			$stmt = "SELECT $mainCols  FROM `{$this->table}` as p $innerJoin LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id LEFT JOIN program_books as c ON c.product_id = p.id LEFT JOIN publishers as pub on p.publisher_id = pub.id  WHERE p.`owner_id`=:owner_id $status_query $publisher_query $dup $type $pin $searchQry $catQry GROUP BY p.id $sortByQry $minQry LIMIT :offset, :perPage";
+			// , barcode, code, board, `group`, price, pprice, publisherName
+			$stmt = "SELECT *, price, concat(`id`, '|', `price`, '|', `full_name`, '|', COALESCE(`publisherName`, ''), '|', COALESCE(`author`, ''), '|', COALESCE(`board`, ''), '|', COALESCE(`code`, ''), '|', COALESCE(`barcode`, ''), '|', COALESCE(`other_codes`, '')) as searchString FROM (SELECT $mainCols  FROM `{$this->table}` as p $innerJoin LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id LEFT JOIN program_books as c ON c.product_id = p.id LEFT JOIN publishers as pub on p.publisher_id = pub.id  WHERE p.`owner_id`=:owner_id $status_query $publisher_query $dup $type $pin $searchQry $catQry GROUP BY p.id $sortByQry $minQry LIMIT :offset, :perPage) AS b";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':owner_id', $owner_id, PDO::PARAM_STR);
 			$prepare->bindParam(':offset', $offset, PDO::PARAM_INT);
