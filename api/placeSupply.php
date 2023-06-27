@@ -81,7 +81,7 @@ if (sizeof($_POST['items'])) {
             $items[] = [
                 'pprice' => $item['pprice'],
                 'price' => $item['price'],
-                'discount' => $item['discount'],
+                'discount' => !empty($item['discount']) ? $item['discount'] : 0,
                 'qty' => $item['qty'],
                 'stock_out' => 0,
                 'product_id' => $item['id'],
@@ -108,7 +108,7 @@ $data = [
     'price' => $_POST['payable'],
     'payment_amount' => $cash,
     'payment_with_credit' => $payment_with_credit,
-    'discount' => $_POST['discount'],
+    'discount' => !empty($_POST['discount']) ? $_POST['discount'] : 0,
     'supplier_type' => $_POST['supplier_type'],
     'id' => $_POST['id'],
     'shopId' => $userData['shopId'],
@@ -128,7 +128,7 @@ if ($supply_id) {
                 'supply_id' => $supply_id,
                 'product_id' => $item['product_id'],
                 'quantity' => $item['qty'],
-                'discount' => $item['discount'],
+                'discount' => !empty($item['discount']) ? $item['discount'] : 0,
                 'price' => $item['price'],
             ];
             $supply->createSupplyDetails($d);
