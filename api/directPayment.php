@@ -26,6 +26,16 @@ try {
     ];
 
 
+    // royalty 
+    if (!empty($type) && $type == 2 && $amount > 0) {
+        $settings = [
+            'summery' => 'ROYALTY PAYMENT',
+            'title' => 'ROYALTY PAYMENT',
+            'sup' => 'D',
+            'acc' => $storeAccounts['royalty_pay'],
+            'type' => 'C'
+        ];
+    }
 
     if (!empty($type) && $type == 2 && $amount < 0) {
         $amount *= -1;
@@ -33,20 +43,8 @@ try {
             'summery' => 'ROYALTY PAYMENT',
             'title' => 'ROYALTY PAYMENT',
             'sup' => 'C',
-            'acc' => $storeAccounts['royalty'],
+            'acc' => $storeAccounts['royalty_pay'],
             'type' => 'D'
-        ];
-    }
-
-
-    // royalty 
-    if (!empty($type) && $type == 2 && $amount > 0) {
-        $settings = [
-            'summery' => 'ROYALTY PAYMENT',
-            'title' => 'ROYALTY PAYMENT',
-            'sup' => 'D',
-            'acc' => $storeAccounts['royalty'],
-            'type' => 'C'
         ];
     }
 
