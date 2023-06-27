@@ -1,9 +1,4 @@
 <?php
-global $shopData;
-global $userData;
-$productCls = new Products();
-$ownerId = $userData['role'] == 'owner' ? $userData['id'] : $userData['created_by'];
-$list = $productCls->getOwnerProducts($ownerId);
 ?>
 <li uib-dropdown auto-close="outsideClick" on-toggle="refreshList()">
   <a href="javascript:void(0)" uib-dropdown-toggle tooltip-placement="bottom" uib-tooltip="Shopping Cart"><img width="22" height="22" src="<?php echo SITE_URL; ?>assets/img/svg/010-shopping-bag-white.svg" alt="" /></a>
@@ -65,8 +60,8 @@ $list = $productCls->getOwnerProducts($ownerId);
       $('html').css('font-size', size + 'px');
     }
 
-    $scope.list = <?php echo safe_json_encode($list); ?>;
-    sessionStorage.setItem('list', JSON.stringify($scope.list));
+    // $scope.list = <?php echo safe_json_encode($list); ?>;
+    // sessionStorage.setItem('list', JSON.stringify($scope.list));
     $scope.exp = {};
     $scope.supplier = {};
     $scope.customer = {};
@@ -166,14 +161,14 @@ $list = $productCls->getOwnerProducts($ownerId);
       $scope.totalPrice = 0;
       $scope.finalList = [];
       $scope.cart.map(row => {
-        const obj = $scope.list.find(r => r.id === row.id);
+        const obj = window.mainList.records.find(r => r.id === row.id);
         $scope.finalList.push({
           ...obj,
-          price: row.price,
+          price: row.price || obj.price,
           discount: row.discount,
           qty: row.qty
         })
-        $scope.totalPrice += parseFloat(row.qty) * (parseFloat(row.price || 0) - parseFloat(row.discount || 0))
+        $scope.totalPrice += parseFloat(row.qty) * (parseFloat(row.price || obj.price || 0) - parseFloat(row.discount || 0))
       })
       document.dispatchEvent(event);
     }

@@ -8,7 +8,7 @@ $productCls = new Products();
 $ownerId = $userData['role'] == 'owner' ? $userData['id'] : $userData['created_by'];
 $categoryObj = new Categories();
 $categories = $categoryObj->getCategories('exp', $ownerId);
-$list = $productCls->getOwnerProducts($ownerId);
+// $list = $productCls->getOwnerProducts($ownerId);
 
 $categoryList = $categoryObj->getCategories('pro', $ownerId);
 $ids = [];

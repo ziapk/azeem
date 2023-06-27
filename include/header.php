@@ -4,10 +4,14 @@ function mainHeader($params = null)
 {
     ob_start();
     global $pages;
+    global $shop;
 
     if (!empty($params['hideheader'])) {
         $params['bodyClasses'][] = 'no-padding';
     }
+
+    $pp = new Products();
+    $mainProductsList = $pp->getOwnerProductsPagination($shop['owner_id'], ['page' => 1, 'perPage' => 10000], $shop['id']);
 ?>
 
     <!DOCTYPE html>
@@ -38,6 +42,7 @@ function mainHeader($params = null)
         <script src="<?php echo SITE_URL; ?>assets/vendors/daterangepicker/moment.min.js"></script>
         <script type="text/javascript" src="<?php echo SITE_URL ?>assets/js/angular.min.js"></script>
         <script src="<?php echo SITE_URL; ?>assets/vendor/select2/select.min.js"></script>
+        <script src="<?php echo SITE_URL; ?>assets/vendor/chartjs-plugin-datalabels.min.js"></script>
         <script src="<?php echo SITE_URL; ?>assets/vendor/angular-sanitize.min.js"></script>
         <script type="text/javascript" src="<?php echo SITE_URL; ?>assets/js/ui-bootstrap-tpls-2.5.0.min.js"></script>
     </head>
@@ -53,6 +58,9 @@ function mainHeader($params = null)
                 }
             };
         });
+    </script>
+    <script>
+        var mainList = <?php echo safe_json_encode($mainProductsList); ?>;
     </script>
 
     <body ng-app="mainApp" class="<?php if (!empty($params['bodyClasses'])) {
