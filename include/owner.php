@@ -19,7 +19,8 @@ foreach ($categoryList as $v) {
 $categoryProducts = $productCls->getCategoryProducts($shop['owner_id'], $ids, $shop['id']);
 $suppliersList = [];
 $suppliersObj = new Suppliers();
-$suppliersList = $suppliersObj->getSuppliers(['shopId' => $shop['id']]);
+$suppliersList = $suppliersObj->getSuppliers(['shopId' => $shop['id'], 'type' => 1]);
+$authorsList = $suppliersObj->getSuppliers(['shopId' => $shop['id'], 'type' => 2]);
 
 $customersList = [];
 $customerObj = new Customers();
@@ -106,6 +107,31 @@ $customersList = $customerObj->getCustomers($shop['id']);
                   <ui-select custom-dropdown ng-model="payment.supplier" theme="bootstrap" ng-disabled="disabled" reset-search-input="false" title="Choose a supplier">
                     <ui-select-match placeholder="Enter a supplier...">{{$select.selected.name}}</ui-select-match>
                     <ui-select-choices repeat="address in suppliersList track by $index" refresh="refreshSuppliers($select.search)" refresh-delay="0">
+                      <div style="white-space: wrap;" ng-bind-html="address.name | highlight: $select.search"></div>
+                    </ui-select-choices>
+                  </ui-select>
+                </div>
+              </div>
+              <div class="form-group">
+                <input placeholder="Description" ng-model="payment.summery" type="text" class="form-control">
+              </div>
+              <div class="form-group">
+                <input placeholder="Amount" ng-model="payment.amount" type="text" class="form-control">
+              </div>
+              <input type="submit" value="Submit" class="btn btn-primary">
+              <label class="pull-right"><input type="checkbox" name="adjustment" ng-model="payment.adjustment"> Adjustment</label>
+            </form>
+          </li>
+          <li class="dropdown" style="padding: 0">
+            <a href="#" class="nav-menu-item btn btn-primary" data-toggle="dropdown" uib-tooltip="Royalty" tooltip-placement="bottom" title="">
+              Roy.
+            </a>
+            <form ng-submit="directPayment(2)" class="dropdown-menu" style="padding: 20px; width: 300px">
+              <div class="form-group">
+                <div class="form-group">
+                  <ui-select custom-dropdown ng-model="payment.supplier" theme="bootstrap" ng-disabled="disabled" reset-search-input="false" title="Choose an author">
+                    <ui-select-match placeholder="Enter an author...">{{$select.selected.name}}</ui-select-match>
+                    <ui-select-choices repeat="address in authorsList track by $index" refresh="refreshAuthors($select.search)" refresh-delay="0">
                       <div style="white-space: wrap;" ng-bind-html="address.name | highlight: $select.search"></div>
                     </ui-select-choices>
                   </ui-select>
@@ -229,6 +255,9 @@ $customersList = $customerObj->getCustomers($shop['id']);
       <li class="<?php if ($params['page'] == 'suppliers') {
                     echo 'active';
                   } ?>"><a uib-tooltip="Suppliers" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/suppliers/"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/supplier.svg" alt="" /><span class="nav-menu-text">Suppliers</span></a></li>
+      <li class="<?php if ($params['page'] == 'author') {
+                    echo 'active';
+                  } ?>"><a uib-tooltip="Authors" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/authors"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/supplier.svg" alt="" /> <span class="nav-menu-text">Authors</span></a></li>
       <li class="<?php if ($params['page'] == 'expense') {
                     echo 'active';
                   } ?>"><a uib-tooltip="Expenses" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/expenses"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/expense.svg" alt="" /><span class="nav-menu-text">Expenses</span></a></li>

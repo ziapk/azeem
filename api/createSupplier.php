@@ -15,6 +15,7 @@ if (empty($_POST['name'])) {
         'company' => !empty($_POST['company']) ? $_POST['company'] : "",
         'title' => !empty($_POST['title']) ? $_POST['title'] : "",
         'user_id' => $userData['id'],
+        'type' => !empty($_POST['type']) ? $_POST['type'] : 1,
         'shopId' => $shop['id'],
     ];
 
@@ -26,10 +27,17 @@ if (empty($_POST['name'])) {
     foreach ($accountsData as $a) {
         $storeAccounts[$a['key_value']] = $a['account_id'];
     }
-    $payableAccount = $de->getAccount($storeAccounts['payable']);
+
+    $settings = ['account' => $storeAccounts['payable'], 'type' => 'Supplier - '];
+
+    if (!empty($data['type']) && $data['type'] == 2) {
+        $settings = ['account' => $storeAccounts['royalty'], 'type' => 'Author - '];
+    }
+
+    $payableAccount = $de->getAccount($settings['account']);
 
     $accountData = [
-        'title' => 'Supplier - ' . $_POST['name'] . ' - ' . $_POST['company'],
+        'title' => $settings['type'] . $_POST['name'] . ' - ' . $_POST['company'],
         'code' => $payableAccount['code'],
         'account_type' => $payableAccount['account_type'],
         'group_id' => $payableAccount['group_id'],

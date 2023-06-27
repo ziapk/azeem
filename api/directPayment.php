@@ -4,6 +4,7 @@ try {
 
     $accountId = $_POST['id'];
     $amount = $_POST['amount'];
+    $type = $_POST['type'];
 
     $storeObj = new Store();
     $storeDATA = $storeObj->getStore($shop['id']);
@@ -34,6 +35,29 @@ try {
             'type' => 'D'
         ];
     }
+
+    if (!empty($type) && $type == 2 && $amount < 0) {
+        $settings = [
+            'summery' => 'ROYALTY PAYMENT',
+            'title' => 'ROYALTY PAYMENT',
+            'sup' => 'C',
+            'acc' => $storeAccounts['royalty'],
+            'type' => 'D'
+        ];
+    }
+
+
+    // royalty 
+    if (!empty($type) && $type == 2 && $amount > 0) {
+        $settings = [
+            'summery' => 'ROYALTY PAYMENT',
+            'title' => 'ROYALTY PAYMENT',
+            'sup' => 'D',
+            'acc' => $storeAccounts['royalty'],
+            'type' => 'C'
+        ];
+    }
+
     if (!empty($_POST['adjustment']) && $amount > 0) {
         $settings = [
             'summery' => 'ADJUSTMENT',

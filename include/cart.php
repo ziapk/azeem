@@ -74,6 +74,8 @@
     $scope.oexpensesList = <?php echo json_encode($categories); ?>;
     $scope.suppliersList = <?php echo json_encode($suppliersList); ?>;
     $scope.osuppliersList = <?php echo json_encode($suppliersList); ?>;
+    $scope.authorsList = <?php echo json_encode($authorsList); ?>;
+    $scope.oauthorsList = <?php echo json_encode($authorsList); ?>;
     $scope.createExpense = () => {
       const cat_id = $scope.exp.expense.id;
       if (cat_id && $scope.exp.price) {
@@ -104,12 +106,16 @@
     $scope.refreshSuppliers = search => {
       $scope.suppliersList = $scope.osuppliersList.filter(r => r.name.toLowerCase().includes(search.toLowerCase()));
     }
+    $scope.refreshAuthors = search => {
+      $scope.authorsList = $scope.oauthorsList.filter(r => r.name.toLowerCase().includes(search.toLowerCase()));
+    }
     $scope.directPayment = (type) => {
       const id = $scope.payment.supplier.account_id;
       $scope.payment.supplier.account_id;
       if (id && $scope.payment.amount) {
         $http.post('<?php echo SITE_URL; ?>api/directPayment.php', $httpParamSerializerJQLike({
           ...$scope.payment,
+          type,
           id,
         }), {
           headers: {
