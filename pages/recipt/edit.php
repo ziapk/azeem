@@ -402,8 +402,7 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                     return [];
                 } else {
                     // params.term = term;
-                    const regex = new RegExp(term, 'i');
-                    const filteredArray = window.mainList.records.filter(obj => regex.test('|' + obj.searchString + '|') || regex.test('|' + obj.searchString) || regex.test(obj.searchString + '|') || regex.test(obj.searchString));
+                    const filteredArray = window.mainList.records.filter(obj => obj.searchString.includes('|' + term + '|') || regex.includes('|' + term) || regex.includes(term + '|') || regex.includes(term));
 
                     return filteredArray.slice(0, 30);
                 }

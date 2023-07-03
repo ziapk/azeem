@@ -275,10 +275,9 @@ echo mainFooter();
             }
         }
 
-        $scope.searchProduct = function(search) {
+        $scope.searchProduct = function(term) {
 
-            const regex = new RegExp(search, 'i');
-            const filteredArray = window.mainList.records.filter(obj => regex.test('|' + obj.searchString + '|') || regex.test('|' + obj.searchString) || regex.test(obj.searchString + '|') || regex.test(obj.searchString));
+            const filteredArray = window.mainList.records.filter(obj => obj.searchString.includes('|' + term + '|') || regex.includes('|' + term) || regex.includes(term + '|') || regex.includes(term));
 
             return filteredArray.slice(0, 30);
         }
