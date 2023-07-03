@@ -222,7 +222,9 @@ echo mainFooter();
         $scope.searchProduct = function(term) {
             const filteredArray = window.mainList.records.filter(obj => obj.searchString.includes('|' + term + '|') || obj.searchString.includes('|' + term) || obj.searchString.includes(term + '|'));
 
-            return filteredArray.slice(0, 30);
+            const secondfilteredArray = !filteredArray.length ? window.mainList.records.filter(obj => obj.searchString.includes(term)) : filteredArray;
+
+            return secondfilteredArray.slice(0, 30);
         }
 
         $scope.searchCustomer = function(term) {

@@ -404,7 +404,9 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                     // params.term = term;
                     const filteredArray = window.mainList.records.filter(obj => obj.searchString.includes('|' + term + '|') || obj.searchString.includes('|' + term) || obj.searchString.includes(term + '|'));
 
-                    return filteredArray.slice(0, 30);
+                    const secondfilteredArray = !filteredArray.length ? window.mainList.records.filter(obj => obj.searchString.includes(term)) : filteredArray;
+
+                    return secondfilteredArray.slice(0, 30);
                 }
             }
 
