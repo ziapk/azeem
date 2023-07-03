@@ -1,5 +1,7 @@
 <?php
-session_start();
+if (!isset($_SESSION)) {
+    session_start();
+}
 define('SITE_URL', '/');
 
 // ini_set('display_errors', 1);
@@ -174,7 +176,8 @@ $reportsArray = [
     9 => ['id' => 9, 'title' => 'Expense Summery Report', 'access' => ['shopkeeper', 'owner', 'manager']],
     10 => ['id' => 10, 'title' => 'Closing Balance Report', 'access' => ['shopkeeper', 'owner', 'manager']],
     11 => array('id' => 11, 'access' => ['owner', 'manager'], 'title' => 'Trial Balance'),
-    12 => array('id' => 12, 'access' => ['owner', 'manager'], 'title' => 'Profit and Loss')
+    12 => array('id' => 12, 'access' => ['owner', 'manager'], 'title' => 'Profit and Loss'),
+    13 => ['id' => 13, 'title' => 'Payments', 'access' => ['owner', 'manager']],
 ];
 
 $returnArray = [

@@ -484,6 +484,19 @@ class DoubleEntry extends Connection
 		}
 	}
 
+	public function getAccountsByParentIds($parent_ids)
+	{
+		try {
+			$stmt = "SELECT id, title, parent_id from `$this->table` where parent_id IN (" . implode(',', $parent_ids) . ") and `status` = 1";
+			$prepare = $this->dbh->prepare($stmt);
+			$prepare->execute();
+			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
+			return $result;
+		} catch (PDOException $e) {
+			die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
+
 
 
 	public function searchAccountLeafs($search, $shopId = null)

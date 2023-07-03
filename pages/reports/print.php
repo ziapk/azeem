@@ -120,6 +120,10 @@ switch ($reportType) {
 		include_once dirname(__FILE__) . '/accounting.php';
 		exit;
 		break;
+	case '13':
+		include_once dirname(__FILE__) . '/ledger.php';
+		exit;
+		break;
 
 	default:
 		# code...

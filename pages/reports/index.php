@@ -11,6 +11,24 @@ $publishers = $publisherObj->getPublishersPagination(['page' => 1, 'perPage' => 
 $groupNames = $cat->getGroupNames($shop['owner_id']);
 $ownerStores = $stores->getOwnerStores($userData['id']);
 
+$de = new DoubleEntry();
+$shopAccounts = new ShopAccounts();
+$accountsData = $shopAccounts->getSAs($shop['id']);
+$store = [];
+foreach ($accountsData as $a) {
+    $store[$a['key_value']] = $a['account_id'];
+}
+
+$params['parent_ids'][] = $store['receivable'];
+$params['parent_ids'][] = $store['payable'];
+
+
+$accounts = $de->getAccountsByParentIds($params['parent_ids']);
+foreach ($accounts as $k => $val) {
+    $accounts[$k] = $val;
+    $accounts[$k]['parent'] = $val['parent_id'] == $store['receivable'] ? 'Customers' : 'Suppliers';
+}
+
 echo mainHeader(['page' => 'reports']);
 
 ?>
@@ -40,6 +58,16 @@ echo mainHeader(['page' => 'reports']);
             <?php
 
             if ($userData['role'] == 'owner' || $userData['role'] == 'manager') { ?>
+                <div class="col-sm-4 col-md-3 form-group">
+                    <label>Select Account</label>
+                    <ui-select custom-dropdown ng-model="account.selected" theme="bootstrap" ng-disabled="disabled" reset-search-input="false" title="Choose an Account">
+                        <ui-select-match placeholder="Enter an account...">{{$select.selected.title}}</ui-select-match>
+                        <ui-select-choices group-by="'parent'" repeat="address in accountsList track by $index" refresh="refreshAccounts($select.search)" refresh-delay="0">
+                            <div style="white-space: wrap;" ng-bind-html="address.title | highlight: $select.search"></div>
+                        </ui-select-choices>
+                    </ui-select>{{publisher.selected.id}}
+                    <input type="hidden" name="account_id" value="{{account.selected.id}}">
+                </div>
                 <div class="col-sm-4 col-md-3 form-group">
                     <label>Select Publisher</label>
                     <ui-select custom-dropdown ng-model="publisher.selected" theme="bootstrap" ng-disabled="disabled" reset-search-input="false" title="Choose a publisher">
@@ -100,8 +128,14 @@ echo mainHeader(['page' => 'reports']);
         $scope.publisher = {};
         $scope.publisherList = <?php echo json_encode($publishers['records']); ?>;
         $scope.opublishersList = <?php echo json_encode($publishers['records']); ?>;
+        $scope.account = {};
+        $scope.accountsList = <?php echo json_encode($accounts); ?>;
+        $scope.oaccountsList = <?php echo json_encode($accounts); ?>;
         $scope.refreshPublishers = search => {
             $scope.publisherList = $scope.opublishersList.filter(r => r.full_name.toLowerCase().includes(search.toLowerCase()));
+        }
+        $scope.refreshAccounts = search => {
+            $scope.accountsList = $scope.oaccountsList.filter(r => r.title.toLowerCase().includes(search.toLowerCase()));
         }
     });
 </script>
