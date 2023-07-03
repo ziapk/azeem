@@ -222,7 +222,7 @@ echo mainFooter();
         $scope.searchProduct = function(term) {
             const filteredArray = window.mainList.records.filter(obj => obj.searchString.includes('|' + term + '|') || obj.searchString.includes('|' + term) || obj.searchString.includes(term + '|'));
 
-            const secondfilteredArray = !filteredArray.length ? window.mainList.records.filter(obj => obj.searchString.includes(term)) : filteredArray;
+            const secondfilteredArray = !filteredArray.length ? window.mainList.records.filter(obj => obj.searchString.toLowerCase().includes(term?.toLowerCase() || term)) : filteredArray;
 
             return secondfilteredArray.slice(0, 30);
         }
