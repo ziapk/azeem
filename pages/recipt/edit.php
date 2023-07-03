@@ -392,11 +392,8 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
             $scope.searchProduct = function(term) {
                 const params = {};
                 if ($scope.focus === true) {
-                    params.searchBy = 'id';
-                    $scope.product = '';
                     params.term = parseFloat(term.split('-')[0]);
-                    const list = sessionStorage.getItem('list') && JSON.parse(sessionStorage.getItem('list'));
-                    const item = list.find(r => r.id == params.term || r.code == params.term || r.barcode == params.term);
+                    const item = window.mainList.records.find(r => r.id == params.term || r.code == params.term || r.barcode == params.term);
                     $scope.product = '';
                     $scope.selectProduct(item);
                     return [];
