@@ -277,7 +277,7 @@ echo mainFooter();
 
         $scope.searchProduct = function(term) {
 
-            const filteredArray = window.mainList.records.filter(obj => obj.searchString.includes('|' + term + '|') || obj.searchString.includes('|' + term) || obj.searchString.includes(term + '|') || obj.searchString.includes(term));
+            const filteredArray = window.mainList.records.filter(obj => obj.searchString.includes('|' + term + '|') || obj.searchString.includes('|' + term) || obj.searchString.includes(term + '|'));
 
             return filteredArray.slice(0, 30);
         }
