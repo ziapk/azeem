@@ -340,7 +340,7 @@ echo mainFooter();
             } else {
                 // params.term = term;
 
-                const filteredArray = window.mainList.records.filter(obj => obj.searchString.includes('|' + term + '|') || regex.includes('|' + term) || regex.includes(term + '|') || regex.includes(term));
+                const filteredArray = window.mainList.records.filter(obj => obj.searchString.includes('|' + term + '|') || obj.searchString.includes('|' + term) || obj.searchString.includes(term + '|') || obj.searchString.includes(term));
 
                 return filteredArray.slice(0, 30);
             }
