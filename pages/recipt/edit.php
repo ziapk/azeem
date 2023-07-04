@@ -17,6 +17,11 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
     //     $allowCustomer = false;
     // }
 ?>
+    <style>
+        .uib-typeahead-match.active span.text-danger {
+            background-color: #fff !important
+        }
+    </style>
     <div ng-controller="cartController">
         <div class="container">
             <h5><strong class="text-danger">Running Products</strong> <small class="text-danger"><strong>Click to Add</strong></small></h5>
@@ -515,10 +520,10 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
 
 
     <script type="text/ng-template" id="row.html">
-        <a>
-      <span ng-bind-html="match.model.full_name | uibTypeaheadHighlight:query"></span>
-      <span class="pull-right">{{match.model.price}}</span>
-  </a>
+        <a style="display: flex; justify-content: space-between; align-items: center">
+        <span class="{{match.model.code ? 'text-danger' : ''}}" ng-bind-html="match.model.full_name | uibTypeaheadHighlight:query"></span>
+        <span class="label label-danger" style="font-size: 14px">{{match.model.price}}</span>
+    </a>
 </script>
     <script type="text/ng-template" id="customer.html">
         <a class="clearfix" style="border-bottom: 1px solid #ccc; display: block">
