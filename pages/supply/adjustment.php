@@ -9,7 +9,11 @@ if ($userData['role'] == 'owner') {
 
 echo mainHeader();
 ?>
-
+<style>
+    .uib-typeahead-match.active span.text-danger {
+        background-color: #fff !important
+    }
+</style>
 <div class="container" ng-controller="reportController">
     <div class="row">
         <div class="col-sm-3 form-group">
@@ -364,8 +368,8 @@ echo mainFooter();
 </script>
 
 <script type="text/ng-template" id="row2.html">
-    <a style="display: block">
-      <span ng-bind-html="match.model.full_name | uibTypeaheadHighlight:query"></span>
-      <span class="pull-right" style="margin-left: 20px">{{match.model.price}}</span>
-  </a>
+    <a style="display: flex; justify-content: space-between; align-items: center">
+        <span class="{{match.model.code ? 'text-danger' : ''}}" ng-bind-html="match.model.full_name | uibTypeaheadHighlight:query"></span>
+        <span class="label label-danger" style="font-size: 14px">{{match.model.price}}</span>
+    </a>
 </script>
