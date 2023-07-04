@@ -19,7 +19,6 @@ if (!empty($_POST) && isset($_POST['update'])) {
     if (empty($_POST['full_name'])) {
         $error = "Please fill all fields";
     } else {
-
         $data = [
             'id' => $_GET['id'],
             "full_name" => !empty($_POST['full_name']) ? $_POST['full_name'] : null,
@@ -31,6 +30,7 @@ if (!empty($_POST) && isset($_POST['update'])) {
             "emg_contact_1" => !empty($_POST['emg_contact_1']) ? $_POST['emg_contact_1'] : null,
             "emg_contact_2" => !empty($_POST['emg_contact_2']) ? $_POST['emg_contact_2'] : null,
             "salary" => !empty($_POST['salary']) ? $_POST['salary'] : null,
+            "status" => !empty($_POST['status']) ? $_POST['status'] : null,
             "opening_balance" => !empty($_POST['opening_balance']) ? $_POST['opening_balance'] : null,
         ];
         $update = $productObj->update($data);
@@ -108,6 +108,14 @@ echo mainHeader();
                 <input name="emg_contact_2" id="emg_contact_2" type="text" ng-model="customer.emg_contact_2" class="form-control" placeholder="Mobile No">
             </div>
             <div class="form-group col-sm-6 col-md-4">
+                <label for="emg_contact_2">Status</label>
+                <select name="status" id="status" type="text" ng-model="customer.status" class="form-control">
+                    <?php foreach ($statusArr as $key => $value) { ?>
+                        <option value="<?php echo $key; ?>"><?php echo $value; ?></option>
+                    <?php } ?>
+                </select>
+            </div>
+            <div class="form-group col-sm-6 col-md-4">
                 <label for="salary">Salary</label>
                 <input name="salary" id="salary" type="text" ng-model="customer.salary" class="form-control" placeholder="Salary">
             </div>
@@ -134,7 +142,8 @@ echo mainHeader();
 <script type="text/javascript">
     app.controller('customerController', function($scope, $http, $httpParamSerializerJQLike, $uibModal, $window, $log) {
         $scope.customer = <?php echo json_encode($store); ?>;
-        $scope.customer.doj = moment($scope.customer.doj);
+        $scope.customer.doj = $scope.customer.doj ? moment($scope.customer.doj) : null;
+        $scope.customer.status = $scope.customer.status.toString();
         $scope.linkAccount = () => {
             ;
             $http.post('./linkAccount.php', $httpParamSerializerJQLike($scope.customer), {

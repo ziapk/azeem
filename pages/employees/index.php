@@ -3,6 +3,23 @@ include_once dirname(__FILE__) . '/../../include/settings.php';
 $customers = new  Employees();
 $customersData = $customers->getEmployees($shop['id']);
 echo mainHeader(['page' => 'employees']);
+function getMonthListBetweenDates($from, $to, $format = "F-Y-d", $intervals = '1 month')
+{
+    $start    = new DateTime($from);
+    $start->modify('first day of this month');
+    $end      = new DateTime($to);
+    $end->modify('first day of next month');
+    $interval = DateInterval::createFromDateString($intervals);
+    $period   = new DatePeriod($start, $interval, $end);
+
+    $list = [];
+
+    foreach ($period as $dt) {
+        $list[] = strtolower($dt->format($format));
+    }
+
+    return $list;
+}
 ?>
 
 <div class="container" ng-controller="customerController">
@@ -11,12 +28,37 @@ echo mainHeader(['page' => 'employees']);
     <div class="form-group">
         <input class="form-control" ng-change="searchEmployee()" ng-model="search" placeholder="Type here for search..." />
     </div>
+    <div class="form-group">
+        <h5>Select months</h5>
+        <div class="row">
+            <div class="col-sm-4">
+                <select class="form-control" ng-model="form.salary_month">
+                    <?php
+                    $currentMonth = strtolower(date('F-Y'));
+                    $firstMonth = date('Y-m-d', strtotime(date('F Y') . '-1 month'));
+                    $lastMonth = date('Y-m-d', strtotime(date('F Y') . '+1 month'));
+                    $periods = getMonthListBetweenDates($firstMonth, $lastMonth, 'F-Y', '1 month');
+                    foreach ($periods as $date) { ?>
+                        <option value="<?php echo $date; ?>" <?php if ($date == $currentMonth) {
+                                                                    echo 'selected';
+                                                                } ?>>
+                            <?php echo strtoupper($date); ?>
+                        </option>
+                    <?php } ?>
+                </select>
+            </div>
+            <div class="col-sm-4">
+                <a href="javascript:void(0)" class="btn btn-primary" ng-click="generateSalaries(form)">Generat Salaries</a>
+            </div>
+        </div>
+    </div>
     <table class="table">
         <thead>
             <tr>
                 <th>Id</th>
                 <th>Contact</th>
                 <th>Title / Company / Address</th>
+                <th>Status</th>
                 <th></th>
             </tr>
         </thead>
@@ -25,6 +67,7 @@ echo mainHeader(['page' => 'employees']);
                 <td>{{li.id}}</td>
                 <td><strong>{{li.full_name}}</strong> <br /> {{li.phoneNumber}}</td>
                 <td><strong>{{li.company}}</strong> - {{li.title}} <br />{{li.address}}</td>
+                <td>{{statusArr[li.status]}}</td>
                 <td>
                     <?php if ($userData['role'] === 'owner' || $userData['role'] === 'manager') { ?><a class="btn btn-info btn-xs" href="javascript:void(0)" ng-click="assignBooks(li)">Disc.</a><?php } ?>
                     <?php if ($userData['role'] === 'owner' || $userData['role'] === 'manager') { ?><a class="btn btn-default btn-xs" href="../chart-of-accounts/summery.php?t=emp&id={{li.account_id}}">Ledger</a><?php } ?>
@@ -52,6 +95,7 @@ echo mainFooter();
 ?>
 <script type="text/javascript">
     app.controller('customerController', function($scope, $http, $httpParamSerializerJQLike, $uibModal, $window, $log) {
+        $scope.statusArr = <?php echo safe_json_encode($statusArr); ?>;
         $scope.currentPage = 1;
         $scope.data = {
             perPage: "10"
@@ -67,6 +111,21 @@ echo mainFooter();
                         page: page || 1,
                         perPage: $scope.data.perPage,
                         search: $scope.search
+                    }
+                })
+                .then(function(response) {
+                    $scope.loading = false;
+                    if (response.status === 200) {
+                        $scope.data = response.data;
+                        $scope.list = response.data.records;
+                    }
+                })
+        }
+        $scope.generateSalaries = (frm) => {
+            console.log('frm', frm);
+            $http.post($scope.siteUrl + "api/generateSalaries.php", $httpParamSerializerJQLike(frm), {
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
                     }
                 })
                 .then(function(response) {

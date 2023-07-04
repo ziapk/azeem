@@ -78,7 +78,11 @@
     $scope.oauthorsList = <?php echo json_encode($authorsList); ?>;
     $scope.createExpense = () => {
       const cat_id = $scope.exp.expense.id;
-      if (cat_id && $scope.exp.price) {
+      let amount = 0;
+      for (let k in $scope.exp.mode) {
+        amount += $scope.exp.mode[k] || 0;
+      }
+      if (cat_id && amount) {
         $http.post('<?php echo SITE_URL; ?>api/createExpense.php', $httpParamSerializerJQLike({
           ...$scope.exp,
           cat_id
@@ -91,7 +95,9 @@
           if (response.data.status == 200) {
             $scope.exp.expense = '';
             $scope.exp.description = '';
-            $scope.exp.price = '';
+            for (let k in $scope.exp.mode) {
+              $scope.exp.mode[k] = '';
+            }
           }
         })
       }
@@ -110,12 +116,20 @@
       $scope.authorsList = $scope.oauthorsList.filter(r => r.name.toLowerCase().includes(search.toLowerCase()));
     }
     $scope.directPayment = (type) => {
+      // console.log('$scope.payment', $scope.payment);
       const id = $scope.payment.supplier.account_id;
+      const royalty_id = $scope.payment?.author?.account_id;
       $scope.payment.supplier.account_id;
-      if (id && $scope.payment.amount) {
+      let amount = 0;
+      for (let k in $scope.payment.mode) {
+        amount += $scope.payment.mode[k] || 0;
+      }
+
+      if (id && amount) {
         $http.post('<?php echo SITE_URL; ?>api/directPayment.php', $httpParamSerializerJQLike({
           ...$scope.payment,
           type,
+          royalty_id: $scope.payment.royalty ? royalty_id : 0,
           id,
         }), {
           headers: {
@@ -125,7 +139,9 @@
           alert(response.data.message);
           if (response.data.status == 200) {
             $scope.payment.summery = '';
-            $scope.payment.amount = '';
+            for (let k in $scope.payment.mode) {
+              $scope.payment.mode[k] = '';
+            }
             $scope.printRecipt(response.data.supply.id);
           }
         })
@@ -133,7 +149,11 @@
     }
     $scope.directReceiving = () => {
       const id = $scope.payment.customer.account_id;
-      if (id && $scope.payment.amount) {
+      let amount = 0;
+      for (let k in $scope.payment.mode) {
+        amount += $scope.payment.mode[k] || 0;
+      }
+      if (id && amount) {
         $http.post('<?php echo SITE_URL; ?>api/directReceiving.php', $httpParamSerializerJQLike({
           ...$scope.payment,
           id
@@ -147,7 +167,9 @@
             $scope.printRecipt(response.data.supply.id);
             $scope.payment.customer = '';
             $scope.payment.summery = '';
-            $scope.payment.amount = '';
+            for (let k in $scope.payment.mode) {
+              $scope.payment.mode[k] = '';
+            }
           }
 
 
@@ -291,5 +313,19 @@
     $scope.getClass = () => {
       return new Date().getHours() >= 20 && new Date().getHours() <= 22
     }
+    $scope.modeNames = {};
+    $scope.modes = [];
+    $scope.searchMode = function() {
+      return $http.get("<?php echo SITE_URL ?>api/getPaymentModes.php")
+        .then(function(response) {
+          $scope.modes = response.data.records;
+          $scope.modes.forEach(p => {
+            $scope.modeNames[p.id] = p.title;
+          })
+          return response.data
+        });
+    }
+
+    $scope.searchMode();
   });
 </script>

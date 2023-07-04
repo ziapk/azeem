@@ -78,7 +78,7 @@ $customersList = $customerObj->getCustomers($shop['id']);
             <a href="#" class="nav-menu-item btn btn-primary" data-toggle="dropdown" uib-tooltip="Receivings" tooltip-placement="bottom" title="">
               Re.
             </a>
-            <form ng-submit="directReceiving()" class="dropdown-menu" style="padding: 20px; width: 300px">
+            <form ng-submit="directReceiving()" class="dropdown-menu" style="padding: 15px; width: 320px">
               <div class="form-group">
                 <ui-select custom-dropdown ng-model="payment.customer" theme="bootstrap" ng-disabled="disabled" reset-search-input="false" title="Choose a customer">
                   <ui-select-match placeholder="Enter a customer...">{{$select.selected.full_name}}</ui-select-match>
@@ -90,8 +90,10 @@ $customersList = $customerObj->getCustomers($shop['id']);
               <div class="form-group">
                 <input placeholder="Description" ng-model="payment.summery" type="text" class="form-control">
               </div>
-              <div class="form-group">
-                <input placeholder="Amount" ng-model="payment.amount" type="text" class="form-control">
+              <div class="row" style="margin: 0 -6px">
+                <div class="form-group col-sm-4" ng-repeat="mode in modes" style="padding: 0 3px">
+                  <input placeholder="{{mode.title}}" ng-model="payment.mode[mode.id]" type="text" class="form-control">
+                </div>
               </div>
               <input type="submit" value="Submit" class="btn btn-primary">
               <label class="pull-right"><input type="checkbox" name="adjustment" ng-model="payment.adjustment"> Adjustment</label>
@@ -101,12 +103,20 @@ $customersList = $customerObj->getCustomers($shop['id']);
             <a href="#" class="nav-menu-item btn btn-primary" data-toggle="dropdown" uib-tooltip="Payments" tooltip-placement="bottom" title="">
               Pay
             </a>
-            <form ng-submit="directPayment()" class="dropdown-menu" style="padding: 20px; width: 300px">
-              <div class="form-group">
-                <div class="form-group">
+            <form ng-submit="directPayment()" class="dropdown-menu" style="padding: 15px; width: 320px">
+              <div class="row">
+                <div class="form-group" ng-class="{'col-sm-6': payment.royalty, 'col-sm-12': !payment.royalty}">
                   <ui-select custom-dropdown ng-model="payment.supplier" theme="bootstrap" ng-disabled="disabled" reset-search-input="false" title="Choose a supplier">
                     <ui-select-match placeholder="Enter a supplier...">{{$select.selected.name}}</ui-select-match>
                     <ui-select-choices repeat="address in suppliersList track by $index" refresh="refreshSuppliers($select.search)" refresh-delay="0">
+                      <div style="white-space: wrap;" ng-bind-html="address.name | highlight: $select.search"></div>
+                    </ui-select-choices>
+                  </ui-select>
+                </div>
+                <div class="form-group" ng-if="payment.royalty" ng-class="{'col-sm-6': payment.royalty, 'col-sm-12': !payment.royalty}">
+                  <ui-select custom-dropdown ng-model="payment.author" theme="bootstrap" ng-disabled="disabled" reset-search-input="false" title="Choose an author">
+                    <ui-select-match placeholder="Enter a author...">{{$select.selected.name}}</ui-select-match>
+                    <ui-select-choices repeat="address in authorsList track by $index" refresh="refreshAuthors($select.search)" refresh-delay="0">
                       <div style="white-space: wrap;" ng-bind-html="address.name | highlight: $select.search"></div>
                     </ui-select-choices>
                   </ui-select>
@@ -115,14 +125,19 @@ $customersList = $customerObj->getCustomers($shop['id']);
               <div class="form-group">
                 <input placeholder="Description" ng-model="payment.summery" type="text" class="form-control">
               </div>
-              <div class="form-group">
-                <input placeholder="Amount" ng-model="payment.amount" type="text" class="form-control">
+              <div class="row" style="margin: 0 -6px">
+                <div class="form-group col-sm-4" ng-repeat="mode in modes" style="padding: 0 3px">
+                  <input placeholder="{{mode.title}}" ng-model="payment.mode[mode.id]" type="text" class="form-control">
+                </div>
               </div>
               <input type="submit" value="Submit" class="btn btn-primary">
-              <label class="pull-right"><input type="checkbox" name="adjustment" ng-model="payment.adjustment"> Adjustment</label>
+              <div class="pull-right">
+                <label style="margin-right: 10px;"><input type="checkbox" name="royalty" ng-model="payment.royalty"> Royalty</label>
+                <label><input type="checkbox" name="adjustment" ng-model="payment.adjustment"> Adjustment</label>
+              </div>
             </form>
           </li>
-          <li class="dropdown" style="padding: 0">
+          <!-- <li class="dropdown" style="padding: 0">
             <a href="#" class="nav-menu-item btn btn-primary" data-toggle="dropdown" uib-tooltip="Royalty" tooltip-placement="bottom" title="">
               Roy.
             </a>
@@ -146,12 +161,12 @@ $customersList = $customerObj->getCustomers($shop['id']);
               <input type="submit" value="Submit" class="btn btn-primary">
               <label class="pull-right"><input type="checkbox" name="adjustment" ng-model="payment.adjustment"> Adjustment</label>
             </form>
-          </li>
+          </li> -->
           <li class="dropdown" style="padding: 0">
             <a href="#" class="nav-menu-item btn btn-primary" data-toggle="dropdown" uib-tooltip="Expenses" tooltip-placement="bottom" title="">
               Exp
             </a>
-            <form ng-submit="createExpense()" class="dropdown-menu" style="padding: 20px; width: 300px">
+            <form ng-submit="createExpense()" class="dropdown-menu" style="padding: 15px; width: 320px">
               <div class="form-group">
                 <ui-select custom-dropdown ng-model="exp.expense" theme="bootstrap" ng-disabled="disabled" reset-search-input="false" title="Choose an expense">
                   <ui-select-match placeholder="Enter a expense...">{{$select.selected.full_name}}</ui-select-match>
@@ -163,8 +178,10 @@ $customersList = $customerObj->getCustomers($shop['id']);
               <div class="form-group">
                 <input placeholder="Description" ng-model="exp.description" type="text" class="form-control">
               </div>
-              <div class="form-group">
-                <input placeholder="Amount" ng-model="exp.price" type="text" class="form-control">
+              <div class="row" style="margin: 0 -6px">
+                <div class="form-group col-sm-4" ng-repeat="mode in modes" style="padding: 0 3px">
+                  <input placeholder="{{mode.title}}" ng-model="exp.mode[mode.id]" type="text" class="form-control">
+                </div>
               </div>
               <input type="submit" value="Submit" class="btn btn-primary">
             </form>

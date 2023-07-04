@@ -144,7 +144,7 @@ class Expenses extends Connection
 				'entry_type' => 'D',
 				'description' => '',
 				'amount' => $array['price'], // 2000
-				'payment_mode' => 1,
+				'payment_mode' => !empty($array['mode']) ? $array['mode'] : 1,
 				'user_id' => $_SESSION['user_credentials']['id'],
 			];
 
@@ -156,7 +156,7 @@ class Expenses extends Connection
 				'entry_type' => 'C',
 				'description' => '',
 				'amount' => $array['price'], // 2000
-				'payment_mode' => 1,
+				'payment_mode' => !empty($array['mode']) ? $array['mode'] : 1,
 				'user_id' => $_SESSION['user_credentials']['id'],
 			];
 

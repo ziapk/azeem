@@ -11,7 +11,7 @@ class Employees extends Connection
 		if ($accountsOnly) {
 			$accountCond = 'and account_id > 0';
 		}
-		$stmt = "SELECT * FROM `{$this->table}`  WHERE status=1 $accountCond and shop_id=:shop_id AND (full_name LIKE '%" . $search . "%' OR title LIKE '%" . $search . "%' OR company LIKE '%" . $search . "%' OR code LIKE '" . $search . "%' OR contact_1 LIKE '%" . $search . "%') LIMIT 10";
+		$stmt = "SELECT * FROM `{$this->table}`  WHERE shop_id=:shop_id $accountCond AND (full_name LIKE '%" . $search . "%' OR title LIKE '%" . $search . "%' OR company LIKE '%" . $search . "%' OR code LIKE '" . $search . "%' OR contact_1 LIKE '%" . $search . "%') LIMIT 10";
 		$prepare = $this->dbh->prepare($stmt);
 		$prepare->bindParam(':shop_id', $shopId, PDO::PARAM_STR);
 		//$prepare->bindParam(':search',$search,PDO::PARAM_STR);
@@ -63,7 +63,7 @@ class Employees extends Connection
 	public function update($array)
 	{
 		try {
-			$stmt = "UPDATE `{$this->table}` SET full_name=:full_name, email=:email, designation=:designation, doj=:doj, contact_1=:contact_1, contact_2=:contact_2, emg_contact_1=:emg_contact_1, emg_contact_2=:emg_contact_2, salary=:salary WHERE id=:id";
+			$stmt = "UPDATE `{$this->table}` SET full_name=:full_name, email=:email, designation=:designation, doj=:doj, contact_1=:contact_1, contact_2=:contact_2, emg_contact_1=:emg_contact_1, emg_contact_2=:emg_contact_2, salary=:salary, status=:status WHERE id=:id";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':full_name', $array['full_name'], PDO::PARAM_STR);
 			$prepare->bindParam(':email', $array['email'], PDO::PARAM_STR);
@@ -74,6 +74,7 @@ class Employees extends Connection
 			$prepare->bindParam(':emg_contact_1', $array['emg_contact_1'], PDO::PARAM_STR);
 			$prepare->bindParam(':emg_contact_2', $array['emg_contact_2'], PDO::PARAM_STR);
 			$prepare->bindParam(':salary', $array['salary'], PDO::PARAM_STR);
+			$prepare->bindParam(':status', $array['status'], PDO::PARAM_STR);
 			$prepare->bindParam(':id', $array['id'], PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $prepare->rowCount();
@@ -97,7 +98,7 @@ class Employees extends Connection
 	public function getEmployees($shopId = null)
 	{
 		try {
-			$stmt = "SELECT *  FROM `{$this->table}` WHERE `shop_id`=:shop_id and status=1";
+			$stmt = "SELECT *  FROM `{$this->table}` WHERE `shop_id`=:shop_id";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':shop_id', $shopId, PDO::PARAM_STR);
 			$prepare->execute();
@@ -112,7 +113,7 @@ class Employees extends Connection
 	public function getUserByAccount($id)
 	{
 		try {
-			$stmt = "SELECT *  FROM `{$this->table}` WHERE `account_id`=:id and status=1";
+			$stmt = "SELECT *  FROM `{$this->table}` WHERE `account_id`=:id";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':id', $id, PDO::PARAM_STR);
 			$prepare->execute();
@@ -129,7 +130,7 @@ class Employees extends Connection
 	public function getEmployee($id)
 	{
 		try {
-			$stmt = "SELECT *  FROM `{$this->table}` WHERE `id`=:id and status=1";
+			$stmt = "SELECT *  FROM `{$this->table}` WHERE `id`=:id";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':id', $id, PDO::PARAM_STR);
 			$prepare->execute();
@@ -148,7 +149,7 @@ class Employees extends Connection
 	{
 		try {
 
-			$stmt = "SELECT COUNT(id) as total FROM `{$this->table}` where shop_id=:shop_id and status=1";
+			$stmt = "SELECT COUNT(id) as total FROM `{$this->table}` where shop_id=:shop_id";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':shop_id', $params['shopId'], PDO::PARAM_INT);
 			$prepare->execute();
@@ -160,7 +161,7 @@ class Employees extends Connection
 			$currentPage = $total_pages >= $params['page'] ? $params['page'] : $total_pages;
 			$offset = (($currentPage - 1) < 0 ? 0 : ($currentPage - 1)) * $no_of_records_per_page;
 			$search = " AND (full_name LIKE '%" . $params["search"] . "%' OR contact_1 LIKE '%" . $params["search"] . "%' OR designation LIKE '%" . $params["search"] . "%' ) ";
-			$stmt = "SELECT * FROM `{$this->table}` WHERE shop_id=:shop_id and status=1 $search LIMIT :offset, :perPage";
+			$stmt = "SELECT * FROM `{$this->table}` WHERE shop_id=:shop_id $search LIMIT :offset, :perPage";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':offset', $offset, PDO::PARAM_INT);
 			$prepare->bindParam(':perPage', $no_of_records_per_page, PDO::PARAM_INT);
