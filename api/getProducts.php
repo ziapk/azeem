@@ -12,7 +12,7 @@ $author = !empty($_GET['author']) ? $_GET['author'] : "";
 $board = !empty($_GET['board']) ? $_GET['board'] : "";
 $courceId = !empty($_GET['courceId']) ? $_GET['courceId'] : "";
 $publisher_id = !empty($_GET['publisher_id']) ? $_GET['publisher_id'] : "";
-// $status = !empty($_GET['status']) && $_GET['status'] == 0 ? 0 : 1;
+$status = !empty($_GET['status']) && $_GET['status'] == 0 ? 0 : 1;
 $minQty = !empty($_GET['minQty']) ? $_GET['minQty'] : "";
 $sortByField = !empty($_GET['sortByField']) ? $_GET['sortByField'] : "";
 $sortByOrder = !empty($_GET['sortByOrder']) ? $_GET['sortByOrder'] : "";
