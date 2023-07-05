@@ -117,15 +117,14 @@
     }
     $scope.directPayment = (type) => {
       // console.log('$scope.payment', $scope.payment);
-      const id = $scope.payment.supplier.account_id;
+      const id = $scope.payment.supplier?.account_id;
       const royalty_id = $scope.payment?.author?.account_id;
-      $scope.payment.supplier.account_id;
       let amount = 0;
       for (let k in $scope.payment.mode) {
         amount += $scope.payment.mode[k] || 0;
       }
 
-      if (id && amount) {
+      if ((id || $scope.payment.royalty && royalty_id) && amount) {
         $http.post('<?php echo SITE_URL; ?>api/directPayment.php', $httpParamSerializerJQLike({
           ...$scope.payment,
           type,

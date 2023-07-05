@@ -86,33 +86,36 @@ try {
 
         $makeTransactionId = $doubleEntry->makeTransaction($makeTransaction);
 
-        // payable credit entry
-        $entry = [
-            'transaction_id' => $makeTransactionId,
-            'account_id' => $accountId,
-            'entry_type' => $settings['payable'],
-            'description' => !empty($_POST['summery']) ? $_POST['summery'] : $settings['summery'],
-            'amount' => $amount,
-            'payment_mode' => $mode_id,
-            'user_id' => $_SESSION['user_credentials']['id'],
-        ];
-        $a[] = $doubleEntry->makeEntry($entry);
+
+        if (!empty($accountId)) {
+            // payable credit entry
+            $entry = [
+                'transaction_id' => $makeTransactionId,
+                'account_id' => $accountId,
+                'entry_type' => $settings['payable'],
+                'description' => !empty($_POST['summery']) ? $_POST['summery'] : $settings['summery'],
+                'amount' => $amount,
+                'payment_mode' => $mode_id,
+                'user_id' => $_SESSION['user_credentials']['id'],
+            ];
+            $a[] = $doubleEntry->makeEntry($entry);
 
 
-        // payable credit entry
-        $entry = [
-            'transaction_id' => $makeTransactionId,
-            'account_id' => $settings['shop_account'],
-            'entry_type' => $settings['type'],
-            'description' => !empty($_POST['summery']) ? $_POST['summery'] : $settings['summery'],
-            'amount' => $amount,
-            'payment_mode' => $mode_id,
-            'user_id' => $_SESSION['user_credentials']['id'],
-        ];
+
+            // payable credit entry
+            $entry = [
+                'transaction_id' => $makeTransactionId,
+                'account_id' => $settings['shop_account'],
+                'entry_type' => $settings['type'],
+                'description' => !empty($_POST['summery']) ? $_POST['summery'] : $settings['summery'],
+                'amount' => $amount,
+                'payment_mode' => $mode_id,
+                'user_id' => $_SESSION['user_credentials']['id'],
+            ];
 
 
-        $a[] = $doubleEntry->makeEntry($entry);
-
+            $a[] = $doubleEntry->makeEntry($entry);
+        }
 
 
         if (!empty($royaltyId)) {
