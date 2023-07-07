@@ -181,7 +181,7 @@ echo mainFooter();
             }
         }
         $scope.selectProduct = function(p, r) {
-            let currentIndex = 0
+            let currentIndex = 1
             let exists = false;
             $scope.items.map((pro, index) => {
                 if (pro.id == p.id) {
@@ -192,13 +192,12 @@ echo mainFooter();
             })
             $scope.product = "";
             if (!exists) {
-                $scope.items.push({
+                $scope.items.unshift({
                     ...p,
                     price: parseInt(p.price || 0),
                     pprice: parseInt(p.pprice || 0),
                     qty: 1
                 });
-                currentIndex = $scope.items.length;
             }
 
             $timeout(() => {

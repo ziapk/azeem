@@ -108,7 +108,7 @@ echo mainFooter();
         $scope.list = [];
         $scope.priceList = sessionStorage.getItem('list') && JSON.parse(sessionStorage.getItem('list'));;
         $scope.focus = false;
-        $scope.qf = false;
+        $scope.qf = true;
 
         $scope.shopId = '<?php echo $userData['shopId']; ?>';
 
@@ -118,7 +118,7 @@ echo mainFooter();
         $scope.gst = 0;
         $scope.service_charges = 0;
         $scope.discountPercentValue = 0;
-        $scope.show_discount = false;
+        $scope.show_discount = true;
         $scope.subTotal = 0;
         $scope.grandTotal = 0;
         $scope.discount = 0;
@@ -137,12 +137,6 @@ echo mainFooter();
         const items = [];
         $scope.modes = [];
         $scope.loading = false;
-        // setInterval(() => {
-        //     if($scope.focus === true && !$('#searchProduct').is(':focus')) {
-        //         $scope.product = null
-        //         $('#searchProduct').focus();
-        //     }
-        // }, 3000);
 
         $scope.getPinProducts = () => {
             // $scope.loading = true;
@@ -260,14 +254,13 @@ echo mainFooter();
 
 
         $scope.selectProduct = function(p, sep) {
-            let currentIndex = 0
+            let currentIndex = 1
             if (sep) {
-                $scope.items.push({
+                $scope.items.unshift({
                     ...p,
                     qty: 1,
                     show: true
                 });
-                currentIndex = $scope.items.length;
             } else {
                 $scope.product = '';
                 $scope.product = null
@@ -281,11 +274,10 @@ echo mainFooter();
                     }
                 })
                 if (!exists) { // if already not exits in bucket
-                    $scope.items.push({
+                    $scope.items.unshift({
                         ...p,
                         qty: 1
                     });
-                    currentIndex = $scope.items.length;
                 }
             }
             $scope.calculateSum();
