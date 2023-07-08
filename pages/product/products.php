@@ -79,17 +79,19 @@ $programs = $programObj->getPrograms();
                         <a href="#" data-toggle="dropdown">
                             <span><img class="fa" width="14" height="14" src="<?php echo SITE_URL; ?>assets/img/svg/qrcode.svg" alt="" /><code>{{li.code || li.id}}</code></span>
                         </a>
-                        <form ng-submit="submitCode(li)" class="dropdown-menu" style="padding: 20px; width: 300px">
-                            <div class="input-group">
-                                <input type="text" placeholder="Bar Code" ng-model="li.newBarCode" type="text" class="form-control">
-                                <span class="input-group-btn" style="width: 100px">
-                                    <input type="text" placeholder="Price" ng-model="li.newPrice" ng-value="li.price" type="text" class="form-control">
-                                </span>
-                                <span class="input-group-btn">
-                                    <button type="submit" class="btn btn-primary">Submit</button>
-                                </span>
-                            </div>
-                        </form>
+                        <?php if ($userData['role'] === 'owner' || $userData['role'] === 'manager') { ?>
+                            <form ng-submit="submitCode(li)" class="dropdown-menu" style="padding: 20px; width: 300px">
+                                <div class="input-group">
+                                    <input type="text" placeholder="Bar Code" ng-model="li.newBarCode" type="text" class="form-control">
+                                    <span class="input-group-btn" style="width: 100px">
+                                        <input type="text" placeholder="Price" ng-model="li.newPrice" ng-value="li.price" type="text" class="form-control">
+                                    </span>
+                                    <span class="input-group-btn">
+                                        <button type="submit" class="btn btn-primary">Submit</button>
+                                    </span>
+                                </div>
+                            </form>
+                        <?php } ?>
                     </span>
                 </td>
                 <td>{{li.price}}</td>

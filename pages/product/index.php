@@ -59,7 +59,7 @@ $programs = $programObj->getPrograms();
             <div class="product-image">
                 <div ng-if="!li.image" class="image"></div>
                 <img ng-if="li.image" class="image" src={{'<?php echo SITE_URL; ?>uploads/products/'+li.image}} />
-                <a href="<?php echo SITE_URL; ?>pages/product/update.php?id={{li.id}}" class="btn-edit" uib-tooltip="Edit"><img width="18" height="18" src="<?php echo SITE_URL; ?>assets/img/svg/edit.svg" alt="" /></a>
+                <?php if ($userData['role'] === 'owner' || $userData['role'] === 'manager') { ?><a href="<?php echo SITE_URL; ?>pages/product/update.php?id={{li.id}}" class="btn-edit" uib-tooltip="Edit"><img width="18" height="18" src="<?php echo SITE_URL; ?>assets/img/svg/edit.svg" alt="" /></a><?php } ?>
                 <a href="javascript:void(0)" ng-click="addToCart(li)" class="btn-cart" uib-tooltip="Add to cart"><img width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/002-add-to-cart-red.svg" alt="" /></a>
                 <?php if ($userData['role'] === 'owner' || $userData['role'] === 'manager') { ?>
                     <a ng-if="li.priority == '1'" href="javascript:void(0)" ng-click="setPriority(li)" class="btn btn-priority" uib-tooltip="Mark No Priority"><span class="fa fa-2x fa-check-circle text-success"></span></a>
@@ -81,17 +81,19 @@ $programs = $programObj->getPrograms();
                     <a href="#" data-toggle="dropdown">
                         <span><img class="fa" width="14" height="14" src="<?php echo SITE_URL; ?>assets/img/svg/qrcode.svg" alt="" /><code>{{li.code || li.id}}</code></span>
                     </a>
-                    <form ng-submit="submitCode(li)" class="dropdown-menu" style="padding: 20px; width: 300px">
-                        <div class="input-group">
-                            <input type="text" placeholder="Bar Code" ng-model="li.newBarCode" type="text" class="form-control">
-                            <span class="input-group-btn" style="width: 100px">
-                                <input type="text" placeholder="Price" ng-model="li.newPrice" ng-value="li.price" type="text" class="form-control">
-                            </span>
-                            <span class="input-group-btn">
-                                <button type="submit" class="btn btn-primary">Submit</button>
-                            </span>
-                        </div>
-                    </form>
+                    <?php if ($userData['role'] === 'owner' || $userData['role'] === 'manager') { ?>
+                        <form ng-submit="submitCode(li)" class="dropdown-menu" style="padding: 20px; width: 300px">
+                            <div class="input-group">
+                                <input type="text" placeholder="Bar Code" ng-model="li.newBarCode" type="text" class="form-control">
+                                <span class="input-group-btn" style="width: 100px">
+                                    <input type="text" placeholder="Price" ng-model="li.newPrice" ng-value="li.price" type="text" class="form-control">
+                                </span>
+                                <span class="input-group-btn">
+                                    <button type="submit" class="btn btn-primary">Submit</button>
+                                </span>
+                            </div>
+                        </form>
+                    <?php } ?>
                 </span>
 
 
