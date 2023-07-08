@@ -107,7 +107,9 @@ $programs = $programObj->getPrograms();
                         <a href="javascript:void(0)" ng-click="setInactive(li)" class="btn btn-dup" uib-tooltip="Mark Inactive"><span class="fa fa-remove text-danger"></span></a>
                     <?php } ?>
                     <a uib-tooltip="Add to Cart" ng-click="addToCart(li)" class="btn btn-xs"><img width="18" height="18" src="<?php echo SITE_URL; ?>assets/img/svg/002-add-to-cart.svg" alt="" /></a>
-                    <a class="btn btn-primary btn-xs" href="<?php echo SITE_URL . "pages/product/update.php?id=" ?>{{li.id}}"><span class="fa fa-edit"></span></a> <a class="btn btn-danger btn-xs" href="<?php echo SITE_URL . "pages/product/create.php?id=" ?>{{li.id}}"><span class="fa fa-copy"></span></a>
+                    <?php if ($userData['role'] === 'owner' || $userData['role'] === 'manager') { ?>
+                        <a class="btn btn-primary btn-xs" href="<?php echo SITE_URL . "pages/product/update.php?id=" ?>{{li.id}}"><span class="fa fa-edit"></span></a> <a class="btn btn-danger btn-xs" href="<?php echo SITE_URL . "pages/product/create.php?id=" ?>{{li.id}}"><span class="fa fa-copy"></span></a>
+                    <?php } ?>
                 </td>
             </tr>
         </tbody>
