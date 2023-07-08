@@ -1,8 +1,9 @@
-<?php 
+<?php
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
-function safe_json_encode($value, $options = 0, $depth = 512, $utfErrorFlag = false) {
+function safe_json_encode($value, $options = 0, $depth = 512, $utfErrorFlag = false)
+{
     $encoded = json_encode($value, $options, $depth);
     switch (json_last_error()) {
         case JSON_ERROR_NONE:
@@ -26,17 +27,18 @@ function safe_json_encode($value, $options = 0, $depth = 512, $utfErrorFlag = fa
 
     }
 }
-function utf8ize($mixed) {
+function utf8ize($mixed)
+{
     if (is_array($mixed)) {
         foreach ($mixed as $key => $value) {
             $mixed[$key] = utf8ize($value);
         }
-    } else if (is_string ($mixed)) {
+    } else if (is_string($mixed)) {
         return utf8_encode($mixed);
     }
     return $mixed;
 }
-require_once(dirname(__FILE__).'/autoload.php');
+require_once(dirname(__FILE__) . '/autoload.php');
 $ownerId = $_GET['owner_id'];
 $products = new  Products();
 $page = !empty($_GET['page']) ? $_GET['page'] : 1;
@@ -57,10 +59,9 @@ $pin = !empty($_GET['bookmark']) ? $_GET['bookmark'] : "";
 $dup = !empty($_GET['dup']) ? $_GET['dup'] : "";
 
 $shopId = $_GET['shop_id'];
-if(!empty($selectedPublisherId) && !empty($correction)) {
-    $search = $products->assignProductsPublisher($ownerId, ['page' => (int)$page, 'perPage' => (int)$perPage, 'search' => $search, 'searchBy' => $searchBy, 'courceId' => $courceId, 'group' => $group, 'board' => $board, 'full_name' => $full_name, 'author' => $author, 'sortByField' => $sortByField, 'sortByOrder' => $sortByOrder, 'pin' => $pin, 'dup' => $dup, 'publisher_id' => $publisher_id, 'correction' => $correction, 'selectedPublisherId' => $selectedPublisherId], $shopId);
-}
-else {
-    $search = $products->getOwnerProductsPagination($ownerId, ['page' => (int)$page, 'perPage' => (int)$perPage, 'search' => $search, 'searchBy' => $searchBy, 'courceId' => $courceId, 'group' => $group, 'board' => $board, 'full_name' => $full_name, 'author' => $author, 'sortByField' => $sortByField, 'sortByOrder' => $sortByOrder, 'pin' => $pin, 'dup' => $dup, 'publisher_id' => $publisher_id, 'correction' => $correction], $shopId);
+if (!empty($selectedPublisherId) && !empty($correction)) {
+    $search = $products->assignProductsPublisher($ownerId, ['page' => (int)$page, 'perPage' => (int)$perPage, 'search' => $search, 'searchBy' => $searchBy, 'courceId' => $courceId, 'group' => $group, 'board' => $board, 'full_name' => $full_name, 'author' => $author, 'sortByField' => $sortByField, 'sortByOrder' => $sortByOrder, 'pin' => $pin, 'dup' => $dup, 'publisher_id' => $publisher_id, 'correction' => $correction, 'selectedPublisherId' => $selectedPublisherId, 'status' => 1], $shopId);
+} else {
+    $search = $products->getOwnerProductsPagination($ownerId, ['page' => (int)$page, 'perPage' => (int)$perPage, 'search' => $search, 'searchBy' => $searchBy, 'courceId' => $courceId, 'group' => $group, 'board' => $board, 'full_name' => $full_name, 'author' => $author, 'sortByField' => $sortByField, 'sortByOrder' => $sortByOrder, 'pin' => $pin, 'dup' => $dup, 'publisher_id' => $publisher_id, 'correction' => $correction, 'status' => 1], $shopId);
 }
 echo safe_json_encode($search);

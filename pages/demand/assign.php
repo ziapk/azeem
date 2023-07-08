@@ -35,7 +35,7 @@ $ownerStores = $storeObj->getOwnerStores($ownerId);
 
 if (!empty($_GET['all']) && $_GET['all'] == '1') {
     $shopId = $_GET['shopId'];
-    $products = $productsObj->getOwnerProductsPagination($ownerId, ['page' => 1, 'perPage' => 100000], $shopId);
+    $products = $productsObj->getOwnerProductsPagination($ownerId, ['page' => 1, 'perPage' => 100000, 'status' => 1], $shopId);
 }
 
 ?>

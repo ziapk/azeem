@@ -293,15 +293,6 @@ ob_start();
 		line-height: 1.3;
 	}
 
-	@page {
-		margin-top: 25px;
-		margin-left: 100px;
-		margin-bottom: 25px;
-		margin-right: 25px;
-		<?php if (!$params['pdf']) { ?>size: Legal;
-		<?php } ?>
-	}
-
 	td {
 		padding: 5px 5px;
 	}

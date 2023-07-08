@@ -10,7 +10,7 @@ if (!empty($_SESSION['shopInfo'])) {
     $searchText = !empty($_GET['term']) ? $_GET['term'] : "";
     $searchBy = !empty($_GET['searchBy']) ? $_GET['searchBy'] : '';
     $shopId = $userData['role'] == 'owner' ? $_GET['shopId'] : $shop['id'];
-    $params = ['page' => 1, 'perPage' => 20, 'searchBy' => $searchBy, 'search' => $searchText, 'type' => $type];
+    $params = ['page' => 1, 'perPage' => 20, 'searchBy' => $searchBy, 'search' => $searchText, 'type' => $type, 'status' => 1];
     $search = $products->getOwnerProductsPagination($ownerId, $params, $shopId)['records'];
 };
 echo json_encode($search);

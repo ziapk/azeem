@@ -508,7 +508,7 @@ class Products extends Connection
 	public function getCategoryProducts($owner_id, $ids, $shopId)
 	{
 		try {
-			$result = $this->getOwnerProductsPagination($owner_id, ['page' => 1, 'perPage' => 1000, 'cat_ids' => $ids], $shopId);
+			$result = $this->getOwnerProductsPagination($owner_id, ['page' => 1, 'perPage' => 1000, 'cat_ids' => $ids, 'status' => 1], $shopId);
 			$res = [];
 			foreach ($result['records'] as $key => $value) {
 				$res[$value['cat_id']][] = $value;
