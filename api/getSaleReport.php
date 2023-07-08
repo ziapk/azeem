@@ -10,6 +10,11 @@ $data['income'] = 0;
 foreach ($orders as $row) {
     if ($row['flag'] == 1) {
         $data['totalIncome'] += $row['price'] - $row['discount'];
+        if (!empty($row['prices'])) {
+            foreach ($row['prices'] as $id => $amount) {
+                $data['via'][$id] += $amount;
+            }
+        }
     } else {
         $data['totalReturn'] += $row['paid_amount'];
     }

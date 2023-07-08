@@ -35,9 +35,10 @@ echo mainHeader(['page' => 'order']);
         <thead>
             <tr>
                 <th>Sr.#</th>
-                <th>Order Number</th>
+                <th>Order. #</th>
                 <th>Customer</th>
                 <th>Price</th>
+                <th ng-repeat="mode in modes">{{mode.title}}</th>
                 <th>Status</th>
                 <th>Date/time</th>
                 <th></th>
@@ -49,6 +50,7 @@ echo mainHeader(['page' => 'order']);
                 <td>{{row.id}}</td>
                 <td>{{row.customer_name || row.full_name}}</td>
                 <td>{{row.price - row.discount}}</td>
+                <td ng-repeat="mode in modes">{{row.prices[mode.id]}}</td>
                 <td>{{statusArr[row.status].full_name}}</td>
                 <td>{{row.order_date}}</td>
                 <td align="right">
@@ -68,15 +70,16 @@ echo mainHeader(['page' => 'order']);
         </tbody>
         <tfoot>
             <tr>
-                <th colspan="7">
+                <th colspan="{{8 + modes.length}}">
                     <table style="text-align: right" width="100%" cellspacing="0" cellpadding="0">
                         <tr>
                             <th style="text-align: right">Number of Orders</th>
                             <th style="text-align: right">{{data.total}}</th>
                         </tr>
-                        <tr>
-                            <th style="text-align: right">Total Payment</th>
-                            <th style="text-align: right">{{data.income | number: 2}}</th>
+
+                        <tr ng-repeat="(k, d) in data.via">
+                            <th style="text-align: right">Pay via {{modeNames[k]}}</th>
+                            <th style="text-align: right">{{d | number: 2}}</th>
                         </tr>
                         <tr>
                             <th style="text-align: right">Total Credit</th>
@@ -161,6 +164,21 @@ echo mainFooter();
         $scope.returnOrder = function(id) {
             $window.location.assign('<?php echo SITE_URL; ?>pages/orders/retrun.php?id=' + id)
         }
+
+        $scope.modeNames = {};
+        $scope.modes = [];
+        $scope.searchMode = function() {
+            return $http.get("<?php echo SITE_URL ?>api/getPaymentModes.php")
+                .then(function(response) {
+                    $scope.modes = response.data.records;
+                    $scope.modes.forEach(p => {
+                        $scope.modeNames[p.id] = p.title;
+                    })
+                    return response.data
+                });
+        }
+
+        $scope.searchMode();
 
     });
 </script>
