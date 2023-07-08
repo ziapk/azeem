@@ -1093,6 +1093,20 @@ class DoubleEntry extends Connection
 		}
 	}
 
+	public function getDebitEntriesByOrderIds($ids = [], $accounts = [], $shopId)
+	{
+		try {
+			$stmt = "SELECT e.*, t.order_ref FROM `{$this->table_ledger_entries}` as e left join `{$this->table_transactions}` as t on t.id = e.transaction_id  WHERE t.flag=1 and t.shopId=:shop_id and t.order_ref is not null and order_ref in (" . implode(",", $ids) . ") and account_id in (" . implode(",", $accounts) . ")  and e.entry_type = 'C'";
+			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':shop_id', $shopId, PDO::PARAM_STR);
+			$prepare->execute();
+			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
+			return $result;
+		} catch (PDOException $e) {
+			die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
+
 	public function getOB($shop_id, $id)
 	{
 		try {

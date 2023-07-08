@@ -413,11 +413,31 @@ class Orders extends Connection
                 $flagCondition .= " AND o.status=$flag ";
             }
 
-            $stmt = "SELECT o.*, full_name FROM `{$this->table}` AS o LEFT JOIN customers AS c ON c.id = o.customer_id WHERE o.shopId=:shopId " . $toCondition . ' ' . $flagCondition . ' and ((o.flag = 1) or (o.flag = 2 and o.status IN (5,6,7))) ORDER BY id desc';
+            $stmt = "SELECT o.*, full_name, account_id FROM `{$this->table}` AS o LEFT JOIN customers AS c ON c.id = o.customer_id WHERE o.shopId=:shopId " . $toCondition . ' ' . $flagCondition . ' and ((o.flag = 1) or (o.flag = 2 and o.status IN (5,6,7))) ORDER BY id desc';
             $prepare = $this->dbh->prepare($stmt);
             $prepare->bindParam(':shopId', $shopId, PDO::PARAM_STR);
             $prepare->execute();
             $result = $prepare->fetchAll(PDO::FETCH_ASSOC);
+            $orderIds = [];
+            $accountIds = [];
+            foreach ($result as $order) {
+                if ($order['status'] != 1) {
+                    $orderIds[] = $order['id'];
+                    $accountIds[] = $order['account_id'];
+                }
+            }
+            if (!empty($orderIds) && !empty($accountIds) &&  !empty($shopId)) {
+                $de = new DoubleEntry();
+                $list = $de->getDebitEntriesByOrderIds($orderIds, $accountIds, $shopId);
+                // $result[0]['list'] = $list;
+                $finalList = [];
+                foreach ($list as $li) {
+                    $finalList[$li['order_ref']][$li['payment_mode']] = $li['amount'];
+                }
+                foreach ($result as $key => $order) {
+                    $result[$key]['prices'] = $finalList[$order['id']];
+                }
+            }
             return $result;
         } catch (PDOException $e) {
             die("Error!: " . $e->getMessage() . "<br/>");
