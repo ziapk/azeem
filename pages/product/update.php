@@ -16,16 +16,23 @@ $error = "";
 $message = "";
 if (!empty($_POST) && isset($_POST['createCode'])) {
     $error = "";
-    if (empty($_POST['code'])) {
+    if (empty($_POST['code']) && empty($_POST['price'])) {
         $error = "Please fill all fields";
     } else {
 
         $data = [
-            'product_id' => $_GET['id'],
-            'code' => $_POST['code']
+            'product_id' => $_GET['id']
         ];
 
-        $create = $productObj->createProductCode($data);
+        if (!empty($_POST['code'])) {
+            $data['code'] = $_POST['code'];
+            $create = $productObj->createProductCode($data);
+        }
+        if (!empty($_POST['price'])) {
+            $data['price'] = $_POST['price'];
+            $create = $productObj->updateProductPrice($data);
+        }
+
         if ($create) {
             $message = "Successfully Added!";
         } else {

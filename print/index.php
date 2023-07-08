@@ -96,11 +96,11 @@ if ($largeView) {
         }
 
         th {
-            padding: 4px 5px;
+            padding: 3px 4px;
         }
 
         td {
-            padding: 4px 5px;
+            padding: 2px 4px;
             text-align: center;
         }
 
@@ -178,33 +178,29 @@ if ($largeView) {
         <table width="100%">
             <thead>
                 <tr>
-                    <th>
+                    <th style="padding: 0;">
                         <div class="head text-left">
                             <span class="pull-right">
                                 <img width="120" height="60" style="vertical-align: middle; margin-right: 5px; filter: grayscale(100%);" src="<?php echo SITE_URL; ?>assets/clients/<?php echo $shop['image']; ?>" />
                             </span>
                             <h3>
-                                <div style="padding-top: 10px"><?php echo strtoupper($shop['full_name']); ?>
-                                    <p class="mt-0"><?php echo $shop['location']; ?>, <?php echo $shop['city']; ?> <br>
+                                <div style="padding: 0"><?php echo strtoupper($shop['full_name']); ?>
+                                    <p style="margin: 0"><?php echo $shop['location']; ?>, <?php echo $shop['city']; ?> <br>
                                         <strong><small><?php echo implode(", ", $result); ?></small></strong>
                                     </p>
                                     <div>
                             </h3>
-                            <h2 style="text-align: center">Sales Invoice <?php echo $order['order']['status'] == 1 ? '(Parked Invoice)' : null ?></h2>
                         </div>
                         <?php $net = abs(($price - $order['order']['discount'])); ?>
-                        <table class="table" style="width: 100%">
+                        <table class="table" style="width: 100%; margin-bottom: 0">
                             <tr>
-                                <td width="140" class="text-right">Customer Name:</td>
-                                <th><?php echo !empty($order['order']['customer_name']) ? $order['order']['customer_name'] : $foodpanda['full_name']; ?></th>
-                                <td width="120" class="text-right">Bill Ref.</td>
-                                <th>0000<?php echo $_GET['id']; ?></th>
-                            </tr>
-                            <tr>
-                                <td class="text-right">Contact No.</td>
-                                <th><?php if (!empty($foodpanda['phoneNumber'])) { ?><?php echo $foodpanda['phoneNumber']; ?><?php } ?></th>
-                                <td width="120" class="text-right">Date Time:</td>
-                                <th><?php echo date('d/m/Y H:i', strtotime($order['order']['created_at'])); ?></th>
+                                <td width="40" class="text-right">Customer:</td>
+                                <th width="40" style="white-space: nowrap;"><?php echo !empty($order['order']['customer_name']) ? $order['order']['customer_name'] : $foodpanda['full_name']; ?></th>
+                                <th style="text-align: center;">
+                                    <span style="font-size: 1.5em;">Sales Invoice</span> (<?php echo $_GET['id']; ?>)
+                                </th>
+                                <td width="40" class="text-right">Date:</td>
+                                <th width="40"><?php echo date('d/m/Y', strtotime($order['order']['created_at'])); ?></th>
                             </tr>
                             <span class="ref"><strong></strong> </span>
                             <span class="date"></span>
@@ -215,11 +211,11 @@ if ($largeView) {
             </thead>
             <tbody>
                 <tr>
-                    <td>
+                    <td style="padding: 0;">
                         <table class="recipt-table" width="100%" cellpadding="0" cellspacing="0">
                             <thead>
                                 <tr>
-                                    <th width="40" class="text-left thead">Sr.#</th>
+                                    <th width="30" class="text-left thead">Sr.#</th>
                                     <th width="40" class="text-left thead">Code</th>
                                     <th class="text-left thead">Item</th>
                                     <th width="40" class="thead">Qty</th>
@@ -230,11 +226,12 @@ if ($largeView) {
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php foreach ($order['order_items'] as $key => $item) { ?>
+                                <?php
+                                foreach ($order['order_items'] as $key => $item) { ?>
                                     <tr>
                                         <td class="text-left"><?php echo $key + 1; ?></td>
                                         <td class="text-left" style="padding: 0 6px"><?php echo $item['product_id']; ?></td>
-                                        <td class="text-left"><?php echo $item['product_title']; ?></td>
+                                        <td class="text-left"><?php echo substr($item['product_title'], 0, 47) . (strlen($item['product_title']) > 47 ? '...' : ''); ?></td>
                                         <td class="text-right"><?php echo abs(($item['quantity'])); ?></td>
                                         <td class="text-right"><?php echo abs(($item['price'])); ?></td>
                                         <td class="text-right"><?php echo abs(($item['discount'] / $item['price']) * 100) . '%'; ?></td>
@@ -259,40 +256,32 @@ if ($largeView) {
                                     <th class="text-right ref"><?php echo abs(($aprice)); ?></th>
                                 </tr>
                                 <tr class="no-border">
-                                    <th rowspan="2" style="border: 0;" valign="middle" colspan="4">
-                                        Important Note: Books once sold nerver be returned or exchanged.
+                                    <th rowspan="2" style="border: 0; padding: 0" valign="middle" colspan="5">
+                                        <table class="table" style="border-collapse: collapse; margin: 0">
+                                            <tr>
+                                                <td style="border: 0; font-weight: 600;">Note: Books once sold nerver be returned or exchanged.</td>
+                                                <td width="100">Current Balance:</td>
+                                                <th width="60" style="text-align: right"><?php echo abs(($currentBalance)); ?></th>
+                                            </tr>
+                                        </table>
                                     </th>
-                                    <td class="text-right ref" style="border: 0" colspan="3">Additional Discount</td>
+                                    <td class="text-right ref" style="border: 0" colspan="2">Additional Discount</td>
                                     <th class="text-right ref"><?php echo abs(($order['order']['discount'])); ?></th>
                                 </tr>
                                 <tr class="no-border">
-                                    <td class="text-right ref" style="border: 0" colspan="3">Total Discount</td>
+                                    <td class="text-right ref" style="border: 0" colspan="2">Total Discount</td>
                                     <th class="text-right ref"><?php echo abs(($order['order']['discount'] + $distTotal)); ?></th>
                                 </tr>
                                 <tr class="no-border">
-                                    <th rowspan="2" style="border: 0;" valign="middle" colspan="4">
-                                        <center>
-                                            <table width="260" class="table" style="border-collapse: collapse;">
-                                                <tr>
-                                                    <td width="130">Current Balance:</td>
-                                                    <th style="text-align: right"><?php echo abs(($currentBalance)); ?></th>
-                                                </tr>
-                                            </table>
-                                        </center>
-                                    </th>
-                                    <td class="text-right ref" style="border: 0" colspan="3">Amount After Discount</td>
-                                    <th class="text-right ref"><?php echo $net; ?></th>
-                                </tr>
-                                <tr class="no-border">
-                                    <td class="text-right ref" style="border: 0" colspan="3">Expense</td>
-                                    <th class="text-right ref"><?php echo abs((0)); ?></th>
-                                </tr>
-                                <tr class="no-border">
-                                    <th rowspan="3" style="border: 0;" valign="middle" colspan="4" class="text-left">
-                                        Net in words: <?php echo convertNumberToWord($net); ?>
-                                    </th>
-                                    <td class="text-right ref" style="border: 0" colspan="3">Net Invoice</td>
+                                    <td colspan="5" style="border: 0; font-weight: 600; text-align: right">Net in words: <?php echo convertNumberToWord($net); ?></td>
+                                    <td class="text-right ref" style="border: 0" colspan="2">Net Invoice</td>
                                     <th class="text-right ref"><?php echo abs($net); ?></th>
+                                </tr>
+                                <tr class="no-border">
+                                    <th rowspan="3" style="border: 0; vertical-align: top" colspan="4" class="text-right">
+
+                                    </th>
+
                                 </tr>
                                 <?php if (!empty($order['order']['paid_amount'])) { ?>
 

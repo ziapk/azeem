@@ -252,7 +252,15 @@ echo mainFooter();
 
         $scope.ok = function() {
             $uibModalInstance.close({
-                books: $scope.final,
+                books: $scope.final.map(({
+                    publisher_id,
+                    discount_type,
+                    discount_value
+                }) => ({
+                    id: publisher_id,
+                    discount_type: discount_type || 1,
+                    discount_value: discount_value || null
+                })),
                 customer_id: parentData.id
             });
         };

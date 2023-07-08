@@ -11,7 +11,7 @@ function mainHeader($params = null)
     }
 
     $pp = new Products();
-    $mainProductsList = $pp->getOwnerProductsPagination($shop['owner_id'], ['page' => 1, 'perPage' => 10000], $shop['id']);
+    $mainProductsList = $pp->getOwnerProductsPagination($shop['owner_id'], ['page' => 1, 'perPage' => 10000, 'status' => 1], $shop['id']);
 ?>
 
     <!DOCTYPE html>

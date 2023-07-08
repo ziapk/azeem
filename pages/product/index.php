@@ -84,6 +84,9 @@ $programs = $programObj->getPrograms();
                     <form ng-submit="submitCode(li)" class="dropdown-menu" style="padding: 20px; width: 300px">
                         <div class="input-group">
                             <input type="text" placeholder="Bar Code" ng-model="li.newBarCode" type="text" class="form-control">
+                            <span class="input-group-btn" style="width: 100px">
+                                <input type="text" placeholder="Price" ng-model="li.newPrice" ng-value="li.price" type="text" class="form-control">
+                            </span>
                             <span class="input-group-btn">
                                 <button type="submit" class="btn btn-primary">Submit</button>
                             </span>
@@ -136,7 +139,7 @@ $programs = $programObj->getPrograms();
                         searchBy: $scope.searchBy,
                         courceId: $scope.courceId,
                         publisher_id: $scope.publisher_id,
-                        status: $scope.status ? true : false
+                        status: $scope.status
                     }
                 })
                 .then(function(response) {
@@ -154,6 +157,7 @@ $programs = $programObj->getPrograms();
         $scope.submitCode = (form) => {
             $http.post("<?php echo SITE_URL ?>pages/product/update.php?id=" + form.id, $httpParamSerializerJQLike({
                     code: form.newBarCode,
+                    price: form.newPrice,
                     createCode: true,
                     json_response: true,
                 }), {

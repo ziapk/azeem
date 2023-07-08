@@ -23,9 +23,6 @@ foreach ($ownerStores as $store) {
     }
 }
 
-
-
-
 $products = $productsObj->getOwnerProducts($currentStore['owner_id']);
 $publishersArr = $publisherObj->getPublishers($currentStore['owner_id']);
 $publishers = [];

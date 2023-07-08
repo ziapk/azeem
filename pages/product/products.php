@@ -59,10 +59,9 @@ $programs = $programObj->getPrograms();
         </div>
     </div>
 
-    <table class="table">
+    <table class="table table-striped">
         <thead>
             <tr>
-                <th></th>
                 <th ng-click="sortBy('title')" ng-class="{active: sortByField === 'title'}">Title / Author - Group <em class="fa sort-icon fa-sort-amount-asc" ng-if="sortByOrder === 'asc'"></em> <em class="fa sort-icon fa-sort-amount-desc" ng-if="sortByOrder === 'desc'"></em></th>
                 <th>Description/Note</th>
                 <th>SKU/Code</th>
@@ -73,7 +72,6 @@ $programs = $programObj->getPrograms();
         </thead>
         <tbody>
             <tr ng-repeat="li in list">
-                <td width="50"><img ng-if="li.image" width="40" class="image" src={{"<?php echo SITE_URL; ?>uploads/products/"+li.image}} /></td>
                 <td><strong>{{li.full_name}}</strong> <br />{{li.author}} - {{li.group}} - {{li.publisherName}}</td>
                 <td>{{li.description}} <br /> {{li.note}}</td>
                 <td>
@@ -84,6 +82,9 @@ $programs = $programObj->getPrograms();
                         <form ng-submit="submitCode(li)" class="dropdown-menu" style="padding: 20px; width: 300px">
                             <div class="input-group">
                                 <input type="text" placeholder="Bar Code" ng-model="li.newBarCode" type="text" class="form-control">
+                                <span class="input-group-btn" style="width: 100px">
+                                    <input type="text" placeholder="Price" ng-model="li.newPrice" ng-value="li.price" type="text" class="form-control">
+                                </span>
                                 <span class="input-group-btn">
                                     <button type="submit" class="btn btn-primary">Submit</button>
                                 </span>
@@ -93,7 +94,7 @@ $programs = $programObj->getPrograms();
                 </td>
                 <td>{{li.price}}</td>
                 <td>{{li.in_hand < 0 ? 0 : li.in_hand}}</td>
-                <td width="200">
+                <td width="230">
                     <a style="padding-left: 0; padding-right: 5px" ng-if="li.dup == 0" href="javascript:void(0)" ng-click="addDuplicate(li)" class="btn btn-bookmark" uib-tooltip="Mark as duplicate"><span class="fa fa-copy text-mute"></span></a>
                     <a style="padding-left: 0; padding-right: 5px" ng-if="li.dup == 1" href="javascript:void(0)" ng-click="removeDuplicate(li)" class="btn btn-bookmark" uib-tooltip="Remove from duplicate"><span class="fa fa-copy text-danger"></span></a>
                     <a style="padding-left: 0; padding-right: 0" ng-if="li.pin != 1" href="javascript:void(0)" ng-click="addBookmark(li)" class="btn btn-bookmark" uib-tooltip="Pin as running items"><span class="fa fa-heart-o"></span></a>
@@ -134,6 +135,7 @@ $programs = $programObj->getPrograms();
         const search = $window.location.search;
         const url = new URLSearchParams(search);
         $scope.publisher_id = url.get('publisher_id') || '';
+        $scope.status = url.get('status') || '';
         $scope.maxSize = 5;
 
         $scope.sortBy = field => {
@@ -157,7 +159,8 @@ $programs = $programObj->getPrograms();
                         search: $scope.search,
                         searchBy: $scope.searchBy,
                         courceId: $scope.courceId,
-                        publisher_id: $scope.publisher_id
+                        publisher_id: $scope.publisher_id,
+                        status: $scope.status
                     }
                 })
                 .then(function(response) {
@@ -316,6 +319,7 @@ $programs = $programObj->getPrograms();
         $scope.submitCode = (form) => {
             $http.post("<?php echo SITE_URL ?>pages/product/update.php?id=" + form.id, $httpParamSerializerJQLike({
                     code: form.newBarCode,
+                    price: form.newPrice,
                     createCode: true,
                     json_response: true,
                 }), {

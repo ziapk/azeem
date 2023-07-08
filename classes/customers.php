@@ -144,6 +144,7 @@ class Customers extends Connection
 	{
 		try {
 			$shopId = $arr['shopId'];
+			$ownerId = $arr['ownerId'];
 			$customer_id = $arr['customer_id'];
 			$stmt = "SELECT d.*, d.publisher_id as id, p.full_name  FROM `{$this->table_discount}` as d left join `{$this->table_publisher}` as p on d.publisher_id=p.id WHERE customer_id=:customer_id and `shopId`=:shopId";
 			$prepare = $this->dbh->prepare($stmt);
@@ -151,7 +152,33 @@ class Customers extends Connection
 			$prepare->bindParam(':customer_id', $customer_id, PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
-			return $result;
+
+			$stmt = "SELECT * FROM `{$this->table_publisher}` WHERE `owner_id`=:owner_id";
+			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':owner_id', $ownerId, PDO::PARAM_STR);
+			$prepare->execute();
+			$result2 = $prepare->fetchAll(PDO::FETCH_ASSOC);
+
+			$all = [];
+
+			foreach ($result2 as $val) {
+				$all[$val['id']] = [
+					'id' => $val['id'],
+					'publisher_id' => $val['id'],
+					'full_name' => $val['full_name'],
+					'discount_type' => $val['discount_type'],
+					'discount_value' => $val['discount_amount'],
+					'customer_id' => $customer_id,
+					'status' => '1',
+					'datetime' => date('Y-m-d H:i:s'),
+				];
+			}
+
+			foreach ($result as $v) {
+				$all[$v['id']]  = $v;
+			}
+
+			return array_values($all);
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
 		}
