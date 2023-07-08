@@ -91,6 +91,7 @@ if (!empty($_GET['all']) && $_GET['all'] == '1') {
                 $scope.list = []; //$scope.data.records;
                 $scope.siteUrl = '<?php echo SITE_URL ?>';
                 $scope.shopId = '<?php echo !empty($_GET['shopId']) ? $_GET['shopId'] : $userData['shopId']; ?>';
+                $scope.currentShopId = '<?php echo $shop['id']; ?>';
 
                 $scope.books = <?php echo safe_json_encode($products); ?>;
 
@@ -128,17 +129,25 @@ if (!empty($_GET['all']) && $_GET['all'] == '1') {
                 }
 
                 $scope.searchProduct = function(term) {
-                    return $http.get("<?php echo SITE_URL ?>api/getStores.php", {
-                            params: {
-                                term,
-                                shopId: $scope.shopId
-                            }
-                        })
-                        .then(function(response) {
-                            $scope.list = response.data;
-                            $scope.priceList = response.data;
-                            return response.data
-                        });
+                    if ($scope.shopId == $scope.currentShopId) {
+                        const filteredArray = window.mainList.records.filter(r => r.id == term || r.code == term || r.barcode == term || r.searchString.includes(term + '|') || r.searchString.includes('|' + term) || r.searchString.includes('|' + term + '|'));
+                        const secondfilteredArray = !filteredArray.length ? window.mainList.records.filter(obj => obj.searchString.toLowerCase().includes(term?.toLowerCase() || term)) : filteredArray;
+
+                        return secondfilteredArray.slice(0, 30);
+                    } else {
+                        return $http.get("<?php echo SITE_URL ?>api/getStores.php", {
+                                params: {
+                                    term,
+                                    shopId: $scope.shopId
+                                }
+                            })
+                            .then(function(response) {
+                                // $scope.list = response.data;
+                                return response.data
+                            });
+                    }
+
+
                 }
 
                 $scope.deleteCategory = function(id) {
