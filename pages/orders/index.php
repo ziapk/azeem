@@ -49,7 +49,7 @@ echo mainHeader(['page' => 'order']);
                 <td>{{$index + 1}}</td>
                 <td>{{row.id}}</td>
                 <td>{{row.customer_name || row.full_name}}</td>
-                <td>{{row.price - row.discount}}</td>
+                <td>{{row.price - row.discount | number: 0}}</td>
                 <td ng-repeat="mode in modes">{{row.prices[mode.id]}}</td>
                 <td>{{statusArr[row.status].full_name}}</td>
                 <td>{{row.order_date}}</td>
