@@ -334,14 +334,13 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                 }
             }
             $scope.selectProduct = function(p, sep) {
-                let currentIndex = 0
+                let currentIndex = 1
                 if (sep) {
-                    $scope.items.push({
+                    $scope.items.unshift({
                         ...p,
                         qty: 1,
                         show: true
                     });
-                    currentIndex = $scope.items.length;
                 } else {
                     $scope.product = '';
                     $scope.product = null
@@ -355,11 +354,10 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                         }
                     })
                     if (!exists) { // if already not exits in bucket
-                        $scope.items.push({
+                        $scope.items.unshift({
                             ...p,
                             qty: 1
                         });
-                        currentIndex = $scope.items.length;
                     }
                 }
                 $scope.calculateSum();
