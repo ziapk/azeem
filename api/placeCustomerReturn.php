@@ -34,8 +34,6 @@ $payment_amount = !empty($_POST['payment_amount']) ? $_POST['payment_amount'] : 
 $shopId = $_POST['shopId'];
 $productsForReturn = [];
 
-$payment_amount -= $discount;
-
 $storeDATA = $storeObj->getStore($shopId);
 
 $shopAccounts = new ShopAccounts();
@@ -45,98 +43,43 @@ foreach ($accountsData as $a) {
     $storeAccounts[$a['key_value']] = $a['account_id'];
 }
 
-$productIds = [];
-foreach ($_POST['items'] as $key => $value) {
-    $productIds[$value['id']] = $value['qty'];
-}
 if (empty($_POST['order_id'])) {
     $orderDetails = []; // $orders->getOrderItemsByProductIds(array_keys($productIds), $supplierId);
+    $orders->orderReturn($_POST['order_id'], 5);
 } else {
     $orderDetails = $_POST['items'];
 }
 
+$returnId = $orders->makeReturn([
+    "amount" => $purchaseValue,
+    "paid" => $payment_amount,
+    "discount" => $discount,
+    "shopId" => $shopId,
+    "return_date" => $storeDATA['sale_date'],
+    "owner_id" => $storeDATA['owner_id'],
+    "order_id" => !empty($_POST['order_id']) ? $_POST['order_id'] : null,
+    "customer_id" => $supplierId,
+    "customer_name" => $_POST['supplierName'],
+]);
 
-
-$or = [];
-$oi = [];
-foreach ($productIds as $id => $qty) {
-    $remaining = $qty;
-    foreach ($orderDetails as $key => $value) {
-        if (!empty($remaining)) {
-            $oi[$value['order_id']]['total'] += 1;
-            $product_id = $value['product_id'];
-            if (!empty($_POST['order_id'])) {
-                $product_id = $value['id'];
-            }
-            if (!empty($remaining) && $product_id == $id && $value['quantity'] <= $remaining) { // full return products
-                $remaining -= $value['quantity'];
-                $oi[$value['order_id']]['full'] += 1;
-                $oi[$value['order_id']]['full_items'][$id] = ['quantity' => $value['quantity'], 'price' => $value['price']];
-            } elseif (!empty($remaining) &&  $product_id == $id && $value['quantity'] > $remaining) { // partial return products
-                // $diff = $value['quantity'] - $remaining;
-                $oi[$value['order_id']]['partial'] += 1;
-                $oi[$value['order_id']]['partial_items'][$id] = ['quantity' => $remaining, 'price' => $value['price']];;
-                $remaining = 0;
-            }
-        }
-    }
+$products = [];
+foreach ($_POST['items'] as $key => $value) {
+    $products[] = [
+        'user_id' => $userData['id'],
+        'shopId' => $shopId,
+        'order_id' => $returnId,
+        'product_id' => $value['id'],
+        'quantity' => $value['qty'],
+        'price' => $value['price'],
+        'discount' => $value['discount'],
+        'type' => 1,
+    ];
 }
 
+
 $res = [];
-foreach ($oi as $id => $row) {
-    $t = $row['total'];
-    $t -= $row['full'];
-
-    if ($t == 0) {
-        // echo 'full';
-        if (!empty($row['full_items'])) {
-            foreach ($row['full_items'] as $product_id => $value) {
-                $data = [
-                    'order_id' => empty($_POST['order_id']) ? 0 : $id,
-                    'shopId' => $shopId,
-                    'type' => 1, // back to inventory
-                    'user_id' => $userData['id'],
-                    'product_id' => $product_id,
-                    'quantity' => $value['quantity'],
-                    'price' => $value['price'],
-                ];
-                $res[$product_id][] = $orders->orderReturnAll($data, 1, 3, true);
-            }
-        }
-        // full return here
-    } else {
-        // echo 'partial';
-        // partial
-        if (!empty($row['partial_items'])) {
-            foreach ($row['partial_items'] as $product_id => $value) {
-                $data = [
-                    'order_id' => empty($_POST['order_id']) ? 0 : $id,
-                    'shopId' => $shopId,
-                    'type' => 1, // back to inventory
-                    'user_id' => $userData['id'],
-                    'product_id' => $product_id,
-                    'quantity' => $value['quantity'],
-                    'price' => $value['price'],
-                ];
-                $res[$product_id][] = $orders->orderReturnAll($data, 1, 3);
-            }
-        }
-
-        if (!empty($row['full_items'])) {
-            foreach ($row['full_items'] as $product_id => $value) {
-                $data = [
-                    'order_id' => empty($_POST['order_id']) ? 0 : $id,
-                    'shopId' => $shopId,
-                    'type' => 1, // back to inventory
-                    'user_id' => $userData['id'],
-                    'product_id' => $product_id,
-                    'quantity' => $value['quantity'],
-                    'price' => $value['price'],
-                ];
-                $res[$product_id][] = $orders->orderReturnAll($data, 1, 3);
-            }
-        }
-    }
+foreach ($products as $id => $row) {
+    $res[$row['product_id']][] = $orders->orderReturnAll($row);
 }
 
 $supplier = $supplierObj->getCustomer($supplierId);
@@ -150,8 +93,7 @@ $makeTransaction = [
     'transaction_type' => 'SALE_RETURN',
     'shopId' => $shopId,
     'created_by' => $_SESSION['user_credentials']['id'],
-    'order_ref' => null,
-    'supply_ref' => null,
+    'return_ref' => $returnId
 ];
 
 $makeTransactionId = $doubleEntry->makeTransaction($makeTransaction);
@@ -232,4 +174,4 @@ if (!empty($payment_amount)) {
     $a[] = $doubleEntry->makeEntry($entry);
 }
 
-echo json_encode(['status' => 200, 'message' => 'successfully done', 'supply' => ['id' => $makeTransactionId]]);
+echo json_encode(['status' => 200, 'message' => 'successfully done', 'order' => ['id' => $returnId]]);

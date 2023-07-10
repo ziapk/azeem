@@ -93,10 +93,10 @@ class Orders extends Connection
         }
     }
 
-    public function orderReturnAll($array, $action, $type = 1, $delete = false)
+    public function orderReturnAll($array)
     {
         try {
-            $stmt = "INSERT INTO `{$this->table_rp}` (`user_id`, `shopId`, `order_id`, `product_id`, `quantity`, `price`, `type`) VALUES (:user_id, :shopId, :order_id, :product_id, :quantity, :price, :type)";
+            $stmt = "INSERT INTO `{$this->table_rp}` (`user_id`, `shopId`, `order_id`, `product_id`, `quantity`, `price`, `discount`, `type`) VALUES (:user_id, :shopId, :order_id, :product_id, :quantity, :price, :discount, :type)";
             $prepare = $this->dbh->prepare($stmt);
             $prepare->bindParam(':user_id', $array['user_id'], PDO::PARAM_STR);
             $prepare->bindParam(':shopId', $array['shopId'], PDO::PARAM_STR);
@@ -104,12 +104,13 @@ class Orders extends Connection
             $prepare->bindParam(':product_id', $array['product_id'], PDO::PARAM_STR);
             $prepare->bindParam(':quantity', $array['quantity'], PDO::PARAM_STR);
             $prepare->bindParam(':price', $array['price'], PDO::PARAM_STR);
+            $prepare->bindParam(':discount', $array['discount'], PDO::PARAM_STR);
             $prepare->bindParam(':type', $array['type'], PDO::PARAM_STR);
             $prepare->execute();
             $result = $this->dbh->lastInsertId();
             $products = new Products();
-            $products->addProductQty($array['product_id'], $array['quantity'], $array['shopId'], $type);
-            $this->orderReturn($array['order_id'], ($action + 4));
+            $products->addProductQty($array['product_id'], $array['quantity'], $array['shopId']);
+            // $this->orderReturn($array['order_id'], ($action + 4));
             // if(!empty($delete)) {
             //     $this->deleteOrderItem($array['order_id'], $array['product_id']);
             // }
@@ -350,6 +351,37 @@ class Orders extends Connection
             die("Error!: " . $e->getMessage() . "<br/>");
         }
     }
+    public function getReturnOrder($id, $disableConcat = false)
+    {
+        try {
+            // $this->runQuery();
+            $stmt = "SELECT * FROM `{$this->table_ro}` WHERE id=:id";
+            $prepare = $this->dbh->prepare($stmt);
+            $prepare->bindParam(':id', $id, PDO::PARAM_STR);
+            $prepare->execute();
+            $result['order'] = $prepare->fetch(PDO::FETCH_ASSOC);
+            if (!empty($result['order'])) {
+                $full_name = '';
+                if ($disableConcat) {
+                    $full_name .= ", p.full_name AS product_title";
+                } else {
+                    $full_name .= ", concat(p.id, ' | ', p.full_name) AS product_title";
+                }
+                $stmt = "SELECT item.* $full_name FROM `{$this->table_rp}` AS item LEFT JOIN products AS p ON item.product_id = p.id WHERE item.order_id=:id";
+                $prepare = $this->dbh->prepare($stmt);
+                $prepare->bindParam(':id', $id, PDO::PARAM_STR);
+                $prepare->execute();
+                $result['order_items'] = $prepare->fetchAll(PDO::FETCH_ASSOC);
+                $c = new Customers();
+                $de = new DoubleEntry();
+                $result['customer'] = $c->getCustomer($result['order']['customer_id']);
+                $result['transactions'] = $de->getPaymentTransactionsByAccountId($result['order']['id'], $result['customer']['account_id']);
+            }
+            return $result;
+        } catch (PDOException $e) {
+            die("Error!: " . $e->getMessage() . "<br/>");
+        }
+    }
     public function getOrder($id, $disableConcat = false)
     {
         try {
@@ -433,6 +465,43 @@ class Orders extends Connection
                 $finalList = [];
                 foreach ($list as $li) {
                     $finalList[$li['order_ref']][$li['payment_mode']] = $li['amount'];
+                }
+                foreach ($result as $key => $order) {
+                    $result[$key]['prices'] = $finalList[$order['id']];
+                }
+            }
+            return $result;
+        } catch (PDOException $e) {
+            die("Error!: " . $e->getMessage() . "<br/>");
+        }
+    }
+    public function userReturnOrders($shopId, $date, $to = null)
+    {
+        try {
+            $toCondition = "";
+            if (!empty($to)) {
+                $toCondition .= " AND DATE(o.return_date) BETWEEN '" . $date . "' AND '" . $to . "'";
+            } else if (!empty($date)) {
+                $toCondition .= " AND DATE(o.return_date) BETWEEN '" . $date . "' AND '" . $date . "'";
+            }
+            $stmt = "SELECT o.*, o.amount as price, full_name, account_id FROM `{$this->table_ro}` AS o LEFT JOIN customers AS c ON c.id = o.customer_id WHERE o.shopId=:shopId " . $toCondition . '  ' . ' and (o.flag = 1) ORDER BY id desc';
+            $prepare = $this->dbh->prepare($stmt);
+            $prepare->bindParam(':shopId', $shopId, PDO::PARAM_STR);
+            $prepare->execute();
+            $result = $prepare->fetchAll(PDO::FETCH_ASSOC);
+            $orderIds = [];
+            $accountIds = [];
+            foreach ($result as $order) {
+                $orderIds[] = $order['id'];
+                $accountIds[] = $order['account_id'];
+            }
+            if (!empty($orderIds) && !empty($accountIds) &&  !empty($shopId)) {
+                $de = new DoubleEntry();
+                $list = $de->getDebitEntriesByReturnIds($orderIds, $accountIds, $shopId);
+                // $result[0]['list'] = $list;
+                $finalList = [];
+                foreach ($list as $li) {
+                    $finalList[$li['return_ref']][$li['payment_mode']] = $li['amount'];
                 }
                 foreach ($result as $key => $order) {
                     $result[$key]['prices'] = $finalList[$order['id']];
@@ -560,20 +629,28 @@ class Orders extends Connection
         }
     }
 
-    public function makeReturn($full_name, $ids)
+    public function makeReturn($array)
     {
-        $idJson = json_encode($ids);
+        // $idJson = json_encode($ids);
+
+        $flag = 1;
 
         try {
-            $stmt = "INSERT INTO `{$this->table_ro}` (`full_name`, `ids`) VALUES (:full_name, :ids)";
+            $stmt = "INSERT INTO `{$this->table_ro}` (`amount`, `paid`, `discount`, `ref_no`, `shopId`, `owner_id`, `order_id`, `customer_id`, `customer_name`, `return_date`, `flag`) VALUES (:amount, :paid, :discount, :ref_no, :shopId, :owner_id, :order_id, :customer_id, :customer_name, :return_date, :flag)";
             $prepare = $this->dbh->prepare($stmt);
-            $prepare->bindParam(':full_name', $full_name, PDO::PARAM_STR);
-            $prepare->bindParam(':ids', $idJson, PDO::PARAM_STR);
+            $prepare->bindParam(':amount', $array['amount'], PDO::PARAM_STR);
+            $prepare->bindParam(':paid', $array['paid'], PDO::PARAM_STR);
+            $prepare->bindParam(':discount', $array['discount'], PDO::PARAM_STR);
+            $prepare->bindParam(':ref_no', $array['ref_no'], PDO::PARAM_STR);
+            $prepare->bindParam(':shopId', $array['shopId'], PDO::PARAM_STR);
+            $prepare->bindParam(':owner_id', $array['owner_id'], PDO::PARAM_STR);
+            $prepare->bindParam(':order_id', $array['order_id'], PDO::PARAM_STR);
+            $prepare->bindParam(':customer_id', $array['customer_id'], PDO::PARAM_STR);
+            $prepare->bindParam(':customer_name', $array['customer_name'], PDO::PARAM_STR);
+            $prepare->bindParam(':return_date', $array['return_date'], PDO::PARAM_STR);
+            $prepare->bindParam(':flag', $flag, PDO::PARAM_STR);
             $prepare->execute();
             $result = $this->dbh->lastInsertId();
-            foreach ($ids as $id) {
-                $this->returnToHeadoffice($id);
-            }
             return $result;
         } catch (PDOException $e) {
             die("Error!: " . $e->getMessage() . "<br/>");
@@ -708,13 +785,29 @@ class Orders extends Connection
             die("Error!: " . $e->getMessage() . "<br/>");
         }
     }
+    public function changeReturnFlag($array)
+    {
+        $id = $array['id'];
+        $reason = $array['reason'];
+        $flag = $array['flag'];
+        try {
+            $stmt = "UPDATE `{$this->table_ro}` SET `reason`=:reason, `flag`=:flag WHERE id=:id";
+            $prepare = $this->dbh->prepare($stmt);
+            $prepare->bindParam(':reason', $reason, PDO::PARAM_STR);
+            $prepare->bindParam(':flag', $flag, PDO::PARAM_STR);
+            $prepare->bindParam(':id', $id, PDO::PARAM_STR);
+            $prepare->execute();
+            $result = $prepare->rowCount();
+            return $result;
+        } catch (PDOException $e) {
+            die("Error!: " . $e->getMessage() . "<br/>");
+        }
+    }
 
     public function orderReturn($id, $action)
     {
-
         try {
             $stmt = "UPDATE `{$this->table}` SET `status`=:status, flag = 2 WHERE id=:id";
-
             $prepare = $this->dbh->prepare($stmt);
             $prepare->bindParam(':status', $action, PDO::PARAM_STR);
             $prepare->bindParam(':id', $id, PDO::PARAM_STR);

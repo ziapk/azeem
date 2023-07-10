@@ -100,6 +100,8 @@ mainHeader();
                             <a href="javascript:void(0)" onclick="openRecipt(<?php echo $value['order_ref']; ?>)"><?php echo $value['order_ref']; ?></a>
                         <?php } elseif (!empty($value['supply_ref'])) { ?>
                             <a href="javascript:void(0)" onclick="openRecipt2(<?php echo $value['supply_ref']; ?>)"><?php echo $value['supply_ref']; ?></a>
+                        <?php } elseif (!empty($value['return_ref'])) { ?>
+                            <a href="javascript:void(0)" onclick="openRecipt3(<?php echo $value['return_ref']; ?>)"><?php echo $value['return_ref']; ?></a>
                         <?php } ?>
                     </td>
                     <td><?php echo $value['reference']; ?></td>
@@ -129,5 +131,9 @@ mainFooter();
 
     function openRecipt2(id) {
         window.open("<?php echo SITE_URL; ?>print/supply.php?id=" + id + "&detail=true&largeView=large", "", "width=800,height=600");
+    }
+
+    function openRecipt3(id) {
+        window.open("<?php echo SITE_URL; ?>print/return.php?id=" + id + "&detail=true&largeView=large", "", "width=800,height=600");
     }
 </script>

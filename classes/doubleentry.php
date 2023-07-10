@@ -234,7 +234,7 @@ class DoubleEntry extends Connection
 			$summery = $prepare->fetch(PDO::FETCH_ASSOC);
 
 
-			$stmt = "SELECT transaction_id, transaction_date, order_ref, supply_ref, transsaction_type, v_description, debitAmount, creditAmount, balance, reference  FROM
+			$stmt = "SELECT transaction_id, transaction_date, order_ref, supply_ref, return_ref, transsaction_type, v_description, debitAmount, creditAmount, balance, reference  FROM
 			(SELECT
 			*
 			,COALESCE(debitAmount)  as debits
@@ -242,7 +242,7 @@ class DoubleEntry extends Connection
 			,(@running_balance := IF(@curr_account_id < account_id,         opening_balance,@running_balance)) prev_runnng_bal
 			,(@curr_account_id := IF(@curr_account_id < account_id,account_id,@curr_account_id)) curr_account_id
 			,(@running_balance := @running_balance + $str) as balance
-			FROM (SELECT t.transsaction_type, t.reference, e.transaction_id, e.payment_mode, a.parent_id, a.code, e.account_id, a.opening_balance, a.account_type, a.title, e.entry_type, t.transaction_date, amount, t.order_ref, t.supply_ref, t.description as v_description, (CASE WHEN e.entry_type = 'D' THEN e.amount ELSE 0 END) AS debitAmount, (CASE WHEN e.entry_type = 'C' THEN e.amount ELSE 0 END) AS creditAmount FROM `$this->table_transactions` t LEFT JOIN `$this->table_ledger_entries` e ON e.transaction_id = t.id LEFT JOIN `$this->table` a ON a.id = e.account_id and a.status = 1 $where) as acc_account_transactions,(SELECT @running_balance := 0,@curr_account_id := 0) r
+			FROM (SELECT t.transsaction_type, t.reference, e.transaction_id, e.payment_mode, a.parent_id, a.code, e.account_id, a.opening_balance, a.account_type, a.title, e.entry_type, t.transaction_date, amount, t.order_ref, t.supply_ref, t.return_ref, t.description as v_description, (CASE WHEN e.entry_type = 'D' THEN e.amount ELSE 0 END) AS debitAmount, (CASE WHEN e.entry_type = 'C' THEN e.amount ELSE 0 END) AS creditAmount FROM `$this->table_transactions` t LEFT JOIN `$this->table_ledger_entries` e ON e.transaction_id = t.id LEFT JOIN `$this->table` a ON a.id = e.account_id and a.status = 1 $where) as acc_account_transactions,(SELECT @running_balance := 0,@curr_account_id := 0) r
 			ORDER BY transaction_id) A";
 
 
@@ -1106,6 +1106,19 @@ class DoubleEntry extends Connection
 			die("Error!: " . $e->getMessage() . "<br/>");
 		}
 	}
+	public function getDebitEntriesByReturnIds($ids = [], $accounts = [], $shopId)
+	{
+		try {
+			$stmt = "SELECT e.*, t.return_ref FROM `{$this->table_ledger_entries}` as e left join `{$this->table_transactions}` as t on t.id = e.transaction_id  WHERE t.flag=1 and t.shopId=:shop_id and t.return_ref is not null and return_ref in (" . implode(",", $ids) . ") and account_id in (" . implode(",", $accounts) . ")  and e.entry_type = 'C'";
+			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':shop_id', $shopId, PDO::PARAM_STR);
+			$prepare->execute();
+			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
+			return $result;
+		} catch (PDOException $e) {
+			die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
 
 	public function getOB($shop_id, $id)
 	{
@@ -1179,15 +1192,20 @@ class DoubleEntry extends Connection
 	public function makeTransaction($array)
 	{
 		try {
-			$stmt = "INSERT INTO `{$this->table_transactions}` (`description`, `reference`, `transaction_date`, `created_by`, `shopId`, `order_ref`,`supply_ref`, `transsaction_type`) VALUES (:description, :reference, :transaction_date, :created_by, :shopId, :order_ref, :supply_ref, :transaction_type)";
+			$return_ref = !empty($array['return_ref']) ? $array['return_ref'] : null;
+			$supply_ref = !empty($array['supply_ref']) ? $array['supply_ref'] : null;
+			$order_ref = !empty($array['order_ref']) ? $array['order_ref'] : null;
+
+			$stmt = "INSERT INTO `{$this->table_transactions}` (`description`, `reference`, `transaction_date`, `created_by`, `shopId`, `order_ref`,`supply_ref`, `return_ref`, `transsaction_type`) VALUES (:description, :reference, :transaction_date, :created_by, :shopId, :order_ref, :supply_ref, :return_ref, :transaction_type)";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':description', $array['description'], PDO::PARAM_STR);
 			$prepare->bindParam(':reference', $array['reference'], PDO::PARAM_STR);
 			$prepare->bindParam(':transaction_date', $array['transaction_date'], PDO::PARAM_STR);
 			$prepare->bindParam(':shopId', $array['shopId'], PDO::PARAM_STR);
 			$prepare->bindParam(':created_by', $array['created_by'], PDO::PARAM_STR);
-			$prepare->bindParam(':order_ref', $array['order_ref'], PDO::PARAM_STR);
-			$prepare->bindParam(':supply_ref', $array['supply_ref'], PDO::PARAM_STR);
+			$prepare->bindParam(':order_ref', $order_ref, PDO::PARAM_STR);
+			$prepare->bindParam(':supply_ref', $supply_ref, PDO::PARAM_STR);
+			$prepare->bindParam(':return_ref', $return_ref, PDO::PARAM_STR);
 			$prepare->bindParam(':transaction_type', $array['transaction_type'], PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $this->dbh->lastInsertId();

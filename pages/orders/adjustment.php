@@ -34,16 +34,14 @@ echo mainHeader();
                 <?php } ?>
             </select>
         </div>
-        <div class="col-sm-3">
-            <label>Opening Balance</label>
-            <strong class="form-control text-danger">{{supplier.opening_balance}}</strong>
-        </div>
     </div>
     <table class="table">
         <thead>
             <tr>
                 <th width="200">Product Id</th>
                 <th>Product Name</th>
+                <th width="100">Discount</th>
+                <th></th>
                 <th width="100">Sold. Price</th>
                 <th width="100">Sold Qty</th>
                 <th></th>
@@ -58,6 +56,25 @@ echo mainHeader();
                 <td>
                     <input type="text" class="form-control" ng-model="row.full_name" placeholder="Product title" />
                 </td>
+                <td>
+                    <div class="input-group">
+                        <input type="number" class="form-control input-add-dist" ng-model="row.discount_value" ng-change="calculateSum()" style="padding-right: 6px">
+                        <span class="dropdown input-group-btn">
+                            <button class="dropdown-toggle btn btn-default" data-toggle="dropdown" style="padding-inline: 8px">{{row.discount_type == 2 ? 'FIX' : '%'}}</button>
+                            <ul class="dropdown-menu">
+                                <li><a href="javascript:void(0)" ng-click="row.discount_type = 1; calculateSum()">%</a></li>
+                                <li><a href="javascript:void(0)" ng-click="row.discount_type = 2; calculateSum()">Fix</a></li>
+                            </ul>
+                        </span>
+                    </div>
+                </td>
+                <td>
+                    <span ng-if="row.discount">
+                        {{row.discount_percent ? row.discount_percent : ''}}
+                        <del class="text-danger">{{row.price | number: 2}}</del> / </span>
+                    <span class="text-success">{{(row.price - row.discount) | number: 2}}</span>
+                </td>
+
                 <td width="100"><input type="number" class="form-control" ng-model="row.price" ng-change="calculateSum()" /></td>
                 <td width="100">
                     <input type="number" class="form-control" ng-change="isValid(row,  calculateSum)" max="row.maxQty" ng-model="row.qty" ng-keydown="initCheckKeypress($event)" />
@@ -68,53 +85,41 @@ echo mainHeader();
         <tbody>
             <tr>
                 <th rowspan="10"></th>
-                <th class="text-right" colspan="3">Sub Total</th>
+                <th class="text-right" colspan="5">Sub Total</th>
                 <th>{{subTotal}}</th>
             </tr>
             <tr>
-                <td class="text-right" colspan="3">Given Discount</td>
+                <td class="text-right" colspan="5">Given Discount</td>
                 <td><strong>{{givenDiscount | number: 2}}</strong></td>
             </tr>
             <tr ng-if="order.order.paid_amount">
-                <th class="text-right" colspan="3">Paid Total</th>
+                <th class="text-right" colspan="5">Paid Total</th>
                 <th>{{order.order.paid_amount}}</th>
             </tr>
             <tr>
-                <th class="text-right" colspan="3">Add Charges</td>
+                <th class="text-right" colspan="5">Discount</td>
                 <td width="150"><input type="search" ng-model="discountAmount" class="form-control" on-enter-press="addDiscount(discountAmount)"></td>
             </tr>
             <tr>
-                <td class="text-right" colspan="3">Additional Discount</td>
+                <td class="text-right" colspan="5">Additional Discount</td>
                 <td><strong>{{discount | number: 2}}</strong></td>
             </tr>
-            <tr>
-                <th class="text-right" colspan="3">Opening Balance.</th>
-                <th width="200">
-                    {{supplier.opening_balance}}
-                </th>
-            </tr>
-            <tr>
-                <th class="text-right" colspan="3">Remaining Balance.</th>
-                <th width="200">
-                    {{supplier.opening_balance - subTotal > 0 ? supplier.opening_balance - (subTotal - givenDiscount) - discount : 0}}
-                </th>
-            </tr>
             <tr ng-if="grandTotal">
-                <th class="text-right" colspan="3">Grand Total</th>
+                <th class="text-right" colspan="5">Grand Total</th>
                 <th>{{grandTotal}}</th>
             </tr>
             <tr ng-if="grandTotal">
-                <th class="text-right" colspan="3">Pay Amount</th>
+                <th class="text-right" colspan="5">Pay Amount</th>
                 <th width="200"><input type="number" ng-model="payment_amount" ng-change="calcBalanc(payment_amount)" class="form-control"></th>
             </tr>
             <tr ng-if="grandTotal">
-                <th class="text-right" colspan="3">Closing Balance</th>
+                <th class="text-right" colspan="5">Closing Balance</th>
                 <th width="200">{{ payment_amount - grandTotal }}</th>
             </tr>
         </tbody>
         <tbody>
             <tr>
-                <th colspan="6" class="text-right">
+                <th colspan="8" class="text-right">
                     <div class="btn-group">
                         <label class="btn btn-default" ng-repeat="li in modes">
                             <input type="radio" name="mode" ng-model="payment_mode" ng-value="li.id" ng-change="printValue(li)">
@@ -158,7 +163,7 @@ echo mainFooter();
             qty: parseFloat(r.quantity),
             pprice: parseFloat(r.price.toString()),
             price: parseFloat(r.price.toString()),
-            maxQty: r.quantity.toString(),
+            maxQty: r.quantity.toString() || "1",
             full_name: r.product_title,
         })) || [];
 
@@ -304,7 +309,7 @@ echo mainFooter();
             $scope.items.map((pro) => {
                 if (pro.id == p.id) {
                     exists = true;
-                    pro.qty = p.maxQty;
+                    pro.qty = p.maxQty || 1;
                 }
             })
             $scope.product = "";
@@ -313,7 +318,7 @@ echo mainFooter();
                     ...p,
                     price: parseInt(p.price || 0),
                     pprice: parseInt(p.pprice || 0),
-                    qty: parseFloat(p.maxQty)
+                    qty: parseFloat(p.maxQty) || 1
                 });
             }
             $scope.calculateSum();
@@ -371,6 +376,7 @@ echo mainFooter();
         $scope.checkout = function() {
             $scope.form = {
                 supplierId: $scope.supplierId,
+                supplierName: $scope.supplierName,
                 ref_no: $scope.ref_no,
                 subTotal: $scope.subTotal,
                 discount: $scope.discount,
@@ -390,11 +396,11 @@ echo mainFooter();
                     }
                 })
                 .then(function(response) {
-                    // window.open("<?php echo SITE_URL; ?>print?id="+response.data.order.id, "", "width=300,height=300"); 
+                    window.open("<?php echo SITE_URL; ?>print/return.php?&detail=true&largeView=large&id=" + response.data.order.id, "", "width=600,height=900");
                     $scope.items = $scope.list = [];
                     $scope.subTotal = $scope.discount = $scope.grandTotal = $scope.payment_amount = 0;
                     alert(response.data.message);
-                    // $window.location.reload()
+                    $window.location.reload()
                 });
         }
 
@@ -402,17 +408,27 @@ echo mainFooter();
             let subtotal = 0;
             // $scope.discount = 0;
             $scope.items.map((product) => {
-                subtotal += (product.price * product.qty);
-                $scope.discount += (product.discount * product.qty);
+                if (product.discount_type == 2) {
+                    product.discount = product.discount_value
+                    subtotal += ((product.price - product.discount) * product.qty);
+                } else {
+                    const price = parseFloat(product.price);
+                    if (product.discount_value) {
+                        product.discount = price * ((product.discount_value || 0) / 100);
+                        $scope.discountPercentValue += (product.discount * product.qty);
+                    } else {
+                        product.discount_percent = '';
+                        product.discount = 0;
+                    }
+                    subtotal += ((product.price - product.discount) * product.qty);
+                }
+                // subtotal += (product.price * product.qty);
+                // $scope.discount += (product.discount * product.qty);
             })
             $scope.subTotal = subtotal;
-            $scope.grandTotal = $scope.subTotal - $scope.supplier.opening_balance;
+            $scope.grandTotal = $scope.subTotal - $scope.discount;
             console.log($scope.grandTotal)
-            if ($scope.subTotal > $scope.supplier.opening_balance) {
-                $scope.payment_amount = $scope.grandTotal;
-            } else {
-                $scope.payment_amount = $scope.grandTotal = 0;
-            }
+            $scope.payment_amount = $scope.grandTotal;
         }
 
 

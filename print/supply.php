@@ -322,7 +322,7 @@ if ($largeView) {
             </tbody>
         </table>
         <footer>
-            Power by: Zia ur Rehman Ph.# <strong>03245120412</strong>
+            Powered by: Zia ur Rehman Ph.# <strong>03245120412</strong>
         </footer>
     </div>
 <?php
@@ -495,7 +495,7 @@ if ($largeView) {
                 </tfoot>
         </table>
         <footer>
-            Power by: Zia ur Rehman Ph.# <strong>03245120412</strong>
+            Powered by: Zia ur Rehman Ph.# <strong>03245120412</strong>
         </footer>
     </div>
 <?php } ?>
