@@ -141,7 +141,7 @@ class Products extends Connection
 			$currentPage = $total_pages >= $params['page'] ? $params['page'] : $total_pages;
 			$offset =  ((!empty($currentPage) ? $currentPage : 1) - 1) * $no_of_records_per_page;
 
-			$stmt = "SELECT *, price, concat(`id`, '|', `price`, '|', `full_name`, '|', COALESCE(`publisherName`, ''), '|', COALESCE(`author`, ''), '|', COALESCE(`board`, ''), '|', COALESCE(`code`, ''), '|', COALESCE(`barcode`, ''), '|', COALESCE(`other_codes`, '')) as searchString FROM (SELECT $mainCols  FROM `{$this->table}` as p $innerJoin LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id LEFT JOIN program_books as c ON c.product_id = p.id LEFT JOIN publishers as pub on p.publisher_id = pub.id  WHERE p.`owner_id`=:owner_id $status_query $publisher_query $dup $type $pin $searchQry $catQry GROUP BY p.id $sortByQry $minQry LIMIT :offset, :perPage order by pub.pin desc) AS b";
+			$stmt = "SELECT *, price, concat(`id`, '|', `price`, '|', `full_name`, '|', COALESCE(`publisherName`, ''), '|', COALESCE(`author`, ''), '|', COALESCE(`board`, ''), '|', COALESCE(`code`, ''), '|', COALESCE(`barcode`, ''), '|', COALESCE(`other_codes`, '')) as searchString FROM (SELECT $mainCols  FROM `{$this->table}` as p $innerJoin LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id LEFT JOIN program_books as c ON c.product_id = p.id LEFT JOIN publishers as pub on p.publisher_id = pub.id  WHERE p.`owner_id`=:owner_id $status_query $publisher_query $dup $type $pin $searchQry $catQry GROUP BY p.id $sortByQry $minQry order by pub.pin desc LIMIT :offset, :perPage) AS b";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':owner_id', $owner_id, PDO::PARAM_STR);
 			$prepare->bindParam(':offset', $offset, PDO::PARAM_INT);
