@@ -191,6 +191,11 @@ $catTypesArr = [
     2 => 'Product',
 ];
 
+$pinArr = [
+    0 => 'No',
+    1 => 'Yes',
+];
+
 
 function dateToSimple($date)
 {

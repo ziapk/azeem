@@ -70,6 +70,12 @@ echo mainHeader(['page' => 'publisher']);
                   <?php foreach ($statusArr as $key => $value) { ?><option value="<?php echo $key; ?>"><?php echo $value; ?></option><?php } ?> 
                 </select>
             </div>
+            <div class="form-group">
+                <label for="stype">Pin Products</label>
+                <select ng-model="form.pin" class="form-control">
+                  <?php foreach ($pinArr as $key => $value) { ?><option ng-value="<?php echo $key; ?>"><?php echo $value; ?></option><?php } ?> 
+                </select>
+            </div>
         </div>
         <div class="modal-footer">
             <button class="btn btn-default" type="button" ng-click="cancel()">Close</button>
@@ -166,7 +172,8 @@ echo mainHeader(['page' => 'publisher']);
                 discount_amount: "",
                 discount_type: "",
                 discount_status: "",
-                ...form
+                ...form,
+                pin: parseInt(form.pin)
             }
             $scope.ok = function() {
                 $uibModalInstance.close($scope.form);

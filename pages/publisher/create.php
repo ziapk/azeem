@@ -1,6 +1,6 @@
 <?php
 
-include_once dirname(__FILE__).'/../../include/settings.php';
+include_once dirname(__FILE__) . '/../../include/settings.php';
 
 
 $publisherObj = new Publishers();
@@ -8,34 +8,34 @@ $publisherObj = new Publishers();
 $error = "";
 $message = "";
 $error = "";
-    
-if(empty($_POST['full_name'])) {
+
+if (empty($_POST['full_name'])) {
 
     $error = "Please fill all fields";
-}
-else {
+} else {
     $ownerId = $userData['role'] == 'owner' ? $userData['id'] : $userData['created_by'];
 
-    $data = [                
+    $data = [
         'full_name' => $_POST['full_name'],
         'discount_type' => $_POST['discount_type'],
         'discount_amount' => $_POST['discount_amount'],
         'discount_status' => $_POST['discount_status'],
+        'pin' => !empty($_POST['pin']) ? 1 : 0,
         'owner_id' => $ownerId,
     ];
 
     $create = $publisherObj->createPublisher($data);
 
-    if($create) {
+    if ($create) {
         $message = "Successfully created!";
     } else {
         $error = "Check form carefully!";
     }
 }
 
-if(!empty($error)) {
-  echo json_encode(['success' => false, 'error' => $error]);
+if (!empty($error)) {
+    echo json_encode(['success' => false, 'error' => $error]);
 }
-if(!empty($message)) {
-  echo json_encode(['success' => true, 'message' => $message]);
+if (!empty($message)) {
+    echo json_encode(['success' => true, 'message' => $message]);
 }

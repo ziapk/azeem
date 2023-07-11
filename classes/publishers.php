@@ -52,13 +52,14 @@ class Publishers extends Connection
 	public function updatePublisher($array)
 	{
 		try {
-			$stmt = "UPDATE `{$this->table}` SET full_name=:full_name, discount_type=:discount_type, discount_amount=:discount_amount, discount_status=:discount_status WHERE id=:id";
+			$stmt = "UPDATE `{$this->table}` SET full_name=:full_name, discount_type=:discount_type, discount_amount=:discount_amount, discount_status=:discount_status, pin=:pin WHERE id=:id";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':full_name', $array['full_name'], PDO::PARAM_STR);
 			$prepare->bindParam(':id', $array['id'], PDO::PARAM_STR);
 			$prepare->bindParam(':discount_type', $array['discount_type'], PDO::PARAM_STR);
 			$prepare->bindParam(':discount_amount', $array['discount_amount'], PDO::PARAM_STR);
 			$prepare->bindParam(':discount_status', $array['discount_status'], PDO::PARAM_STR);
+			$prepare->bindParam(':pin', $array['pin'], PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $prepare->rowCount();
 			return $result;
@@ -69,12 +70,13 @@ class Publishers extends Connection
 	public function createPublisher($array)
 	{
 		try {
-			$stmt = "INSERT INTO `{$this->table}` (`full_name`, `discount_type`, `discount_amount`, `discount_status`, `owner_id`) VALUES (:full_name, :discount_type, :discount_amount, :discount_status, :owner_id)";
+			$stmt = "INSERT INTO `{$this->table}` (`full_name`, `discount_type`, `discount_amount`, `discount_status`, `owner_id`, `pin`) VALUES (:full_name, :discount_type, :discount_amount, :discount_status, :owner_id, :pin)";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':full_name', $array['full_name'], PDO::PARAM_STR);
 			$prepare->bindParam(':discount_type', $array['discount_type'], PDO::PARAM_STR);
 			$prepare->bindParam(':discount_amount', $array['discount_amount'], PDO::PARAM_STR);
 			$prepare->bindParam(':discount_status', $array['discount_status'], PDO::PARAM_STR);
+			$prepare->bindParam(':pin', $array['pin'], PDO::PARAM_STR);
 			$prepare->bindParam(':owner_id', $array['owner_id'], PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $this->dbh->lastInsertId();
