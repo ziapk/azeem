@@ -150,7 +150,7 @@ echo mainFooter();
         };
     });
     app.controller('reportController', function($scope, $http, $window, $httpParamSerializerJQLike) {
-
+        $scope.currentShopId = '<?php echo $shop['id']; ?>';
         $scope.supplierName = "";
         $scope.ref_no = "";
         $scope.supplierId = "";
@@ -336,20 +336,27 @@ echo mainFooter();
             }
         }
 
-        $scope.searchProduct = function(search) {
-            return $http.get("<?php echo SITE_URL ?>api/getProducts.php", {
-                    params: {
-                        search,
-                        perPage: 30,
-                        customerId: $scope.supplierId,
-                        shopId: $scope.shopId
-                    }
-                })
-                .then(function(response) {
-                    $scope.list = response.data.records;
-                    $scope.priceList = response.data.records;
-                    return response.data.records
-                });
+        $scope.searchProduct = function(term) {
+            if ($scope.shopId == $scope.currentShopId) {
+                const filteredArray = window.mainList.records.filter(r => r.id == term || r.code == term || r.barcode == term || r.searchString.includes(term + '|') || r.searchString.includes('|' + term) || r.searchString.includes('|' + term + '|'));
+                const secondfilteredArray = !filteredArray.length ? window.mainList.records.filter(obj => obj.searchString.toLowerCase().includes(term?.toLowerCase() || term)) : filteredArray;
+
+                return secondfilteredArray.slice(0, 30);
+            } else {
+                return $http.get("<?php echo SITE_URL ?>api/getProducts.php", {
+                        params: {
+                            search: term,
+                            perPage: 30,
+                            customerId: $scope.supplierId,
+                            shopId: $scope.shopId
+                        }
+                    })
+                    .then(function(response) {
+                        $scope.list = response.data.records;
+                        $scope.priceList = response.data.records;
+                        return response.data.records
+                    });
+            }
         }
 
         $scope.searchMode = function() {
