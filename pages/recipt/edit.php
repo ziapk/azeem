@@ -1,8 +1,5 @@
 <?php
 include_once dirname(__FILE__) . '/../../include/settings.php';
-$productCls = new Products();
-$ownerId = $userData['role'] == 'owner' ? $userData['id'] : $userData['created_by'];
-$list = $productCls->getOwnerProducts($ownerId);
 $orders = new Orders();
 $id = !empty($_GET['id']) ? $_GET['id'] : (!empty($_GET['dup']) ? $_GET['dup'] : 0);
 $order = $orders->getOrder($id);
@@ -83,7 +80,7 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
             };
         });
         app.controller('cartController', function($scope, $http, $httpParamSerializerJQLike, $filter, $window, $timeout, $location, $anchorScroll) {
-            $scope.mainList = <?php echo safe_json_encode($list); ?>;
+            $scope.mainList = $window.mainList.records;
             $scope.shopId = '<?php echo $userData['shopId']; ?>';
             $scope.list = [];
             $scope.priceList = sessionStorage.getItem('list') && JSON.parse(sessionStorage.getItem('list'));;
@@ -279,17 +276,29 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                         const obj = $scope.mainList.find(function(e) {
                             return e.id == row.id
                         });
-                        items.push({
+                        const final = {
                             ...obj,
                             qty: row.qty,
                             show: row.show,
                             description: row.description
-                        })
+                        };
+                        items.push(final)
                     });
+                    $window.sessionStorage.setItem('shopping', JSON.stringify([]));
                     $scope.items = items;
                     $timeout(() => {
                         $scope.calculateSum()
-                    });
+                        if ($scope.qf) {
+                            const currentIndex = $scope.items.length;
+                            $location.hash('product-' + currentIndex);
+                            $anchorScroll();
+                            if ($('#product-' + currentIndex).find('.input-add-dist').length) {
+                                $('#product-' + currentIndex).find('.input-add-dist').focus();
+                            } else {
+                                $('#product-' + currentIndex).find('.input-qty').focus();
+                            }
+                        }
+                    }, 200);
                 }
             });
 

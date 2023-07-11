@@ -236,7 +236,7 @@ echo mainFooter();
                     const obj = $scope.mainList.find(function(e) {
                         return e.id == row.id
                     });
-                    items.push({
+                    items.unshift({
                         ...obj,
                         qty: row.qty,
                         show: row.show,
@@ -246,7 +246,18 @@ echo mainFooter();
                 $scope.items = items;
                 $timeout(() => {
                     $scope.calculateSum()
-                });
+                    if ($scope.qf) {
+                        const currentIndex = 1;
+                        $location.hash('product-' + currentIndex);
+                        $anchorScroll();
+                        if ($('#product-' + currentIndex).find('.input-add-dist').length) {
+                            $('#product-' + currentIndex).find('.input-add-dist').focus();
+                        } else {
+                            $('#product-' + currentIndex).find('.input-qty').focus();
+                        }
+                    }
+                }, 200);
+
             } else {
                 $scope.items = []
             }

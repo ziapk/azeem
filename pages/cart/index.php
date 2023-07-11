@@ -1,8 +1,5 @@
 <?php
 include_once dirname(__FILE__) . '/../../include/settings.php';
-$productCls = new Products();
-$ownerId = $userData['role'] == 'owner' ? $userData['id'] : $userData['created_by'];
-$list = $productCls->getOwnerProducts($ownerId);
 echo mainHeader();
 ?>
 <style>
@@ -132,9 +129,6 @@ echo mainHeader();
         };
     });
     app.controller('cartController', function($scope, $http, $httpParamSerializerJQLike, $filter, $window, $timeout, $location, $anchorScroll) {
-        $scope.mainList = <?php echo safe_json_encode($list); ?>;
-
-        $scope.list = [];
         $scope.priceList = [];
         $scope.focus = true;
         $scope.shopId = '<?php echo $userData['shopId']; ?>';
