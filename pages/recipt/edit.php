@@ -113,7 +113,6 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
             $scope.mainList = $window.mainList.records;
             $scope.shopId = '<?php echo $userData['shopId']; ?>';
             $scope.list = [];
-            $scope.priceList = sessionStorage.getItem('list') && JSON.parse(sessionStorage.getItem('list'));;
             $scope.focus = false;
             $scope.qf = true;
 

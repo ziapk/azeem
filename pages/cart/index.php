@@ -129,6 +129,7 @@ echo mainHeader();
         };
     });
     app.controller('cartController', function($scope, $http, $httpParamSerializerJQLike, $filter, $window, $timeout, $location, $anchorScroll) {
+        $scope.mainList = $window.mainList.records;
         $scope.priceList = [];
         $scope.focus = true;
         $scope.shopId = '<?php echo $userData['shopId']; ?>';
@@ -278,7 +279,7 @@ echo mainHeader();
             if ($scope.focus === true) {
                 params.searchBy = 'id';
                 params.term = parseFloat(term.split('-')[0]);
-                const list = sessionStorage.getItem('list') && JSON.parse(sessionStorage.getItem('list'));
+                const list = $window.mainList;
                 const item = list.find(r => r.id == params.term);
                 $scope.product = '';
                 $scope.selectProduct(item);

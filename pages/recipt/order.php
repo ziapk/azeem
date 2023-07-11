@@ -1,8 +1,5 @@
 <?php
 include_once dirname(__FILE__) . '/../../include/settings.php';
-$productCls = new Products();
-$ownerId = $userData['role'] == 'owner' ? $userData['id'] : $userData['created_by'];
-$list = $productCls->getOwnerProducts($ownerId);
 $credit = $_GET["credit"];
 echo mainHeader(['page' => !empty($credit) ? 'recipt-credit' : 'recipt']);
 $ordersObj = new Orders();
@@ -97,7 +94,7 @@ echo mainFooter();
         };
     });
     app.controller('cartController', function($scope, $http, $httpParamSerializerJQLike, $filter, $window, $timeout, $location, $anchorScroll) {
-        $scope.mainList = <?php echo safe_json_encode($list); ?>;
+        $scope.mainList = $window.mainList.records;;
 
         $scope.minDate = moment();
         $scope.expected_delivery_date = moment();
@@ -106,7 +103,6 @@ echo mainFooter();
 
         $scope.pinList = [];
         $scope.list = [];
-        $scope.priceList = sessionStorage.getItem('list') && JSON.parse(sessionStorage.getItem('list'));;
         $scope.focus = false;
         $scope.qf = false;
 
@@ -367,8 +363,6 @@ echo mainFooter();
                     })
                     .then(function(response) {
 
-                        // $scope.list = response.data;
-                        // $scope.priceList = response.data;
                         return response.data
 
                     });
