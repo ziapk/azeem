@@ -31,4 +31,4 @@ if (!empty($_SESSION['shopInfo'])) {
     }
 };
 $search['status'] = $status;
-echo json_encode($search);
+echo safe_json_encode($search);
