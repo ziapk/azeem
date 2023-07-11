@@ -840,6 +840,10 @@ body.no-padding {
     padding: 20px 0 50px;
     margin: 0;
 }
+body.no-horizontal-padding {
+    padding-inline: 0;
+    margin: 0;
+}
 .fw-bold {
     font-weight: bold;
 }
@@ -913,4 +917,10 @@ body.no-padding {
     > li:hover > .dropdown-submenu {
         display: block;
     }
+}
+
+thead.navbar-fixed-top {
+    width: calc(100% - 30px);
+    margin: auto;
+    display: table;
 }

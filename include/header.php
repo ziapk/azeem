@@ -10,8 +10,10 @@ function mainHeader($params = null)
         $params['bodyClasses'][] = 'no-padding';
     }
 
-    $pp = new Products();
-    $mainProductsList = $pp->getOwnerProductsPagination($shop['owner_id'], ['page' => 1, 'perPage' => 10000, 'status' => 1], $shop['id']);
+    if (!empty($params['hideSidebar'])) {
+        $params['bodyClasses'][] = 'no-horizontal-padding';
+    }
+
 ?>
 
     <!DOCTYPE html>
@@ -58,9 +60,6 @@ function mainHeader($params = null)
                 }
             };
         });
-    </script>
-    <script>
-        var mainList = <?php echo safe_json_encode($mainProductsList); ?>;
     </script>
 
     <body ng-app="mainApp" class="<?php if (!empty($params['bodyClasses'])) {

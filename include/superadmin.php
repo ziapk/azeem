@@ -40,14 +40,17 @@ $list = $productCls->getOwnerProducts($ownerId);
         </ul>
       </div><!-- /.container-fluid -->
   </nav>
-  <div class="sidebar">
-    <ul class="nav">
-      <li class="<?php if ($params['page'] == 'dashboard') {
-                    echo 'active';
-                  } ?>"><a uib-tooltip="Dashboard" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/product.svg" alt="" /> <span class="nav-menu-text">Dashboard</span></a></li>
-    </ul>
-    <a href="javascript:void(0)" ng-click="toggleSidebar()" class="toggle-sidebar"><img width="16" height="16" src="<?php echo SITE_URL; ?>assets/img/svg/left-arrow.svg" alt="" /></a>
-  </div>
+  <?php
+  if (empty($params['hideSidebar'])) { ?>
+    <div class="sidebar">
+      <ul class="nav">
+        <li class="<?php if ($params['page'] == 'dashboard') {
+                      echo 'active';
+                    } ?>"><a uib-tooltip="Dashboard" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/product.svg" alt="" /> <span class="nav-menu-text">Dashboard</span></a></li>
+      </ul>
+      <a href="javascript:void(0)" ng-click="toggleSidebar()" class="toggle-sidebar"><img width="16" height="16" src="<?php echo SITE_URL; ?>assets/img/svg/left-arrow.svg" alt="" /></a>
+    </div>
+  <?php } ?>
 </div>
 <script>
   function createCustomer() {

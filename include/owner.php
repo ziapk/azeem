@@ -221,82 +221,85 @@ $customersList = $customerObj->getCustomers($shop['id']);
         </ul>
       </div><!-- /.container-fluid -->
   </nav>
-  <div class="sidebar">
-    <ul class="nav">
-      <li class="<?php if ($params['page'] == 'recipt') {
-                    echo 'active';
-                  } ?>"><a uib-tooltip="Cash Entry" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/recipt" target="_blank"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/receipt.svg" alt="" /> <span class="nav-menu-text">Recipt Generator</span></a></li>
-      <li class="<?php if ($params['page'] == 'recipt-credit') {
-                    echo 'active';
-                  } ?>"><a uib-tooltip="Credit Entry" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/recipt?credit=1" target="_blank"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/receipt.svg" alt="" /> <span class="nav-menu-text">Credit Entry</span></a></li>
-      <li class="<?php if ($params['page'] == 'order') {
-                    echo 'active';
-                  } ?>"><a uib-tooltip="Sales" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/orders"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/sales.svg" alt="" /> <span class="nav-menu-text">Sales</span></a></li>
-      <li class="<?php if ($params['page'] == 'product-create') {
-                    echo 'active';
-                  } ?>"><a uib-tooltip="Add New Product" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/product/create.php"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/product.svg" alt="" /> <span class="nav-menu-text">New Product</span></a></li>
-      <li class="<?php if ($params['page'] == 'product') {
-                    echo 'active';
-                  } ?>"><a uib-tooltip="Products" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/product/products.php"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/product.svg" alt="" /> <span class="nav-menu-text">Products</span></a></li>
-      <li class="<?php if ($params['page'] == 'product') {
-                    echo 'active';
-                  } ?>"><a uib-tooltip="Products" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/product/products.php?status=0"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/product.svg" alt="" /> <span class="nav-menu-text">In-Active Products</span></a></li>
-      <li class="<?php if ($params['page'] == 'product-create') {
-                    echo 'active';
-                  } ?>"><a uib-tooltip="Today's Transactions" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/chart-of-accounts/ledger_transactions.php"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/accounting.png" alt="" /> <span class="nav-menu-text">Today Entries</span></a></li>
-      <li class="<?php if ($params['page'] == 'sale_returns') {
-                    echo 'active';
-                  } ?>"><a uib-tooltip="Sale Return" tooltip-placement="right" title="" href="<?php echo SITE_URL . 'pages/orders/returns.php'; ?>"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/sales.svg" alt="" /><span class="nav-menu-text">Sale Return</span></a></li>
-      <li class="<?php if ($params['page'] == 'employees') {
-                    echo 'active';
-                  } ?>"><a uib-tooltip="Employees" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/employees"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/product.svg" alt="" /> <span class="nav-menu-text">Employees</span></a></li>
-      <li class="<?php if ($params['page'] == 'supplies') {
-                    echo 'active';
-                  } ?>"><a uib-tooltip="Supplies" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/supply/list.php"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/sales.svg" alt="" /> <span class="nav-menu-text">Purchase Orders</span></a></li>
-      <li class="<?php if ($params['page'] == 'coa') {
-                    echo 'active';
-                  } ?>"><a uib-tooltip="Chart of Accounts" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/chart-of-accounts"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/accounting.png" alt="" /> <span class="nav-menu-text">Accounts</span></a></li>
-      <!-- <li class="<?php if ($params['page'] == 'demand') {
-                        echo 'active';
-                      } ?>"><a uib-tooltip="Demands" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/demand/create.php"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/justice-hammer.svg" alt="" /> <span class="nav-menu-text">Invoicing</span></a></li> -->
-      <!-- <li class="<?php if ($params['page'] == 'shop_accounts') {
-                        echo 'active';
-                      } ?>"><a uib-tooltip="Shop Accounts" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/shop_accounts"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/accounting.png" alt="" /> <span class="nav-menu-text">Shop Accounts</span></a></li> -->
-      <li class="<?php if ($params['page'] == 'demand') {
-                    echo 'active';
-                  } ?>"><a uib-tooltip="Demands" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/demand"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/justice-hammer.svg" alt="" /> <span class="nav-menu-text">Demands</span></a></li>
-      <li class="<?php if ($params['page'] == 'publisher') {
-                    echo 'active';
-                  } ?>"><a uib-tooltip="Publisher" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/publisher"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/publisher.svg" alt="" /><span class="nav-menu-text">Publisher</span></a></li>
-      <li class="<?php if ($params['page'] == 'program') {
-                    echo 'active';
-                  } ?>"><a uib-tooltip="Programs" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/program"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/016-books-stack-of-three.svg" alt="" /> <span class="nav-menu-text">Programs</span></a></li>
-      <li class="<?php if ($params['page'] == 'customers') {
-                    echo 'active';
-                  } ?>"><a uib-tooltip="Customers" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/customers/"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/customer.svg" alt="" /><span class="nav-menu-text">Customers</span></a></li>
+  <?php
+  if (empty($params['hideSidebar'])) { ?>
+    <div class="sidebar">
+      <ul class="nav">
+        <li class="<?php if ($params['page'] == 'recipt') {
+                      echo 'active';
+                    } ?>"><a uib-tooltip="Cash Entry" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/recipt" target="_blank"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/receipt.svg" alt="" /> <span class="nav-menu-text">Recipt Generator</span></a></li>
+        <li class="<?php if ($params['page'] == 'recipt-credit') {
+                      echo 'active';
+                    } ?>"><a uib-tooltip="Credit Entry" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/recipt?credit=1" target="_blank"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/receipt.svg" alt="" /> <span class="nav-menu-text">Credit Entry</span></a></li>
+        <li class="<?php if ($params['page'] == 'order') {
+                      echo 'active';
+                    } ?>"><a uib-tooltip="Sales" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/orders"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/sales.svg" alt="" /> <span class="nav-menu-text">Sales</span></a></li>
+        <li class="<?php if ($params['page'] == 'product-create') {
+                      echo 'active';
+                    } ?>"><a uib-tooltip="Add New Product" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/product/create.php"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/product.svg" alt="" /> <span class="nav-menu-text">New Product</span></a></li>
+        <li class="<?php if ($params['page'] == 'product') {
+                      echo 'active';
+                    } ?>"><a uib-tooltip="Products" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/product/products.php"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/product.svg" alt="" /> <span class="nav-menu-text">Products</span></a></li>
+        <li class="<?php if ($params['page'] == 'product') {
+                      echo 'active';
+                    } ?>"><a uib-tooltip="Products" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/product/products.php?status=0"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/product.svg" alt="" /> <span class="nav-menu-text">In-Active Products</span></a></li>
+        <li class="<?php if ($params['page'] == 'product-create') {
+                      echo 'active';
+                    } ?>"><a uib-tooltip="Today's Transactions" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/chart-of-accounts/ledger_transactions.php"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/accounting.png" alt="" /> <span class="nav-menu-text">Today Entries</span></a></li>
+        <li class="<?php if ($params['page'] == 'sale_returns') {
+                      echo 'active';
+                    } ?>"><a uib-tooltip="Sale Return" tooltip-placement="right" title="" href="<?php echo SITE_URL . 'pages/orders/returns.php'; ?>"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/sales.svg" alt="" /><span class="nav-menu-text">Sale Return</span></a></li>
+        <li class="<?php if ($params['page'] == 'employees') {
+                      echo 'active';
+                    } ?>"><a uib-tooltip="Employees" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/employees"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/product.svg" alt="" /> <span class="nav-menu-text">Employees</span></a></li>
+        <li class="<?php if ($params['page'] == 'supplies') {
+                      echo 'active';
+                    } ?>"><a uib-tooltip="Supplies" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/supply/list.php"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/sales.svg" alt="" /> <span class="nav-menu-text">Purchase Orders</span></a></li>
+        <li class="<?php if ($params['page'] == 'coa') {
+                      echo 'active';
+                    } ?>"><a uib-tooltip="Chart of Accounts" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/chart-of-accounts"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/accounting.png" alt="" /> <span class="nav-menu-text">Accounts</span></a></li>
+        <!-- <li class="<?php if ($params['page'] == 'demand') {
+                          echo 'active';
+                        } ?>"><a uib-tooltip="Demands" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/demand/create.php"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/justice-hammer.svg" alt="" /> <span class="nav-menu-text">Invoicing</span></a></li> -->
+        <!-- <li class="<?php if ($params['page'] == 'shop_accounts') {
+                          echo 'active';
+                        } ?>"><a uib-tooltip="Shop Accounts" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/shop_accounts"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/accounting.png" alt="" /> <span class="nav-menu-text">Shop Accounts</span></a></li> -->
+        <li class="<?php if ($params['page'] == 'demand') {
+                      echo 'active';
+                    } ?>"><a uib-tooltip="Demands" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/demand"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/justice-hammer.svg" alt="" /> <span class="nav-menu-text">Demands</span></a></li>
+        <li class="<?php if ($params['page'] == 'publisher') {
+                      echo 'active';
+                    } ?>"><a uib-tooltip="Publisher" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/publisher"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/publisher.svg" alt="" /><span class="nav-menu-text">Publisher</span></a></li>
+        <li class="<?php if ($params['page'] == 'program') {
+                      echo 'active';
+                    } ?>"><a uib-tooltip="Programs" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/program"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/016-books-stack-of-three.svg" alt="" /> <span class="nav-menu-text">Programs</span></a></li>
+        <li class="<?php if ($params['page'] == 'customers') {
+                      echo 'active';
+                    } ?>"><a uib-tooltip="Customers" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/customers/"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/customer.svg" alt="" /><span class="nav-menu-text">Customers</span></a></li>
 
-      <li class="<?php if ($params['page'] == 'suppliers') {
-                    echo 'active';
-                  } ?>"><a uib-tooltip="Suppliers" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/suppliers/"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/supplier.svg" alt="" /><span class="nav-menu-text">Suppliers</span></a></li>
-      <li class="<?php if ($params['page'] == 'author') {
-                    echo 'active';
-                  } ?>"><a uib-tooltip="Authors" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/authors"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/supplier.svg" alt="" /> <span class="nav-menu-text">Authors</span></a></li>
-      <li class="<?php if ($params['page'] == 'expense') {
-                    echo 'active';
-                  } ?>"><a uib-tooltip="Expenses" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/expenses"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/expense.svg" alt="" /><span class="nav-menu-text">Expenses</span></a></li>
-      <li class="<?php if ($params['page'] == 'barcode') {
-                    echo 'active';
-                  } ?>"><a uib-tooltip="Reports" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/barcode"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/qrcode.svg" alt="" /> <span class="nav-menu-text">Barcode</span></a></li>
-      <li class="<?php if ($params['page'] == 'category') {
-                    echo 'active';
-                  } ?>"><a uib-tooltip="Categories" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/category/"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/category.svg" alt="" /><span class="nav-menu-text">Categories</span></a></li>
-      <li class="<?php if ($params['page'] == 'return') {
-                    echo 'active';
-                  } ?>"><a uib-tooltip="Return to Lahore" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/orders/faultyOrders.php"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/reports.svg" alt="" /> <span class="nav-menu-text">Return to Lahore</span></a></li>
-      <li class="<?php if ($params['page'] == 'reports') {
-                    echo 'active';
-                  } ?>"><a uib-tooltip="Reports" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/reports/"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/reports.svg" alt="" /><span class="nav-menu-text">Reports</span></a></li>
-    </ul>
-    <a href="javascript:void(0)" ng-click="toggleSidebar()" class="toggle-sidebar"><img width="16" height="16" src="<?php echo SITE_URL; ?>assets/img/svg/left-arrow.svg" alt="" /></a>
-  </div>
+        <li class="<?php if ($params['page'] == 'suppliers') {
+                      echo 'active';
+                    } ?>"><a uib-tooltip="Suppliers" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/suppliers/"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/supplier.svg" alt="" /><span class="nav-menu-text">Suppliers</span></a></li>
+        <li class="<?php if ($params['page'] == 'author') {
+                      echo 'active';
+                    } ?>"><a uib-tooltip="Authors" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/authors"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/supplier.svg" alt="" /> <span class="nav-menu-text">Authors</span></a></li>
+        <li class="<?php if ($params['page'] == 'expense') {
+                      echo 'active';
+                    } ?>"><a uib-tooltip="Expenses" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/expenses"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/expense.svg" alt="" /><span class="nav-menu-text">Expenses</span></a></li>
+        <li class="<?php if ($params['page'] == 'barcode') {
+                      echo 'active';
+                    } ?>"><a uib-tooltip="Reports" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/barcode"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/qrcode.svg" alt="" /> <span class="nav-menu-text">Barcode</span></a></li>
+        <li class="<?php if ($params['page'] == 'category') {
+                      echo 'active';
+                    } ?>"><a uib-tooltip="Categories" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/category/"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/category.svg" alt="" /><span class="nav-menu-text">Categories</span></a></li>
+        <li class="<?php if ($params['page'] == 'return') {
+                      echo 'active';
+                    } ?>"><a uib-tooltip="Return to Lahore" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/orders/faultyOrders.php"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/reports.svg" alt="" /> <span class="nav-menu-text">Return to Lahore</span></a></li>
+        <li class="<?php if ($params['page'] == 'reports') {
+                      echo 'active';
+                    } ?>"><a uib-tooltip="Reports" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/reports/"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/reports.svg" alt="" /><span class="nav-menu-text">Reports</span></a></li>
+      </ul>
+      <a href="javascript:void(0)" ng-click="toggleSidebar()" class="toggle-sidebar"><img width="16" height="16" src="<?php echo SITE_URL; ?>assets/img/svg/left-arrow.svg" alt="" /></a>
+    </div>
+  <?php } ?>
 </div>

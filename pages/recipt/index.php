@@ -4,7 +4,7 @@ $productCls = new Products();
 $ownerId = $userData['role'] == 'owner' ? $userData['id'] : $userData['created_by'];
 $list = $productCls->getOwnerProducts($ownerId);
 $credit = $_GET["credit"];
-echo mainHeader(['page' => !empty($credit) ? 'recipt-credit' : 'recipt']);
+echo mainHeader(['page' => !empty($credit) ? 'recipt-credit' : 'recipt', 'hideSidebar' => true]);
 $ordersObj = new Orders();
 $orders = $ordersObj->userOrders($shop['id'], $shop['sale_date'], null, 1, false);
 $stores = new Store();
@@ -28,55 +28,61 @@ $ownerStores = $stores->getOwnerStores($userId);
                 <a class="btn btn-default" href="./edit.php?id=<?php echo $value['id']; ?>"><?php echo $value['full_name'] . ' - ' . $value['id']; ?></a>
             <?php } ?>
         </span>
-        <div class="clearfix"></div>
-        <table class="table">
-            <thead>
-                <?php if ($userData['role'] == 'owner') { ?>
-                    <tr>
-                        <th>
-                            <label class="text-danger"><strong>Shop Select</strong></label>
-                        </th>
-                        <th>
-                            <select class="form-control c-select" ng-model="shopId">
-                                <?php foreach ($ownerStores as $value) { ?>
-                                    <option value="<?php echo $value['id']; ?>"><?php echo $value['full_name']; ?></option>
-                                <?php } ?>
-                            </select>
-                        </th>
-                        <th></th>
-                        <th></th>
-                    </tr>
-                <?php } ?>
-                <tr>
-                    <th style="vertical-align: middle">Customer Name</th>
-                    <th style="width: 200px">
-                        <div class="dropdown-wrapper" style="position: relative;">
-                            <input type="text" class="form-control" ng-model="customerName" placeholder="Search Customer" uib-typeahead="address as address.full_name for address in searchCustomer($viewValue)" typeahead-on-select="selectCustomer($item)" ng-model-options="{debounce: 100}" typeahead-template-url="customer.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="1">
-                        </div>
-                    </th>
-                    <th style="vertical-align: middle">
-                        <label class="pull-left"><span style="vertical-align: middle"><input type="checkbox" ng-model="show_discount"></span> <span style="vertical-align: middle">Add Discount</span></label>
-                        <div class="pull-right">
-                            <label><span style="vertical-align: middle">QF</span> <span style="vertical-align: middle; margin-left: 4px;"><input type="checkbox" name="qf" ng-model="qf"><span></label>
-                            <label><span style="vertical-align: middle">Search Product</span> <span style="vertical-align: middle; margin-left: 4px"><input type="checkbox" name="focus" ng-model="focus"><span></label>
-                        </div>
-                    </th>
-                    <th width="100">
-                        <div class="dropdown-wrapper align-right">
-                            <input type="text" class="form-control" id="searchProduct" ng-model="product" placeholder="Search Products" uib-typeahead="address as address.full_name for address in searchProduct($viewValue)" typeahead-on-select="selectProduct($item)" ng-model-options="{debounce: 100}" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="1">
-                            <!-- <div class="list-group recipt-search-dropdown">
+        <div class="clearfix" id="dummyHeight"></div>
+
+        <table class="table table-striped recipt-table">
+            <thead id="fixme">
+                <th colspan="8" style="padding: 0">
+                    <table class="table" style="box-shadow: none; margin: 0">
+                        <thead>
+                            <?php if ($userData['role'] == 'owner') { ?>
+                                <tr>
+                                    <th>
+                                        <label class="text-danger"><strong>Shop Select</strong></label>
+                                    </th>
+                                    <th>
+                                        <select class="form-control c-select" ng-model="shopId">
+                                            <?php foreach ($ownerStores as $value) { ?>
+                                                <option value="<?php echo $value['id']; ?>"><?php echo $value['full_name']; ?></option>
+                                            <?php } ?>
+                                        </select>
+                                    </th>
+                                    <th></th>
+                                    <th></th>
+                                </tr>
+                            <?php } ?>
+                            <tr>
+                                <th style="vertical-align: middle">Customer Name</th>
+                                <th style="width: 200px">
+                                    <div class="dropdown-wrapper" style="position: relative;">
+                                        <input type="text" class="form-control" ng-model="customerName" placeholder="Search Customer" uib-typeahead="address as address.full_name for address in searchCustomer($viewValue)" typeahead-on-select="selectCustomer($item)" ng-model-options="{debounce: 100}" typeahead-template-url="customer.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="1">
+                                    </div>
+                                </th>
+                                <th style="vertical-align: middle">
+                                    <label class="pull-left"><span style="vertical-align: middle"><input type="checkbox" ng-model="show_discount"></span> <span style="vertical-align: middle">Add Discount</span></label>
+                                    <div class="pull-right">
+                                        <label><span style="vertical-align: middle">QF</span> <span style="vertical-align: middle; margin-left: 4px;"><input type="checkbox" name="qf" ng-model="qf"><span></label>
+                                        <label><span style="vertical-align: middle">Search Product</span> <span style="vertical-align: middle; margin-left: 4px"><input type="checkbox" name="focus" ng-model="focus"><span></label>
+                                    </div>
+                                </th>
+                                <th width="100">
+                                    <div class="dropdown-wrapper align-right">
+                                        <input type="text" class="form-control" id="searchProduct" ng-model="product" placeholder="Search Products" uib-typeahead="address as address.full_name for address in searchProduct($viewValue)" typeahead-on-select="selectProduct($item)" ng-model-options="{debounce: 100}" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="1">
+                                        <!-- <div class="list-group recipt-search-dropdown">
                         <a ng-click="selectProduct(l)" class="list-group-item" ng-repeat="l in list">
                             <h4 class="list-group-item-heading">{{l.full_name}} <span>{{l.price}}</span></h4>
                         </a>
                         <a ng-if="list.length" ng-click="clearSearch()" class="list-group-item">Close</a>
                     </div> -->
-                        </div>
-                    </th>
-                </tr>
-            </thead>
-        </table>
+                                    </div>
+                                </th>
+                            </tr>
+                        </thead>
+                    </table>
+                </th>
 
-        <?php echo include_once dirname(__FILE__) . '/table.php'; ?>
+
+                <?php echo include_once dirname(__FILE__) . '/table.php'; ?>
     </div>
 
 </div>
@@ -85,8 +91,31 @@ echo mainFooter();
 ?>
 
 <script type="text/javascript">
+    var element = $('#fixme');
+    var fixmeTop = element.offset().top;
+    var dummyHeight = $('#dummyHeight');
+    var offset = $('.navbar').height();
+    $(window).on('load scroll', function() { // assign scroll event listener
+        var fixedHeight = element.height()
+
+
+        var currentScroll = $(window).scrollTop(); // get current position
+
+        if ((currentScroll + offset) >= fixmeTop) { // apply position: fixed if you
+            element.css({ // scroll to that element or below it
+                top: offset,
+            });
+            element.addClass('navbar-fixed-top')
+            dummyHeight.height(fixedHeight)
+        } else { // apply position: static
+            element.removeClass('navbar-fixed-top');
+            dummyHeight.height(0)
+        }
+
+    });
     app.run(['$anchorScroll', function($anchorScroll) {
         $anchorScroll.yOffset = $('.navbar').height(true, true); // always scroll by 50 extra pixels
+
     }])
     app.directive('onEnterPress', function() {
         return function(scope, element, attrs) {

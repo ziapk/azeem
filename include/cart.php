@@ -326,5 +326,35 @@
     }
 
     $scope.searchMode();
+
+    $scope.loadProduct = function(term) {
+      const p = $window.localStorage.getItem('mainList');
+      if (!p) {
+        // console.log('abce')
+        $http.get("<?php echo SITE_URL ?>api/getProducts.php?perPage=10000&status=1")
+          .then(function(response) {
+            // console.log(response);
+            const records = response.data.records.map(({
+                is_active,
+                min_qty,
+                other_codes,
+                pprice,
+                discount_amount,
+                discount_type,
+                board,
+                cat_id,
+                ...product
+              }) =>
+              product)
+            $window.localStorage.setItem('mainList', JSON.stringify({
+              records
+            }))
+            $window.mainList = response.data;
+          });
+      } else {
+        $window.mainList = JSON.parse(p);
+      }
+    }
+    $scope.loadProduct();
   });
 </script>
