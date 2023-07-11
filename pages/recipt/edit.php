@@ -110,7 +110,7 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
             };
         });
         app.controller('cartController', function($scope, $http, $httpParamSerializerJQLike, $filter, $window, $timeout, $location, $anchorScroll) {
-            $scope.mainList = $window.mainList.records;
+            $scope.mainList = $window.mainList?.records || [];
             $scope.shopId = '<?php echo $userData['shopId']; ?>';
             $scope.list = [];
             $scope.focus = false;

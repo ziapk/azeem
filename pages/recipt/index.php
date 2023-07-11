@@ -128,7 +128,7 @@ echo mainFooter();
         };
     });
     app.controller('cartController', function($scope, $http, $httpParamSerializerJQLike, $filter, $window, $timeout, $location, $anchorScroll) {
-        $scope.mainList = $window.mainList.records;
+        $scope.mainList = $window.mainList?.records || [];
 
         $scope.pinList = [];
         $scope.list = [];
