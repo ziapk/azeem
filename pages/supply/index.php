@@ -61,6 +61,7 @@ echo mainFooter();
         $scope.supplierId = "";
         $scope.product = "";
         $scope.shopId = '4';
+        $scope.qf = true;
 
         $scope.selectSupplier = function(p) {
             $http.get("<?php echo SITE_URL ?>api/getOpeningBalance.php", {
@@ -201,9 +202,11 @@ echo mainFooter();
             }
 
             $timeout(() => {
-                $location.hash('product-' + currentIndex);
-                $anchorScroll();
-                $('#product-' + currentIndex).find('.discount-field').focus();
+                if ($scope.qf) {
+                    $location.hash('product-' + currentIndex);
+                    $anchorScroll();
+                    $('#product-' + currentIndex).find('.discount-field').focus();
+                }
             }, 200);
 
             $scope.calculateSum();
