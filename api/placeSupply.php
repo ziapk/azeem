@@ -18,6 +18,7 @@ $shopAccounts = new ShopAccounts();
 $accountsData = $shopAccounts->getSAs($shop['id']);
 $storeAccounts = [];
 $cash = !empty($_POST['payment_amount']) ? $_POST['payment_amount'] : 0;
+$isDemandCreate = !empty($_POST['createDemand']);
 $payment_with_credit = !empty($_POST['payment_with_credit']) ? $_POST['payment_with_credit'] : 0;
 $de = new DoubleEntry();
 foreach ($accountsData as $a) {
@@ -73,9 +74,18 @@ $items = [];
 $status = $_POST['status'] ? $_POST['status'] : 2;
 $purchaseValue = 0;
 $productsValue = 0;
+$demandProducts = [];
 if (sizeof($_POST['items'])) {
     foreach ($_POST['items'] as $item) {
         if (!empty($item['id'])) {
+
+            if ($isDemandCreate) {
+                $demandProducts[] = [
+                    'id' => $item['id'],
+                    'qty' => $item['qty'],
+                ];
+            }
+
             $purchaseValue += ($item['pprice'] * $item['qty']);
             $productsValue += ($item['price'] * $item['qty']);
             $items[] = [
@@ -84,6 +94,8 @@ if (sizeof($_POST['items'])) {
                 'discount' => !empty($item['discount']) ? $item['discount'] : 0,
                 'qty' => $item['qty'],
                 'stock_out' => 0,
+                'pin' => $item['pin'],
+                'minQty' => $item['minQty'],
                 'product_id' => $item['id'],
                 'shopId' => $_POST['shopId'],
                 'owner_id' => $ownerId,
@@ -96,9 +108,11 @@ if (sizeof($items)) {
 
     foreach ($items as $item) {
         $products->assignProduct($item);
+        if (!empty($item['pin'])) {
+            $products->setPriority($item['product_id'], 1);
+        }
     }
 }
-
 $supply = new Supply();
 $data = [
     'user_id' => $userData['id'],
@@ -119,6 +133,19 @@ if (!empty($_POST['id'])) {
     $de->deleteTransactionBySupplyId($_POST['id']);
 }
 $supply_id = $supply->createSupply($data);
+$dd = 0;
+if (sizeof($demandProducts)) {
+    $demands = new Demands();
+    $final = [
+        'demand_title' => 'Created With Supply ID: ' . $supply_id,
+        'demand_date' => $shop['sale_date'],
+        'shop_id' => $shop['id'],
+        'owner_id' => $shop['owner_id'],
+        'created_by' => $userData['id'],
+        'items' => $demandProducts,
+    ];
+    $dd = $demands->createDemand($final, false);
+}
 
 if ($supply_id) {
     if (sizeof($items)) {

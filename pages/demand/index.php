@@ -71,6 +71,7 @@ foreach ($ownerStores as $store) {
                                 <a class="btn btn-success btn-xs" href="<?php echo SITE_URL . "pages/demand/modify.php?id=" . $demand['id']; ?>">Modify</a>
                             <?php } ?>
                         <?php } ?>
+                        <a class="btn btn-info btn-xs" href="<?php echo SITE_URL . "pages/barcode/index.php?id=" . $demand['id']; ?>">Code</a>
                         <a class="btn btn-success btn-xs" href="<?php echo SITE_URL . "pages/demand/print.php?id=" . $demand['id']; ?>">Print</a>
                     </td>
                 </tr>

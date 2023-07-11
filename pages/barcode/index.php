@@ -8,6 +8,11 @@ $productsObj = new Products();
 $storeObj = new Store();
 $ownerId = $userData['role'] == 'owner' ? $userData['id'] : $userData['created_by'];
 $ownerStores = $storeObj->getOwnerStores($ownerId);
+$id = $_GET['id'];
+if (!empty($id)) {
+    $demandObj = new Demands();
+    $demandDetail = $demandObj->getDemandDetail($id, $ownerId);
+}
 
 if (!empty($_GET['all']) && $_GET['all'] == '1') {
     $shopId = $_GET['shopId'];
@@ -90,13 +95,18 @@ if (!empty($_GET['all']) && $_GET['all'] == '1') {
             app.controller('categoryController', function($scope, $http, $httpParamSerializerJQLike, $filter, $window, $document, $uibModal, $log, $location, $anchorScroll, $timeout) {
                 $scope.list = []; //$scope.data.records;
                 $scope.siteUrl = '<?php echo SITE_URL ?>';
+                $scope.demandDetail = <?php echo safe_json_encode($demandDetail); ?>;
                 $scope.shopId = '<?php echo !empty($_GET['shopId']) ? $_GET['shopId'] : $userData['shopId']; ?>';
                 $scope.currentShopId = '<?php echo $shop['id']; ?>';
 
                 $scope.books = <?php echo safe_json_encode($products); ?>;
 
                 $scope.list = [];
-                $scope.items = $scope.books?.records?.map(r => ({
+                console.log('$scope.demandDetail', $scope.demandDetail);
+                $scope.items = $scope.demandDetail ? $scope.demandDetail.items.map(r => ({
+                    ...r,
+                    qty: parseInt(r.product_qty)
+                })) : $scope.books?.records?.map(r => ({
                     ...r,
                     qty: parseInt(r.qty)
                 }))?.filter(r => r.qty) || [];

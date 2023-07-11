@@ -96,7 +96,7 @@ class Orders extends Connection
     public function orderReturnAll($array)
     {
         try {
-            $stmt = "INSERT INTO `{$this->table_rp}` (`user_id`, `shopId`, `order_id`, `product_id`, `quantity`, `price`, `discount`, `type`) VALUES (:user_id, :shopId, :order_id, :product_id, :quantity, :price, :discount, :type)";
+            $stmt = "INSERT INTO `{$this->table_rp}` (`user_id`, `shopId`, `order_id`, `product_id`, `quantity`, `price`, `discount`, `discount_type`, `discount_value`, `type`) VALUES (:user_id, :shopId, :order_id, :product_id, :quantity, :price, :discount, :discount_type, :discount_value, :type)";
             $prepare = $this->dbh->prepare($stmt);
             $prepare->bindParam(':user_id', $array['user_id'], PDO::PARAM_STR);
             $prepare->bindParam(':shopId', $array['shopId'], PDO::PARAM_STR);
@@ -105,6 +105,8 @@ class Orders extends Connection
             $prepare->bindParam(':quantity', $array['quantity'], PDO::PARAM_STR);
             $prepare->bindParam(':price', $array['price'], PDO::PARAM_STR);
             $prepare->bindParam(':discount', $array['discount'], PDO::PARAM_STR);
+            $prepare->bindParam(':discount_type', $array['discount_type'], PDO::PARAM_STR);
+            $prepare->bindParam(':discount_value', $array['discount_value'], PDO::PARAM_STR);
             $prepare->bindParam(':type', $array['type'], PDO::PARAM_STR);
             $prepare->execute();
             $result = $this->dbh->lastInsertId();
@@ -141,6 +143,20 @@ class Orders extends Connection
             $prepare = $this->dbh->prepare($stmt);
             $prepare->bindParam(':order_id', $order_id, PDO::PARAM_STR);
             $prepare->bindParam(':product_id', $product_id, PDO::PARAM_STR);
+            $prepare->execute();
+            $result = $prepare->rowCount();
+            return $result;
+        } catch (PDOException $e) {
+            die("Error!: " . $e->getMessage() . "<br/>");
+        }
+    }
+
+    public function deleteReturnOrderItem($id)
+    {
+        try {
+            $stmt = "DELETE FROM `{$this->table_rp}` where `order_id` = :order_id";
+            $prepare = $this->dbh->prepare($stmt);
+            $prepare->bindParam(':order_id', $id, PDO::PARAM_STR);
             $prepare->execute();
             $result = $prepare->rowCount();
             return $result;
@@ -633,27 +649,41 @@ class Orders extends Connection
     {
         // $idJson = json_encode($ids);
 
-        $flag = 1;
 
+        $ref_no = !empty($array['ref_no']) ? $array['ref_no'] : null;
+        $flag = 1;
         try {
-            $stmt = "INSERT INTO `{$this->table_ro}` (`amount`, `paid`, `discount`, `ref_no`, `shopId`, `owner_id`, `order_id`, `customer_id`, `customer_name`, `return_date`, `flag`) VALUES (:amount, :paid, :discount, :ref_no, :shopId, :owner_id, :order_id, :customer_id, :customer_name, :return_date, :flag)";
+            if (!empty($array['id'])) {
+                $stmt = "UPDATE `{$this->table_ro}` SET `amount`=:amount, `paid`=:paid, `discount`=:discount, `ref_no`=:ref_no, `shopId`=:shopId, `owner_id`=:owner_id, `order_id`=:order_id, `customer_id`=:customer_id, `customer_name`=:customer_name, `return_date`=:return_date, `flag`=:flag where id=:id";
+            } else {
+                $stmt = "INSERT INTO `{$this->table_ro}` (`amount`, `paid`, `discount`, `ref_no`, `shopId`, `owner_id`, `order_id`, `customer_id`, `customer_name`, `return_date`, `flag`) VALUES (:amount, :paid, :discount, :ref_no, :shopId, :owner_id, :order_id, :customer_id, :customer_name, :return_date, :flag)";
+            }
             $prepare = $this->dbh->prepare($stmt);
             $prepare->bindParam(':amount', $array['amount'], PDO::PARAM_STR);
             $prepare->bindParam(':paid', $array['paid'], PDO::PARAM_STR);
             $prepare->bindParam(':discount', $array['discount'], PDO::PARAM_STR);
-            $prepare->bindParam(':ref_no', $array['ref_no'], PDO::PARAM_STR);
+            $prepare->bindParam(':ref_no', $ref_no, PDO::PARAM_STR);
             $prepare->bindParam(':shopId', $array['shopId'], PDO::PARAM_STR);
+            $prepare->bindParam(':return_date', $array['return_date'], PDO::PARAM_STR);
             $prepare->bindParam(':owner_id', $array['owner_id'], PDO::PARAM_STR);
             $prepare->bindParam(':order_id', $array['order_id'], PDO::PARAM_STR);
             $prepare->bindParam(':customer_id', $array['customer_id'], PDO::PARAM_STR);
             $prepare->bindParam(':customer_name', $array['customer_name'], PDO::PARAM_STR);
-            $prepare->bindParam(':return_date', $array['return_date'], PDO::PARAM_STR);
             $prepare->bindParam(':flag', $flag, PDO::PARAM_STR);
+            if (!empty($array['id'])) {
+                $prepare->bindParam(':id', $array['id'], PDO::PARAM_STR);
+            }
             $prepare->execute();
-            $result = $this->dbh->lastInsertId();
+
+            if (!empty($array['id'])) {
+                $result = $array['id'];
+            } else {
+                $result = $this->dbh->lastInsertId();
+            }
+
             return $result;
         } catch (PDOException $e) {
-            die("Error!: " . $e->getMessage() . "<br/>");
+            die("Error!: here" . $e->getMessage() . "<br/>");
         }
     }
 

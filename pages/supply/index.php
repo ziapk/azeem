@@ -61,6 +61,7 @@ echo mainFooter();
         $scope.supplierId = "";
         $scope.product = "";
         $scope.shopId = '4';
+        $scope.createDemand = false;
         $scope.qf = true;
 
         $scope.selectSupplier = function(p) {
@@ -287,6 +288,7 @@ echo mainFooter();
                 payment_amount: $scope.payment_amount,
                 supplier_type: $scope.toggleForm.searchMode ? 2 : 1,
                 payment_with_credit: $scope.payment_with_credit,
+                createDemand: $scope.createDemand,
             }
 
 

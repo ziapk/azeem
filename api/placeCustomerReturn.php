@@ -49,8 +49,20 @@ if (empty($_POST['order_id'])) {
 } else {
     $orderDetails = $_POST['items'];
 }
+if (!empty($_POST['returnOrder'])) {
 
+    $order = $orders->getReturnOrder($_POST['returnOrder']);
+
+    $doubleEntry = new DoubleEntry();
+    if (!empty($order['order']['id'])) {
+        $orders->deleteReturnOrderItem($order['order']['id']);
+        // delete transactions
+        $doubleEntry->deleteTransactionByOrderId($order['order']['id']);
+    }
+}
 $returnId = $orders->makeReturn([
+    "id" => $_POST['returnOrder'],
+    "amount" => $purchaseValue,
     "amount" => $purchaseValue,
     "paid" => $payment_amount,
     "discount" => $discount,
@@ -71,6 +83,8 @@ foreach ($_POST['items'] as $key => $value) {
         'product_id' => $value['id'],
         'quantity' => $value['qty'],
         'price' => $value['price'],
+        'discount_type' => $value['discount_type'],
+        'discount_value' => $value['discount_value'],
         'discount' => $value['discount'],
         'type' => 1,
     ];
@@ -84,7 +98,7 @@ foreach ($products as $id => $row) {
 
 $supplier = $supplierObj->getCustomer($supplierId);
 
-$doubleEntry = new DoubleEntry();
+
 
 $makeTransaction = [
     'description' => !empty($_POST['summery']) ? $_POST['summery'] : "Sale Return PLACED",

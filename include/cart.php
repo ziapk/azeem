@@ -52,7 +52,7 @@
   var event = new CustomEvent("ProdcutAdded");
 
   app.controller('headerController', function($scope, $http, $httpParamSerializerJQLike, $filter, $window, toaster) {
-    $scope.fontsize = localStorage.getItem('font-size') || 13;
+    $scope.fontsize = parseInt(localStorage.getItem('font-size') || 13);
 
     $('html').css('font-size', $scope.fontsize + 'px');
 

@@ -752,7 +752,12 @@ class Products extends Connection
 	public function assignProductToStore($array)
 	{
 		try {
-			$stmt = "INSERT INTO `{$this->table_st}` (`qty`, `stock_out`, `product_id`, `shopId`, `owner_id`, `location`) VALUES (:qty, :stock_out, :product_id, :shopId, :owner_id, :location)";
+			$minQty = !empty($array['minQty']);
+			if ($minQty) {
+				$stmt = "INSERT INTO `{$this->table_st}` (`qty`, `stock_out`, `product_id`, `shopId`, `owner_id`, `location`, `min_qty`) VALUES (:qty, :stock_out, :product_id, :shopId, :owner_id, :location, :min_qty)";
+			} else {
+				$stmt = "INSERT INTO `{$this->table_st}` (`qty`, `stock_out`, `product_id`, `shopId`, `owner_id`, `location`) VALUES (:qty, :stock_out, :product_id, :shopId, :owner_id, :location)";
+			}
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':qty', $array['qty'], PDO::PARAM_STR);
 			$prepare->bindParam(':stock_out', $array['stock_out'], PDO::PARAM_STR);
@@ -760,6 +765,9 @@ class Products extends Connection
 			$prepare->bindParam(':shopId', $array['shopId'], PDO::PARAM_INT);
 			$prepare->bindParam(':owner_id', $array['owner_id'], PDO::PARAM_INT);
 			$prepare->bindParam(':location', $array['location'], PDO::PARAM_STR);
+			if ($minQty) {
+				$prepare->bindParam(':min_qty', $array['minQty'], PDO::PARAM_STR);
+			}
 			$prepare->execute();
 			$result = $this->dbh->lastInsertId();
 			return $result;
@@ -772,17 +780,25 @@ class Products extends Connection
 		try {
 			$data['qty'] += $array['qty'];
 			$data['stock_out'] += $array['stock_out'];
-
-			$stmt = "UPDATE `{$this->table_st}` SET `qty`=:qty, `stock_out`=:stock_out WHERE id=:id";
+			$data['minQty'] += $array['minQty'];
+			$minQty = !empty($array['minQty']);
+			if ($minQty) {
+				$stmt = "UPDATE `{$this->table_st}` SET `qty`=:qty, `stock_out`=:stock_out, `min_qty`=:min_qty WHERE id=:id";
+			} else {
+				$stmt = "UPDATE `{$this->table_st}` SET `qty`=:qty, `stock_out`=:stock_out WHERE id=:id";
+			}
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':qty', $data['qty'], PDO::PARAM_STR);
 			$prepare->bindParam(':stock_out', $data['stock_out'], PDO::PARAM_STR);
+			if ($minQty) {
+				$prepare->bindParam(':min_qty', $data['minQty'], PDO::PARAM_STR);
+			}
 			$prepare->bindParam(':id', $data['id'], PDO::PARAM_INT);
 			$prepare->execute();
 			$result = $prepare->rowCount();
 			return $result;
 		} catch (PDOException $e) {
-			die("Error!: " . $e->getMessage() . "<br/>");
+			die("Error!: here " . $e->getMessage() . "<br/>");
 		}
 	}
 

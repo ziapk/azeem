@@ -8,9 +8,13 @@ if ($userData['role'] == 'owner') {
 }
 
 $id = $_GET['id'];
-
+$return = $_GET['return'];
 $orders = new Orders();
-$order = $orders->getOrder($id);
+if (!empty($return)) {
+    $order = $orders->getReturnOrder($return);
+} else {
+    $order = $orders->getOrder($id);
+}
 
 echo mainHeader();
 ?>
@@ -157,6 +161,7 @@ echo mainFooter();
         $scope.product = "";
         $scope.shopId = '';
         $scope.order = <?php echo json_encode($order) ?>;
+        $scope.returnOrder = <?php echo json_encode($return) ?>;
 
         $scope.items = $scope.order?.order_items?.map(r => ({
             ...r,
@@ -164,6 +169,8 @@ echo mainFooter();
             pprice: parseFloat(r.price.toString()),
             price: parseFloat(r.price.toString()),
             maxQty: r.quantity.toString() || "1",
+            discount_value: parseInt(r.discount_value || r.discount),
+            discount_type: parseInt(r.discount_type) || 2,
             full_name: r.product_title,
         })) || [];
 
@@ -388,12 +395,13 @@ echo mainFooter();
                 subTotal: $scope.subTotal,
                 discount: $scope.discount,
                 givenDiscount: $scope.givenDiscount,
-                order_id: $scope.order.order.id,
+                order_id: $scope.returnOrder ? $scope.order.order.order_id : $scope.order.order.id,
                 items: $scope.items,
                 shopId: $scope.shopId,
                 grandTotal: $scope.grandTotal,
                 payment_amount: $scope.payment_amount,
-                opening_balance: $scope.supplier.opening_balance
+                opening_balance: $scope.supplier.opening_balance,
+                returnOrder: $scope.returnOrder
             }
 
 

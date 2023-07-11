@@ -55,6 +55,7 @@ echo mainHeader(['page' => 'sale_returns']);
                 <td>{{statusArr[row.status].full_name}}</td>
                 <td>{{row.order_date}}</td>
                 <td align="right">
+                    <?php if ($userData['role'] === 'owner') { ?><a class="btn btn-xs btn-default" href="<?php echo SITE_URL; ?>pages/orders/adjustment.php?return={{row.id}}">Edit</a><?php } ?>
                     <a class="btn btn-xs btn-danger" ng-click="deleteRecipt(row.id)" href="javascript:void(0)">Delete</a>
                     <a class="btn btn-xs btn-default" ng-click="openRecipt(row.id, 'details', 'large')" href="javascript:void(0)">Large View</a>
                 </td>
