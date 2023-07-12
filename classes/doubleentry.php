@@ -1061,6 +1061,21 @@ class DoubleEntry extends Connection
 			}
 		}
 	}
+	public function deleteTransactionByReturnId($id)
+	{
+		if (!empty($id)) {
+			try {
+				$stmt = "UPDATE `{$this->table_transactions}` SET flag=2 where return_ref=:id";
+				$prepare = $this->dbh->prepare($stmt);
+				$prepare->bindParam(':id', $id, PDO::PARAM_INT);
+				$prepare->execute();
+				$result = $prepare->rowCount();
+				return $result;
+			} catch (PDOException $e) {
+				die("Error!: " . $e->getMessage() . "<br/>");
+			}
+		}
+	}
 	public function deleteTransactionBySupplyId($id)
 	{
 		if (!empty($id)) {

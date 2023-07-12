@@ -57,7 +57,7 @@ if (!empty($_POST['returnOrder'])) {
     if (!empty($order['order']['id'])) {
         $orders->deleteReturnOrderItem($order['order']['id']);
         // delete transactions
-        $doubleEntry->deleteTransactionByOrderId($order['order']['id']);
+        $doubleEntry->deleteTransactionByReturnId($_POST['returnOrder']);
     }
 }
 $returnId = $orders->makeReturn([
