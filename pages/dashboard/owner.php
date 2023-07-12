@@ -55,8 +55,7 @@ foreach ($publishersArr as $key => $value) {
                 <td>{{ store.location }}</td>
                 <td>{{ store.status }}</td>
                 <td>
-                    <span ng-if="!showPicker[store.id]">{{ store.sale_date }}</span>
-                    <div style="position: relative; width: 100px" ng-if="showPicker[store.id]"><input type="text" class="form-control datepicker-single" /></div>
+                    <span>{{ store.sale_date }}</span>
                 </td>
                 <td>
                     <label uib-tooltip="When you enable this option [SHOP'S MANAGER] can close Today's Sale" tooltip-placement="bottom"><input type="checkbox" ng-model="store.sale_date_show" ng-true-value="'1'" ng-false-value="'0'" ng-change="showClosing(store.id, store.sale_date_show)"> Enable</label>
@@ -68,24 +67,7 @@ foreach ($publishersArr as $key => $value) {
             </tr>
         </tbody>
     </table>
-    <!-- <h4>Hot Products</h4>
-    <table class="table">Products in stores
-
-        <thead>
-            <tr>
-                <th>Sr.#</th>
-                <th>Title</th>
-                <th>Number of Sales</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>1</td>
-                <td>Physics 2nd year</td>
-                <td>20</td>
-            </tr>
-        </tbody>
-    </table> -->
+    <!-- <h4>Hot Products</h4> -->
     <a href="<?php echo SITE_URL . "pages/product/create.php" ?>" class="btn btn-primary btn-xs pull-right" style="margin-left: 12px">Create Product</a> <a href="<?php echo SITE_URL . "pages/product/assign.php" ?>" class="btn btn-primary btn-xs pull-right">Assign Product</a>
     <h4>Products in stores </h4>
     <div class="row">
@@ -152,103 +134,20 @@ foreach ($publishersArr as $key => $value) {
     </div>
 
 
-    <!-- <h4>Products All </h4>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Sr.#</th>
-                <th>Title</th>
-                <th>Publisher</th>
-                <th>Group</th>
-                <th>Code</th>
-                <th>BAR Code</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php $count = 1;
-            foreach ($products as $product) { ?>
-                <tr>
-                    <td><?php echo $count; ?></td>
-                    <td><?php echo $product['full_name']; ?></td>
-                    <td><?php echo !empty($product['publisher_id']) ? $publishers[$product['publisher_id']]['full_name'] : null; ?></td>
-                    <td><?php echo $product['group']; ?></td>
-                    <td><?php echo $product['code']; ?></td>
-                    <td><?php echo $product['barcode'] ? $product['barcode'] : 'NULL'; ?></td>
-                    <td><a href="<?php echo SITE_URL . "pages/product/update.php?id=" . $product['id']; ?>">Modify</a></td>
-                </tr>
-            <?php $count++;
-            } ?>
-        </tbody>
-    </table> -->
-    <!-- <h4>Pending Orders</h4>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Sr.#</th>
-                <th>Customer</th>
-                <th>Amount</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>1</td>
-                <td>PCIT</td>
-                <td width="120">3500</td>
-            </tr>
-            <tr>
-                <td>2</td>
-                <td>PCW</td>
-                <td width="120">4500</td>
-            </tr>
-        </tbody>
-        <tfoot>
-            <tr>
-                <th colspan="2">Total</th>
-                <th>80000</th>
-            </tr>
-        </tfoot>
-    </table>
-    <h4>Pending Bills</h4>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Sr.#</th>
-                <th>Supplier</th>
-                <th>Amount</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>1</td>
-                <td>XYZ</td>
-                <td width="120">3500</td>
-            </tr>
-            <tr>
-                <td>2</td>
-                <td>XYZ</td>
-                <td width="120">4500</td>
-            </tr>
-        </tbody>
-        <tfoot>
-            <tr>
-                <th colspan="2">Total</th>
-                <th>80000</th>
-            </tr>
-        </tfoot>
-    </table> -->
+    <!-- <h4>Pending Orders</h4> -->
+    <!-- <h4>Pending Bills</h4> -->
 </div>
 <script type="text/javascript">
-    app.controller('productController', function($scope, $timeout, $http, $httpParamSerializerJQLike, $filter, $window, toaster) {
+    app.controller('productController', function($scope, $timeout, $log, $http, $httpParamSerializerJQLike, $filter, $window, toaster, $uibModal) {
         $scope.currentPage = 1;
         $scope.shopData = <?php echo safe_json_encode($storeList); ?>;
         $scope.data = {
             perPage: 12
-        }; //$scope.data.records;
-        $scope.list = []; //$scope.data.records;
+        };
+        $scope.list = [];
         $scope.searchBy = "";
-        $scope.search = ""; //$scope.data.records;
-        $scope.courceId = ""; //$scope.data.records;
+        $scope.search = "";
+        $scope.courceId = "";
         $scope.full_name = "";
         $scope.author = "";
         $scope.group = "";
@@ -328,35 +227,37 @@ foreach ($publishersArr as $key => $value) {
         }
 
         $scope.applyClosing = (id, store) => {
-            $scope.showPicker = {};
-            $scope.showPicker[id] = true;
-            $timeout(() => {
-                const d = $('.datepicker-single').daterangepicker({
-                    autoApply: true,
-                    minDate: moment().subtract(1, 'week').format('YYYY-MM-DD'),
-                    maxDate: moment().add(1, 'week').format('YYYY-MM-DD'),
-                    singleDatePicker: true,
-                    locale: {
-                        format: 'YYYY-MM-DD'
-                    },
-                }, function(date) {
-                    if ($window.confirm('Are you sure you want to close to sale for Today')) {
-                        $http.post('<?php echo SITE_URL; ?>api/closing.php', $httpParamSerializerJQLike({
-                            id,
-                            sale_date: moment(date).format('YYYY-MM-DD')
-                        }), {
-                            headers: {
-                                'Content-Type': 'application/x-www-form-urlencoded'
-                            }
-                        }).then((response) => {
-                            store.sale_date = moment(date).format('YYYY-MM-DD');
-                            alert('Date Updated!');
-                            $scope.showPicker = {};
-                        })
-                    }
-                    $scope.$apply();
-                }).val(store.sale_date);
-            }, 100)
+            console.log('id, store', id, store);
+            $scope.shopClosing(store);
+            // $scope.showPicker = {};
+            // $scope.showPicker[id] = true;
+            // $timeout(() => {
+            //     const d = $('.datepicker-single').daterangepicker({
+            //         autoApply: true,
+            //         minDate: moment().subtract(1, 'week').format('YYYY-MM-DD'),
+            //         maxDate: moment().add(1, 'week').format('YYYY-MM-DD'),
+            //         singleDatePicker: true,
+            //         locale: {
+            //             format: 'YYYY-MM-DD'
+            //         },
+            //     }, function(date) {
+            //         if ($window.confirm('Are you sure you want to close to sale for Today')) {
+            //             $http.post('<?php echo SITE_URL; ?>api/closing.php', $httpParamSerializerJQLike({
+            //                 id,
+            //                 sale_date: moment(date).format('YYYY-MM-DD')
+            //             }), {
+            //                 headers: {
+            //                     'Content-Type': 'application/x-www-form-urlencoded'
+            //                 }
+            //             }).then((response) => {
+            //                 store.sale_date = moment(date).format('YYYY-MM-DD');
+            //                 alert('Date Updated!');
+            //                 $scope.showPicker = {};
+            //             })
+            //         }
+            //         $scope.$apply();
+            //     }).val(store.sale_date);
+            // }, 100)
 
         }
         $scope.showClosing = (id, enable, sale_date) => {
@@ -373,24 +274,69 @@ foreach ($publishersArr as $key => $value) {
                 })
             }
         }
-    })
-</script>
-<!-- 
-<script>
-app.controller('productController', function($scope, $http, $httpParamSerializerJQLike, $filter, $window) {
-    $scope.currentPage = 1; 
-    $scope.data = {}; //$scope.data.records;
-    $scope.list = []; //$scope.data.records;
-    $scope.url = "<?php echo SITE_URL; ?>"; //$scope.data.records;
-    $scope.deleteStoreItem = (id) => {
-        if($window.confirm('Are you sure you want to delete this?')) {
-            $http.get("<?php echo SITE_URL ?>pages/product/delete_item.php", {params: { id }})
-            .then(function(response) {
+        $scope.shopClosing = function(item) {
+            $uibModal.open({
+                ariaLabelledBy: 'modal-title',
+                ariaDescribedBy: 'modal-body',
+                templateUrl: 'shopClosing.html',
+                controller: 'ModalInstanceCtrl',
+                resolve: {
+                    parentData: function() {
+                        return item
+                    }
+                }
+            }).result.then(function(response) {
                 console.log(response);
-            }).catch(function(err) {
-                console.log(err);
-            })
+                $http.post('<?php echo SITE_URL; ?>api/closing.php', $httpParamSerializerJQLike(response), {
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    }
+                }).then(function() {
+                    $window.location.reload();
+                });
+            }, function() {
+                $log.info('Modal dismissed at: ' + new Date());
+            });
+        };
+    });
+    app.controller('ModalInstanceCtrl', function($scope, $http, $window, $uibModalInstance, $httpParamSerializerJQLike, parentData) {
+        $scope.form = {
+            full_name: parentData.full_name,
+            sale_date: parentData.sale_date,
+            closing_amount: 0,
         }
-    }
-})
-</script> -->
+        $scope.ok = function() {
+            $uibModalInstance.close({
+                ...$scope.form,
+                sale_date: moment($scope.form.sale_date).format('YYYY-MM-DD'),
+                id: parentData.id,
+            });
+        };
+
+        $scope.cancel = function() {
+            $uibModalInstance.dismiss('cancel');
+        };
+    });
+</script>
+<script type="text/ng-template" id="shopClosing.html">
+    <form ng-submit="ok()">
+        <div class="modal-header">
+            <h3 class="modal-title" id="modal-title">Closing {{form.full_name}}</h3>
+        </div>
+        <div class="modal-body" id="modal-body">
+            <div uib-alert ng-if="alert" ng-class="'alert-'+(alert.type || 'warning')" close="closeAlert()">{{alert.message}}</div>
+            <div class="form-group">
+                <label for="sname">Closing Amount</label>
+                <input id="sname" type="text" ng-model="form.closing_balance" class="form-control" placeholder="Closing Balance">
+            </div>
+            <div class="form-group">
+                <label>Contact</label>
+                <input date-range-picker class="form-control date-picker" type="text" ng-model="form.sale_date" options="{ autoApply: true, singleDatePicker: true }">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-default" type="button" ng-click="cancel()">Close</button>
+            <button class="btn btn-primary" type="submit">Submit Form</button>
+        </div>
+    </form>
+</script>

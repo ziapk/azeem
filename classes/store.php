@@ -130,15 +130,23 @@ class Store extends Connection
 		}
 	}
 
-	public function closeStoreSale($id, $date)
+	public function closeStoreSale($params)
 	{
 		try {
 			$stmt = "UPDATE `{$this->table}` SET sale_date=:sale_date WHERE id=:id";
 			$prepare = $this->dbh->prepare($stmt);
-			$prepare->bindParam(':sale_date', $date, PDO::PARAM_STR);
-			$prepare->bindParam(':id', $id, PDO::PARAM_STR);
+			$prepare->bindParam(':sale_date', $params['sale_date'], PDO::PARAM_STR);
+			$prepare->bindParam(':id', $params['shopId'], PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $prepare->rowCount();
+			$data = [
+				'shop_id' => $params['shopId'],
+				'owner_id' => $params['owner_id'],
+				'amount' => $params['closing'],
+				'sale_date' => $params['sale_date'],
+			];
+			$de = new DoubleEntry();
+			$cl = $de->insertOB($data);
 			return $result;
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
