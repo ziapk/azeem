@@ -175,10 +175,10 @@ echo mainFooter();
             $scope.calculateSum();
         }
 
-        $scope.remove = function(item) {
+        $scope.remove = function(index) {
             if (confirm('Are you sure you want delete?')) {
-                var index = $scope.items.indexOf(item);
-                $scope.items.splice(index, 1);
+                const items = JSON.parse(JSON.stringify($scope.items));
+                $scope.items = items.filter((r, i) => i !== index);
                 $scope.calculateSum();
             }
         }

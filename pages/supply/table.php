@@ -30,7 +30,7 @@
             <td width="100"><input type="number" class="form-control" ng-model="row.price" /></td>
             <td width="100"><input type="number" class="form-control" ng-change="calculateSum()" ng-model="row.qty" ng-keydown="initCheckKeypress($event)" /></td>
             <td width="100">{{row.total | number: 0}}</td>
-            <td width="60"><a href="#" class="btn btn-xs btn-danger pull-right" ng-click="remove(cart)">Delete</a></td>
+            <td width="60"><a href="#" class="btn btn-xs btn-danger pull-right" ng-click="remove($index)">Delete</a></td>
         </tr>
     </tbody>
     <tbody>
