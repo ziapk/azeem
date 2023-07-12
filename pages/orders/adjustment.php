@@ -56,7 +56,7 @@ echo mainHeader();
         </thead>
         <tbody>
             <tr ng-repeat="row in items">
-                <td><input type="text" class="form-control" ng-model="row.id" /></td>
+                <td><input type="text" class="form-control" ng-model="row.product_id" /></td>
                 <td>
                     <input type="text" class="form-control" ng-model="row.full_name" placeholder="Product title" />
                 </td>

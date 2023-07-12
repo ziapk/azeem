@@ -49,11 +49,11 @@ if (empty($_POST['order_id'])) {
 } else {
     $orderDetails = $_POST['items'];
 }
+$doubleEntry = new DoubleEntry();
 if (!empty($_POST['returnOrder'])) {
 
     $order = $orders->getReturnOrder($_POST['returnOrder']);
 
-    $doubleEntry = new DoubleEntry();
     if (!empty($order['order']['id'])) {
         $orders->deleteReturnOrderItem($order['order']['id']);
         // delete transactions
@@ -80,7 +80,7 @@ foreach ($_POST['items'] as $key => $value) {
         'user_id' => $userData['id'],
         'shopId' => $shopId,
         'order_id' => $returnId,
-        'product_id' => $value['id'],
+        'product_id' => $value['product_id'],
         'quantity' => $value['qty'],
         'price' => $value['price'],
         'discount_type' => $value['discount_type'],
