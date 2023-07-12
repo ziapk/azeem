@@ -314,8 +314,9 @@ echo mainFooter();
         $scope.selectProduct = function(p, r) {
             let exists = false;
             $scope.items.map((pro) => {
-                if (pro.id == p.id) {
+                if (pro.product_id == p.id) {
                     exists = true;
+                    pro.product_id = p.id;
                     pro.qty = p.maxQty || 1;
                 }
             })
@@ -323,6 +324,7 @@ echo mainFooter();
             if (!exists) {
                 $scope.items.push({
                     ...p,
+                    product_id: p.id,
                     price: parseInt(p.price || 0),
                     pprice: parseInt(p.pprice || 0),
                     qty: parseFloat(p.maxQty) || 1
