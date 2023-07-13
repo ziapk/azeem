@@ -476,7 +476,10 @@ class Orders extends Connection
             }
             if (!empty($orderIds) && !empty($accountIds) &&  !empty($shopId)) {
                 $de = new DoubleEntry();
-                $list = $de->getDebitEntriesByOrderIds($orderIds, $accountIds, $shopId);
+                print_r($orderIds);
+                print_r($accountIds);
+                print_r($shopId);
+                $list = $de->getDebitEntriesByOrderIds(array_unique($orderIds), array_unique($accountIds), $shopId);
                 // $result[0]['list'] = $list;
                 $finalList = [];
                 foreach ($list as $li) {
