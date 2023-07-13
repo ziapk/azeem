@@ -125,7 +125,7 @@ switch ($reportType) {
 			} else {
 				$consider = true;
 
-				if (in_array($value['transsaction_type'], ['PURCHASE_PAYMENT', 'DIRECT_PAYMENT'])) {
+				if (in_array($value['transsaction_type'], ['ROYALTY PAYMENT', 'PURCHASE_PAYMENT', 'DIRECT_PAYMENT'])) {
 					if ($cashModeId == $value['payment_mode']) {
 						$payments += $value['amount'];
 					}
