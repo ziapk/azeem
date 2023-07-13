@@ -470,8 +470,12 @@ class Orders extends Connection
             $accountIds = [];
             foreach ($result as $order) {
                 if ($order['status'] != 1) {
-                    $orderIds[] = $order['id'];
-                    $accountIds[] = $order['account_id'];
+                    if (!empty($order['id'])) {
+                        $orderIds[] = $order['id'];
+                    }
+                    if (!empty($order['account_id'])) {
+                        $accountIds[] = $order['account_id'];
+                    }
                 }
             }
             if (!empty($orderIds) && !empty($accountIds) &&  !empty($shopId)) {

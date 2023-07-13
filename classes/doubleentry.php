@@ -1111,12 +1111,7 @@ class DoubleEntry extends Connection
 	public function getDebitEntriesByOrderIds($ids = [], $accounts = [], $shopId)
 	{
 		try {
-			print_r($ids);
-			print_r($accounts);
-			print_r($shopId);
-
 			$stmt = "SELECT e.*, t.order_ref FROM `{$this->table_ledger_entries}` as e left join `{$this->table_transactions}` as t on t.id = e.transaction_id  WHERE t.flag=1 and t.shopId=:shop_id and t.order_ref is not null and order_ref in (" . implode(",", $ids) . ") and account_id in (" . implode(",", $accounts) . ") and e.entry_type = 'C'";
-			print_r($stmt);
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':shop_id', $shopId, PDO::PARAM_STR);
 			$prepare->execute();
