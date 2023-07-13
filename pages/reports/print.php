@@ -124,6 +124,14 @@ switch ($reportType) {
 		include_once dirname(__FILE__) . '/ledger.php';
 		exit;
 		break;
+	case '14':
+		include_once dirname(__FILE__) . '/online.php';
+		exit;
+		break;
+	case '15':
+		include_once dirname(__FILE__) . '/onlineSummery.php';
+		exit;
+		break;
 
 	default:
 		# code...

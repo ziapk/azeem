@@ -257,6 +257,50 @@ class DoubleEntry extends Connection
 			die("Error!: " . $e->getMessage() . "<br/>");
 		}
 	}
+
+	public function getOnlineLedgerByAccounts($arr = [])
+	{
+		try {
+			$where = "where m.code = 'ONLINE' and t.flag=1 ";
+			$account_id = $arr['ids'];
+
+			$type = $arr['type'];
+
+			$str = "(acc_account_transactions.debitAmount - acc_account_transactions.creditAmount)";
+			if ($type == 's') {
+				$str = "(acc_account_transactions.creditAmount - acc_account_transactions.debitAmount)";
+			}
+
+			if (!empty($arr['from']) && !empty($arr['to'])) {
+
+				$to = $arr['to'];
+				$from = $arr['from'];
+				$where .= " and t.transaction_date between '$from' AND '$to'";
+			}
+
+			if (!empty($account_id)) {
+				$where .= " and a.id IN ( " . implode(', ', $account_id) . ")";
+			}
+
+			$stmt = "SELECT transaction_id, modeTitle, transaction_date, order_ref, supply_ref, return_ref, transsaction_type, v_description, debitAmount, creditAmount, balance, reference  FROM
+			(SELECT
+			*
+			,COALESCE(debitAmount)  as debits
+			,COALESCE(creditAmount) as credits
+			,(@running_balance := IF(@curr_account_id < account_id, opening_balance,@running_balance)) prev_runnng_bal
+			,(@curr_account_id := IF(@curr_account_id < account_id,account_id,@curr_account_id)) curr_account_id
+			,(@running_balance := @running_balance + $str) as balance
+			FROM (SELECT t.transsaction_type, m.title as modeTitle, t.reference, e.transaction_id, e.payment_mode, a.parent_id, a.code, e.account_id, a.opening_balance, a.account_type, a.title, e.entry_type, t.transaction_date, amount, t.order_ref, t.supply_ref, t.return_ref, t.description as v_description, (CASE WHEN e.entry_type = 'D' THEN e.amount ELSE 0 END) AS debitAmount, (CASE WHEN e.entry_type = 'C' THEN e.amount ELSE 0 END) AS creditAmount FROM `$this->table_transactions` t LEFT JOIN `$this->table_ledger_entries` e ON e.transaction_id = t.id LEFT JOIN `$this->table_modes` as m on m.id=e.payment_mode LEFT JOIN `$this->table` a ON a.id = e.account_id and a.status = 1 $where) as acc_account_transactions,(SELECT @running_balance := 0,@curr_account_id := 0) r
+			ORDER BY transaction_id) A";
+
+			$prepare = $this->dbh->prepare($stmt);
+			$prepare->execute();
+			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
+			return ['rows' => $result];
+		} catch (PDOException $e) {
+			die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
 	public function getLedgerByTID($id)
 	{
 		try {
