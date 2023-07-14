@@ -4,6 +4,7 @@ class Employees extends Connection
 {
 
 	private $table = 'employees';
+	private $table_salary = 'salaries';
 
 	public function searchEmployee($shopId, $search, $accountsOnly = false)
 	{
@@ -103,6 +104,66 @@ class Employees extends Connection
 			$prepare->bindParam(':shop_id', $shopId, PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
+			return $result;
+		} catch (PDOException $e) {
+			die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
+	public function createSalary($array = [])
+	{
+		try {
+			$stmt = "INSERT INTO `{$this->table_salary}` (`salary_month`, `employee_id`, `amount`, `flag`, `shop_id`,`owner_id`) VALUES (:salary_month,:employee_id,:amount,:flag,:shop_id,:owner_id)";
+			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':salary_month', $array['salary_month'], PDO::PARAM_STR);
+			$prepare->bindParam(':employee_id', $array['employee_id'], PDO::PARAM_STR);
+			$prepare->bindParam(':amount', $array['amount'], PDO::PARAM_STR);
+			$prepare->bindParam(':flag', $array['flag'], PDO::PARAM_STR);
+			$prepare->bindParam(':shop_id', $array['shop_id'], PDO::PARAM_STR);
+			$prepare->bindParam(':owner_id', $array['owner_id'], PDO::PARAM_STR);
+			$prepare->execute();
+			$result = $this->dbh->lastInsertId();
+			return $result;
+		} catch (PDOException $e) {
+			die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
+	public function getCurrentEmployees($shopId = null, $params = [])
+	{
+		try {
+			$query = "";
+			if (!empty($params['flag'])) {
+				$flag = $params['flag'];
+				$query .= " AND flag=$flag ";
+			}
+			if (!empty($params['salary_month'])) {
+				$salary_month = $params['salary_month'];
+				$query .= " AND salary_month='$salary_month' ";
+			}
+			$stmt = "SELECT *  FROM `{$this->table}` WHERE `shop_id`=:shop_id and status = 1";
+			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':shop_id', $shopId, PDO::PARAM_STR);
+			$prepare->execute();
+			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
+			$ids = [];
+			foreach ($result as $emp) {
+				$ids[] = $emp['id'];
+			}
+			if (!empty($ids)) {
+				$stmt = "SELECT *  FROM `{$this->table_salary}` WHERE `shop_id`=:shop_id $query";
+				$prepare = $this->dbh->prepare($stmt);
+				$prepare->bindParam(':shop_id', $shopId, PDO::PARAM_STR);
+				$prepare->execute();
+				$salaries = $prepare->fetchAll(PDO::FETCH_ASSOC);
+				$exists = [];
+				foreach ($salaries as $key => $em) {
+					$exists[] = $em['employee_id'];
+				}
+				foreach ($result as $key => $em) {
+					if (in_array($em['id'], $exists)) {
+						unset($result[$key]);
+					}
+				}
+			}
 			return $result;
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");

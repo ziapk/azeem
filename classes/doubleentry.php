@@ -642,6 +642,20 @@ class DoubleEntry extends Connection
 			die("Error!: " . $e->getMessage() . "<br/>");
 		}
 	}
+	public function getDefaultPaymentMode($params)
+	{
+		try {
+
+			$stmt = "SELECT * FROM `{$this->table_modes}` WHERE `shopId`=:shopId and is_default=1";
+			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':shopId', $params['shopId'], PDO::PARAM_INT);
+			$prepare->execute();
+			$result = $prepare->fetch(PDO::FETCH_ASSOC);
+			return $result;
+		} catch (PDOException $e) {
+			die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
 
 	public function createPaymentMode($array)
 	{
