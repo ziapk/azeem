@@ -6,9 +6,6 @@
     <div class="cart-list">
       <table width="100%">
         <tr ng-repeat="li in finalList" class="cart-list-item">
-          <td width="60">
-            <img class="cart-list-image" src={{'<?php echo SITE_URL; ?>/uploads/products/'+li.image}} alt="" />
-          </td>
           <td colspan="2">
             <span class="cart-item-title">{{li.full_name}}<span>
                 <div class="cart-item-controls">
@@ -328,9 +325,9 @@
 
     $scope.searchMode();
 
-    $scope.loadProduct = function(term) {
+    $scope.loadProduct = function(term, init) {
       const p = $window.localStorage.getItem('mainList');
-      if (!p) {
+      if (!p || init) {
         // console.log('abce')
         $http.get("<?php echo SITE_URL ?>api/getProducts.php?perPage=10000&status=1")
           .then(function(response) {

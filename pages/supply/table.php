@@ -1,16 +1,16 @@
 <table class="table">
     <thead>
         <tr>
-            <th>Pin</th>
-            <th>M. Qty</th>
-            <th width="200">Product Id</th>
+            <th width="50">Pin</th>
+            <th width="60">M.Qty</th>
+            <th width="80">P.ID</th>
             <th>Product Name</th>
-            <th width="100">Dist %</th>
+            <th width="80">Dist %</th>
             <th width="100">P. Price</th>
             <th width="100">S. Price</th>
-            <th width="100">Qty</th>
-            <th width="100">Total</th>
-            <th></th>
+            <th width="60">Qty</th>
+            <th width="50">Total</th>
+            <th width="70"></th>
         </tr>
         <tr>
             <td colspan="9"><input type="text" id="searchProduct" class="form-control" ng-model="product" placeholder="Search Product to add" typeahead-on-select="selectProduct($item, row)" uib-typeahead="address as address.full_name for address in searchProduct($viewValue)" typeahead-template-url="row2.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="1" class="form-control" ng-model="row.product_name" ng-model-options="{debounce: 100}" /></td>
@@ -19,7 +19,7 @@
     </thead>
     <tbody>
         <tr ng-repeat="row in items track by $index" id="product-{{$index + 1}}">
-            <td><input type="checkbox" ng-model="row.pin" /></td>
+            <td style="text-align: center"><input type="checkbox" ng-model="row.pin" /></td>
             <td><input type="text" class="form-control" ng-model="row.minQty" /></td>
             <td><input type="text" class="form-control" ng-model="row.id" /></td>
             <td>
@@ -27,10 +27,10 @@
             </td>
             <td><input type="number" class="form-control discount-field" ng-change="calculateSum()" ng-model="row.discount" /></td>
             <td><input type="number" class="form-control" ng-change="calculatePercent(row)" ng-model="row.pprice" /></td>
-            <td width="100"><input type="number" class="form-control" ng-model="row.price" /></td>
-            <td width="100"><input type="number" class="form-control" ng-change="calculateSum()" ng-model="row.qty" ng-keydown="initCheckKeypress($event)" /></td>
-            <td width="100">{{row.total | number: 0}}</td>
-            <td width="60"><a href="#" class="btn btn-xs btn-danger pull-right" ng-click="remove($index)">Delete</a></td>
+            <td><input type="number" class="form-control" ng-model="row.price" /></td>
+            <td><input type="number" class="form-control" ng-change="calculateSum()" ng-model="row.qty" ng-keydown="initCheckKeypress($event)" /></td>
+            <td>{{row.total | number: 0}}</td>
+            <td><a href="#" class="btn btn-xs btn-danger pull-right" ng-click="remove($index)">Delete</a></td>
         </tr>
     </tbody>
     <tbody>
@@ -41,7 +41,7 @@
         </tr>
         <tr>
             <th class="text-right" colspan="2">Disc.</th>
-            <th colspan="2" width="200"><input type="number" ng-model="discount" class="form-control" ng-change="addDiscount(discount)"></th>
+            <th colspan="2"><input type="number" ng-model="discount" class="form-control" ng-change="addDiscount(discount)"></th>
         </tr>
         <tr>
             <th class="text-right" colspan="2">Grand Total</th>
@@ -49,15 +49,15 @@
         </tr>
         <tr>
             <th class="text-right" colspan="2">Pay with Credit</th>
-            <th colspan="2" width="200"><input type="number" ng-model="payment_with_credit" class="form-control"></th>
+            <th colspan="2"><input type="number" ng-model="payment_with_credit" class="form-control"></th>
         </tr>
         <tr>
             <th class="text-right" colspan="2">Pay Direct</th>
-            <th colspan="2" width="200"><input type="number" ng-model="payment_amount" class="form-control"></th>
+            <th colspan="2"><input type="number" ng-model="payment_amount" class="form-control"></th>
         </tr>
         <tr>
             <th class="text-right" colspan="2">Balance</th>
-            <th colspan="2" width="200">{{grandTotal - payment_amount - payment_with_credit}}</th>
+            <th colspan="2">{{grandTotal - payment_amount - payment_with_credit}}</th>
         </tr>
     </tbody>
     <tbody>

@@ -5,6 +5,7 @@ class Orders extends Connection
 
     private $table = 'orders';
     private $table_sub = 'order_items';
+    private $table_services = 'services';
     private $table_oservice = 'order_services';
     private $table_pro = 'products';
     private $table_rp = 'product_returns';
@@ -274,10 +275,10 @@ class Orders extends Connection
                     'status_id' => !empty($value['status']) ? $value['status'] : null,
                     'employee_id' => !empty($value['employeeSelect']) ? $value['employeeSelect']['id'] : null,
                     'assign_date' => !empty($value['employeeSelect']) ? date('Y-m-d') : null,
-                    'cost' => $value['cost'],
-                    'price' => $value['price'],
+                    'cost' => !empty($value['cost']) ? $value['cost'] : 0,
+                    'price' => !empty($value['price']) ? $value['price'] : 0,
                     'quantity' => 1,
-                    'flag' => 1,
+                    'flag' => 1, // service
                 ];
                 $this->createOrderService($dd);
             }
@@ -289,10 +290,10 @@ class Orders extends Connection
                     'status_id' => !empty($value['status']) ? $value['status'] : null,
                     'employee_id' => null,
                     'assign_date' => null,
-                    'cost' => $value['cost'],
-                    'price' => $value['price'],
-                    'quantity' => $value['qty'],
-                    'flag' => 2,
+                    'cost' => !empty($value['cost']) ? $value['cost'] : 0,
+                    'price' => !empty($value['price']) ? $value['price'] : 0,
+                    'quantity' => !empty($value['qty']) ? $value['qty'] : 1,
+                    'flag' => 2, // raw_item
                     'shopId' => $array['shopId'],
                     'owner_id' => $array['shopId'],
                     'product_id' => !empty($value['product']) ? $value['product']['id'] : null,
@@ -398,6 +399,54 @@ class Orders extends Connection
             die("Error!: " . $e->getMessage() . "<br/>");
         }
     }
+    public function getOrderServices($params = [])
+    {
+        try {
+            $stmt = "SELECT b.*, s.full_name as serviceName, p.full_name as productName FROM `{$this->table_oservice}` as b left join `{$this->table_services}` as s on s.id=b.service_id and b.flag = 1 left join `{$this->table_pro}` as p on p.id=b.service_id and b.flag = 2 where b.`order_id` = :order_id";
+            $prepare = $this->dbh->prepare($stmt);
+            $prepare->bindParam(':order_id', $params['order_id'], PDO::PARAM_STR);
+            $prepare->execute();
+            $result = $prepare->fetchAll(PDO::FETCH_ASSOC);
+            $response = [];
+            $empIds = [];
+
+            foreach ($result as $k => $v) {
+                $result[$k]['qty'] = $v['quantity'];
+                if ($v['flag'] == 1) {
+                    $result[$k]['service'] = ['full_name' => $v['serviceName'], 'id' => $v['service_id']];
+                } elseif ($v['flag'] == 2) {
+                    $result[$k]['product'] = ['full_name' => $v['productName'], 'id' => $v['service_id']];
+                }
+                if (!empty($v['employee_id'])) {
+                    $empIds[] = $v['employee_id'];
+                }
+            }
+
+
+            if (!empty($empIds)) {
+                $employeesObj = new Employees();
+                $employees = $employeesObj->getEmployees($params['shopId']);
+                $emp = [];
+                foreach ($employees as $em) {
+                    $emp[$em['id']] = $em;
+                }
+                foreach ($result as $k => $v) {
+                    if (!empty($v['employee_id']) && !empty($emp[$v['employee_id']])) {
+                        $result[$k]['employeeSelect'] = $emp[$v['employee_id']];
+                    }
+                }
+            }
+
+            foreach ($result as $fal) {
+                $response[$fal['order_item_id']][$fal['flag']][] = $fal;
+            }
+
+            return $response;
+        } catch (PDOException $e) {
+            die("Error!: " . $e->getMessage() . "<br/>");
+        }
+    }
+
     public function getOrder($id, $disableConcat = false)
     {
         try {
@@ -419,6 +468,17 @@ class Orders extends Connection
                 $prepare->bindParam(':id', $id, PDO::PARAM_STR);
                 $prepare->execute();
                 $result['order_items'] = $prepare->fetchAll(PDO::FETCH_ASSOC);
+                $services = $this->getOrderServices(['shopId' => $result['order']['shopId'], 'order_id' => $id]);
+                foreach ($result['order_items'] as $key => $val) {
+                    $result['order_items'][$key]['expected_dates']['startDate'] = $val['start_date'];
+                    $result['order_items'][$key]['expected_dates']['endDate'] = $val['end_date'];
+                    if ($services[$val['id']][1]) { // service
+                        $result['order_items'][$key]['services'] = $services[$val['id']][1];
+                    }
+                    if ($services[$val['id']][2]) { // raw
+                        $result['order_items'][$key]['raw_items'] = $services[$val['id']][2];
+                    }
+                }
                 $c = new Customers();
                 $de = new DoubleEntry();
                 $result['customer'] = $c->getCustomer($result['order']['customer_id']);

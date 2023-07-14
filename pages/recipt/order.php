@@ -452,8 +452,8 @@ echo mainFooter();
                     price,
                 }) => ({
                     id,
-                    start_date: moment(expected_dates.startDate).format('YYYY-MM-DD'),
-                    end_date: moment(expected_dates.endDate).format('YYYY-MM-DD'),
+                    start_date: expected_dates?.startDate ? moment(expected_dates.startDate).format('YYYY-MM-DD') : null,
+                    end_date: expected_dates?.endDate ? moment(expected_dates.endDate).format('YYYY-MM-DD') : null,
                     employee_id: employeeSelect?.id,
                     description,
                     item_status,

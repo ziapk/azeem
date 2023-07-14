@@ -1,3 +1,21 @@
+<?php
+$statusObj = new Statuses();
+$statuses = $statusObj->getOwnerStatus($shop['id']);
+$itemStatus = [];
+$orderStatus = [];
+$serviceStatus = [];
+foreach ($statuses as  $value) {
+    if ($value['type'] == 'ORDER') {
+        $orderStatus[] = $value;
+    }
+    if ($value['type'] == 'ITEM') {
+        $itemStatus[] = $value;
+    }
+    if ($value['type'] == 'SERVICE') {
+        $serviceStatus[] = $value;
+    }
+}
+?>
 <tr>
     <th width="70">Sr.#</th>
     <th width="320">Description</th>
@@ -10,14 +28,13 @@
 </tr>
 </thead>
 <tbody>
-    <tr ng-repeat="cart in items track by $index" id="product-{{$index + 1}}">
+    <tr ng-repeat-start="cart in items track by $index" id="product-{{$index + 1}}">
         <td width="70">{{$index + 1}}</td>
         <td width="320">
             {{cart.full_name}}
             <input type="text" ng-change="calculateSum()" ng-model="cart.description" placeholder="Description" ng-if="cart.show" class="form-control">
         </td>
         <td width="120" width="120" ng-if="show_discount">
-
             <div class="input-group">
                 <input type="number" class="form-control input-add-dist" ng-model="cart.discount_value" ng-change="calculateSum()" style="padding-right: 6px">
                 <span class="dropdown input-group-btn">
@@ -28,8 +45,6 @@
                     </ul>
                 </span>
             </div>
-
-
         </td>
         <td width="140">
             <span ng-if="cart.discount">
@@ -53,9 +68,114 @@
             <a href="#" class="btn btn-xs btn-danger pull-right" ng-click="remove(cart)">Delete</a>
         </td>
     </tr>
+    <tr ng-if="cart.product_type == 2">
+        <td colspan="2"><strong>Services Items</strong></td>
+        <td>
+            <input type="text" class="form-control" ng-model="cart.service" placeholder="Add Service" uib-typeahead="address as address.full_name for address in searchServices($viewValue)" typeahead-on-select="selectService($item, cart)" ng-model-options="{debounce: 500}" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="1">
+        </td>
+        <td colspan="2">
+            <input type="text" class="form-control" ng-model="cart.raw" placeholder="Add Raw material" uib-typeahead="address as address.full_name for address in searchProduct($viewValue, 3)" typeahead-on-select="selectRaw($item, cart)" ng-model-options="{debounce: 500}" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="1">
+        </td>
+        <td colspan="6"></td>
+    </tr>
+    <tr ng-repeat="service in cart.services track by $index" class="row-service">
+        <td style="padding-left: 40px; text-align: right">S.#{{$index + 1}}</td>
+        <td>
+            <input type="text" class="form-control" ng-model="service.service" placeholder="Search Service" uib-typeahead="address as address.full_name for address in searchServices($viewValue)" typeahead-on-select="selectService($item)" ng-model-options="{debounce: 500}" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="1">
+        </td>
+        <td>
+            <input type="text" class="form-control" ng-model="service.employeeSelect" placeholder="Search Employee" uib-typeahead="address as address.full_name for address in searchEmployee($viewValue)" ng-model-options="{debounce: 500}" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="1">
+        </td>
+        <td>
+            <input type="text" class="form-control" ng-model="service.cost" placeholder="COST" />
+        </td>
+        <td>
+            <input type="text" class="form-control" ng-change="calculateSum()" ng-model="service.price" placeholder="PRICE" />
+        </td>
+        <td>
+            <select class="form-control" ng-model="service.status" placeholder="status">
+                <option value="">-- status --</option>
+                <?php
+                foreach ($serviceStatus as $value) { ?>
+                    <option value="<?php echo $value['id']; ?>"><?php echo $value['title']; ?></option>
+                <?php }
+                ?>
+            </select>
+        </td>
+        <td colspan="4"></td>
+    </tr>
+    <tr ng-repeat="service in cart.raw_items track by $index" class="row-raw">
+        <td style="padding-left: 40px; text-align: right">Raw #{{$index + 1}}</td>
+        <td>
+            <input type="text" class="form-control" ng-model="service.product" placeholder="Search Raw" uib-typeahead="address as address.full_name for address in searchProduct($viewValue, 3)" typeahead-on-select="selectService($item)" ng-model-options="{debounce: 500}" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="1">
+        </td>
+        <td>
+            <input type="text" class="form-control" ng-change="calculateSum()" ng-model="service.price" placeholder="Price" />
+        </td>
+        <td>
+            <input type="text" class="form-control" ng-change="calculateSum()" ng-model="service.qty" placeholder="QTY" />
+        </td>
+        <td>
+            {{service.price * service.qty | number: 2 }}
+        </td>
+        <td colspan="6"></td>
+    </tr>
+    <tr ng-if="cart.product_type == 2" ng-repeat-end="cart in items track by $index" id="product-{{$index + 1}}" class="row-expected">
+        <td>
+            Delivery
+        </td>
+        <td>
+            <input placeholder="Expected Dates" min="minDate" type="text" date-range-picker class="form-control" ng-model="cart.expected_dates" options="{ autoApply: true, changeCallback: calculateSum(), startDate: minDate }">
+        </td>
+        <td colspan="2">
+            <input type="text" class="form-control" ng-model="cart.description" placeholder="Instructions">
+        </td>
+        <td>
+            <select name="item_status" id="item_status" class="form-control" ng-model="cart.item_status" placeholder="item_status">
+                <option value="">-- status --</option>
+                <?php
+                foreach ($itemStatus as $value) { ?>
+                    <option value="<?php echo $value['id']; ?>"><?php echo $value['title']; ?></option>
+                <?php }
+                ?>
+            </select>
+        </td>
+        <td>
+            <select name="priority" id="priority" class="form-control" ng-model="cart.priority" placeholder="priority">
+                <option value="">-- priority --</option>
+                <?php
+                foreach ($orderPriority as $key => $value) { ?>
+                    <option value="<?php echo $key; ?>"><?php echo $value; ?></option>
+                <?php }
+                ?>
+            </select>
+        </td>
+        <td></td>
+    </tr>
     <tr>
-        <td class="text-right" colspan="{{show_discount ?  (6) : (5)}}" rowspan="{{8 + modes.length}}">
-            <p><input class="form-control" placeholder="Reference No" ng-model="ref_no" /></p>
+        <td colspan="{{show_discount ?  (6) : (5)}}" rowspan="{{8 + modes.length}}">
+            <div class="row">
+                <div class="col-md-4">
+                    <p>
+                        <label>Order Status</label>
+                        <select name="status_id" id="status_id" ng-model="status_id" class="form-control">
+                            <?php
+                            foreach ($orderStatus as $value) { ?>
+                                <option value="<?php echo $value['id']; ?>"><?php echo $value['title']; ?></option>
+                            <?php }
+                            ?>
+                        </select>
+                    <p>
+                </div>
+                <div class="col-md-4">
+                    <label>Expected Date</label>
+                    <p><input class="form-control" date-range-picker placeholder="Expected Date" ng-model="expected_delivery_date" options="{autoApply: true, singleDatePicker: true, minDate: minDate}" /></p>
+                </div>
+                <div class="col-md-4">
+                    <label>Order Reference</label>
+                    <p><input class="form-control" placeholder="Reference No" ng-model="ref_no" /></p>
+                </div>
+            </div>
             <textarea class="form-control" rows="10" placeholder="Summery" ng-model="summery"></textarea>
         </td>
         <td class="text-right">Sub Total</td>

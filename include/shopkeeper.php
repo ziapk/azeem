@@ -32,7 +32,10 @@ $categoryProducts = $productCls->getCategoryProducts($shop['owner_id'], $ids, $s
               <img width="60" src="<?php echo SITE_URL; ?>assets/img/logo.png" alt="" />
             <?php } ?></a>
         </div>
-        <div class="pull-left welcome-header-section"><span>Welcome to <strong><?php echo $shop['full_name']; ?></strong></span></div>
+        <div class="pull-left welcome-header-section">
+          <span>Welcome to <strong><?php echo $shop['full_name']; ?></strong></span>
+          <a href="javascript:void(0)" uib-tooltip="Refresh Products" tooltip-placement="right" ng-click="loadProduct('', true)" class="btn btn-primary btn-xs" style="margin-left: 10px"><span class="fa fa-refresh"></span></a>
+        </div>
 
         <ul class="list-inline navbar-right navbar-nav nav">
           <li class="dropdown" style="padding: 0">
