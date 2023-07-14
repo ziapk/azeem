@@ -9,33 +9,40 @@ $userId = $userData['id'];
 
 $store = $productObj->getOB($shop['id'], $_GET['id']);
 
-$error = "";
-$message = "";
-if (!empty($_POST) && isset($_POST['update'])) {
+$action = !empty($_GET['action']) && $_GET['action'] === "DELETE" ? true : false;
+
+if ($action) {
+    $productObj->deleteOB($_GET['id']);
+    header('Location: index.php');
+    exit;
+} else {
 
     $error = "";
+    $message = "";
+    if (!empty($_POST) && isset($_POST['update'])) {
+
+        $error = "";
 
 
-    if (empty($_POST['amount']) || empty($_POST['sale_date'])) {
-        $error = "Please fill all fields";
-    } else {
-
-        $data = [
-            'id' => $_GET['id'],
-            'amount' => $_POST['amount'],
-            'sale_date' => $_POST['sale_date']
-        ];
-        $update = $productObj->updateOB($data);
-
-        if ($update) {
-            $message = "Successfully saved!";
+        if (empty($_POST['amount']) || empty($_POST['sale_date'])) {
+            $error = "Please fill all fields";
         } else {
-            $message = "Nothing change";
+
+            $data = [
+                'id' => $_GET['id'],
+                'amount' => $_POST['amount'],
+                'sale_date' => $_POST['sale_date']
+            ];
+            $update = $productObj->updateOB($data);
+
+            if ($update) {
+                $message = "Successfully saved!";
+            } else {
+                $message = "Nothing change";
+            }
         }
     }
 }
-
-
 $store = $productObj->getOb($shop['id'], $_GET['id']);
 
 

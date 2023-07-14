@@ -326,7 +326,7 @@ foreach ($publishersArr as $key => $value) {
         <div class="modal-body" id="modal-body">
             <div uib-alert ng-if="alert" ng-class="'alert-'+(alert.type || 'warning')" close="closeAlert()">{{alert.message}}</div>
             <div class="form-group">
-                <label for="sname">Closing Amount</label>
+                <label for="sname">Opening Balance</label>
                 <input id="sname" type="text" ng-model="form.closing_balance" class="form-control" placeholder="Closing Balance">
             </div>
             <div class="form-group">

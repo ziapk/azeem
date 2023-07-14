@@ -44,7 +44,8 @@ echo mainHeader(['page' => 'customer']);
                     <td><?php echo $value['amount']; ?></td>
                     <td><?php echo $value['sale_date']; ?></td>
                     <td><?php echo $shopsData[$value['shop_id']]; ?></td>
-                    <td><?php if (($userData['role'] === 'owner' || $userData['role'] === 'manager') && $value['sale_date'] == $shop['sale_date']) { ?><a class="btn btn-default btn-xs" href="<?php echo SITE_URL . 'pages/ob/update.php?id=' . $value['id']; ?>"><span class="fa fa-edit"><span></a><?php } ?></td>
+                    <td><?php if (($userData['role'] === 'owner' || $userData['role'] === 'manager') && $value['sale_date'] == $shop['sale_date']) { ?><a class="btn btn-default btn-xs" href="<?php echo SITE_URL . 'pages/ob/update.php?id=' . $value['id']; ?>"><span class="fa fa-edit"><span></a><?php } ?>
+                        <?php if (($userData['role'] === 'owner')) { ?><a class="btn btn-default btn-xs" ng-click="deleteBalance(<?php echo $value['id']; ?>)"><span class="fa fa-remove"><span></a><?php } ?></td>
                 </tr>
             <?php } ?>
         </tbody>
@@ -69,7 +70,11 @@ echo mainFooter();
         $scope.search = ""; //$scope.data.records;
         $scope.siteUrl = '<?php echo SITE_URL ?>';
 
-
+        $scope.deleteBalance = (id) => {
+            if ($window.confirm("Are you sure?")) {
+                $window.location.assign($scope.siteUrl + '/pages/ob/update.php?action=DELETE&id=' + id);
+            }
+        }
         $scope.addCustomer = function(size, parentSelector) {
             $scope.form = null
             $uibModal.open({
