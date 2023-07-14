@@ -622,6 +622,31 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                         });
                 }
             }
+            $scope.submitCode = (form) => {
+                $http.post("<?php echo SITE_URL ?>pages/product/update.php?id=" + form.id, $httpParamSerializerJQLike({
+                        code: form.newBarCode,
+                        price: form.newPrice,
+                        createCode: true,
+                        json_response: true,
+                    }), {
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        }
+                    })
+                    .then(function(response) {
+                        if (response.data.status === 200) {
+                            toaster.success({
+                                body: response.data.message
+                            });
+                            form.newBarCode = '';
+                        } else {
+                            toaster.success({
+                                body: response.data.message
+                            });
+                            form.newBarCode = '';
+                        }
+                    })
+            }
 
         })
     </script>

@@ -122,7 +122,6 @@ foreach ($entiresFinal as $key => $rows) { ?>
                     <td style="border: 1px solid; text-align: right"><?php echo $rows[$mode]['credit']; ?></td>
                 <?php } ?>
             </tr>
-
         </tbody>
         <tfoot>
             <tr>

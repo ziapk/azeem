@@ -32,6 +32,22 @@ foreach ($statuses as  $value) {
         <td width="70">{{$index + 1}}</td>
         <td width="320">
             {{cart.full_name}}
+            <?php if ($userData['role'] === 'owner' || $userData['role'] === 'manager') { ?>
+                <span class="dropdown">
+                    <button class="dropdown-toggle btn btn-default" data-toggle="dropdown" style="padding-inline: 8px"><span class="fa fa-caret-down"></span></button>
+                    <form ng-submit="submitCode(cart)" class="dropdown-menu" style="padding: 10px; width: 300px">
+                        <div class="input-group">
+                            <input type="text" placeholder="Bar Code" ng-model="cart.newBarCode" type="text" class="form-control">
+                            <span class="input-group-btn" style="width: 100px">
+                                <input type="text" placeholder="Price" ng-model="cart.newPrice" ng-value="cart.price" type="text" class="form-control">
+                            </span>
+                            <span class="input-group-btn">
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                            </span>
+                        </div>
+                    </form>
+                </span>
+            <?php } ?>
             <input type="text" ng-change="calculateSum()" ng-model="cart.description" placeholder="Description" ng-if="cart.show" class="form-control">
         </td>
         <td width="120" width="120" ng-if="show_discount">
