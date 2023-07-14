@@ -74,6 +74,8 @@ class Products extends Connection
 					$searchQry = "AND p.cat LIKE '" . $prefix . $params["search"] . "%'";
 				} else if ($name == 'subCategory') {
 					$searchQry = "AND p.sub_cat LIKE '" . $prefix . $params["search"] . "%'";
+				} else if ($name == 'publisher') {
+					$searchQry = "AND pub.full_name LIKE '" . $prefix . $params["search"] . "%'";
 				} else $searchQry = "AND (p.id = '" . $params["search"] . "' OR p.code = '" . $params["search"] . "' OR p.full_name LIKE '" . $prefix . $params["search"] . "%' OR p.group LIKE '" . $prefix . $params["search"] . "%' OR p.description LIKE '" . $prefix . $params["search"] . "%' OR p.board LIKE '" . $prefix . $params["search"] . "%' OR p.author LIKE '" . $prefix . $params["search"] . "%' OR p.price LIKE '" . $prefix . $params["search"] . "%' OR pc.code LIKE '" . $prefix . $params["search"] . "%' ) ";
 			} else {
 				$searchQry = "AND (p.id = '" . $params["search"] . "' OR p.code = '" . $params["search"] . "' OR p.full_name LIKE '" . $prefix . $params["search"] . "%' OR p.group LIKE '" . $prefix . $params["search"] . "%' OR p.description LIKE '" . $prefix . $params["search"] . "%' OR p.board LIKE '" . $prefix . $params["search"] . "%' OR p.author LIKE '" . $prefix . $params["search"] . "%' OR p.price LIKE '" . $prefix . $params["search"] . "%' OR pc.code LIKE '" . $prefix . $params["search"] . "%' ) ";

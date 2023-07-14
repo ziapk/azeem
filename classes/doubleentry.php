@@ -1196,7 +1196,7 @@ class DoubleEntry extends Connection
 	public function getOBs($shop_id)
 	{
 		try {
-			$stmt = "SELECT * FROM `{$this->table_ob}` WHERE shop_id=:shop_id";
+			$stmt = "SELECT * FROM `{$this->table_ob}` WHERE shop_id=:shop_id and flag=1";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':shop_id', $shop_id, PDO::PARAM_STR);
 			$prepare->execute();
@@ -1239,6 +1239,19 @@ class DoubleEntry extends Connection
 			$prepare->bindParam(':id', $id, PDO::PARAM_STR);
 			$prepare->bindParam(':sale_date', $sale_date, PDO::PARAM_STR);
 			$prepare->bindParam(':amount', $amount, PDO::PARAM_STR);
+			$prepare->execute();
+			$result = $prepare->rowCount();
+			return $result;
+		} catch (PDOException $e) {
+			die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
+	public function deleteOB($id)
+	{
+		try {
+			$stmt = "UPDATE `{$this->table_ob}` SET `flag`=2 WHERE id=:id";
+			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':id', $id, PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $prepare->rowCount();
 			return $result;

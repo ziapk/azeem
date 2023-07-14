@@ -24,6 +24,7 @@ $programs = $programObj->getPrograms();
                     <option value="group">Search By Group</option>
                     <option value="author">Search By Author</option>
                     <option value="board">Search By Board</option>
+                    <option value="publisher">Search By Publisher</option>
                     <option value="cource">Search By Cource</option>
                     <option value="multi">Search By Multiple Colums</option>
                 </select>
