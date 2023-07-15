@@ -600,7 +600,7 @@ class Orders extends Connection
             $toCondition = " AND o.order_date>='" . $date . "' AND o.order_date<='" . $to . "'";
             if (!empty($ids)) {
                 $toCondition .= " AND sub.product_id IN (" . implode(',', $ids) . ")";
-                $stmt = "SELECT o.*, sub.order_id, p.full_name as productName, c.full_name FROM `{$this->table_sub}` AS o left join `{$this->table_pro}` as p on p.id = o.product_id left join `{$this->table}` as sub on sub.id = o.order_id LEFT JOIN customers AS c ON c.id = sub.customer_id WHERE sub.shopId=:shopId " . $toCondition . ' and sub.flag = 1 ORDER BY id asc';
+                $stmt = "SELECT sub.*, p.full_name as productName, c.full_name FROM `{$this->table_sub}` AS sub left join `{$this->table_pro}` as p on p.id = sub.product_id left join `{$this->table}` as o on sub.order_id = o.id LEFT JOIN customers AS c ON c.id = o.customer_id WHERE o.shopId=:shopId " . $toCondition . ' and o.flag = 1 ORDER BY id asc';
             } else {
                 $stmt = "SELECT o.*, full_name FROM `{$this->table}` AS o LEFT JOIN customers AS c ON c.id = o.customer_id left join `{$this->table_sub}` as sub on sub.order_id = o.id WHERE o.shopId=:shopId " . $toCondition . ' and o.flag = 1 ORDER BY id asc';
             }
