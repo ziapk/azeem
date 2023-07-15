@@ -21,13 +21,11 @@ $ownerStores = $stores->getOwnerStores($userId);
             <span ng-repeat="(k, l) in li">
                 <a href="#">{{k}}</a>
                 > <span ng-repeat="(dd, i) in l">
-                    <a href="#" ng-click="setSelectedProgramItems(i.items)">{{dd}}</a>
+                    <a class="btn btn-primary btn-xs" href="#" ng-click="setSelectedProgramItems(i.items)">{{dd}}</a>
                 </span>
             </span>
         </li>
-        <ul>
-            <li ng-repeat="row in selectedProgramItems"><a href="javascript:void(0)" class="btn btn-default">{{row.full_name}} {{row.price}}</a></li>
-        </ul>
+        <span ng-repeat="row in selectedProgramItems"><a href="javascript:void(0)" class="btn btn-default" ng-click="selectProduct(row)">{{row.full_name}} {{row.price}}</a></span>
         <h5><strong class="text-danger">Running Products</strong> <small class="text-danger"><strong>Click to Add</strong></small></h5>
         <span class="btn-group btn-group-sm form-group">
             <a class="btn btn-default" ng-repeat="l in pinList" href="javascript:void(0)" ng-click="selectProduct(l, 's')">{{l.full_name}}</a>
