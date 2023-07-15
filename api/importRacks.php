@@ -20,51 +20,51 @@ if (!empty($_FILES["file"]) && !empty($_FILES["file"]['name'])) {
         $spreadsheet = $reader->load($_FILES['file']['tmp_name']);
         $worksheet = $spreadsheet->getActiveSheet()->toArray();
 
-        if (sizeof($worksheet) > 1) {
-            $headerRow = array_shift($worksheet);
-        }
+        // if (sizeof($worksheet) > 1) {
+        //     $headerRow = array_shift($worksheet);
+        // }
 
-        $final = [];
-        foreach ($worksheet as $key => $value) {
-            $final[$key] = [];
-            foreach ($headerRow as $index => $heading) {
+        // $final = [];
+        // foreach ($worksheet as $key => $value) {
+        //     $final[$key] = [];
+        //     foreach ($headerRow as $index => $heading) {
 
-                $k = null;
-                $val = $value[$index];
+        //         $k = null;
+        //         $val = $value[$index];
 
-                /* switch ($heading) {
-                case 'Amount1':
-                    $k = 'total';
-                break;
-                case 'RegistrationNumber':
-                    $k = 'regno';
-                break;
+        //         /* switch ($heading) {
+        //         case 'Amount1':
+        //             $k = 'total';
+        //         break;
+        //         case 'RegistrationNumber':
+        //             $k = 'regno';
+        //         break;
 
-                case 'InvoiceNumber':
-                    $k = 'reciptNumber';
-                break;
-            } */
-                if ($_POST['AmountColumn'] == $heading) {
-                    $k = 'total';
-                } elseif ($_POST['StudentIdColumn'] == $heading) {
-                    $k = 'studentId';
-                } elseif ($_POST['ReciptId'] == $heading) {
-                    $k = 'reciptNumber';
-                }
+        //         case 'InvoiceNumber':
+        //             $k = 'reciptNumber';
+        //         break;
+        //     } */
+        //         if ($_POST['AmountColumn'] == $heading) {
+        //             $k = 'total';
+        //         } elseif ($_POST['StudentIdColumn'] == $heading) {
+        //             $k = 'studentId';
+        //         } elseif ($_POST['ReciptId'] == $heading) {
+        //             $k = 'reciptNumber';
+        //         }
 
-                if (!empty($k)) {
+        //         if (!empty($k)) {
 
-                    $final[$key][$k] = $val;
-                }
-            }
-        }
+        //             $final[$key][$k] = $val;
+        //         }
+        //     }
+        // }
 
 
         // $recipts = new Recipt();
-        $details = [];
-        $failed = [];
-        $notfound = [];
-        $success = [];
+        // $details = [];
+        // $failed = [];
+        // $notfound = [];
+        // $success = [];
         // foreach ($final as $row) {
         //     $res = $recipts->getReciptDetailForAutopay($row['reciptNumber'], $row['studentId']);
         //     if (!empty($res)) {
@@ -87,7 +87,7 @@ if (!empty($_FILES["file"]) && !empty($_FILES["file"]['name'])) {
         //     $details[] =  $row;
         // }
 
-        echo json_encode(['status' => 200, 'message' => 'Successfully Import all data!', 'data' => $final]);
+        echo json_encode(['status' => 200, 'message' => 'Successfully Import all data!', 'data' => $worksheet]);
     } else {
         echo json_encode(['status' => 400, 'message' => 'Only .xls or .xlsx file allowed']);
     }
