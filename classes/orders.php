@@ -593,12 +593,15 @@ class Orders extends Connection
         }
     }
 
-    public function ordersReport($shopId, $date, $to)
+    public function ordersReport($shopId, $date, $to, $ids = [])
     {
         try {
 
             $toCondition = " AND o.order_date>='" . $date . "' AND o.order_date<='" . $to . "'";
-            $stmt = "SELECT o.*, full_name FROM `{$this->table}` AS o LEFT JOIN customers AS c ON c.id = o.customer_id WHERE o.shopId=:shopId " . $toCondition . ' and o.flag = 1 ORDER BY id asc';
+            if (!empty($ids)) {
+                $toCondition .= " AND sub.product_id IN (" . implode(',', $ids) . ")";
+            }
+            $stmt = "SELECT o.*, full_name FROM `{$this->table}` AS o LEFT JOIN customers AS c ON c.id = o.customer_id left join `{$this->table_sub}` as sub on sub.order_id = o.id WHERE o.shopId=:shopId " . $toCondition . ' and o.flag = 1 ORDER BY id asc';
             $prepare = $this->dbh->prepare($stmt);
             $prepare->bindParam(':shopId', $shopId, PDO::PARAM_STR);
             $prepare->execute();

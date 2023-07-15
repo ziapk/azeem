@@ -210,7 +210,7 @@ class DoubleEntry extends Connection
 			$type = $arr['type'];
 
 			$str = "(acc_account_transactions.debitAmount - acc_account_transactions.creditAmount)";
-			if ($type == 's') {
+			if ($type == 's' || $type == 'emp') {
 				$str = "(acc_account_transactions.creditAmount - acc_account_transactions.debitAmount)";
 			}
 

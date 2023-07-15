@@ -1,28 +1,31 @@
 <?php
 include_once dirname(__FILE__) . '/../../include/settings.php';
 $category = new  Categories();
-$categoryData = $category->getOwnerCategories($shop['owner_id']);
-echo mainHeader(['page' => 'customer']);
+$categoryData = $category->getOwnerCategories($userData['created_by']);
+echo mainHeader(['page' => 'supplier']);
 
-$customerObj = new Employees();
+$supplierObj = new Employees();
 
 if (empty($_GET['id']) || !is_numeric($_GET['id'])) {
     header('location: ' . SITE_URL . '');
 }
 
-$user = $customerObj->getUserByAccount($_GET['id']);
-if (empty($user)) {
+$user = $supplier = $supplierObj->getUserByAccount($_GET['id']);
+if (empty($supplier)) {
     header('location: ' . SITE_URL . '');
 }
 
 $dentry = new DoubleEntry();
-$journel = $dentry->getLedgerByAccount(['account_id' => $user['account_id'], 'type' => 's']);
+
+$journel = $dentry->getLedgerByAccount(['account_id' => $supplier['account_id'], 'type' => 's']);
 $summery = $journel['summery'];
 
-$summery['debit'] += $user['account']['opening_balance'];
 
-$paid = $summery['credit'];
-$amount = $summery['debit'];
+$summery['credit'] += $user['account']['opening_balance'];
+
+$paid = $summery['debit'];
+$amount = $summery['credit'];
+// $amount = ($user['account']['opening_balance'] + $amount);
 $balance = ($amount - $paid);
 
 $data = [
@@ -65,8 +68,8 @@ $data = [
                     </tr>
                     <tr>
                         <td>
-                            <h3 class="text-success h3">Going to Pay = {{wallet}}</h3>
-                            <h4 class="text-danger">REMAINING BALANCE = {{data.balance - wallet}}</h4>
+                            <h3 class="text-danger h3">Going to Pay = {{wallet}}</h3>
+                            <h4 class="text-success">REMAINING BALANCE = {{data.balance - wallet}}</h4>
                         </td>
                     </tr>
                 </table>
@@ -84,18 +87,18 @@ $data = [
             <input ng-model="summery" value={{summery}} class="form-control" />
         </div>
         <div class="col-sm-3">
-            <label>Receiving Amount</label>
+            <label>Going to Pay</label>
             <input type="number" ng-model="wallet" value={{wallet}} ng-change="changeValue()" class="form-control" />
         </div>
         <div class="col-sm-12 text-right">
-            <strong class="text-success h3">Going to Pay = {{wallet}}</strong>
+            <strong class="text-danger h3">Going to Pay = {{wallet}}</strong>
             <div class="btn-group">
                 <label class="btn btn-default" ng-repeat="li in modes">
                     <input type="radio" name="mode" ng-model="payment_mode" ng-value="li.id" ng-change="printValue(li)">
                     {{li.title}}
                 </label>
             </div>
-            <input type="button" ng-click="payToWallet()" value="Generate Payment" class="btn btn-danger" />
+            <input type="button" ng-click="payToWallet()" value="Pay to Employee" class="btn btn-primary" />
         </div>
     </div>
 </div>

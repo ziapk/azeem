@@ -27,8 +27,8 @@ if ($_GET['t'] == 'c') {
 } else {
     $summery['credit'] += $user['account']['opening_balance'];
 }
-$paid = $_GET['t'] == 's' ? $summery['debit'] : $summery['credit'];
-$amount = $_GET['t'] == 's' ? $summery['credit'] : $summery['debit'];
+$paid = in_array($_GET['t'], ['s', 'emp']) ? $summery['debit'] : $summery['credit'];
+$amount = in_array($_GET['t'], ['s', 'emp']) ? $summery['credit'] : $summery['debit'];
 // $amount = ($user['account']['opening_balance'] + $amount);
 $balance = ($amount - $paid);
 
