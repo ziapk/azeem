@@ -1,4 +1,5 @@
 <?php
+include_once dirname(__FILE__) . '/../../include/settings.php';
 $date = date('d-m-Y');
 
 // $attendance = new Banks();
@@ -38,7 +39,7 @@ $date = date('d-m-Y');
 </div>
 
 <script type="text/javascript">
-    var site_url = '<?php echo SITE_URL ?>';
+    var site_url = '<?php echo SITE_URL . "api/importRacks.php" ?>';
     $('.input-datetimepicker').datetimepicker({
         icons: {
             time: 'fa fa-clock-o',
@@ -63,7 +64,7 @@ $date = date('d-m-Y');
             },
             submitHandler: function(form) {
                 var formData = new FormData(form);
-                var url = site_url + 'api/importRacks.php';
+                var url = site_url;
                 $.ajax({
                     url: url,
                     type: 'POST',
