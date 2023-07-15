@@ -30,7 +30,7 @@ $ownerStores = $stores->getOwnerStores($userId);
             </span>
         </div>
         <div class="form-group" ng-if="selectedProgramItems.length">
-            <span ng-repeat="row in selectedProgramItems" style="display: inline-block; padding: 4px 2px"><a href="javascript:void(0)" class="btn" style="border-radius: 4px" ng-class="{'btn-danger': selectedUniform == 'Girls', 'btn-primary': selectedUniform == 'Boys'}" ng-click="selectProduct(row)"><strong>{{row.full_name}}</strong></a></span>
+            <span ng-repeat="row in selectedProgramItems" style="display: inline-block; padding: 4px 2px"><a href="javascript:void(0)" class="btn" style="border-radius: 4px; padding: 2px 6px" ng-class="{'btn-danger': selectedUniform == 'Girls', 'btn-primary': selectedUniform == 'Boys'}" ng-click="selectProduct(row)"><strong>{{row.full_name}}</strong></a></span>
         </div>
         <h5><strong class="text-danger">Running Products</strong> <small class="text-danger"><strong>Click to Add</strong></small></h5>
         <span class="btn-group btn-group-sm form-group">
