@@ -205,9 +205,9 @@ echo mainFooter();
                     const list = {};
                     response.data.map(r => {
                         list[r.degree] = list[r.degree] || {}
-                        list[r.degree][r.program] = list[r.degree][r.program] || {}
-                        list[r.degree][r.program][r.class] = list[r.degree][r.program][r.class] || {}
-                        list[r.degree][r.program][r.class].items = r.items;
+                        list[r.degree][r.class] = list[r.degree][r.class] || {}
+                        list[r.degree][r.class][r.program] = list[r.degree][r.class][r.program] || {}
+                        list[r.degree][r.class][r.program].items = r.items;
                     })
                     $scope.pinPrograms = list;
                 })
