@@ -57,7 +57,8 @@ switch ($reportType) {
 		include_once dirname(__FILE__) . '/shop_products.php';
 		exit;
 	case '1':
-		$orders = $ordersObj->ordersReport($shopId, $from, $to);
+		$product_ids[] = $_POST['product_id'];
+		$orders = $ordersObj->ordersReport($shopId, $from, $to, $product_ids);
 		include_once dirname(__FILE__) . '/salesReport.php';
 		exit;
 		// $headers = ['Order #', 'Date', 'Customer Name', 'Price', 'Discount.', 'Paid', 'Status'];

@@ -32,7 +32,11 @@ foreach ($accounts as $k => $val) {
 echo mainHeader(['page' => 'reports']);
 
 ?>
-
+<style>
+    .uib-typeahead-match.active span.text-danger {
+        background-color: #fff !important
+    }
+</style>
 <div class="container" ng-controller="reportController">
     <form method="POST" action="print.php">
         <h4>Reports</h4>
@@ -80,6 +84,12 @@ echo mainHeader(['page' => 'reports']);
                 </div>
 
             <?php } ?>
+            <div class="clearfix"></div>
+            <div class="col-sm-4 col-md-3 form-group">
+                <label>Select Product (Product Bill)</label>
+                <input type="hidden" name="product_id" value="{{product.id}}">
+                <input type="text" class="form-control" id="searchProduct" ng-model="product" placeholder="Search Products" uib-typeahead="address as address.full_name for address in searchProduct($viewValue)" ng-model-options="{debounce: 100}" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="1">
+            </div>
             <div class="col-sm-4 col-md-3 form-group">
                 <label>Select Report</label>
                 <select class="form-control" name="reportType" ng-change="checkReport(reportType)" ng-model="reportType">
@@ -137,6 +147,26 @@ echo mainHeader(['page' => 'reports']);
         $scope.refreshAccounts = search => {
             $scope.accountsList = $scope.oaccountsList.filter(r => r.title.toLowerCase().includes(search.toLowerCase()));
         }
+        $scope.product = '';
+        $scope.searchProduct = function(term) {
+            const params = {};
+            if ($scope.focus === true) {
+                params.term = parseFloat(term.split('-')[0]);
+                const item = window.mainList.records.find(r => r.id == params.term || r.code == params.term || r.barcode == params.term);
+                return [];
+            } else {
+                const filteredArray = window.mainList.records.filter(r => r.id == term || r.code == term || r.barcode == term || r.searchString.includes(term + '|') || r.searchString.includes('|' + term) || r.searchString.includes('|' + term + '|'));
+                const secondfilteredArray = !filteredArray.length ? window.mainList.records.filter(obj => obj.searchString.toLowerCase().includes(term?.toLowerCase() || term)) : filteredArray;
+                return secondfilteredArray.slice(0, 30);
+            }
+        }
     });
 </script>
+<script type="text/ng-template" id="row.html">
+    <a style="display: flex; justify-content: space-between; align-items: center">
+        <span class="{{match.model.code ? 'text-danger' : ''}}" ng-bind-html="match.model.full_name | uibTypeaheadHighlight:query"></span>
+        <span class="label label-danger" style="font-size: 14px">{{match.model.price}}</span>
+    </a>
+</script>
+
 <?php echo mainFooter(); ?>
