@@ -6,17 +6,18 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 
 $reader = new \PhpOffice\PhpSpreadsheet\Reader\Xlsx();
+
 header("Content-Type: application/json");
-if (!empty($_FILES["import"]) && !empty($_FILES["import"]['name'])) {
+if (!empty($_FILES["file"]) && !empty($_FILES["file"]['name'])) {
     $allowed_extension = array('xls', 'xlsx');
-    $file_array = explode(".", $_FILES['import']['name']);
+    $file_array = explode(".", $_FILES['file']['name']);
     $file_extension = end($file_array);
     $data = [];
 
     if (in_array($file_extension, $allowed_extension)) {
         $reader->setLoadSheetsOnly($_POST['SheetName']);
         $reader->setReadDataOnly(true);
-        $spreadsheet = $reader->load($_FILES['import']['tmp_name']);
+        $spreadsheet = $reader->load($_FILES['file']['tmp_name']);
         $worksheet = $spreadsheet->getActiveSheet()->toArray();
 
         if (sizeof($worksheet) > 1) {
