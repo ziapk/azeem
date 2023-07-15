@@ -181,6 +181,18 @@ echo mainFooter();
                 })
         }
 
+        $scope.getPinPrograms = () => {
+            // $scope.loading = true;
+            $http.get("<?php echo SITE_URL ?>api/getPinPrograms.php")
+                .then(function(response) {
+                    // $scope.loading = false;
+                    if (response.status === 200) {
+                        $scope.pinList = response.data.records;
+                    }
+                })
+        }
+
+        $scope.getPinPrograms();
         $scope.getPinProducts();
 
         $scope.printValue = o => {

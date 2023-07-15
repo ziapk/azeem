@@ -59,6 +59,10 @@ echo mainHeader(['page' => 'program']);
                 <label for="sclass">Class/Part</label>
                 <input id="sclass" type="text" ng-model="form.class" placeholder="Class/Part" class="type-ahead-input form-control" uib-typeahead="address as address.title for address in searchClass($viewValue)" typeahead-template-url="row.html" typeahead-show-hint="true" typeahead-min-length="0">
             </div>
+            <div class="form-group">
+                <label for="sclass">Pin</label>
+                <input id="spin" type="checkbox" ng-model="form.pin" ng-true-value="1" ng-false-value="0">
+            </div>
         </div>
         <div class="modal-footer">
             <button class="btn btn-default" type="button" ng-click="cancel()">Close</button>
