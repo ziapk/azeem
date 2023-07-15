@@ -1,5 +1,5 @@
 <?php
-include_once dirname(__FILE__) . '/../../fee/vendor/autoload.php';
+include_once dirname(__FILE__) . '/../../portal/vendor/autoload.php';
 include_once dirname(__FILE__) . '/../settings/settings.php';
 
 use PhpOffice\PhpSpreadsheet\IOFactory;
