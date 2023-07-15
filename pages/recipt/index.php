@@ -166,9 +166,9 @@ echo mainFooter();
         $scope.selectedSize = '';
         $scope.selectedUniform = '';
         $scope.setSelectedProgramItems = (items, type, size) => {
-            $scope.selectedUniform = type;
+            $scope.selectedUniform = $scope.selectedSize == size ? '' : type;
             $scope.selectedProgramItems = $scope.selectedSize == size ? [] : JSON.parse(JSON.stringify(items));
-            $scope.selectedSize = size;
+            $scope.selectedSize = $scope.selectedSize == size ? '' : size;
         }
         $scope.modeNames = [];
         $scope.payWith = {};
