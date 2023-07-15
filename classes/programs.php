@@ -115,7 +115,7 @@ class Programs extends Connection
 	public function getProgramBooks($array)
 	{
 		try {
-			$stmt = "SELECT p.* FROM `{$this->booktable}` AS p LEFT JOIN `{$this->pb_table}` AS pb ON pb.product_id = p.id WHERE pb.`program_id`=:program_id";
+			$stmt = "SELECT p.*, concat(p.id, ' | ', p.full_name) as full_name FROM `{$this->booktable}` AS p LEFT JOIN `{$this->pb_table}` AS pb ON pb.product_id = p.id WHERE pb.`program_id`=:program_id";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':program_id', $array['program_id'], PDO::PARAM_STR);
 			$prepare->execute();
