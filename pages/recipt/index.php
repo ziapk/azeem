@@ -21,11 +21,11 @@ $ownerStores = $stores->getOwnerStores($userId);
             <span ng-repeat="(k, l) in li">
                 <a href="#">{{k}}</a>
                 > <span ng-repeat="(dd, i) in l">
-                    <a class="btn btn-xs" ng-class="{'btn-primary': dd == 'Girls', 'btn-danger': dd == 'Boys'}" style="border-radius: 4px" href="#" ng-click="setSelectedProgramItems(i.items, dd, k)">{{dd}}</a>
+                    <a class="btn btn-xs" ng-class="{'btn-danger': dd == 'Girls', 'btn-primary': dd == 'Boys'}" style="border-radius: 4px" href="#" ng-click="setSelectedProgramItems(i.items, dd, k)">{{dd}}</a>
                 </span>
             </span>
         </li>
-        <span ng-repeat="row in selectedProgramItems"><a href="javascript:void(0)" class="btn" style="border-radius: 4px" ng-class="{'btn-primary': selectedUniform == 'Girls', 'btn-danger': selectedUniform == 'Boys'}" ng-click="selectProduct(row)"><strong>{{row.full_name}}</strong></a></span>
+        <span ng-repeat="row in selectedProgramItems" style="padding: 4px 2px"><a href="javascript:void(0)" class="btn" style="border-radius: 4px" ng-class="{'btn-danger': selectedUniform == 'Girls', 'btn-primary': selectedUniform == 'Boys'}" ng-click="selectProduct(row)"><strong>{{row.full_name}}</strong></a></span>
         <h5><strong class="text-danger">Running Products</strong> <small class="text-danger"><strong>Click to Add</strong></small></h5>
         <span class="btn-group btn-group-sm form-group">
             <a class="btn btn-default" ng-repeat="l in pinList" href="javascript:void(0)" ng-click="selectProduct(l, 's')">{{l.full_name}}</a>
@@ -166,9 +166,9 @@ echo mainFooter();
         $scope.selectedSize = '';
         $scope.selectedUniform = '';
         $scope.setSelectedProgramItems = (items, type, size) => {
-            $scope.selectedSize = $scope.selectedSize == size ? '' : size;
             $scope.selectedUniform = type;
-            $scope.selectedProgramItems = JSON.parse(JSON.stringify(items));
+            $scope.selectedProgramItems = $scope.selectedSize == size ? [] : JSON.parse(JSON.stringify(items));
+            $scope.selectedSize = size;
         }
         $scope.modeNames = [];
         $scope.payWith = {};
