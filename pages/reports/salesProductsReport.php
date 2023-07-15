@@ -11,11 +11,11 @@ $totals = ['price' => 0, 'discount' => 0, 'paid' => 0, 'balance' => 0];
             <th>Sr.#</th>
             <th>Order #</th>
             <th>Customer</th>
+            <th>Item</th>
             <th>Date</th>
             <th>Price</th>
             <th>Discount</th>
-            <th>Paid</th>
-            <th>Balance</th>
+            <th>Qty</th>
         </tr>
     </thead>
     <tbody>
@@ -24,18 +24,17 @@ $totals = ['price' => 0, 'discount' => 0, 'paid' => 0, 'balance' => 0];
 
             $totals['price'] += $s['price'];
             $totals['discount'] += $s['discount'];
-            $totals['paid'] += $s['paid_amount'];
-            $totals['balance'] += ($s['price'] - $s['discount'] - $s['paid_amount']);
+
         ?>
             <tr>
                 <td><?php echo $count; ?></td>
                 <td><?php echo $s['id']; ?></td>
                 <td><?php echo $s['full_name']; ?></td>
+                <td><?php echo $s['productName']; ?></td>
                 <td><?php echo dateToSimple($s['order_date']); ?></td>
                 <td><?php echo $s['price']; ?></td>
                 <td><?php echo $s['discount']; ?></td>
-                <td><?php echo $s['paid_amount']; ?></td>
-                <td><?php echo $s['price'] - $s['discount'] - $s['paid_amount']; ?></td>
+                <td><?php echo $s['quantity']; ?></td>
             </tr>
         <?php $count++;
         } ?>
@@ -55,14 +54,6 @@ $totals = ['price' => 0, 'discount' => 0, 'paid' => 0, 'balance' => 0];
         <tr>
             <th align="left">Total Discount</th>
             <td><?php echo $totals['discount']; ?></td>
-        </tr>
-        <tr>
-            <th align="left">Total Paid</th>
-            <td><?php echo $totals['paid']; ?></td>
-        </tr>
-        <tr>
-            <th align="left">Total Balance</th>
-            <td><?php echo $totals['balance']; ?></td>
         </tr>
     </table>
 </div>

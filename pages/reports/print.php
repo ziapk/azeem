@@ -49,7 +49,6 @@ switch ($reportType) {
 	case '0':
 		$ownerId = $userData['role'] == 'owner' ? $userData['id'] : $userData['created_by'];
 		$publisher_id = !empty($_POST['publisher_id']) ? $_POST['publisher_id'] : "";
-
 		$search = $productObj->getOwnerProductsPagination($ownerId, ['page' => 1, 'perPage' => 100000, 'publisher_id' => $publisher_id, 'status' => 1], $shopId);
 		$orders = $search['records'];
 		$stores = new Store();
@@ -58,8 +57,13 @@ switch ($reportType) {
 		exit;
 	case '1':
 		$product_ids[] = $_POST['product_id'];
-		$orders = $ordersObj->ordersReport($shopId, $from, $to, $product_ids);
-		include_once dirname(__FILE__) . '/salesReport.php';
+		if (!empty($product_ids)) {
+			$orders = $ordersObj->ordersReport($shopId, $from, $to, $product_ids);
+			include_once dirname(__FILE__) . '/salesProductsReport.php';
+		} else {
+			$orders = $ordersObj->ordersReport($shopId, $from, $to, $product_ids);
+			include_once dirname(__FILE__) . '/salesReport.php';
+		}
 		exit;
 		// $headers = ['Order #', 'Date', 'Customer Name', 'Price', 'Discount.', 'Paid', 'Status'];
 		// $columns = ['id', 'order_date', 'full_name', 'price', 'discount','paid_amount', 'status'];
