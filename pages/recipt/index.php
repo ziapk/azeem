@@ -12,20 +12,26 @@ $ownerStores = $stores->getOwnerStores($userId);
     .uib-typeahead-match.active span.text-danger {
         background-color: #fff !important
     }
+
+    .text-bold {
+        font-weight: bold;
+    }
 </style>
 <div ng-controller="cartController">
     <div class="container">
-        <li ng-repeat="(key, li) in pinPrograms">
+        <div class="form-group" ng-if="pinPrograms.length" ng-repeat="(key, li) in pinPrograms">
             <a href="#">{{key}}</a>
             >
             <span ng-repeat="(k, l) in li">
-                <a href="#">{{k}}</a>
+                <a href="#" ng-class="{'text-danger text-bold': selectedSize == k }">{{k}}</a>
                 > <span ng-repeat="(dd, i) in l">
                     <a class="btn btn-xs" ng-class="{'btn-danger': dd == 'Girls', 'btn-primary': dd == 'Boys'}" style="border-radius: 4px" href="#" ng-click="setSelectedProgramItems(i.items, dd, k)">{{dd}}</a>
                 </span>
             </span>
-        </li>
-        <span ng-repeat="row in selectedProgramItems" style="padding: 4px 2px"><a href="javascript:void(0)" class="btn" style="border-radius: 4px" ng-class="{'btn-danger': selectedUniform == 'Girls', 'btn-primary': selectedUniform == 'Boys'}" ng-click="selectProduct(row)"><strong>{{row.full_name}}</strong></a></span>
+        </div>
+        <div class="form-group" ng-if="selectedProgramItems.length">
+            <span ng-repeat="row in selectedProgramItems" style="padding: 4px 2px"><a href="javascript:void(0)" class="btn" style="border-radius: 4px" ng-class="{'btn-danger': selectedUniform == 'Girls', 'btn-primary': selectedUniform == 'Boys'}" ng-click="selectProduct(row)"><strong>{{row.full_name}}</strong></a></span>
+        </div>
         <h5><strong class="text-danger">Running Products</strong> <small class="text-danger"><strong>Click to Add</strong></small></h5>
         <span class="btn-group btn-group-sm form-group">
             <a class="btn btn-default" ng-repeat="l in pinList" href="javascript:void(0)" ng-click="selectProduct(l, 's')">{{l.full_name}}</a>
@@ -162,14 +168,6 @@ echo mainFooter();
                 $scope.payment_total += parseFloat(row.amount || 0)
             })
         }
-        $scope.selectedProgramItems = [];
-        $scope.selectedSize = '';
-        $scope.selectedUniform = '';
-        $scope.setSelectedProgramItems = (items, type, size) => {
-            $scope.selectedUniform = $scope.selectedSize == size ? '' : type;
-            $scope.selectedProgramItems = $scope.selectedSize == size ? [] : JSON.parse(JSON.stringify(items));
-            $scope.selectedSize = $scope.selectedSize == size ? '' : size;
-        }
         $scope.modeNames = [];
         $scope.payWith = {};
         const items = [];
@@ -198,6 +196,14 @@ echo mainFooter();
                         $scope.pinList = response.data.records;
                     }
                 })
+        }
+        $scope.selectedProgramItems = [];
+        $scope.selectedSize = '';
+        $scope.selectedUniform = '';
+        $scope.setSelectedProgramItems = (items, type, size) => {
+            $scope.selectedUniform = $scope.selectedSize == size ? '' : type;
+            $scope.selectedProgramItems = $scope.selectedSize == size ? [] : JSON.parse(JSON.stringify(items));
+            $scope.selectedSize = $scope.selectedSize == size ? '' : size;
         }
         $scope.pinPrograms = {};
         $scope.getPinPrograms = () => {

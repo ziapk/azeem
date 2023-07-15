@@ -18,9 +18,26 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
         .uib-typeahead-match.active span.text-danger {
             background-color: #fff !important
         }
+
+        .text-bold {
+            font-weight: bold;
+        }
     </style>
     <div ng-controller="cartController">
         <div class="container">
+            <div class="form-group" ng-if="pinPrograms.length" ng-repeat="(key, li) in pinPrograms">
+                <a href="#">{{key}}</a>
+                >
+                <span ng-repeat="(k, l) in li">
+                    <a href="#" ng-class="{'text-danger text-bold': selectedSize == k }">{{k}}</a>
+                    > <span ng-repeat="(dd, i) in l">
+                        <a class="btn btn-xs" ng-class="{'btn-danger': dd == 'Girls', 'btn-primary': dd == 'Boys'}" style="border-radius: 4px" href="#" ng-click="setSelectedProgramItems(i.items, dd, k)">{{dd}}</a>
+                    </span>
+                </span>
+            </div>
+            <div class="form-group" ng-if="selectedProgramItems.length">
+                <span ng-repeat="row in selectedProgramItems" style="padding: 4px 2px"><a href="javascript:void(0)" class="btn" style="border-radius: 4px" ng-class="{'btn-danger': selectedUniform == 'Girls', 'btn-primary': selectedUniform == 'Boys'}" ng-click="selectProduct(row)"><strong>{{row.full_name}}</strong></a></span>
+            </div>
             <h5><strong class="text-danger">Running Products</strong> <small class="text-danger"><strong>Click to Add</strong></small></h5>
             <span class="btn-group btn-group-sm form-group">
                 <a class="btn btn-default" ng-repeat="l in pinList" href="javascript:void(0)" ng-click="selectProduct(l, 's')">{{l.full_name}}</a>
@@ -170,6 +187,32 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                         }
                     })
             }
+
+            $scope.selectedProgramItems = [];
+            $scope.selectedSize = '';
+            $scope.selectedUniform = '';
+            $scope.setSelectedProgramItems = (items, type, size) => {
+                $scope.selectedUniform = $scope.selectedSize == size ? '' : type;
+                $scope.selectedProgramItems = $scope.selectedSize == size ? [] : JSON.parse(JSON.stringify(items));
+                $scope.selectedSize = $scope.selectedSize == size ? '' : size;
+            }
+            $scope.pinPrograms = {};
+            $scope.getPinPrograms = () => {
+                // $scope.loading = true;
+                $http.get("<?php echo SITE_URL ?>api/getPinPrograms.php")
+                    .then(function(response) {
+                        const list = {};
+                        response.data.map(r => {
+                            list[r.degree] = list[r.degree] || {}
+                            list[r.degree][r.class] = list[r.degree][r.class] || {}
+                            list[r.degree][r.class][r.program] = list[r.degree][r.class][r.program] || {}
+                            list[r.degree][r.class][r.program].items = r.items;
+                        })
+                        $scope.pinPrograms = list;
+                    })
+            }
+
+            $scope.getPinPrograms();
 
             $scope.searchCustomer = function(value, onloading) {
                 $scope.customerName = value;
