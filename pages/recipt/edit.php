@@ -25,7 +25,7 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
     </style>
     <div ng-controller="cartController">
         <div class="container">
-            <div class="form-group" ng-if="pinPrograms.length" ng-repeat="(key, li) in pinPrograms">
+            <div class="form-group" ng-if="pinPrograms" ng-repeat="(key, li) in pinPrograms">
                 <a href="#">{{key}}</a>
                 >
                 <span ng-repeat="(k, l) in li">
@@ -196,7 +196,7 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                 $scope.selectedProgramItems = $scope.selectedSize == size ? [] : JSON.parse(JSON.stringify(items));
                 $scope.selectedSize = $scope.selectedSize == size ? '' : size;
             }
-            $scope.pinPrograms = {};
+            $scope.pinPrograms = '';
             $scope.getPinPrograms = () => {
                 // $scope.loading = true;
                 $http.get("<?php echo SITE_URL ?>api/getPinPrograms.php")
