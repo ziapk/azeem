@@ -62,7 +62,7 @@ echo mainFooter([]);
                 headers: {
                     'Content-Type': undefined
                 }
-            }).success(function(d) {
+            }).then(function successCallback(d) {
                 console.log(d);
             })
         }

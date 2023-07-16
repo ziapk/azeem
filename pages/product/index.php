@@ -6,6 +6,11 @@ echo mainHeader(['page' => 'product']);
 $programObj = new Programs();
 $programs = $programObj->getPrograms();
 ?>
+<style>
+    .text-bold {
+        font-weight: bold;
+    }
+</style>
 <div class="container" ng-controller="productsController">
     <div class="form-group">
         <div class="row">
@@ -96,6 +101,9 @@ $programs = $programObj->getPrograms();
                         </form>
                     <?php } ?>
                 </span>
+                <div class="pull-right">
+                    <span uib-tooltip="Racks" class="text-danger text-bold" style="font-size: 1.3em;"><img width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/bookshelf.png" alt="" /> {{li.rackNumbers.split(',').join(' | ')}}</span>
+                </div>
 
 
             </div>

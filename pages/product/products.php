@@ -74,7 +74,8 @@ $programs = $programObj->getPrograms();
         <tbody>
             <tr ng-repeat="li in list">
                 <td><strong>{{li.full_name}}</strong> <br />{{li.author}} - {{li.group}} - {{li.publisherName}}</td>
-                <td>{{li.description}} <br /> {{li.note}}</td>
+                <td><span uib-tooltip="Racks" class="text-danger text-bold" style="font-size: 1.3em;"><img width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/bookshelf.png" alt="" /> {{li.rackNumbers.split(',').join(' | ')}}</span> <br />{{li.description}} <br /> {{li.note}}
+                </td>
                 <td>
                     <span class="dropdown" style="padding: 0">
                         <a href="#" data-toggle="dropdown">

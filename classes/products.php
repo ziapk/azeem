@@ -6,6 +6,8 @@ class Products extends Connection
 	private $table = 'products';
 	private $table_st = 'store_products';
 	private $pc_table = 'products_code';
+	private $table_rack = 'racks';
+	private $table_rack_products = 'rack_products';
 
 	public function getOwnerProductsPagination($owner_id, $params, $shopId = null, $mobileCol = false)
 	{
@@ -123,7 +125,7 @@ class Products extends Connection
 			}
 
 			$mobileCols = "p.id,p.full_name";
-			$allCols = "group_concat(pc.code) as other_codes, p.author, p.barcode, p.code, p.cat_id, p.board, p.group, p.id, p.pprice, p.publisher_id, concat(p.id, ' | ', p.full_name) as full_name, pub.full_name as publisherName, pub.discount_type, pub.discount_amount, CONVERT(case when (pub.discount_amount > 0) then (p.price * (1 - (pub.discount_amount / 100)) ) else p.price end, DECIMAL) as price, is_active, product_type $column";
+			$allCols = "group_concat(r.title) as rackNumbers, group_concat(pc.code) as other_codes, p.author, p.barcode, p.code, p.cat_id, p.board, p.group, p.id, p.pprice, p.publisher_id, concat(p.id, ' | ', p.full_name) as full_name, pub.full_name as publisherName, pub.discount_type, pub.discount_amount, CONVERT(case when (pub.discount_amount > 0) then (p.price * (1 - (pub.discount_amount / 100)) ) else p.price end, DECIMAL) as price, is_active, product_type $column";
 
 			$mainCols = "";
 			if (!empty($mobileCol)) {
@@ -132,7 +134,7 @@ class Products extends Connection
 				$mainCols = $allCols;
 			}
 
-			$stmt = "SELECT count(b.id) as count FROM (SELECT $mainCols  FROM `{$this->table}` as p $innerJoin LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id LEFT JOIN program_books as c ON c.product_id = p.id LEFT JOIN publishers as pub on p.publisher_id = pub.id  WHERE p.`owner_id`=:owner_id $status_query $publisher_query $dup $type $pin $searchQry $catQry GROUP BY p.id $sortByQry $minQry) AS b";
+			$stmt = "SELECT count(b.id) as count FROM (SELECT $mainCols  FROM `{$this->table}` as p $innerJoin LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id LEFT JOIN {$this->table_rack_products} as rp ON rp.product_id = p.id INNER JOIN `{$this->table_rack}` as r on r.id = rp.rack_id LEFT JOIN program_books as c ON c.product_id = p.id LEFT JOIN publishers as pub on p.publisher_id = pub.id  WHERE p.`owner_id`=:owner_id $status_query $publisher_query $dup $type $pin $searchQry $catQry GROUP BY p.id $sortByQry $minQry) AS b";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':owner_id', $owner_id, PDO::PARAM_STR);
 			$prepare->execute();
@@ -143,7 +145,7 @@ class Products extends Connection
 			$currentPage = $total_pages >= $params['page'] ? $params['page'] : $total_pages;
 			$offset =  ((!empty($currentPage) ? $currentPage : 1) - 1) * $no_of_records_per_page;
 
-			$stmt = "SELECT *, price, concat(`id`, '|', `price`, '|', `full_name`, '|', COALESCE(`publisherName`, ''), '|', COALESCE(`author`, ''), '|', COALESCE(`board`, ''), '|', COALESCE(`code`, ''), '|', COALESCE(`barcode`, ''), '|', COALESCE(`other_codes`, '')) as searchString FROM (SELECT $mainCols  FROM `{$this->table}` as p $innerJoin LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id LEFT JOIN program_books as c ON c.product_id = p.id LEFT JOIN publishers as pub on p.publisher_id = pub.id  WHERE p.`owner_id`=:owner_id $status_query $publisher_query $dup $type $pin $searchQry $catQry GROUP BY p.id $sortByQry $minQry order by code desc LIMIT :offset, :perPage) AS b";
+			$stmt = "SELECT *, price, concat(`id`, '|', `price`, '|', `full_name`, '|', COALESCE(`publisherName`, ''), '|', COALESCE(`author`, ''), '|', COALESCE(`board`, ''), '|', COALESCE(`code`, ''), '|', COALESCE(`barcode`, ''), '|', COALESCE(`other_codes`, '')) as searchString FROM (SELECT $mainCols  FROM `{$this->table}` as p $innerJoin LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id LEFT JOIN {$this->table_rack_products} as rp ON rp.product_id = p.id INNER JOIN `{$this->table_rack}` as r on r.id = rp.rack_id LEFT JOIN program_books as c ON c.product_id = p.id LEFT JOIN publishers as pub on p.publisher_id = pub.id  WHERE p.`owner_id`=:owner_id $status_query $publisher_query $dup $type $pin $searchQry $catQry GROUP BY p.id $sortByQry $minQry order by code desc LIMIT :offset, :perPage) AS b";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':owner_id', $owner_id, PDO::PARAM_STR);
 			$prepare->bindParam(':offset', $offset, PDO::PARAM_INT);
@@ -900,6 +902,40 @@ class Products extends Connection
 			die("Error!: " . $e->getMessage() . "<br/>");
 		}
 	}
+
+	public function createRack($array)
+	{
+		try {
+			$stmt = "INSERT INTO `{$this->table_rack}` (`title`, `owner_id`, `shop_id`, `status`) VALUES (:title, :owner_id, :shop_id, :status)";
+			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':title', $array['title'], PDO::PARAM_STR);
+			$prepare->bindParam(':owner_id', $array['owner_id'], PDO::PARAM_INT);
+			$prepare->bindParam(':shop_id', $array['shop_id'], PDO::PARAM_INT);
+			$prepare->bindParam(':status', $array['status'], PDO::PARAM_INT);
+			$prepare->execute();
+			$result = $this->dbh->lastInsertId();
+			return $result;
+		} catch (PDOException $e) {
+			die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
+
+	public function createRackProducts($array)
+	{
+		try {
+			$stmt = "INSERT INTO `{$this->table_rack_products}` (`rack_id`, `product_id`, `status`) VALUES (:rack_id, :product_id, :status)";
+			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':rack_id', $array['rack_id'], PDO::PARAM_STR);
+			$prepare->bindParam(':product_id', $array['product_id'], PDO::PARAM_INT);
+			$prepare->bindParam(':status', $array['status'], PDO::PARAM_INT);
+			$prepare->execute();
+			$result = $this->dbh->lastInsertId();
+			return $result;
+		} catch (PDOException $e) {
+			die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
+
 
 	public function createProductCode($array)
 	{

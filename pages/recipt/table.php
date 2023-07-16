@@ -18,20 +18,20 @@ foreach ($statuses as  $value) {
 ?>
 <tr>
     <th width="70">Sr.#</th>
-    <th width="320">Description</th>
+    <th width="380">Description</th>
     <th width="120" ng-if="show_discount">Discount</th>
-    <th width="140">Unit Price</th>
+    <th width="100">Unit Price</th>
     <th width="120">Add Qty</th>
     <th width="180" style="text-align: center;">Qty</th>
-    <th width="150">Total</th>
+    <th width="100">Total</th>
     <th></th>
 </tr>
 </thead>
 <tbody>
     <tr ng-repeat-start="cart in items track by $index" id="product-{{$index + 1}}">
         <td width="70">{{$index + 1}}</td>
-        <td width="320">
-            {{cart.full_name}}
+        <td width="380">
+            {{cart.full_name}} | <strong class="text-danger">{{cart.rackNumbers}}</strong>
             <?php if ($userData['role'] === 'owner' || $userData['role'] === 'manager') { ?>
                 <span class="dropdown">
                     <button class="dropdown-toggle btn btn-default" data-toggle="dropdown" style="padding-inline: 8px"><span class="fa fa-caret-down"></span></button>
@@ -62,7 +62,7 @@ foreach ($statuses as  $value) {
                 </span>
             </div>
         </td>
-        <td width="140">
+        <td width="100">
             <span ng-if="cart.discount">
                 {{cart.discount_percent ? cart.discount_percent : ''}}
                 <del class="text-danger">{{cart.price | number: 2}}</del> / </span>
@@ -76,7 +76,7 @@ foreach ($statuses as  $value) {
                 <a href="#" class="quantity__plus" ng-click="addQty(cart)"><span>+</span></a>
             </div>
         </td>
-        <td width="150">
+        <td width="100">
             <input class="form-control text-center" type="number" ng-model="addprice" ng-change="directlyPrice(addprice, cart)" ng-keydown="initCheckKeypress($event)">
         </td>
         <td>
