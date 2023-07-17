@@ -158,6 +158,29 @@ class Products extends Connection
 		}
 	}
 
+	public function getRackProductsPagination($owner_id, $params = [], $shopId = null)
+	{
+		try {
+
+			$stmt = "SELECT rp.*, r.title  FROM `{$this->table_rack_products}` as rp left join `{$this->table_rack}` as r on rp.rack_id=r.id where r.shop_id=:shop_id and owner_id=:owner_id";
+			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':owner_id', $owner_id, PDO::PARAM_STR);
+			$prepare->bindParam(':shop_id', $shopId, PDO::PARAM_INT);
+			$prepare->execute();
+			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
+			$final = [];
+			$count = 0;
+			foreach ($result as $value) {
+				$final[$value['title']] = !empty($final[$value['title']]) ? $final[$value['title']] : $value;
+				$final[$value['title']]['products'][] = $value['product_id'];
+				$count++;
+			}
+			return $final;
+		} catch (PDOException $e) {
+			die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
+
 	public function getOrderProductsPagination($owner_id, $customer_id, $params, $shopId)
 	{
 		try {

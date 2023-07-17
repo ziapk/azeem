@@ -897,4 +897,13 @@ thead.navbar-fixed-top {
   display: table;
 }
 
+.card-item {
+  background: #fff;
+}
+
+.card-item-title {
+  font-weight: bold;
+  padding: 5px 12px;
+}
+
 /*# sourceMappingURL=style.css.map */

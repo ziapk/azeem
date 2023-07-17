@@ -1,5 +1,5 @@
 <?php
-include_once dirname(__FILE__) . '/../../portal/vendor/autoload.php';
+include_once dirname(__FILE__) . '/../../fee/vendor/autoload.php';
 include_once dirname(__FILE__) . '/../include/settings.php';
 include_once dirname(__FILE__) . '/../classes/products.php';
 
@@ -44,11 +44,10 @@ if (!empty($_FILES["file"]) && !empty($_FILES["file"]['name'])) {
             $ff[$row['rack']]['rack'] = $row['rack'];
             $ff[$row['rack']]['codes'][] = $row['code'];
         }
-
+        ksort($ff);
         $owner_id = $shop['owner_id'];
         $shop_id = $shop['id'];
         $products = new Products();
-        ksort($ff);
         foreach ($ff as $row) {
             $data = [
                 'title' => $row['rack'],
@@ -56,22 +55,16 @@ if (!empty($_FILES["file"]) && !empty($_FILES["file"]['name'])) {
                 'owner_id' => $owner_id,
                 'status' => !empty($row['rack']) && $row['rack'] <= 200 ? 1 : 0,
             ];
-
             $racks[] = $id = $products->createRack($data);
-            if (!empty($row['codes'])) {
-                foreach ($row['codes'] as $productId) {
-                    $d = [
-                        'product_id' => $productId,
-                        'rack_id' => $id,
-                        'status' => 1
-                    ];
-                }
-                $childId = $products->createRackProducts($d);
+            foreach ($row['codes'] as $productId) {
+                $d = [
+                    'product_id' => $productId,
+                    'rack_id' => $id,
+                    'status' => 1
+                ];
+                $childId[] = $products->createRackProducts($d);
             }
         }
-
-
-
         echo json_encode(['status' => 200, 'message' => 'Successfully Import all data!', 'data' => $racks]);
     } else {
         echo json_encode(['status' => 400, 'message' => 'Only .xls or .xlsx file allowed']);
