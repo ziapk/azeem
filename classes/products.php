@@ -134,7 +134,7 @@ class Products extends Connection
 				$mainCols = $allCols;
 			}
 
-			$stmt = "SELECT count(b.id) as count FROM (SELECT $mainCols  FROM `{$this->table}` as p $innerJoin LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id LEFT JOIN {$this->table_rack_products} as rp ON rp.product_id = p.id INNER JOIN `{$this->table_rack}` as r on r.id = rp.rack_id LEFT JOIN program_books as c ON c.product_id = p.id LEFT JOIN publishers as pub on p.publisher_id = pub.id  WHERE p.`owner_id`=:owner_id $status_query $publisher_query $dup $type $pin $searchQry $catQry GROUP BY p.id $sortByQry $minQry) AS b";
+			$stmt = "SELECT count(b.id) as count FROM (SELECT $mainCols  FROM `{$this->table}` as p $innerJoin LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id LEFT JOIN {$this->table_rack_products} as rp ON rp.product_id = p.id LEFT JOIN `{$this->table_rack}` as r on r.id = rp.rack_id LEFT JOIN program_books as c ON c.product_id = p.id LEFT JOIN publishers as pub on p.publisher_id = pub.id  WHERE p.`owner_id`=:owner_id $status_query $publisher_query $dup $type $pin $searchQry $catQry GROUP BY p.id $sortByQry $minQry) AS b";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':owner_id', $owner_id, PDO::PARAM_STR);
 			$prepare->execute();
