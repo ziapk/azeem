@@ -2,7 +2,7 @@
 if (empty($disableHeader)) {
     include_once dirname(__FILE__) . '/../../include/settings.php';
 
-    echo mainHeader(['page' => 'product']);
+    echo mainHeader(['page' => 'racks']);
 }
 
 $productsObj = new Products();

@@ -264,6 +264,9 @@ $customersList = $customerObj->getCustomers($shop['id']);
         <li class="<?php if ($params['page'] == 'product' && (empty($_GET["status"]) && $_GET["status"] != '0')) {
                       echo 'active';
                     } ?>"><a uib-tooltip="Products" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/product/products.php"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/product.svg" alt="" /> <span class="nav-menu-text">Products</span></a></li>
+        <li class="<?php if ($params['page'] == 'racks' && (empty($_GET["status"]) && $_GET["status"] != '0')) {
+                      echo 'active';
+                    } ?>"><a uib-tooltip="Product Racks" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/product/racks.php"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/product.svg" alt="" /> <span class="nav-menu-text">Product Racks</span></a></li>
         <li class="<?php if ($params['page'] == 'least') {
                       echo 'active';
                     } ?>"><a uib-tooltip="Least Products" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/product/least.php"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/product.svg" alt="" /> <span class="nav-menu-text">Min Products</span></a></li>

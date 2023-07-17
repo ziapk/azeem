@@ -109,6 +109,9 @@ $categoryProducts = $productCls->getCategoryProducts($shop['owner_id'], $ids, $s
         <li class="<?php if ($params['page'] == 'product') {
                       echo 'active';
                     } ?>"><a uib-tooltip="Products" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/product"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/product.svg" alt="" /> <span class="nav-menu-text">Products</span></a></li>
+        <li class="<?php if ($params['page'] == 'racks' && (empty($_GET["status"]) && $_GET["status"] != '0')) {
+                      echo 'active';
+                    } ?>"><a uib-tooltip="Product Racks" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/product/racks.php"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/product.svg" alt="" /> <span class="nav-menu-text">Product Racks</span></a></li>
         <!-- <li class="<?php if ($params['page'] == 'program') {
                           echo 'active';
                         } ?>"><a uib-tooltip="Programs" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/program"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/016-books-stack-of-three.svg" alt="" /> <span class="nav-menu-text">Programs</span></a></li> -->
