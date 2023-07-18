@@ -94,7 +94,7 @@ echo mainFooter();
         };
     });
     app.controller('cartController', function($scope, $http, $httpParamSerializerJQLike, $filter, $window, $timeout, $location, $anchorScroll) {
-        $scope.mainList = $window.mainList.records;;
+        $scope.mainList = $window.mainList.records;
 
         $scope.minDate = moment();
         $scope.expected_delivery_date = moment();
