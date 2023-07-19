@@ -61,6 +61,11 @@ function mainHeader($params = null)
             };
         });
     </script>
+    <style>
+        .input-lg {
+            font-size: 18px !important;
+        }
+    </style>
 
     <body ng-app="mainApp" class="<?php if (!empty($params['bodyClasses'])) {
                                         echo implode(' ', $params['bodyClasses']);
