@@ -522,7 +522,7 @@ class Orders extends Connection
             }
 
             if (!empty($params['orderId'])) {
-                $toCondition .= " AND o.id='" . $params['orderId'] . "' ";
+                $toCondition = " AND o.id='" . $params['orderId'] . "' ";
             }
 
             $stmt = "SELECT o.*, full_name, account_id FROM `{$this->table}` AS o LEFT JOIN customers AS c ON c.id = o.customer_id WHERE o.shopId=:shopId " . $toCondition . ' ' . $flagCondition . ' and ((o.flag = 1) or (o.flag = 2 and o.status IN (5,6,7))) ORDER BY id desc';
