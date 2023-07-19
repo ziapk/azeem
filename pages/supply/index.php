@@ -204,7 +204,7 @@ echo mainFooter();
 
             $timeout(() => {
                 if ($scope.qf) {
-                    $anchorScroll.yOffset = 100;
+                    $anchorScroll.yOffset = 160;
                     $location.hash('product-' + currentIndex);
                     $anchorScroll();
                     $('#product-' + currentIndex).find('.discount-field').focus();
