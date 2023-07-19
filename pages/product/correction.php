@@ -221,7 +221,7 @@ $publishers = $publisherObj->getPublishers($ownerId);
             $http.get("<?php echo SITE_URL ?>api/setPriority.php", {
                     params: {
                         id: item.id,
-                        action: parseInt(item.priority)
+                        action: parseInt(item.priority || 0)
                     }
                 })
                 .then(function(response) {
