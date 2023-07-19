@@ -8,12 +8,13 @@ $start = $end = $shop['sale_date'];
 if (isset($_GET['report'])) {
     $from = $_GET['from'];
     $to = $_GET['to'];
-    $orders = $ordersObj->userOrders($shop['id'], $from, $to);
+    $orders = $ordersObj->userOrders($shop['id'], $_GET);
     $dateLabel .= '<strong>' . $from . '</strong> to <strong>' . $to . '</strong>';
     $start = date('Y-m-d', strtotime($from));
     $end = date('Y-m-d', strtotime($to));
 } else {
-    $orders = $ordersObj->userOrders($shop['id'], $shop['sale_date']);
+    $data = ['from' => $shop['sale_date']];
+    $orders = $ordersObj->userOrders($shop['id'], $data);
     $dateLabel .= '<strong>' . $shop['sale_date'] . '</strong>';
     $start = $shop['sale_date'];
     $end = $shop['sale_date'];
@@ -25,6 +26,9 @@ echo mainHeader(['page' => 'order']);
     <form method="GET" ng-submit="getReport()" class="form-group">
         <h4><?php echo $dateLabel; ?></h4>
         <div class="input-group">
+            <div class="input-group-btn" style="width: 20%">
+                <input class="form-control" type="text" ng-model="orderId" placeholder="Order.#" />
+            </div>
             <input date-range-picker class="form-control date-picker" type="text" ng-model="datePicker.date" options="{ locale: {format: 'DD/MM/YYYY'}}" />
             <div class="input-group-btn">
                 <input type="submit" value="Submit" name="report" class="btn btn-primary" />
@@ -114,6 +118,7 @@ echo mainFooter();
                 endDate: '<?php echo $shop['sale_date']; ?>'
             }
         };
+        $scope.orderId = '';
 
         $scope.statusArr = <?php echo json_encode($orderStatusArr); ?>
 
@@ -121,7 +126,8 @@ echo mainFooter();
             $http.get("<?php echo SITE_URL ?>api/getSaleReport.php", {
                     params: {
                         from: moment($scope.datePicker.date.startDate).format('YYYY-MM-DD'),
-                        to: moment($scope.datePicker.date.endDate).format('YYYY-MM-DD')
+                        to: moment($scope.datePicker.date.endDate).format('YYYY-MM-DD'),
+                        orderId: $scope.orderId
                     }
                 })
                 .then(function(response) {

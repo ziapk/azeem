@@ -505,20 +505,24 @@ class Orders extends Connection
         }
     }
 
-    public function userOrders($shopId, $date, $to = null, $flag = null, $ignore = true)
+    public function userOrders($shopId, $params, $flag = null, $ignore = true)
     {
         try {
             $toCondition = "";
             if ($ignore) {
-                if (!empty($to)) {
-                    $toCondition .= " AND DATE(o.order_date) BETWEEN '" . $date . "' AND '" . $to . "'";
+                if (!empty($params['to'])) {
+                    $toCondition .= " AND DATE(o.order_date) BETWEEN '" . $params['from'] . "' AND '" . $params['to'] . "'";
                 } else if (!empty($date)) {
-                    $toCondition .= " AND DATE(o.order_date) BETWEEN '" . $date . "' AND '" . $date . "'";
+                    $toCondition .= " AND DATE(o.order_date) BETWEEN '" . $params['from'] . "' AND '" . $params['from'] . "'";
                 }
             }
             $flagCondition = "";
             if (!empty($flag)) {
                 $flagCondition .= " AND o.status=$flag ";
+            }
+
+            if (!empty($params['orderId'])) {
+                $toCondition .= " AND o.id='" . $params['orderId'] . "' ";
             }
 
             $stmt = "SELECT o.*, full_name, account_id FROM `{$this->table}` AS o LEFT JOIN customers AS c ON c.id = o.customer_id WHERE o.shopId=:shopId " . $toCondition . ' ' . $flagCondition . ' and ((o.flag = 1) or (o.flag = 2 and o.status IN (5,6,7))) ORDER BY id desc';
