@@ -9,7 +9,7 @@ $data = [
     'to' => $_GET['to'],
     'orderId' => $_GET['orderId']
 ];
-$orders = $ordersObj->userOrders($userData['shopId'], $data, $orderId);
+$orders = $ordersObj->userOrders($userData['shopId'], $data);
 $data = [];
 $data['records'] = $orders;
 $data['income'] = 0;
