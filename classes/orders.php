@@ -572,8 +572,12 @@ class Orders extends Connection
             $orderIds = [];
             $accountIds = [];
             foreach ($result as $order) {
-                $orderIds[] = $order['id'];
-                $accountIds[] = $order['account_id'];
+                if (!empty($order['id'])) {
+                    $orderIds[] = $order['id'];
+                }
+                if (!empty($order['account_id'])) {
+                    $accountIds[] = $order['account_id'];
+                }
             }
             if (!empty($orderIds) && !empty($accountIds) &&  !empty($shopId)) {
                 $de = new DoubleEntry();
