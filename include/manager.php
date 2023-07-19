@@ -86,12 +86,12 @@ $customersList = $customerObj->getCustomers($shop['id']);
               <div class="row">
                 <div class="col-xs-6">
                   <div class="form-group">
-                    <input type="number" placeholder="Qty" ng-model="frm.qty" type="text" class="form-control">
+                    <input type="number" placeholder="Qty" ng-model="frm.qty" type="text" class="form-control input-lg">
                   </div>
                 </div>
                 <div class="col-xs-6">
                   <div class="form-group">
-                    <input type="number" placeholder="Price" ng-model="frm.price" type="text" class="form-control">
+                    <input type="number" placeholder="Price" ng-model="frm.price" type="text" class="form-control input-lg">
                   </div>
                 </div>
               </div>
@@ -112,11 +112,11 @@ $customersList = $customerObj->getCustomers($shop['id']);
                 </ui-select>
               </div>
               <div class="form-group">
-                <input placeholder="Description" ng-model="payment.summery" type="text" class="form-control">
+                <input placeholder="Description" ng-model="payment.summery" type="text" class="form-control input-lg">
               </div>
               <div class="row" style="margin: 0 -6px">
                 <div class="form-group col-sm-4" ng-repeat="mode in modes" style="padding: 0 3px">
-                  <input placeholder="{{mode.title}}" ng-model="payment.mode[mode.id]" type="text" class="form-control">
+                  <input placeholder="{{mode.title}}" ng-model="payment.mode[mode.id]" type="text" class="form-control input-lg">
                 </div>
               </div>
               <input type="submit" value="Submit" class="btn btn-primary">
@@ -147,11 +147,11 @@ $customersList = $customerObj->getCustomers($shop['id']);
                 </div>
               </div>
               <div class="form-group">
-                <input placeholder="Description" ng-model="payment.summery" type="text" class="form-control">
+                <input placeholder="Description" ng-model="payment.summery" type="text" class="form-control input-lg">
               </div>
               <div class="row" style="margin: 0 -6px">
                 <div class="form-group col-sm-4" ng-repeat="mode in modes" style="padding: 0 3px">
-                  <input placeholder="{{mode.title}}" ng-model="payment.mode[mode.id]" type="text" class="form-control">
+                  <input placeholder="{{mode.title}}" ng-model="payment.mode[mode.id]" type="text" class="form-control input-lg">
                 </div>
               </div>
               <input type="submit" value="Submit" class="btn btn-primary">
@@ -177,11 +177,11 @@ $customersList = $customerObj->getCustomers($shop['id']);
                 </div>
               </div>
               <div class="form-group">
-                <input placeholder="Description" ng-model="payment.summery" type="text" class="form-control">
+                <input placeholder="Description" ng-model="payment.summery" type="text" class="form-control input-lg">
               </div>
               <div class="row" style="margin: 0 -6px">
                 <div class="form-group col-sm-4" ng-repeat="mode in modes" style="padding: 0 3px">
-                  <input placeholder="{{mode.title}}" ng-model="payment.mode[mode.id]" type="text" class="form-control">
+                  <input placeholder="{{mode.title}}" ng-model="payment.mode[mode.id]" type="text" class="form-control input-lg">
                 </div>
               </div>
               <input type="submit" value="Submit" class="btn btn-primary">
@@ -202,11 +202,11 @@ $customersList = $customerObj->getCustomers($shop['id']);
                 </ui-select>
               </div>
               <div class="form-group">
-                <input placeholder="Description" ng-model="exp.description" type="text" class="form-control">
+                <input placeholder="Description" ng-model="exp.description" type="text" class="form-control input-lg">
               </div>
               <div class="row" style="margin: 0 -6px">
                 <div class="form-group col-sm-4" ng-repeat="mode in modes" style="padding: 0 3px">
-                  <input placeholder="{{mode.title}}" ng-model="exp.mode[mode.id]" type="text" class="form-control">
+                  <input placeholder="{{mode.title}}" ng-model="exp.mode[mode.id]" type="text" class="form-control input-lg">
                 </div>
               </div>
               <input type="submit" value="Submit" class="btn btn-primary">

@@ -2,7 +2,7 @@
 if (!isset($_SESSION)) {
     session_start();
 }
-define('SITE_URL', '/');
+define('SITE_URL', '/pos-v2/');
 
 // ini_set('display_errors', 1);
 // ini_set('display_startup_errors', 1);

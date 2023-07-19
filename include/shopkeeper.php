@@ -69,12 +69,12 @@ $categoryProducts = $productCls->getCategoryProducts($shop['owner_id'], $ids, $s
               <div class="row">
                 <div class="col-xs-6">
                   <div class="form-group">
-                    <input type="number" placeholder="Qty" ng-model="frm.qty" type="text" class="form-control">
+                    <input type="number" placeholder="Qty" ng-model="frm.qty" type="text" class="form-control input-lg">
                   </div>
                 </div>
                 <div class="col-xs-6">
                   <div class="form-group">
-                    <input type="number" placeholder="Price" ng-model="frm.price" type="text" class="form-control">
+                    <input type="number" placeholder="Price" ng-model="frm.price" type="text" class="form-control input-lg">
                   </div>
                 </div>
               </div>
