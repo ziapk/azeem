@@ -72,7 +72,7 @@ echo mainFooter();
 
         $scope.deleteBalance = (id) => {
             if ($window.confirm("Are you sure?")) {
-                $window.location.assign($scope.siteUrl + '/pages/ob/update.php?action=DELETE&id=' + id);
+                $window.location.assign('update.php?action=DELETE&id=' + id);
             }
         }
         $scope.addCustomer = function(size, parentSelector) {
