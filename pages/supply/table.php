@@ -8,7 +8,7 @@
             <th width="80">Dist %</th>
             <th width="100">P. Price</th>
             <th width="100">S. Price</th>
-            <th width="60">Qty</th>
+            <th width="80">Qty</th>
             <th width="50">Total</th>
             <th width="70"></th>
         </tr>
