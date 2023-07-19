@@ -42,6 +42,7 @@ echo mainHeader();
     <table class="table">
         <thead>
             <tr>
+                <th>Sr.#</th>
                 <th width="200">Product Id</th>
                 <th>Product Name</th>
                 <th width="100">Discount</th>
@@ -55,7 +56,8 @@ echo mainHeader();
             </tr>
         </thead>
         <tbody>
-            <tr ng-repeat="row in items">
+            <tr ng-repeat="row in items track by $index">
+                <td>{{$index + 1}}</td>
                 <td><input type="text" class="form-control" ng-model="row.product_id" /></td>
                 <td>
                     <input type="text" class="form-control" ng-model="row.full_name" placeholder="Product title" />

@@ -19,7 +19,7 @@
     </thead>
     <tbody>
         <tr ng-repeat="row in items track by $index" id="product-{{$index + 1}}">
-            <td style="text-align: center"><input type="checkbox" ng-model="row.pin" /></td>
+            <td style="text-align: center"><input type="checkbox" ng-model="row.pin" /> {{$index + 1}}</td>
             <td><input type="text" class="form-control" ng-model="row.minQty" /></td>
             <td><input type="text" class="form-control" ng-model="row.id" /></td>
             <td>
