@@ -472,10 +472,11 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
             }
             $scope.selectProduct = function(p, sep) {
                 let currentIndex = 1
+                let tempSep = sep;
                 if (p.product_type == 2) {
-                    sep = true;
+                    tempSep = true;
                 }
-                if (sep) {
+                if (tempSep) {
                     $scope.items.unshift({
                         ...p,
                         qty: 1,

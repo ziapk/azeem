@@ -365,10 +365,11 @@ echo mainFooter();
 
         $scope.selectProduct = function(p, sep) {
             let currentIndex = 1
+            let tempSep = sep;
             if (p.product_type == 2) {
-                sep = true;
+                tempSep = true;
             }
-            if (sep) {
+            if (tempSep) {
                 $scope.items.unshift({
                     ...p,
                     qty: 1,
