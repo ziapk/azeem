@@ -111,7 +111,7 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
 
         });
         app.run(['$anchorScroll', function($anchorScroll) {
-            $anchorScroll.yOffset = $('.navbar').height(true, true); // always scroll by 50 extra pixels
+            $anchorScroll.yOffset = 200; // always scroll by 50 extra pixels
         }])
         app.directive('onEnterPress', function() {
             return function(scope, element, attrs) {
@@ -477,7 +477,7 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                     tempSep = true;
                 }
                 if (tempSep) {
-                    $scope.items.unshift({
+                    $scope.items.push({
                         ...p,
                         qty: 1,
                         show: true
@@ -495,10 +495,13 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                         }
                     })
                     if (!exists) { // if already not exits in bucket
-                        $scope.items.unshift({
+
+                        $scope.items.push({
                             ...p,
                             qty: 1
                         });
+
+                        currentIndex = $scope.items.length;
                     }
                 }
                 $scope.calculateSum();
@@ -508,6 +511,7 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                 $timeout(() => {
 
                     if ($scope.qf) {
+
                         $location.hash('product-' + currentIndex);
                         $anchorScroll();
                         if ($('#product-' + currentIndex).find('.input-add-dist').length) {

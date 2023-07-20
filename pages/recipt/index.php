@@ -123,7 +123,7 @@ echo mainFooter();
 
     });
     app.run(['$anchorScroll', function($anchorScroll) {
-        $anchorScroll.yOffset = $('.navbar').height(true, true); // always scroll by 50 extra pixels
+        $anchorScroll.yOffset = 200; // always scroll by 50 extra pixels
 
     }])
     app.directive('onEnterPress', function() {
@@ -328,14 +328,17 @@ echo mainFooter();
 
         $(document).on("ProdcutAdded", function(e) {
             const items = [];
+            let currentIndex = 1;
             if ($window.sessionStorage.getItem('shopping')) {
+                currentIndex = $scope.items.length;
                 const shopCart = JSON.parse($window.sessionStorage.getItem('shopping'));
 
-                shopCart.map(function(row) {
+                shopCart.map(function(row, index) {
                     const obj = $scope.mainList.find(function(e) {
                         return e.id == row.id
                     });
-                    items.unshift({
+                    currentIndex = index + 1;
+                    items.push({
                         ...obj,
                         qty: row.qty,
                         show: row.show,
@@ -346,7 +349,9 @@ echo mainFooter();
                 $timeout(() => {
                     $scope.calculateSum()
                     if ($scope.qf) {
-                        const currentIndex = 1;
+
+                        $anchorScroll.yOffset = 200;
+
                         $location.hash('product-' + currentIndex);
                         $anchorScroll();
                         if ($('#product-' + currentIndex).find('.input-add-dist').length) {
@@ -365,16 +370,16 @@ echo mainFooter();
 
         $scope.selectProduct = function(p, sep) {
             let currentIndex = 1
-            let tempSep = sep;
             if (p.product_type == 2) {
-                tempSep = true;
+                sep = true;
             }
-            if (tempSep) {
-                $scope.items.unshift({
+            if (sep) {
+                $scope.items.push({
                     ...p,
                     qty: 1,
                     show: true
                 });
+                currentIndex = $scope.items.length;
             } else {
                 $scope.product = '';
                 $scope.product = null
@@ -388,10 +393,11 @@ echo mainFooter();
                     }
                 })
                 if (!exists) { // if already not exits in bucket
-                    $scope.items.unshift({
+                    $scope.items.push({
                         ...p,
                         qty: 1
                     });
+                    currentIndex = $scope.items.length;
                 }
             }
             $scope.calculateSum();
@@ -401,6 +407,7 @@ echo mainFooter();
             $timeout(() => {
 
                 if ($scope.qf) {
+                    $anchorScroll.yOffset = 200;
                     $location.hash('product-' + currentIndex);
                     $anchorScroll();
                     if ($('#product-' + currentIndex).find('.input-add-dist').length) {
