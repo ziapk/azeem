@@ -400,7 +400,21 @@ echo mainFooter();
                 discount: $scope.discount,
                 givenDiscount: $scope.givenDiscount,
                 order_id: $scope.returnOrder ? $scope.order.order.order_id : $scope.order.order.id,
-                items: $scope.items,
+                items: $scope.items.map(({
+                    product_id,
+                    qty,
+                    price,
+                    discount,
+                    discount_type,
+                    discount_value
+                }) => ({
+                    product_id,
+                    qty,
+                    price,
+                    discount,
+                    discount_type,
+                    discount_value
+                })),
                 shopId: $scope.shopId,
                 grandTotal: $scope.grandTotal,
                 payment_amount: $scope.payment_amount,

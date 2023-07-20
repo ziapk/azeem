@@ -85,7 +85,7 @@ foreach ($_POST['items'] as $key => $value) {
         'price' => $value['price'],
         'discount_type' => !empty($value['discount_type']) ? $value['discount_type'] : 1,
         'discount_value' => !empty($value['discount_value']) ? $value['discount_value'] : 0,
-        'discount' => $value['discount'],
+        'discount' => !empty($value['discount']) ? $value['discount'] : 0,
         'type' => 1,
     ];
 }
