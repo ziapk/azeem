@@ -390,11 +390,17 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                     $scope.subTotal = parseFloat($scope.subTotal) + parseFloat($scope.discount);
                     items.push({
                         ...obj,
-                        qty: row.quantity,
+                        qty: row.qty,
                         show: true,
+                        price: row.price,
+                        item_status: row.item_status,
+                        priority: row.priority,
+                        expected_dates: row.expected_dates,
+                        employeeSelect: row.employeeSelect,
                         description: row.description,
-                        discount: row.discount,
-                        discount_value: row.discount_type == 2 ? row.discount : (parseFloat(row.discount || 0) / row.price) * 100
+                        discount: row.discount_type == 2 ? row.discount : (parseFloat(row.discount || 0) / row.price) * 100,
+                        raw_items: row.raw_items,
+                        services: row.services
                     })
                 });
 

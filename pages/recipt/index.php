@@ -342,7 +342,15 @@ echo mainFooter();
                         ...obj,
                         qty: row.qty,
                         show: row.show,
-                        description: row.description
+                        price: row.price,
+                        item_status: row.item_status,
+                        priority: row.priority,
+                        expected_dates: row.expected_dates,
+                        employeeSelect: row.employeeSelect,
+                        description: row.description,
+                        discount: row.discount,
+                        raw_items: row.raw_items,
+                        services: row.services
                     })
                 });
                 $scope.items = items;
