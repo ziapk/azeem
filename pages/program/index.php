@@ -314,7 +314,7 @@ echo mainHeader(['page' => 'program']);
         <div class="modal-body" id="modal-body">
             <div class="form-group">
                 <label for="sname">Search Books</label>
-                <input id="sname" type="text" ng-model="book" placeholder="Search Book" typeahead-on-select="selectProduct($item)" uib-typeahead="address as address.full_name for address in searchProduct($viewValue)" typeahead-template-url="book.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="0">
+                <input id="sname" type="text" ng-model="book" placeholder="Search Book" typeahead-on-select="selectProduct($item)" uib-typeahead="address as address.full_name for address in searchProduct($viewValue)" typeahead-template-url="book.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="1" ng-model-options="{debounce: 1000}">
             </div>
             <table class="table table-striped">
                 <thead>
