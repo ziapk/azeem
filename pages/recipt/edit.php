@@ -264,7 +264,7 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                     if (product.product_type == 1 || product.product_type != 1 && !product.services?.length && !product.raw_items?.length) {
                         if (product.discount_type == 2) {
                             product.discount = parseFloat(product.discount_value)
-                            product.discount_percent = row.discount_value + "%";
+                            product.discount_percent = product.discount_value + "%";
                             subtotal += ((product.price - product.discount) * product.qty);
                         } else if (!product.discount_value && customerData.discount_array?.length && customerData.discount_array?.filter(r => r.publisher_id == product.publisher_id).length) {
                             const row = customerData.discount_array.find(r => r.publisher_id == product.publisher_id);
