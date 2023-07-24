@@ -25,7 +25,27 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
     </style>
     <div ng-controller="cartController">
         <div class="container">
-            <div class="form-group" ng-if="pinPrograms" ng-repeat="(key, li) in pinPrograms">
+            <div class="dropdown">
+                <a style="padding: 3px 6px" class="dropdown-item btn btn-primary" href="#" data-toggle="dropdown"><span class="nav-menu-icon" style="margin-right: 6px"></span><span class="nav-menu-text">Syllabus</span>
+                    <div class="fa fa-caret-right"></div>
+                </a>
+                <ul class="dropdown-menu" style="min-width: 250px; max-height: 300px;">
+                    <li class="form-group" ng-if="pinPrograms" ng-repeat="(key, li) in pinPrograms">
+                        <a style="padding: 3px 6px" class="dropdown-item" href="#"><code class="nav-menu-text"></code><span class="nav-menu-text" style="white-space: normal">{{key}}</span></a>
+                        <ul class="dropdown-menu dropdown-submenu" style="min-width: 250px; max-height: 300px;">
+                            <li ng-repeat="(k, l) in li">
+                                <a href="javascript:void(0)" ng-class="{'text-danger text-bold': selectedSize == k }">{{k}}</a>
+                                <ul class="dropdown-menu dropdown-submenu" style="min-width: 250px; max-height: 300px;">
+                                    <li ng-repeat="(dd, i) in l">
+                                        <a href="javascript:void(0)" ng-click="addAllBooks(i.items)">{{dd}}</a>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <!-- <div class="form-group" ng-if="pinPrograms" ng-repeat="(key, li) in pinPrograms">
                 <a href="javascript:void(0)">{{key}}</a>
                 >
                 <span ng-repeat="(k, l) in li">
@@ -38,7 +58,7 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
             </div>
             <div class="form-group" ng-if="selectedProgramItems.length">
                 <span ng-repeat="row in selectedProgramItems" style="display: inline-block; padding: 2px"><a href="javascript:void(0)" class="btn" style="border-radius: 4px; padding: 2px 6px" ng-class="{'btn-danger': selectedUniform == 'Girls', 'btn-primary': selectedUniform == 'Boys', 'btn-default': selectedUniform && !['Boys', 'Girls'].includes(selectedUniform)}" ng-click="selectProduct(row)"><strong>{{row.full_name}}</strong> <span class="badge badge-warning">{{row.board}}</span></a></span>
-            </div>
+            </div> -->
             <h5><strong class="text-danger">Running Products</strong> <small class="text-danger"><strong>Click to Add</strong></small></h5>
             <span class="btn-group btn-group-sm form-group">
                 <a class="btn btn-default" ng-repeat="l in pinList" href="javascript:void(0)" ng-click="selectProduct(l, 's')">{{l.full_name}}</a>
