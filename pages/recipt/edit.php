@@ -154,6 +154,36 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
             $scope.focus = false;
             $scope.qf = true;
 
+            $scope.selectedList = {};
+            $scope.indexes = [];
+            $scope.setList = list => {
+                $scope.indexes = [];
+                Object.keys(list).forEach((key) => {
+                    if (list[key]) {
+                        $scope.indexes.push(parseInt(key));
+                    }
+                });
+            }
+
+            $scope.deleteAll = (indexes, list) => {
+                if (confirm('Are you sure you want delete?')) {
+                    if (indexes?.length) {
+                        $scope.items = list.reduce((acc, value, index) => {
+                            if (!indexes.includes(index)) {
+                                acc.push(value);
+                            }
+                            return acc;
+                        }, []);
+                    } else {
+                        $scope.items = [];
+                    }
+
+                    $scope.indexes = [];
+                    $scope.calculateSum();
+                }
+
+            }
+
             $scope.data = <?php echo json_encode($order); ?>;
             $scope.customerData = {};
             $scope.summery = $scope.data.order.summery;

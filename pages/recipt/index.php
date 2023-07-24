@@ -170,6 +170,36 @@ echo mainFooter();
         $scope.focus = false;
         $scope.qf = true;
 
+        $scope.selectedList = {};
+        $scope.indexes = [];
+        $scope.setList = list => {
+            $scope.indexes = [];
+            Object.keys(list).forEach((key) => {
+                if (list[key]) {
+                    $scope.indexes.push(parseInt(key));
+                }
+            });
+        }
+
+        $scope.deleteAll = (indexes, list) => {
+            if (confirm('Are you sure you want delete?')) {
+                if (indexes?.length) {
+                    $scope.items = list.reduce((acc, value, index) => {
+                        if (!indexes.includes(index)) {
+                            acc.push(value);
+                        }
+                        return acc;
+                    }, []);
+                } else {
+                    $scope.items = [];
+                }
+
+                $scope.indexes = [];
+                $scope.calculateSum();
+            }
+
+        }
+
         $scope.shopId = '<?php echo $userData['shopId']; ?>';
 
         $scope.customerData = {};
@@ -676,7 +706,6 @@ echo mainFooter();
             <?php
             if (empty($credit)) { ?>
                 const pay = Object.values($scope.payWith);
-                console.log('pay', pay);
                 pay.map(p => {
                     if (p.is_default == 1) {
                         console.log('$scope.payWith[p.id]', $scope.payWith[p.id]);
@@ -686,7 +715,6 @@ echo mainFooter();
                         $scope.payWith[p.id].amount = 0;
                     }
                 });
-                console.log('pay', $scope.payWith);
                 $scope.calculatePayment($scope.payWith);
             <?php } ?>
 
