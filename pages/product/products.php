@@ -352,7 +352,8 @@ $programs = $programObj->getPrograms();
             if ($window.confirm('Are you sure?')) {
                 $http.get("<?php echo SITE_URL ?>api/setInactive.php", {
                         params: {
-                            id: item.id
+                            id: item.id,
+                            action: item.is_active == 1 ? 0 : 1
                         }
                     })
                     .then(function(response) {
