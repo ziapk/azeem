@@ -27,7 +27,7 @@ $ownerStores = $stores->getOwnerStores($userId);
                 <a href="javascript:void(0)" ng-class="{'text-danger text-bold': selectedSize == k }">{{k}}</a>
                 > <span ng-repeat="(dd, i) in l">
                     <a class="btn btn-xs" ng-class="{'btn-danger': dd == 'Girls', 'btn-primary': dd == 'Boys'}" style="border-radius: 4px" href="#" ng-click="setSelectedProgramItems(i.items, dd, k)">{{dd}}</a>
-                    <a href="javascript:void(0)" class="btn btn-default  btn-xs" ng-click="addAllBooks(i.items)">Add Whole Course</a>
+                    <a href="javascript:void(0)" class="btn btn-default  btn-xs" ng-click="addAllBooks(i.items)">All</a>
                 </span>
             </span>
         </div>
