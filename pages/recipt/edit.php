@@ -30,7 +30,7 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                     <div class="fa fa-caret-right"></div>
                 </a>
                 <ul class="dropdown-menu" style="min-width: 250px; max-height: 300px;">
-                    <li class="form-group" ng-if="pinPrograms" ng-repeat="(key, li) in pinPrograms">
+                    <li ng-if="pinPrograms" ng-repeat="(key, li) in pinPrograms">
                         <a style="padding: 3px 6px" class="dropdown-item" href="#"><code class="nav-menu-text"></code><span class="nav-menu-text" style="white-space: normal">{{key}}</span></a>
                         <ul class="dropdown-menu dropdown-submenu" style="min-width: 250px; max-height: 300px;">
                             <li ng-repeat="(k, l) in li">

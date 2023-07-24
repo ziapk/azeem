@@ -24,8 +24,8 @@ $ownerStores = $stores->getOwnerStores($userId);
             <a style="padding: 3px 6px" class="dropdown-item btn btn-primary" href="#" data-toggle="dropdown"><span class="nav-menu-icon" style="margin-right: 6px"></span><span class="nav-menu-text">Syllabus</span>
                 <div class="fa fa-caret-right"></div>
             </a>
-            <ul class="dropdown-menu" style="min-width: 250px; max-height: 300px;">
-                <li class="form-group" ng-if="pinPrograms" ng-repeat="(key, li) in pinPrograms">
+            <ul style="min-width: 250px; max-height: 300px;">
+                <li ng-if="pinPrograms" ng-repeat="(key, li) in pinPrograms">
                     <a style="padding: 3px 6px" class="dropdown-item" href="#"><code class="nav-menu-text"></code><span class="nav-menu-text" style="white-space: normal">{{key}}</span></a>
                     <ul class="dropdown-menu dropdown-submenu" style="min-width: 250px; max-height: 300px;">
                         <li ng-repeat="(k, l) in li">
