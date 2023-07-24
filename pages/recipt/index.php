@@ -21,17 +21,18 @@ $ownerStores = $stores->getOwnerStores($userId);
 <div ng-controller="cartController">
     <div class="container">
         <div class="form-group" ng-if="pinPrograms" ng-repeat="(key, li) in pinPrograms">
-            <a href="#">{{key}}</a>
+            <a href="javascript:void(0)">{{key}}</a>
             >
             <span ng-repeat="(k, l) in li">
-                <a href="#" ng-class="{'text-danger text-bold': selectedSize == k }">{{k}}</a>
+                <a href="javascript:void(0)" ng-class="{'text-danger text-bold': selectedSize == k }">{{k}}</a>
                 > <span ng-repeat="(dd, i) in l">
                     <a class="btn btn-xs" ng-class="{'btn-danger': dd == 'Girls', 'btn-primary': dd == 'Boys'}" style="border-radius: 4px" href="#" ng-click="setSelectedProgramItems(i.items, dd, k)">{{dd}}</a>
+                    <a href="javascript:void(0)" class="btn btn-default  btn-xs" ng-click="addAllBooks(i.items)">Add Whole Course</a>
                 </span>
             </span>
         </div>
         <div class="form-group" ng-if="selectedProgramItems.length">
-            <span ng-repeat="row in selectedProgramItems" style="display: inline-block; padding: 2px"><a href="javascript:void(0)" class="btn" style="border-radius: 4px; padding: 2px 6px" ng-class="{'btn-danger': selectedUniform == 'Girls', 'btn-primary': selectedUniform == 'Boys'}" ng-click="selectProduct(row)"><strong>{{row.full_name}}</strong> <span class="badge badge-warning">{{row.board}}</span></a></span>
+            <span ng-repeat="row in selectedProgramItems" style="display: inline-block; padding: 2px"><a href="javascript:void(0)" class="btn" style="border-radius: 4px; padding: 2px 6px" ng-class="{'btn-danger': selectedUniform == 'Girls', 'btn-primary': selectedUniform == 'Boys', 'btn-default': selectedUniform && !['Boys', 'Girls'].includes(selectedUniform)}" ng-click="selectProduct(row)"><strong>{{row.full_name}}</strong> <span class="badge badge-warning">{{row.board}}</span></a></span>
         </div>
         <h5><strong class="text-danger">Running Products</strong> <small class="text-danger"><strong>Click to Add</strong></small></h5>
         <span class="btn-group btn-group-sm form-group">
@@ -161,6 +162,13 @@ echo mainFooter();
         $scope.discount = 0;
         $scope.payment_mode = '1';
         $scope.payment_total = 0;
+
+        $scope.addAllBooks = (books, key) => {
+            books?.forEach(book => {
+                $scope.selectProduct(book, false, true);
+            });
+            $scope.calculateSum();
+        }
 
         $scope.calculatePayment = (payWith) => {
             $scope.payment_total = 0;
@@ -376,7 +384,7 @@ echo mainFooter();
         });
 
 
-        $scope.selectProduct = function(p, sep) {
+        $scope.selectProduct = function(p, sep, disableCalc) {
             let currentIndex = 1
             if (p.product_type == 2) {
                 sep = true;
@@ -408,25 +416,27 @@ echo mainFooter();
                     currentIndex = $scope.items.length;
                 }
             }
-            $scope.calculateSum();
+            if (!disableCalc) {
+                $scope.calculateSum();
 
-            // // call $anchorScroll()
-            // $scope.product = null;
-            $timeout(() => {
+                // // call $anchorScroll()
+                // $scope.product = null;
+                $timeout(() => {
 
-                if ($scope.qf) {
-                    $anchorScroll.yOffset = 200;
-                    $location.hash('product-' + currentIndex);
-                    $anchorScroll();
-                    if ($('#product-' + currentIndex).find('.input-add-dist').length) {
-                        $('#product-' + currentIndex).find('.input-add-dist').focus();
-                    } else {
-                        $('#product-' + currentIndex).find('.input-qty').focus();
+                    if ($scope.qf) {
+                        $anchorScroll.yOffset = 200;
+                        $location.hash('product-' + currentIndex);
+                        $anchorScroll();
+                        if ($('#product-' + currentIndex).find('.input-add-dist').length) {
+                            $('#product-' + currentIndex).find('.input-add-dist').focus();
+                        } else {
+                            $('#product-' + currentIndex).find('.input-qty').focus();
+                        }
                     }
-                }
 
-                $scope.product = '';
-            }, 200);
+                    $scope.product = '';
+                }, 200);
+            }
 
         }
         $scope.addMoreQty = function(obj, val, e) {
@@ -607,6 +617,7 @@ echo mainFooter();
                 if (product.product_type == 1 || product.product_type != 1 && !product.services?.length && !product.raw_items?.length) {
                     if (product.discount_type == 2) {
                         product.discount = product.discount_value
+                        product.discount_percent = row.discount_value + "%";
                         subtotal += ((product.price - product.discount) * product.qty);
                     } else if (!product.discount_value && customerData.discount_array?.length && customerData.discount_array?.filter(r => r.publisher_id == product.publisher_id).length) {
                         const row = customerData.discount_array.find(r => r.publisher_id == product.publisher_id);
