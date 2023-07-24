@@ -179,6 +179,7 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                     }
 
                     $scope.indexes = [];
+                    $scope.selectedList = {};
                     $scope.calculateSum();
                 }
 

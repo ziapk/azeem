@@ -195,6 +195,7 @@ echo mainFooter();
                 }
 
                 $scope.indexes = [];
+                $scope.selectedList = {};
                 $scope.calculateSum();
             }
 
