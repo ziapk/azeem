@@ -724,6 +724,7 @@ echo mainFooter();
             $http.post("<?php echo SITE_URL ?>pages/product/update.php?id=" + form.id, $httpParamSerializerJQLike({
                     code: form.newBarCode,
                     price: form.newPrice,
+                    rackNo: form.rackNo,
                     createCode: true,
                     json_response: true,
                 }), {

@@ -37,8 +37,11 @@ foreach ($statuses as  $value) {
             <?php if ($userData['role'] === 'owner' || $userData['role'] === 'manager') { ?>
                 <span class="dropdown">
                     <button class="dropdown-toggle btn btn-default" data-toggle="dropdown" style="padding-inline: 8px"><span class="fa fa-caret-down"></span></button>
-                    <form ng-submit="submitCode(cart)" class="dropdown-menu" style="padding: 10px; width: 300px">
+                    <form ng-submit="submitCode(cart)" class="dropdown-menu" style="padding: 10px; width: 400px">
                         <div class="input-group">
+                            <span class="input-group-btn" style="width: 100px">
+                                <input type="text" placeholder="Rack No" ng-model="cart.rackNo" type="text" class="form-control">
+                            </span>
                             <input type="text" placeholder="Bar Code" ng-model="cart.newBarCode" type="text" class="form-control">
                             <span class="input-group-btn" style="width: 100px">
                                 <input type="text" placeholder="Price" ng-model="cart.newPrice" ng-value="cart.price" type="text" class="form-control">

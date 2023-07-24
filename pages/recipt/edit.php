@@ -742,6 +742,7 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                 $http.post("<?php echo SITE_URL ?>pages/product/update.php?id=" + form.id, $httpParamSerializerJQLike({
                         code: form.newBarCode,
                         price: form.newPrice,
+                        rackNo: form.rackNo,
                         createCode: true,
                         json_response: true,
                     }), {
