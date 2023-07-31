@@ -395,7 +395,8 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                     ...row,
                     id: obj.id,
                     discount: row.discount?.toString(),
-                    discount_value: row.discount_value?.toString(),
+                    qty: row.quantity,
+                    discount_value: row.discount_type == 2 ? row.discount : (parseFloat(row.discount || 0) / row.price) * 100,
                 })
             });
             if ($window.sessionStorage.getItem('shopping')) {
@@ -409,7 +410,8 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                         ...row,
                         id: obj.id,
                         discount: parseFloat(row.discount),
-                        discount_value: parseFloat(row.discount_value)
+                        qty: row.quantity,
+                        discount_value: row.discount_type == 2 ? row.discount : (parseFloat(row.discount || 0) / row.price) * 100,
                     })
                 });
                 $scope.items = items;
@@ -437,7 +439,8 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                         ...row,
                         id: obj.id,
                         discount: parseFloat(row.discount),
-                        discount_value: parseFloat(row.discount_value)
+                        qty: row.quantity,
+                        discount_value: row.discount_type == 2 ? row.discount : (parseFloat(row.discount || 0) / row.price) * 100,
                     })
                 });
 
@@ -451,8 +454,9 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                             ...obj,
                             ...row,
                             id: obj.id,
+                            qty: row.quantity,
                             discount: parseFloat(row.discount),
-                            discount_value: parseFloat(row.discount_value)
+                            discount_value: row.discount_type == 2 ? row.discount : (parseFloat(row.discount || 0) / row.price) * 100,
                         };
                         items.push(final)
                     });
