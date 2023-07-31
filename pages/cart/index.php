@@ -152,12 +152,8 @@ echo mainHeader();
             const shopCart = JSON.parse($window.sessionStorage.getItem('shopping'));
 
             shopCart.map(function(row) {
-                const obj = $scope.mainList.find(function(e) {
-                    return e.id == row.id
-                });
                 items.push({
-                    ...obj,
-                    qty: row.qty
+                    ...row
                 })
             });
             $scope.items = items;

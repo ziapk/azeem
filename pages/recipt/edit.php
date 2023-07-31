@@ -385,47 +385,21 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
             }
 
             shopCart.map(function(row) {
-                const obj = $scope.mainList.find(function(e) {
-                    return e.id == row.product_id
-                });
                 $scope.discountPercentValue += parseFloat(row.discount);
                 $scope.subTotal = parseFloat($scope.subTotal) + parseFloat($scope.discount);
                 items.push({
-                    ...obj,
-                    qty: row.quantity,
-                    show: true,
-                    price: row.price,
-                    item_status: row.item_status,
-                    priority: row.priority,
-                    expected_dates: row.expected_dates,
-                    employeeSelect: row.employeeSelect,
-                    description: row.description,
-                    discount: row.discount,
-                    raw_items: row.raw_items,
-                    services: row.services,
-                    discount_type: row.discount_type,
-                    discount_value: row.discount_type == 2 ? parseFloat(row.discount) : (parseFloat(row.discount || 0) / row.price) * 100
+                    ...row,
+                    discount: row.discount?.toString(),
+                    discount_value: row.discount_value?.toString(),
                 })
             });
             if ($window.sessionStorage.getItem('shopping')) {
                 const shopCart = JSON.parse($window.sessionStorage.getItem('shopping'));
                 shopCart.map(function(row) {
-                    const obj = $scope.mainList.find(function(e) {
-                        return e.id == row.id
-                    });
                     items.push({
-                        ...obj,
-                        qty: row.qty,
-                        show: row.show,
-                        price: row.price,
-                        services: row.services,
-                        raw_items: row.raw_items,
-                        item_status: row.item_status,
-                        item_status: row.item_status,
-                        priority: row.priority,
-                        expected_dates: row.expected_dates,
-                        employeeSelect: row.employeeSelect,
-                        description: row.description
+                        ...row,
+                        discount: parseFloat(row.discount),
+                        discount_value: parseFloat(row.discount_value)
                     })
                 });
                 $scope.items = items;
@@ -443,38 +417,22 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                 const shopCart = $scope.data.order_items;
                 const items = [];
                 shopCart.map(function(row) {
-                    const obj = $scope.mainList.find(function(e) {
-                        return e.id == row.product_id
-                    });
                     $scope.discountPercentValue += parseFloat(row.discount);
                     $scope.subTotal = parseFloat($scope.subTotal) + parseFloat($scope.discount);
                     items.push({
-                        ...obj,
-                        qty: row.qty,
-                        show: true,
-                        price: row.price,
-                        item_status: row.item_status,
-                        priority: row.priority,
-                        expected_dates: row.expected_dates,
-                        employeeSelect: row.employeeSelect,
-                        description: row.description,
-                        discount: row.discount_type == 2 ? row.discount : (parseFloat(row.discount || 0) / row.price) * 100,
-                        raw_items: row.raw_items,
-                        services: row.services
+                        ...row,
+                        discount: parseFloat(row.discount),
+                        discount_value: parseFloat(row.discount_value)
                     })
                 });
 
                 if ($window.sessionStorage.getItem('shopping')) {
                     const storageCart = JSON.parse($window.sessionStorage.getItem('shopping'));
                     storageCart.map(function(row) {
-                        const obj = $scope.mainList.find(function(e) {
-                            return e.id == row.id
-                        });
                         const final = {
-                            ...obj,
-                            qty: row.qty,
-                            show: row.show,
-                            description: row.description
+                            ...row,
+                            discount: parseFloat(row.discount),
+                            discount_value: parseFloat(row.discount_value)
                         };
                         items.push(final)
                     });

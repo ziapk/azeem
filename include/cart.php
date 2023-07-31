@@ -186,9 +186,8 @@
       $scope.totalPrice = 0;
       $scope.finalList = [];
       $scope.cart.map(row => {
-        const obj = window.mainList.records.find(r => r.id === row.id);
         $scope.finalList.push({
-          ...obj,
+          ...row,
           price: row.price || obj.price,
           discount: row.discount,
           qty: row.qty

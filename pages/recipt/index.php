@@ -323,22 +323,10 @@ echo mainFooter();
             const shopCart = JSON.parse($window.sessionStorage.getItem('shopping'));
 
             shopCart.map(function(row) {
-                const obj = $scope.mainList.find(function(e) {
-                    return e.id == row.id
-                });
                 items.push({
-                    ...obj,
-                    qty: row.qty,
-                    show: row.show,
-                    price: row.price,
-                    item_status: row.item_status,
-                    priority: row.priority,
-                    expected_dates: row.expected_dates,
-                    employeeSelect: row.employeeSelect,
-                    description: row.description,
-                    discount: row.discount,
-                    raw_items: row.raw_items,
-                    services: row.services,
+                    ...row,
+                    discount: row.discount?.toString(),
+                    discount_value: row.discount_value?.toString(),
                 })
             });
             $scope.items = items;
@@ -395,23 +383,11 @@ echo mainFooter();
                 const shopCart = JSON.parse($window.sessionStorage.getItem('shopping'));
 
                 shopCart.map(function(row, index) {
-                    const obj = $scope.mainList.find(function(e) {
-                        return e.id == row.id
-                    });
                     currentIndex = index + 1;
                     items.push({
-                        ...obj,
-                        qty: row.qty,
-                        show: row.show,
-                        price: row.price,
-                        item_status: row.item_status,
-                        priority: row.priority,
-                        expected_dates: row.expected_dates,
-                        employeeSelect: row.employeeSelect,
-                        description: row.description,
-                        discount: row.discount,
-                        raw_items: row.raw_items,
-                        services: row.services
+                        ...row,
+                        discount: parseFloat(row.discount),
+                        discount_value: parseFloat(row.discount_value)
                     })
                 });
                 $scope.items = items;
@@ -668,23 +644,30 @@ echo mainFooter();
             $scope.discountPercentValue = 0;
             $scope.items.map((product) => {
                 if (product.product_type == 1 || product.product_type != 1 && !product.services?.length && !product.raw_items?.length) {
+                    console.log('product.discount_type', product.discount_type);
                     if (product.discount_type == 2) {
                         product.discount = product.discount_value
-                        product.discount_percent = row.discount_value + "%";
+                        product.discount_value = parseFloat(product.discount_value);
+                        product.discount_percent = product.discount_value;
                         subtotal += ((product.price - product.discount) * product.qty);
                     } else if (!product.discount_value && customerData.discount_array?.length && customerData.discount_array?.filter(r => r.publisher_id == product.publisher_id).length) {
                         const row = customerData.discount_array.find(r => r.publisher_id == product.publisher_id);
                         const price = parseFloat(product.price);
                         product.discount = price * (parseFloat(row.discount_value) / 100);
+                        product.discount_value = row.discount_value;
                         product.discount_percent = row.discount_value + "%";
                         subtotal += ((product.price - product.discount) * product.qty);
                     } else {
                         const price = parseFloat(product.price);
                         if (product.discount_value) {
-                            product.discount = price * ((product.discount_value || 0) / 100);
+                            product.discount = price * (parseFloat(product.discount_value || 0) / 100);
                             $scope.discountPercentValue += (product.discount * product.qty);
+                            product.discount_percent = product.discount_value + "%";
+                            product.discount_value = parseFloat(product.discount_value);
+                            console.log('product', product);
                         } else {
                             product.discount_percent = '';
+                            product.discount_value = '';
                             product.discount = 0;
                         }
                         subtotal += ((product.price - product.discount) * product.qty);
