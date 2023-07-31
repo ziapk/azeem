@@ -386,27 +386,28 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
 
             shopCart.map(function(row) {
                 const obj = $scope.mainList.find(function(e) {
-                    return e.id == row.id
+                    return e.id == row.product_id
                 });
-
                 $scope.discountPercentValue += parseFloat(row.discount);
                 $scope.subTotal = parseFloat($scope.subTotal) + parseFloat($scope.discount);
                 items.push({
                     ...obj,
                     ...row,
+                    id: obj.id,
                     discount: row.discount?.toString(),
                     discount_value: row.discount_value?.toString(),
                 })
             });
             if ($window.sessionStorage.getItem('shopping')) {
-                const sessionShopCart = JSON.parse($window.sessionStorage.getItem('shopping'));
-                sessionShopCart.map(function(row) {
+                const shopCart = JSON.parse($window.sessionStorage.getItem('shopping'));
+                shopCart.map(function(row) {
                     const obj = $scope.mainList.find(function(e) {
                         return e.id == row.id
                     });
                     items.push({
                         ...obj,
                         ...row,
+                        id: obj.id,
                         discount: parseFloat(row.discount),
                         discount_value: parseFloat(row.discount_value)
                     })
@@ -426,14 +427,15 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                 const shopCart = $scope.data.order_items;
                 const items = [];
                 shopCart.map(function(row) {
+                    const obj = $scope.mainList.find(function(e) {
+                        return e.id == row.product_id
+                    });
                     $scope.discountPercentValue += parseFloat(row.discount);
                     $scope.subTotal = parseFloat($scope.subTotal) + parseFloat($scope.discount);
-                    const obj = $scope.mainList.find(function(e) {
-                        return e.id == row.id
-                    });
                     items.push({
                         ...obj,
                         ...row,
+                        id: obj.id,
                         discount: parseFloat(row.discount),
                         discount_value: parseFloat(row.discount_value)
                     })
@@ -448,6 +450,7 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                         const final = {
                             ...obj,
                             ...row,
+                            id: obj.id,
                             discount: parseFloat(row.discount),
                             discount_value: parseFloat(row.discount_value)
                         };
