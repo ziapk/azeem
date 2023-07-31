@@ -1281,8 +1281,9 @@ class DoubleEntry extends Connection
 			$return_ref = !empty($array['return_ref']) ? $array['return_ref'] : null;
 			$supply_ref = !empty($array['supply_ref']) ? $array['supply_ref'] : null;
 			$order_ref = !empty($array['order_ref']) ? $array['order_ref'] : null;
+			$salary_ref = !empty($array['salary_ref']) ? $array['salary_ref'] : null;
 
-			$stmt = "INSERT INTO `{$this->table_transactions}` (`description`, `reference`, `transaction_date`, `created_by`, `shopId`, `order_ref`,`supply_ref`, `return_ref`, `transsaction_type`) VALUES (:description, :reference, :transaction_date, :created_by, :shopId, :order_ref, :supply_ref, :return_ref, :transaction_type)";
+			$stmt = "INSERT INTO `{$this->table_transactions}` (`description`, `reference`, `transaction_date`, `created_by`, `shopId`, `order_ref`,`supply_ref`, `return_ref`, `salary_ref`, `transsaction_type`) VALUES (:description, :reference, :transaction_date, :created_by, :shopId, :order_ref, :supply_ref, :return_ref, :salary_ref, :transaction_type)";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':description', $array['description'], PDO::PARAM_STR);
 			$prepare->bindParam(':reference', $array['reference'], PDO::PARAM_STR);
@@ -1292,6 +1293,7 @@ class DoubleEntry extends Connection
 			$prepare->bindParam(':order_ref', $order_ref, PDO::PARAM_STR);
 			$prepare->bindParam(':supply_ref', $supply_ref, PDO::PARAM_STR);
 			$prepare->bindParam(':return_ref', $return_ref, PDO::PARAM_STR);
+			$prepare->bindParam(':salary_ref', $salary_ref, PDO::PARAM_STR);
 			$prepare->bindParam(':transaction_type', $array['transaction_type'], PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $this->dbh->lastInsertId();
