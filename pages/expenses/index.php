@@ -49,8 +49,8 @@ echo mainHeader(['page' => 'expense']);
             <tr>
                 <th width="100px">Sr.#</th>
                 <th>Name</th>
-                <th width="150px">Price</th>
                 <th width="150px">Description</th>
+                <th width="150px">Price</th>
                 <th width="150px">Date</th>
                 <th width="150px"></th>
             </tr>
