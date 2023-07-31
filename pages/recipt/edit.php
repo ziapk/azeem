@@ -353,6 +353,7 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                 $scope.payment_mode = o.id;
             }
             const shopCart = $scope.data.order_items;
+            console.log('shopCart', shopCart);
             $scope.searchEmployee = function(value) {
                 return $http.get("<?php echo SITE_URL ?>api/getEmployees.php?search=" + value)
                     .then(function(response) {
@@ -400,8 +401,8 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                 })
             });
             if ($window.sessionStorage.getItem('shopping')) {
-                const shopCart = JSON.parse($window.sessionStorage.getItem('shopping'));
-                shopCart.map(function(row) {
+                const sessionShopCart = JSON.parse($window.sessionStorage.getItem('shopping'));
+                sessionShopCart.map(function(row) {
                     const obj = $scope.mainList.find(function(e) {
                         return e.id == row.id
                     });
@@ -439,7 +440,7 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                         ...row,
                         id: obj.id,
                         discount: parseFloat(row.discount),
-                        qty: row.quantity,
+                        qty: row.quantity || row.qty || 1,
                         discount_value: row.discount_type == 2 ? parseFloat(row.discount) : (parseFloat(row.discount || 0) / row.price) * 100,
                     })
                 });
@@ -454,7 +455,7 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                             ...obj,
                             ...row,
                             id: obj.id,
-                            qty: row.quantity,
+                            qty: row.quantity || row.qty || 1,
                             discount: parseFloat(row.discount),
                             discount_value: row.discount_type == 2 ? parseFloat(row.discount) : (parseFloat(row.discount || 0) / row.price) * 100,
                         };
