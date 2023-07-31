@@ -396,7 +396,7 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                     id: obj.id,
                     discount: row.discount?.toString(),
                     qty: row.quantity,
-                    discount_value: row.discount_type == 2 ? row.discount : (parseFloat(row.discount || 0) / row.price) * 100,
+                    discount_value: row.discount_type == 2 ? parseFloat(row.discount) : (parseFloat(row.discount || 0) / row.price) * 100,
                 })
             });
             if ($window.sessionStorage.getItem('shopping')) {
@@ -411,7 +411,7 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                         id: obj.id,
                         discount: parseFloat(row.discount),
                         qty: row.quantity,
-                        discount_value: row.discount_type == 2 ? row.discount : (parseFloat(row.discount || 0) / row.price) * 100,
+                        discount_value: row.discount_type == 2 ? parseFloat(row.discount) : (parseFloat(row.discount || 0) / row.price) * 100,
                     })
                 });
                 $scope.items = items;
@@ -440,7 +440,7 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                         id: obj.id,
                         discount: parseFloat(row.discount),
                         qty: row.quantity,
-                        discount_value: row.discount_type == 2 ? row.discount : (parseFloat(row.discount || 0) / row.price) * 100,
+                        discount_value: row.discount_type == 2 ? parseFloat(row.discount) : (parseFloat(row.discount || 0) / row.price) * 100,
                     })
                 });
 
@@ -456,7 +456,7 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                             id: obj.id,
                             qty: row.quantity,
                             discount: parseFloat(row.discount),
-                            discount_value: row.discount_type == 2 ? row.discount : (parseFloat(row.discount || 0) / row.price) * 100,
+                            discount_value: row.discount_type == 2 ? parseFloat(row.discount) : (parseFloat(row.discount || 0) / row.price) * 100,
                         };
                         items.push(final)
                     });
