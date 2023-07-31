@@ -385,9 +385,14 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
             }
 
             shopCart.map(function(row) {
+                const obj = $scope.mainList.find(function(e) {
+                    return e.id == row.id
+                });
+
                 $scope.discountPercentValue += parseFloat(row.discount);
                 $scope.subTotal = parseFloat($scope.subTotal) + parseFloat($scope.discount);
                 items.push({
+                    ...obj,
                     ...row,
                     discount: row.discount?.toString(),
                     discount_value: row.discount_value?.toString(),
