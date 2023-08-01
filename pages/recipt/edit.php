@@ -45,7 +45,7 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                     </li>
                 </ul>
             </div>
-            <div class="form-group" ng-if="pinPrograms && key.toLowerCase().includes('uniform'))" ng-repeat="(key, li) in pinPrograms">
+            <div class="form-group" ng-if="pinPrograms && key.toLowerCase().includes('uniform')" ng-repeat="(key, li) in pinPrograms">
                 <a href="javascript:void(0)">{{key}}</a>
                 >
                 <span ng-repeat="(k, l) in li">

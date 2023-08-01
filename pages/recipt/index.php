@@ -41,7 +41,7 @@ $ownerStores = $stores->getOwnerStores($userId);
                 </li>
             </ul>
         </div>
-        <div class="form-group" ng-if="pinPrograms && key.toLowerCase().includes('uniform'))" ng-repeat="(key, li) in pinPrograms">
+        <div class="form-group" ng-if="pinPrograms && key.toLowerCase().includes('uniform')" ng-repeat="(key, li) in pinPrograms">
             <a href="javascript:void(0)">{{key}}</a>
             >
 
