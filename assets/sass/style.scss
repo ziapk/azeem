@@ -932,3 +932,7 @@ thead.navbar-fixed-top {
     font-weight: bold;
     padding: 5px 12px;
 }
+
+.dropdown-menu li:hover > a {
+    background-color: #f5f5f5 !important;
+}

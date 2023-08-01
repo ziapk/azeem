@@ -906,4 +906,8 @@ thead.navbar-fixed-top {
   padding: 5px 12px;
 }
 
+.dropdown-menu li:hover > a {
+  background-color: #f5f5f5 !important;
+}
+
 /*# sourceMappingURL=style.css.map */
