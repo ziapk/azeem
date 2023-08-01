@@ -41,7 +41,7 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                                         <a href="javascript:void(0)" ng-if="key.toLowerCase().includes('uniform')">{{dd}}</a>
                                         <ul class="dropdown-menu dropdown-submenu" style="min-width: 250px; max-height: 300px;" ng-if="key.toLowerCase().includes('uniform')">
                                             <li ng-repeat="book in i.items">
-                                                <a href="javascript:void(0)" ng-click="selectProduct(book, 's')">{{book.full_name}}</a>
+                                                <a href="javascript:void(0)" ng-click="selectProduct(book, 's', undefined, $event)">{{book.full_name}}</a>
                                             </li>
                                         </ul>
                                     </li>
@@ -525,7 +525,8 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                     $scope.calculateSum();
                 }
             }
-            $scope.selectProduct = function(p, sep, disableCalc) {
+            $scope.selectProduct = function(p, sep, disableCalc, event) {
+                event && event.stopPropagation();
                 let currentIndex = 1
                 let tempSep = sep;
                 if (p.product_type == 2) {

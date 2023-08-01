@@ -37,7 +37,7 @@ $ownerStores = $stores->getOwnerStores($userId);
                                     <a href="javascript:void(0)" ng-if="key.toLowerCase().includes('uniform')">{{dd}}</a>
                                     <ul class="dropdown-menu dropdown-submenu" style="min-width: 250px; max-height: 300px;" ng-if="key.toLowerCase().includes('uniform')">
                                         <li ng-repeat="book in i.items">
-                                            <a href="javascript:void(0)" ng-click="selectProduct(book, 's')">{{book.full_name}}</a>
+                                            <a href="javascript:void(0)" ng-click="selectProduct(book, 's', undefined, $event)">{{book.full_name}}</a>
                                         </li>
                                     </ul>
                                 </li>
@@ -419,7 +419,8 @@ echo mainFooter();
         });
 
 
-        $scope.selectProduct = function(p, sep, disableCalc) {
+        $scope.selectProduct = function(p, sep, disableCalc, event) {
+            event && event.stopPropagation();
             let currentIndex = 1
             if (p.product_type == 2) {
                 sep = true;
