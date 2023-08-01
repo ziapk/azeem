@@ -20,7 +20,7 @@ foreach ($products as $value) {
     }
     $id = $value['rack_id'];
 }
-if (!empty($_POST) && empty($exits)) {
+if (!empty($_POST['rackNo']) && empty($exits)) {
     if (empty($products)) {
         $data = [
             'title' => $_POST['rackNo'],
