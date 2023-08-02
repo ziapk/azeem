@@ -195,7 +195,7 @@ if ($largeView) {
                                     <div>
                             </h3>
                         </div>
-                        <?php $net = abs(($price - $order['order']['discount'])); ?>
+                        <?php $net = abs($price); ?>
                         <table class="table" style="width: 100%; margin-bottom: 0">
                             <tr>
                                 <td width="40" class="text-right">Customer:</td>
