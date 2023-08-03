@@ -463,7 +463,7 @@ class Orders extends Connection
                 } else {
                     $full_name .= ", concat(p.id, ' | ', p.full_name) AS product_title";
                 }
-                $stmt = "SELECT item.* $full_name FROM `{$this->table_sub}` AS item LEFT JOIN products AS p ON item.product_id = p.id WHERE item.order_id=:id";
+                $stmt = "SELECT item.*, p.id as product_id, $full_name FROM `{$this->table_sub}` AS item LEFT JOIN products AS p ON item.product_id = p.id WHERE item.order_id=:id";
                 $prepare = $this->dbh->prepare($stmt);
                 $prepare->bindParam(':id', $id, PDO::PARAM_STR);
                 $prepare->execute();

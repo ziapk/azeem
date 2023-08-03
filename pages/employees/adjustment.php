@@ -114,7 +114,7 @@ $data = [
 
         $scope.payToWallet = function() {
 
-            $http.post("<?php echo SITE_URL ?>api/directPayment.php", $httpParamSerializerJQLike({
+            $http.post("<?php echo SITE_URL ?>api/payToEmployee.php", $httpParamSerializerJQLike({
                     amount: $scope.wallet,
                     id: $scope.id, // account_id
                     summery: $scope.summery,

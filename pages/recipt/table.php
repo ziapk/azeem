@@ -58,12 +58,12 @@ foreach ($statuses as  $value) {
         <td width="120" width="120" ng-if="show_discount">
             <div class="input-group">
                 <input type="number" class="form-control input-add-dist" ng-model="cart.discount_value" ng-change="calculateSum()" style="padding-right: 6px">
-                <span class="dropdown input-group-btn">
-                    <button class="dropdown-toggle btn btn-default" data-toggle="dropdown" style="padding-inline: 8px">{{cart.discount_type == 2 ? 'FIX' : '%'}}</button>
-                    <ul class="dropdown-menu">
+                <span class="input-group-btn"><!-- class="dropdown input-group-btn" -->
+                    <button class="btn btn-default" style="padding-inline: 8px" ng-click="cart.discount_type = (cart.discount_type == 1 ? 2 : 1); calculateSum();">{{cart.discount_type == 2 ? 'FIX' : '%'}}</button><!-- data-toggle="dropdown" -->
+                    <!-- <ul class="dropdown-menu">
                         <li><a href="javascript:void(0)" ng-click="cart.discount_type = 1; calculateSum()">%</a></li>
                         <li><a href="javascript:void(0)" ng-click="cart.discount_type = 2; calculateSum()">Fix</a></li>
-                    </ul>
+                    </ul> -->
                 </span>
             </div>
         </td>

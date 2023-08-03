@@ -36,17 +36,17 @@ if (empty($_POST['full_name'])) {
         $storeAccounts[$a['key_value']] = $a['account_id'];
     }
 
-    $receivableAccount = $de->getAccount($storeAccounts['salary']);
+    $salaryAccount = $de->getAccount($storeAccounts['salary']);
 
 
 
     $accountData = [
         'title' => 'Employee - ' . $_POST['full_name'] . ' - ' . $_POST['company'],
-        'code' => $receivableAccount['code'],
-        'account_type' => $receivableAccount['account_type'],
-        'group_id' => $receivableAccount['group_id'],
-        'status' => $receivableAccount['status'],
-        'parent_id' => $receivableAccount['id'],
+        'code' => $salaryAccount['code'],
+        'account_type' => $salaryAccount['account_type'],
+        'group_id' => $salaryAccount['group_id'],
+        'status' => $salaryAccount['status'],
+        'parent_id' => $salaryAccount['id'],
         'shopId' => $shop['id'],
         'opening_balance' => $_POST['opening_balance'],
         'created_by' => $userId
