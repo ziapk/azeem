@@ -223,7 +223,6 @@ echo mainFooter();
                 $scope.selectedList = {};
                 $scope.calculateSum();
             }
-
         }
         $scope.setInactive = function(item) {
             $http.get("<?php echo SITE_URL ?>api/setInactive.php", {
@@ -233,518 +232,536 @@ echo mainFooter();
                 }
             })
         }
-    }
-    $scope.shopId = '<?php echo $userData['shopId']; ?>';
+        $scope.shopId = '<?php echo $userData['shopId']; ?>';
 
-    $scope.customerData = {}; $scope.summery = ''; $scope.ref_no = ''; $scope.gst = 0; $scope.service_charges = 0; $scope.discountPercentValue = 0; $scope.show_discount = true; $scope.subTotal = 0; $scope.grandTotal = 0; $scope.discount = 0; $scope.payment_mode = '1'; $scope.payment_total = 0;
-
-    $scope.addAllBooks = (books, key) => {
-        books?.forEach(book => {
-            $scope.selectProduct(book, false, true);
-        });
-        $scope.calculateSum();
-    }
-
-    $scope.calculatePayment = (payWith) => {
+        $scope.customerData = {};
+        $scope.summery = '';
+        $scope.ref_no = '';
+        $scope.gst = 0;
+        $scope.service_charges = 0;
+        $scope.discountPercentValue = 0;
+        $scope.show_discount = true;
+        $scope.subTotal = 0;
+        $scope.grandTotal = 0;
+        $scope.discount = 0;
+        $scope.payment_mode = '1';
         $scope.payment_total = 0;
-        $scope.payWith = payWith;
-        Object.values(payWith).map(row => {
-            $scope.payment_total += parseFloat(row.amount || 0)
-        })
-    }
-    $scope.modeNames = []; $scope.payWith = {};
-    const items = []; $scope.modes = []; $scope.loading = false;
 
-    $scope.getPinProducts = () => {
-        // $scope.loading = true;
-        $http.get("<?php echo SITE_URL ?>api/getProducts.php", {
-                params: {
-                    page: 1,
-                    perPage: 10,
-                    search: '',
-                    full_name: '',
-                    group: '',
-                    author: '',
-                    board: '',
-                    searchBy: '',
-                    courceId: '',
-                    bookmark: 1
-                }
-            })
-            .then(function(response) {
-                // $scope.loading = false;
-                if (response.status === 200) {
-                    $scope.pinList = response.data.records;
-                }
-            })
-    }
-    $scope.selectedProgramItems = []; $scope.selectedSize = ''; $scope.selectedUniform = ''; $scope.setSelectedProgramItems = (items, type, size) => {
-        $scope.selectedUniform = $scope.selectedSize == size ? '' : type;
-        $scope.selectedProgramItems = $scope.selectedSize == size ? [] : JSON.parse(JSON.stringify(items));
-        $scope.selectedSize = $scope.selectedSize == size ? '' : size;
-    }
-    $scope.pinPrograms = ''; $scope.getPinPrograms = () => {
-        // $scope.loading = true;
-        $http.get("<?php echo SITE_URL ?>api/getPinPrograms.php")
-            .then(function(response) {
-                const list = {};
-                response.data.map(r => {
-                    list[r.degree] = list[r.degree] || {}
-                    list[r.degree][r.class] = list[r.degree][r.class] || {}
-                    list[r.degree][r.class][r.program] = list[r.degree][r.class][r.program] || {}
-                    list[r.degree][r.class][r.program].items = r.items;
-                })
-                $scope.pinPrograms = list;
-            })
-    }
-
-    $scope.getPinPrograms(); $scope.getPinProducts();
-
-    $scope.printValue = o => {
-        $scope.payment_mode = o.id;
-    }
-    $scope.searchEmployee = function(value) {
-        return $http.get("<?php echo SITE_URL ?>api/getEmployees.php?search=" + value)
-            .then(function(response) {
-                return response.data.records
+        $scope.addAllBooks = (books, key) => {
+            books?.forEach(book => {
+                $scope.selectProduct(book, false, true);
             });
-    }
-    $scope.searchServices = function(value, onloading) {
-        return $http.get("<?php echo SITE_URL ?>api/getServices.php?search=" + value)
-            .then(function(response) {
-                return response.data.records
-            });
-    }
-    $scope.selectService = (item, row) => {
-        row.services = row.services || [];
-        row.services.push({
-            service: item
-        });
-        row.service = '';
-        $scope.calculateSum();
-    }
-    $scope.selectRaw = (item, row) => {
-        row.raw_items = row.raw_items || [];
-        row.raw_items.push({
-            product: item,
-            price: item.price,
-            qty: 1
-        });
-        row.raw = '';
-        $scope.calculateSum();
-    }
-    if ($window.sessionStorage.getItem('shopping')) {
-        const shopCart = JSON.parse($window.sessionStorage.getItem('shopping'));
-
-        shopCart.map(function(row) {
-            items.push({
-                ...row,
-                discount: row.discount?.toString(),
-                discount_value: row.discount_value?.toString(),
-            })
-        });
-        $scope.items = items;
-        $timeout(() => {
-            $scope.calculateSum()
-        });
-    } else {
-        $scope.items = []
-    }
-
-    $scope.addTax = () => {
-        $scope.calculateSum();
-    }
-
-    $scope.addDiscount = function(val, obj) {
-        if (parseFloat(val) > 0) {
-            $scope.discount = (parseFloat($scope.discount) + parseFloat(val));
-        } else if (parseFloat($scope.discount) + parseFloat(val) >= 0) {
-            $scope.discount = (parseFloat($scope.discount) + parseFloat(val));
-        } else {
-            alert('Negative Discount value must be less than equal to -' + $scope.discount);
-        }
-        $scope.calculateSum();
-        $scope.discountAmount = '';
-    }
-    $scope.directlyAdd = function(val, obj) {
-        if (val > 0) {
-            obj.qty = val
-        }
-        $scope.calculateSum();
-    }
-
-    $scope.directlyPrice = function(val, obj) {
-        if (val > 0) {
-            var v = val / obj.price;
-            obj.qty = v;
-        }
-        $scope.calculateSum();
-    }
-
-    $scope.remove = function(item) {
-        if (confirm('Are you sure you want delete?')) {
-            var index = $scope.items.indexOf(item);
-            $scope.items.splice(index, 1);
             $scope.calculateSum();
         }
-    }
 
-    $(document).on("ProdcutAdded", function(e) {
+        $scope.calculatePayment = (payWith) => {
+            $scope.payment_total = 0;
+            $scope.payWith = payWith;
+            Object.values(payWith).map(row => {
+                $scope.payment_total += parseFloat(row.amount || 0)
+            })
+        }
+        $scope.modeNames = [];
+        $scope.payWith = {};
         const items = [];
-        let currentIndex = 1;
+        $scope.modes = [];
+        $scope.loading = false;
+
+        $scope.getPinProducts = () => {
+            // $scope.loading = true;
+            $http.get("<?php echo SITE_URL ?>api/getProducts.php", {
+                    params: {
+                        page: 1,
+                        perPage: 10,
+                        search: '',
+                        full_name: '',
+                        group: '',
+                        author: '',
+                        board: '',
+                        searchBy: '',
+                        courceId: '',
+                        bookmark: 1
+                    }
+                })
+                .then(function(response) {
+                    // $scope.loading = false;
+                    if (response.status === 200) {
+                        $scope.pinList = response.data.records;
+                    }
+                })
+        }
+        $scope.selectedProgramItems = [];
+        $scope.selectedSize = '';
+        $scope.selectedUniform = '';
+        $scope.setSelectedProgramItems = (items, type, size) => {
+            $scope.selectedUniform = $scope.selectedSize == size ? '' : type;
+            $scope.selectedProgramItems = $scope.selectedSize == size ? [] : JSON.parse(JSON.stringify(items));
+            $scope.selectedSize = $scope.selectedSize == size ? '' : size;
+        }
+        $scope.pinPrograms = '';
+        $scope.getPinPrograms = () => {
+            // $scope.loading = true;
+            $http.get("<?php echo SITE_URL ?>api/getPinPrograms.php")
+                .then(function(response) {
+                    const list = {};
+                    response.data.map(r => {
+                        list[r.degree] = list[r.degree] || {}
+                        list[r.degree][r.class] = list[r.degree][r.class] || {}
+                        list[r.degree][r.class][r.program] = list[r.degree][r.class][r.program] || {}
+                        list[r.degree][r.class][r.program].items = r.items;
+                    })
+                    $scope.pinPrograms = list;
+                })
+        }
+
+        $scope.getPinPrograms();
+        $scope.getPinProducts();
+
+        $scope.printValue = o => {
+            $scope.payment_mode = o.id;
+        }
+        $scope.searchEmployee = function(value) {
+            return $http.get("<?php echo SITE_URL ?>api/getEmployees.php?search=" + value)
+                .then(function(response) {
+                    return response.data.records
+                });
+        }
+        $scope.searchServices = function(value, onloading) {
+            return $http.get("<?php echo SITE_URL ?>api/getServices.php?search=" + value)
+                .then(function(response) {
+                    return response.data.records
+                });
+        }
+        $scope.selectService = (item, row) => {
+            row.services = row.services || [];
+            row.services.push({
+                service: item
+            });
+            row.service = '';
+            $scope.calculateSum();
+        }
+        $scope.selectRaw = (item, row) => {
+            row.raw_items = row.raw_items || [];
+            row.raw_items.push({
+                product: item,
+                price: item.price,
+                qty: 1
+            });
+            row.raw = '';
+            $scope.calculateSum();
+        }
         if ($window.sessionStorage.getItem('shopping')) {
-            currentIndex = $scope.items.length;
             const shopCart = JSON.parse($window.sessionStorage.getItem('shopping'));
 
-            shopCart.map(function(row, index) {
-                currentIndex = index + 1;
+            shopCart.map(function(row) {
                 items.push({
                     ...row,
-                    discount: parseFloat(row.discount),
-                    discount_value: parseFloat(row.discount_value)
+                    discount: row.discount?.toString(),
+                    discount_value: row.discount_value?.toString(),
                 })
             });
             $scope.items = items;
             $timeout(() => {
                 $scope.calculateSum()
-                if ($scope.qf) {
-
-                    $anchorScroll.yOffset = 200;
-
-                    $location.hash('product-' + currentIndex);
-                    $anchorScroll();
-                    if ($('#product-' + currentIndex).find('.input-add-dist').length) {
-                        $('#product-' + currentIndex).find('.input-add-dist').focus();
-                    } else {
-                        $('#product-' + currentIndex).find('.input-qty').focus();
-                    }
-                }
-            }, 200);
-
+            });
         } else {
             $scope.items = []
         }
-    });
 
-
-    $scope.selectProduct = function(p, sep, disableCalc, event) {
-        event && event.stopPropagation();
-        let currentIndex = 1
-        if (p.product_type == 2) {
-            sep = true;
+        $scope.addTax = () => {
+            $scope.calculateSum();
         }
-        if (sep) {
-            $scope.items.push({
-                ...p,
-                qty: 1,
-                show: true
-            });
-            currentIndex = $scope.items.length;
-        } else {
-            $scope.product = '';
-            $scope.product = null
-            let exists = false;
 
-            $scope.items.map((pro, index) => {
-                if (pro.id == p.id && !pro.show) {
+        $scope.addDiscount = function(val, obj) {
+            if (parseFloat(val) > 0) {
+                $scope.discount = (parseFloat($scope.discount) + parseFloat(val));
+            } else if (parseFloat($scope.discount) + parseFloat(val) >= 0) {
+                $scope.discount = (parseFloat($scope.discount) + parseFloat(val));
+            } else {
+                alert('Negative Discount value must be less than equal to -' + $scope.discount);
+            }
+            $scope.calculateSum();
+            $scope.discountAmount = '';
+        }
+        $scope.directlyAdd = function(val, obj) {
+            if (val > 0) {
+                obj.qty = val
+            }
+            $scope.calculateSum();
+        }
+
+        $scope.directlyPrice = function(val, obj) {
+            if (val > 0) {
+                var v = val / obj.price;
+                obj.qty = v;
+            }
+            $scope.calculateSum();
+        }
+
+        $scope.remove = function(item) {
+            if (confirm('Are you sure you want delete?')) {
+                var index = $scope.items.indexOf(item);
+                $scope.items.splice(index, 1);
+                $scope.calculateSum();
+            }
+        }
+
+        $(document).on("ProdcutAdded", function(e) {
+            const items = [];
+            let currentIndex = 1;
+            if ($window.sessionStorage.getItem('shopping')) {
+                currentIndex = $scope.items.length;
+                const shopCart = JSON.parse($window.sessionStorage.getItem('shopping'));
+
+                shopCart.map(function(row, index) {
                     currentIndex = index + 1;
-                    exists = true;
-                    pro.qty++;
-                }
-            })
-            if (!exists) { // if already not exits in bucket
+                    items.push({
+                        ...row,
+                        discount: parseFloat(row.discount),
+                        discount_value: parseFloat(row.discount_value)
+                    })
+                });
+                $scope.items = items;
+                $timeout(() => {
+                    $scope.calculateSum()
+                    if ($scope.qf) {
+
+                        $anchorScroll.yOffset = 200;
+
+                        $location.hash('product-' + currentIndex);
+                        $anchorScroll();
+                        if ($('#product-' + currentIndex).find('.input-add-dist').length) {
+                            $('#product-' + currentIndex).find('.input-add-dist').focus();
+                        } else {
+                            $('#product-' + currentIndex).find('.input-qty').focus();
+                        }
+                    }
+                }, 200);
+
+            } else {
+                $scope.items = []
+            }
+        });
+
+
+        $scope.selectProduct = function(p, sep, disableCalc, event) {
+            event && event.stopPropagation();
+            let currentIndex = 1
+            if (p.product_type == 2) {
+                sep = true;
+            }
+            if (sep) {
                 $scope.items.push({
                     ...p,
-                    qty: 1
+                    qty: 1,
+                    show: true
                 });
                 currentIndex = $scope.items.length;
-            }
-        }
-        if (!disableCalc) {
-            $scope.calculateSum();
-
-            // // call $anchorScroll()
-            // $scope.product = null;
-            $timeout(() => {
-
-                if ($scope.qf) {
-                    $anchorScroll.yOffset = 200;
-                    $location.hash('product-' + currentIndex);
-                    $anchorScroll();
-                    if ($('#product-' + currentIndex).find('.input-add-dist').length) {
-                        $('#product-' + currentIndex).find('.input-add-dist').focus();
-                    } else {
-                        $('#product-' + currentIndex).find('.input-qty').focus();
-                    }
-                }
-
+            } else {
                 $scope.product = '';
-            }, 200);
-        }
+                $scope.product = null
+                let exists = false;
 
-    }
-    $scope.addMoreQty = function(obj, val, e) {
-        if (val > 0) {
-            obj.qty = parseFloat(obj.qty) + (parseFloat(val));
-        }
-        $scope.calculateSum();
-    }
-    $scope.selectCustomer = function(p) {
-        $scope.customerName = p.full_name;
-        $scope.customerData = p;
-        $scope.calculateSum(p);
-    }
-
-    $scope.addQty = function(row) {
-        row.qty++;
-        $scope.calculateSum();
-    }
-    $scope.subQty = function(row) {
-        if (row.qty > 1) {
-            row.qty--;
-            $scope.calculateSum();
-        }
-    }
-
-    $scope.searchProduct = function(term) {
-        const params = {};
-        if ($scope.focus === true) {
-            params.term = parseFloat(term.split('-')[0]);
-            const item = window.mainList.records.find(r => r.id == params.term || r.code == params.term || r.barcode == params.term);
-            $scope.product = '';
-            $scope.selectProduct(item);
-            return [];
-        } else {
-            const filteredArray = window.mainList.records.filter(r => r.id == term || r.code == term || r.barcode == term || r.searchString.includes(term + '|') || r.searchString.includes('|' + term) || r.searchString.includes('|' + term + '|'));
-            const secondfilteredArray = !filteredArray.length ? window.mainList.records.filter(obj => obj.searchString.toLowerCase().includes(term?.toLowerCase() || term)) : filteredArray;
-            return secondfilteredArray.slice(0, 30);
-        }
-    }
-    $scope.searchCustomer = function(value, onloading) {
-        $scope.customerName = value;
-        return $http.get("<?php echo SITE_URL ?>api/getCustomer.php?term=" + value)
-            .then(function(response) {
-                $scope.customersList = response.data;
-                if (onloading) {
-                    $scope.selectCustomer($scope.customersList[0]);
-                }
-                return response.data
-            });
-    }
-    $scope.searchMode = function() {
-        return $http.get("<?php echo SITE_URL ?>api/getPaymentModes.php")
-            .then(function(response) {
-                $scope.modes = response.data.records;
-                $scope.modes.forEach(p => {
-                    $scope.modeNames[p.id] = p.title;
-                    $scope.payWith[p.id] = {
-                        ...p,
-                        amount: p.is_default == 1 ? $scope.payment_amount : 0
+                $scope.items.map((pro, index) => {
+                    if (pro.id == p.id && !pro.show) {
+                        currentIndex = index + 1;
+                        exists = true;
+                        pro.qty++;
                     }
                 })
-                return response.data
-            });
-    }
+                if (!exists) { // if already not exits in bucket
+                    $scope.items.push({
+                        ...p,
+                        qty: 1
+                    });
+                    currentIndex = $scope.items.length;
+                }
+            }
+            if (!disableCalc) {
+                $scope.calculateSum();
 
-    $scope.searchMode();
+                // // call $anchorScroll()
+                // $scope.product = null;
+                $timeout(() => {
 
-    $scope.searchCustomer('', true)
+                    if ($scope.qf) {
+                        $anchorScroll.yOffset = 200;
+                        $location.hash('product-' + currentIndex);
+                        $anchorScroll();
+                        if ($('#product-' + currentIndex).find('.input-add-dist').length) {
+                            $('#product-' + currentIndex).find('.input-add-dist').focus();
+                        } else {
+                            $('#product-' + currentIndex).find('.input-qty').focus();
+                        }
+                    }
 
-    $scope.clearSearch = () => {
-        $scope.product = null
-        $scope.list = [];
-    }
-    $scope.clearCustomer = () => {
-        $scope.customersList = [];
-    }
-
-    $scope.park = () => {
-        $scope.checkout(1);
-    }
-
-    $scope.checkout = function(status) {
-        if ($scope.items.length) {
-
-            $scope.calculatePayment($scope.payWith);
-            $scope.loading = true;
-            $scope.form = {
-                status_id: $scope.status_id,
-                expected_delivery_date: moment($scope.expected_delivery_date).format('YYYY-MM-DD'),
-                customer_name: $scope.customerName,
-                customerId: $scope.customerData && $scope.customerData.id ? $scope.customerData.id : 1,
-                subTotal: $scope.subTotal,
-                discount: $scope.discount,
-                items: $scope.items.map(({
-                    id,
-                    description,
-                    qty,
-                    discount,
-                    discount_type,
-                    price,
-                    item_status,
-                    employeeSelect,
-                    expected_dates,
-                    services,
-                    raw_items,
-                    product_type,
-                }) => ({
-                    id,
-                    description,
-                    qty,
-                    discount,
-                    discount_type,
-                    start_date: expected_dates?.startDate ? moment(expected_dates.startDate).format('YYYY-MM-DD') : null,
-                    end_date: expected_dates?.endDate ? moment(expected_dates.endDate).format('YYYY-MM-DD') : null,
-                    employee_id: employeeSelect?.id,
-                    price,
-                    item_status,
-                    product_type,
-                    services,
-                    raw_items,
-                })),
-                shopId: $scope.shopId,
-                payment_amount: $scope.payment_total,
-                payment_with: $scope.payWith,
-                gst: $scope.gst,
-                service_charges: $scope.service_charges,
-                summery: $scope.summery,
-                show_discount: $scope.show_discount,
-                ref_no: $scope.ref_no,
-                id: $scope.id,
-                payment_mode: $scope.payment_mode,
-                status: status || 2,
-                shopId: $scope.shopId
+                    $scope.product = '';
+                }, 200);
             }
 
+        }
+        $scope.addMoreQty = function(obj, val, e) {
+            if (val > 0) {
+                obj.qty = parseFloat(obj.qty) + (parseFloat(val));
+            }
+            $scope.calculateSum();
+        }
+        $scope.selectCustomer = function(p) {
+            $scope.customerName = p.full_name;
+            $scope.customerData = p;
+            $scope.calculateSum(p);
+        }
 
-            $http.post("<?php echo SITE_URL ?>api/placeOrder.php", $httpParamSerializerJQLike($scope.form), {
+        $scope.addQty = function(row) {
+            row.qty++;
+            $scope.calculateSum();
+        }
+        $scope.subQty = function(row) {
+            if (row.qty > 1) {
+                row.qty--;
+                $scope.calculateSum();
+            }
+        }
+
+        $scope.searchProduct = function(term) {
+            const params = {};
+            if ($scope.focus === true) {
+                params.term = parseFloat(term.split('-')[0]);
+                const item = window.mainList.records.find(r => r.id == params.term || r.code == params.term || r.barcode == params.term);
+                $scope.product = '';
+                $scope.selectProduct(item);
+                return [];
+            } else {
+                const filteredArray = window.mainList.records.filter(r => r.id == term || r.code == term || r.barcode == term || r.searchString.includes(term + '|') || r.searchString.includes('|' + term) || r.searchString.includes('|' + term + '|'));
+                const secondfilteredArray = !filteredArray.length ? window.mainList.records.filter(obj => obj.searchString.toLowerCase().includes(term?.toLowerCase() || term)) : filteredArray;
+                return secondfilteredArray.slice(0, 30);
+            }
+        }
+        $scope.searchCustomer = function(value, onloading) {
+            $scope.customerName = value;
+            return $http.get("<?php echo SITE_URL ?>api/getCustomer.php?term=" + value)
+                .then(function(response) {
+                    $scope.customersList = response.data;
+                    if (onloading) {
+                        $scope.selectCustomer($scope.customersList[0]);
+                    }
+                    return response.data
+                });
+        }
+        $scope.searchMode = function() {
+            return $http.get("<?php echo SITE_URL ?>api/getPaymentModes.php")
+                .then(function(response) {
+                    $scope.modes = response.data.records;
+                    $scope.modes.forEach(p => {
+                        $scope.modeNames[p.id] = p.title;
+                        $scope.payWith[p.id] = {
+                            ...p,
+                            amount: p.is_default == 1 ? $scope.payment_amount : 0
+                        }
+                    })
+                    return response.data
+                });
+        }
+
+        $scope.searchMode();
+
+        $scope.searchCustomer('', true)
+
+        $scope.clearSearch = () => {
+            $scope.product = null
+            $scope.list = [];
+        }
+        $scope.clearCustomer = () => {
+            $scope.customersList = [];
+        }
+
+        $scope.park = () => {
+            $scope.checkout(1);
+        }
+
+        $scope.checkout = function(status) {
+            if ($scope.items.length) {
+
+                $scope.calculatePayment($scope.payWith);
+                $scope.loading = true;
+                $scope.form = {
+                    status_id: $scope.status_id,
+                    expected_delivery_date: moment($scope.expected_delivery_date).format('YYYY-MM-DD'),
+                    customer_name: $scope.customerName,
+                    customerId: $scope.customerData && $scope.customerData.id ? $scope.customerData.id : 1,
+                    subTotal: $scope.subTotal,
+                    discount: $scope.discount,
+                    items: $scope.items.map(({
+                        id,
+                        description,
+                        qty,
+                        discount,
+                        discount_type,
+                        price,
+                        item_status,
+                        employeeSelect,
+                        expected_dates,
+                        services,
+                        raw_items,
+                        product_type,
+                    }) => ({
+                        id,
+                        description,
+                        qty,
+                        discount,
+                        discount_type,
+                        start_date: expected_dates?.startDate ? moment(expected_dates.startDate).format('YYYY-MM-DD') : null,
+                        end_date: expected_dates?.endDate ? moment(expected_dates.endDate).format('YYYY-MM-DD') : null,
+                        employee_id: employeeSelect?.id,
+                        price,
+                        item_status,
+                        product_type,
+                        services,
+                        raw_items,
+                    })),
+                    shopId: $scope.shopId,
+                    payment_amount: $scope.payment_total,
+                    payment_with: $scope.payWith,
+                    gst: $scope.gst,
+                    service_charges: $scope.service_charges,
+                    summery: $scope.summery,
+                    show_discount: $scope.show_discount,
+                    ref_no: $scope.ref_no,
+                    id: $scope.id,
+                    payment_mode: $scope.payment_mode,
+                    status: status || 2,
+                    shopId: $scope.shopId
+                }
+
+
+                $http.post("<?php echo SITE_URL ?>api/placeOrder.php", $httpParamSerializerJQLike($scope.form), {
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        }
+                    })
+                    .then(function(response) {
+                        $scope.loading = false;
+                        if (status == 1) {
+                            alert(response.data.message);
+                        } else {
+                            window.open("<?php echo SITE_URL; ?>print?id=" + response.data.order.id, "", "width=300,height=300");
+                        }
+
+                        $scope.items = $scope.list = [];
+                        $scope.subTotal = $scope.discount = $scope.grandTotal = $scope.payment_amount = $scope.payment_total = 0;
+                        $window.sessionStorage.setItem('shopping', JSON.stringify($scope.items))
+                        // $window.location.assign('<?php echo SITE_URL ?>')
+                        $scope.searchCustomer('', true)
+
+                    }).catch(err => {
+                        $scope.loading = false;
+                        alert(err.message)
+                    });
+
+            }
+        }
+
+        $scope.initCheckKeypress = (evt) => {
+            var e = evt; // for trans-browser compatibility
+            var charCode = e.which || e.keyCode;
+            if (charCode === 9) {
+                $('#searchProduct').focus();
+                e.preventDefault();
+            }
+        }
+
+        $scope.calculateSum = (c) => {
+            const customerData = c || $scope.customerData;
+            let subtotal = 0;
+            $scope.discountPercentValue = 0;
+            $scope.items.map((product) => {
+                if (product.product_type == 1 || product.product_type != 1 && !product.services?.length && !product.raw_items?.length) {
+                    console.log('product.discount_type', product.discount_type);
+                    if (product.discount_type == 2) {
+                        product.discount = product.discount_value
+                        product.discount_value = parseFloat(product.discount_value);
+                        product.discount_percent = product.discount_value;
+                        subtotal += ((product.price - product.discount) * product.qty);
+                    } else if (!product.discount_value && customerData.discount_array?.length && customerData.discount_array?.filter(r => r.publisher_id == product.publisher_id).length) {
+                        const row = customerData.discount_array.find(r => r.publisher_id == product.publisher_id);
+                        const price = parseFloat(product.price);
+                        product.discount = price * (parseFloat(row.discount_value) / 100);
+                        product.discount_value = row.discount_value;
+                        product.discount_percent = row.discount_value + "%";
+                        subtotal += ((product.price - product.discount) * product.qty);
+                    } else {
+                        const price = parseFloat(product.price);
+                        if (product.discount_value) {
+                            product.discount = price * (parseFloat(product.discount_value || 0) / 100);
+                            $scope.discountPercentValue += (product.discount * product.qty);
+                            product.discount_percent = product.discount_value + "%";
+                            product.discount_value = parseFloat(product.discount_value);
+                            console.log('product', product);
+                        } else {
+                            product.discount_percent = '';
+                            product.discount_value = '';
+                            product.discount = 0;
+                        }
+                        subtotal += ((product.price - product.discount) * product.qty);
+                    }
+                } else {
+                    product.price = 0;
+                    product.services?.forEach(row => {
+                        product.price += (row.price || 0) * (row.qty || 1)
+                    })
+                    product.raw_items?.forEach(row => {
+                        product.price += (row.price || 0) * (row.qty || 1)
+                    })
+                    subtotal += product.price * product.qty;
+                }
+            })
+            $scope.subTotal = subtotal;
+            $scope.payment_amount = $scope.subTotal - $scope.discount;
+            $scope.grandTotal = $scope.payment_amount = $scope.payment_amount + Math.round($scope.payment_amount * ($scope.gst / 100)) + Math.round($scope.payment_amount * ($scope.service_charges / 100));
+            $window.sessionStorage.setItem('shopping', JSON.stringify($scope.items));
+            <?php
+            if (empty($credit)) { ?>
+                const pay = Object.values($scope.payWith);
+                pay.map(p => {
+                    if (p.is_default == 1) {
+                        console.log('$scope.payWith[p.id]', $scope.payWith[p.id]);
+                        $scope.payWith[p.id].amount = $scope.payment_amount;
+                        $scope.payment_total = $scope.payment_amount;
+                    } else {
+                        $scope.payWith[p.id].amount = 0;
+                    }
+                });
+                $scope.calculatePayment($scope.payWith);
+            <?php } ?>
+
+        }
+
+        $scope.submitCode = (form) => {
+            $http.post("<?php echo SITE_URL ?>pages/product/update.php?id=" + form.id, $httpParamSerializerJQLike({
+                    code: form.newBarCode,
+                    price: form.newPrice,
+                    rackNo: form.rackNo,
+                    createCode: true,
+                    json_response: true,
+                }), {
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded'
                     }
                 })
                 .then(function(response) {
-                    $scope.loading = false;
-                    if (status == 1) {
-                        alert(response.data.message);
+                    if (response.data.status === 200) {
+                        toaster.success({
+                            body: response.data.message
+                        });
+                        form.newBarCode = '';
                     } else {
-                        window.open("<?php echo SITE_URL; ?>print?id=" + response.data.order.id, "", "width=300,height=300");
+                        toaster.success({
+                            body: response.data.message
+                        });
+                        form.newBarCode = '';
                     }
-
-                    $scope.items = $scope.list = [];
-                    $scope.subTotal = $scope.discount = $scope.grandTotal = $scope.payment_amount = $scope.payment_total = 0;
-                    $window.sessionStorage.setItem('shopping', JSON.stringify($scope.items))
-                    // $window.location.assign('<?php echo SITE_URL ?>')
-                    $scope.searchCustomer('', true)
-
-                }).catch(err => {
-                    $scope.loading = false;
-                    alert(err.message)
-                });
-
-        }
-    }
-
-    $scope.initCheckKeypress = (evt) => {
-        var e = evt; // for trans-browser compatibility
-        var charCode = e.which || e.keyCode;
-        if (charCode === 9) {
-            $('#searchProduct').focus();
-            e.preventDefault();
-        }
-    }
-
-    $scope.calculateSum = (c) => {
-        const customerData = c || $scope.customerData;
-        let subtotal = 0;
-        $scope.discountPercentValue = 0;
-        $scope.items.map((product) => {
-            if (product.product_type == 1 || product.product_type != 1 && !product.services?.length && !product.raw_items?.length) {
-                console.log('product.discount_type', product.discount_type);
-                if (product.discount_type == 2) {
-                    product.discount = product.discount_value
-                    product.discount_value = parseFloat(product.discount_value);
-                    product.discount_percent = product.discount_value;
-                    subtotal += ((product.price - product.discount) * product.qty);
-                } else if (!product.discount_value && customerData.discount_array?.length && customerData.discount_array?.filter(r => r.publisher_id == product.publisher_id).length) {
-                    const row = customerData.discount_array.find(r => r.publisher_id == product.publisher_id);
-                    const price = parseFloat(product.price);
-                    product.discount = price * (parseFloat(row.discount_value) / 100);
-                    product.discount_value = row.discount_value;
-                    product.discount_percent = row.discount_value + "%";
-                    subtotal += ((product.price - product.discount) * product.qty);
-                } else {
-                    const price = parseFloat(product.price);
-                    if (product.discount_value) {
-                        product.discount = price * (parseFloat(product.discount_value || 0) / 100);
-                        $scope.discountPercentValue += (product.discount * product.qty);
-                        product.discount_percent = product.discount_value + "%";
-                        product.discount_value = parseFloat(product.discount_value);
-                        console.log('product', product);
-                    } else {
-                        product.discount_percent = '';
-                        product.discount_value = '';
-                        product.discount = 0;
-                    }
-                    subtotal += ((product.price - product.discount) * product.qty);
-                }
-            } else {
-                product.price = 0;
-                product.services?.forEach(row => {
-                    product.price += (row.price || 0) * (row.qty || 1)
                 })
-                product.raw_items?.forEach(row => {
-                    product.price += (row.price || 0) * (row.qty || 1)
-                })
-                subtotal += product.price * product.qty;
-            }
-        })
-        $scope.subTotal = subtotal;
-        $scope.payment_amount = $scope.subTotal - $scope.discount;
-        $scope.grandTotal = $scope.payment_amount = $scope.payment_amount + Math.round($scope.payment_amount * ($scope.gst / 100)) + Math.round($scope.payment_amount * ($scope.service_charges / 100));
-        $window.sessionStorage.setItem('shopping', JSON.stringify($scope.items));
-        <?php
-        if (empty($credit)) { ?>
-            const pay = Object.values($scope.payWith);
-            pay.map(p => {
-                if (p.is_default == 1) {
-                    console.log('$scope.payWith[p.id]', $scope.payWith[p.id]);
-                    $scope.payWith[p.id].amount = $scope.payment_amount;
-                    $scope.payment_total = $scope.payment_amount;
-                } else {
-                    $scope.payWith[p.id].amount = 0;
-                }
-            });
-            $scope.calculatePayment($scope.payWith);
-        <?php } ?>
-
-    }
-
-    $scope.submitCode = (form) => {
-        $http.post("<?php echo SITE_URL ?>pages/product/update.php?id=" + form.id, $httpParamSerializerJQLike({
-                code: form.newBarCode,
-                price: form.newPrice,
-                rackNo: form.rackNo,
-                createCode: true,
-                json_response: true,
-            }), {
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                }
-            })
-            .then(function(response) {
-                if (response.data.status === 200) {
-                    toaster.success({
-                        body: response.data.message
-                    });
-                    form.newBarCode = '';
-                } else {
-                    toaster.success({
-                        body: response.data.message
-                    });
-                    form.newBarCode = '';
-                }
-            })
-    }
+        }
 
     })
 </script>
