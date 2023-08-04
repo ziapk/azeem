@@ -24,7 +24,10 @@ foreach ($statuses as  $value) {
     <th width="120">Add Qty</th>
     <th width="180" style="text-align: center;">Qty</th>
     <th width="100">Total</th>
-    <th><a href="#" ng-click="deleteAll(indexes, items)">deleteAll</a></th>
+    <th>
+        <a href="#" class="btn btn-xs btn-danger" ng-click="deleteAll(indexes, items)">Del</a> <br />
+        <a href="#" class="btn btn-xs btn-primary" ng-click="inActiveAll(indexes, items)">InAct</a>
+    </th>
 </tr>
 </thead>
 <tbody>

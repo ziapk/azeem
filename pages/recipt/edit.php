@@ -190,6 +190,36 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                 }
 
             }
+            $scope.inActiveAll = (indexes, list) => {
+                if (confirm('Are you sure you want delete?')) {
+                    if (indexes?.length) {
+                        const removableItems = [];
+                        $scope.items = list.reduce((acc, value, index) => {
+                            if (!indexes.includes(index)) {
+                                acc.push(value);
+                            } else {
+                                $scope.setInactive(value);
+                            }
+                            return acc;
+                        }, []);
+                    }
+                    $scope.indexes = [];
+                    $scope.selectedList = {};
+                    $scope.calculateSum();
+                }
+
+            }
+
+            $scope.setInactive = function(item) {
+                $http.get("<?php echo SITE_URL ?>api/setInactive.php", {
+                    params: {
+                        id: item.id,
+                        action: 0
+                    }
+                })
+            }
+
+
 
             $scope.data = <?php echo json_encode($order); ?>;
             $scope.customerData = {};
