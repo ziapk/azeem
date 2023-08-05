@@ -29,7 +29,6 @@ if ($_GET['t'] == 'c') {
 }
 $paid = in_array($_GET['t'], ['s', 'emp']) ? $summery['debit'] : $summery['credit'];
 $amount = in_array($_GET['t'], ['s', 'emp']) ? $summery['credit'] : $summery['debit'];
-// $amount = ($user['account']['opening_balance'] + $amount);
 $balance = ($amount - $paid);
 
 $url = '?';
@@ -40,7 +39,7 @@ foreach ($_GET as $key => $value) {
 
 mainHeader();
 ?>
-<div class="container">
+<div class="container" ng-controller="coaController">
     <table width="100%">
         <tr>
             <td>
@@ -76,6 +75,7 @@ mainHeader();
             </td>
         </tr>
     </table>
+    <!-- <form method="GET" action=""> -->
     <table width="100%" class="table table-striped">
         <thead>
             <tr>
@@ -89,6 +89,24 @@ mainHeader();
                 <th>Credit</th>
                 <th>Running Balance</th>
             </tr>
+            <!-- <tr>
+                    <th>
+                        <input type="hidden" name="from" value="{{startDate}}">
+                        <input type="hidden" name="to" value="{{endDate}}">
+                        <?php foreach ($_GET as $key => $value) { ?>
+                            <input type="hidden" name="<?php echo $key; ?>" value="<?php echo $value; ?>">
+                        <?php } ?>
+                    </th>
+                    <th>
+                        <input date-range-picker class="form-control date-picker" type="text" ng-model="form.betweenDate" options="{ autoApply: true, locale: {format: 'DD/MM/YYYY'}, changeCallback: setRange(form.betweenDate)}">
+                    </th>
+                    <th><input class="form-control" name="order_id" />
+                    </th>
+                    <th><input class="form-control" name="reference" /></th>
+                    <th><input class="form-control" name="description" /></th>
+                    <th><input class="form-control" name="entry_type" /></th>
+                    <th colspan="3"><button type="submit" class="btn btn-default">Go</button></th>
+                </tr> -->
         </thead>
         <tbody>
             <?php foreach ($journel['rows'] as $key => $value) { ?>
@@ -107,17 +125,36 @@ mainHeader();
                     <td><?php echo $value['reference']; ?></td>
                     <td><?php echo $value['v_description']; ?></td>
                     <td><?php echo $value['transsaction_type']; ?></td>
-                    <td><?php echo number_format($value['debitAmount'], 2); ?></td>
-                    <td><?php echo number_format($value['creditAmount'], 2); ?></td>
-                    <td style="<?php if ($value['balance'] < 0) {
-                                    echo "color: red";
-                                } ?>"><?php echo number_format($value['balance'], 2); ?></td>
+                    <td style="text-align: right"><?php echo number_format($value['debitAmount'], 2); ?></td>
+                    <td style="text-align: right"><?php echo number_format($value['creditAmount'], 2); ?></td>
+                    <td style="text-align: right; <?php if ($value['balance'] < 0) {
+                                                        echo "color: red";
+                                                    } ?>"><?php echo number_format($value['balance'], 2); ?></td>
                 </tr>
             <?php } ?>
         </tbody>
     </table>
+    <!-- </form> -->
 </div>
 
+<script>
+    app.controller('coaController', function($scope, $http, $httpParamSerializerJQLike) {
+        var site_url = '<?php echo SITE_URL ?>';
+        $scope.startDate = moment('<?php echo $_GET['from']; ?>' || moment());
+        $scope.endDate = moment('<?php echo $_GET['to']; ?>' || moment());
+        $scope.form = {
+            betweenDate: {
+                startDate: moment($scope.startDate),
+                toDate: moment($scope.toDate),
+            }
+        };
+        $scope.setRange = (range) => {
+            console.log(range.startDate, )
+            $scope.startDate = range.startDate?.format('YYYY-MM-DD');
+            $scope.endDate = range.endDate?.format('YYYY-MM-DD');
+        }
+    });
+</script>
 
 <?php
 
