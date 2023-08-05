@@ -430,7 +430,7 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                 items.push({
                     ...obj,
                     ...row,
-                    id: obj.id,
+                    id: obj?.id || row.product_id,
                     discount: row.discount?.toString(),
                     qty: row.quantity,
                     discount_value: row.discount_type == 2 ? parseFloat(row.discount) : (parseFloat(row.discount || 0) / row.price) * 100,
@@ -445,7 +445,7 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                     items.push({
                         ...obj,
                         ...row,
-                        id: obj.id,
+                        id: obj?.id || row.product_id,
                         discount: parseFloat(row.discount),
                         qty: row.quantity,
                         discount_value: row.discount_type == 2 ? parseFloat(row.discount) : (parseFloat(row.discount || 0) / row.price) * 100,
@@ -474,7 +474,7 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                     items.push({
                         ...obj,
                         ...row,
-                        id: obj.id,
+                        id: obj?.id || row.product_id,
                         discount: parseFloat(row.discount),
                         qty: row.quantity || row.qty || 1,
                         discount_value: row.discount_type == 2 ? parseFloat(row.discount) : (parseFloat(row.discount || 0) / row.price) * 100,
