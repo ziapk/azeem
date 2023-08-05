@@ -63,11 +63,11 @@ ob_start();
                 <td><?php echo $value['reference']; ?></td>
                 <td><?php echo $value['v_description']; ?></td>
                 <td><?php echo $value['transsaction_type']; ?></td>
-                <td><?php echo number_format($value['debitAmount'], 2); ?></td>
-                <td><?php echo number_format($value['creditAmount'], 2); ?></td>
-                <td style="<?php if ($value['balance'] < 0) {
-                                echo "color: red";
-                            } ?>"><?php echo number_format($value['balance'], 2); ?></td>
+                <td style="text-align: right;"><?php echo number_format($value['debitAmount'], 0); ?></td>
+                <td style="text-align: right;"><?php echo number_format($value['creditAmount'], 0); ?></td>
+                <td style="text-align: right; <?php if ($value['balance'] < 0) {
+                                                    echo "color: red";
+                                                } ?>"><?php echo number_format($value['balance'], 0); ?></td>
             </tr>
         <?php } ?>
     </tbody>
@@ -103,19 +103,19 @@ ob_start();
             <table width="100%">
                 <tr>
                     <td>Opening Balance:</td>
-                    <td style="text-align: right; font-weight: bold" width="140"><?php echo number_format($user['account']['opening_balance'], 2); ?><br /></td>
+                    <td style="text-align: right; font-weight: bold" width="140"><?php echo number_format($user['account']['opening_balance'], 0); ?><br /></td>
                 </tr>
                 <tr>
                     <td>Total Amount:</td>
-                    <td style="text-align: right; font-weight: bold"><?php echo number_format($amount, 2); ?><br /></td>
+                    <td style="text-align: right; font-weight: bold"><?php echo number_format($amount, 0); ?><br /></td>
                 </tr>
                 <tr>
                     <td>Total Paid:</td>
-                    <td style="text-align: right; font-weight: bold"><?php echo number_format($paid, 2); ?><br /></td>
+                    <td style="text-align: right; font-weight: bold"><?php echo number_format($paid, 0); ?><br /></td>
                 </tr>
                 <tr>
                     <td>Closing Balance:</td>
-                    <td style="text-align: right; font-weight: bold"><?php echo number_format($balance, 2); ?></td>
+                    <td style="text-align: right; font-weight: bold"><?php echo number_format($balance, 0); ?></td>
                 </tr>
             </table>
 
