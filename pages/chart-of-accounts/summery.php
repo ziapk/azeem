@@ -52,7 +52,7 @@ mainHeader();
                 <table width="100%">
                     <tr>
                         <td>Openin¡¡g Balance:</td>
-                        <td width="140"><?php echo number_format($user['account']['opening_balance'], 2); ?><br /></td>
+                        <td width="140"><?php echo number_format($user['account']['opening_balance'], 0); ?><br /></td>
                     </tr>
                     <tr>
                         <td>Total Invoices:</td>
@@ -60,15 +60,15 @@ mainHeader();
                     </tr>
                     <tr>
                         <td>Total Amount:</td>
-                        <td><?php echo number_format($amount, 2); ?><br /></td>
+                        <td><?php echo number_format($amount, 0); ?><br /></td>
                     </tr>
                     <tr>
                         <td>Total Paid:</td>
-                        <td><?php echo number_format($paid, 2); ?><br /></td>
+                        <td><?php echo number_format($paid, 0); ?><br /></td>
                     </tr>
                     <tr>
                         <td>Closing Balance:</td>
-                        <td><?php echo number_format($balance, 2); ?></td>
+                        <td><?php echo number_format($balance, 0); ?></td>
                     </tr>
                 </table>
 
