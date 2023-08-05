@@ -6,7 +6,7 @@ $order = $orders->getOrder($id);
 if (!empty($_GET['dup'])) { // remove id from order
     unset($order['order']['id']);
 }
-echo mainHeader(['page' => 'recipt', 'title' => (!empty($_GET['dup']) ? "Duplicate => " : "") . $order['customer']['full_name'], 'hideSidebar' => $userData['role'] == 'shopkeeper' ? false : true]);
+echo mainHeader(['page' => 'recipt', 'title' => (!empty($_GET['dup']) ? "Duplicate => " : "") . $order['order']['customer_name'], 'hideSidebar' => $userData['role'] == 'shopkeeper' ? false : true]);
 if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
 
     $allowCustomer = true;
