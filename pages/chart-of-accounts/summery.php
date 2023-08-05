@@ -51,7 +51,7 @@ mainHeader();
             <td width="300">
                 <table width="100%">
                     <tr>
-                        <td>Opening Balance:</td>
+                        <td>Openin¡¡g Balance:</td>
                         <td width="140"><?php echo number_format($user['account']['opening_balance'], 2); ?><br /></td>
                     </tr>
                     <tr>
@@ -125,11 +125,11 @@ mainHeader();
                     <td><?php echo $value['reference']; ?></td>
                     <td><?php echo $value['v_description']; ?></td>
                     <td><?php echo $value['transsaction_type']; ?></td>
-                    <td style="text-align: right"><?php echo number_format($value['debitAmount'], 2); ?></td>
-                    <td style="text-align: right"><?php echo number_format($value['creditAmount'], 2); ?></td>
+                    <td style="text-align: right"><?php echo number_format($value['debitAmount'], 0); ?></td>
+                    <td style="text-align: right"><?php echo number_format($value['creditAmount'], 0); ?></td>
                     <td style="text-align: right; <?php if ($value['balance'] < 0) {
                                                         echo "color: red";
-                                                    } ?>"><?php echo number_format($value['balance'], 2); ?></td>
+                                                    } ?>"><?php echo number_format($value['balance'], 0); ?></td>
                 </tr>
             <?php } ?>
         </tbody>
