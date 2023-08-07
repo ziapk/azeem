@@ -29,7 +29,7 @@ echo mainHeader(['page' => 'supplier']);
                 <td width="50">{{li.id}}</td>
                 <td><strong>{{li.name}}</strong> <br /> {{li.contact}}</td>
                 <td><strong>{{li.company}}</strong> - {{li.title}} <br />{{li.address}}</td>
-                <td ng-class="{'text-danger': li.closing_balance < 0}">{{li.closing_balance}}</td>
+                <td style="text-align: right;" ng-class="{'text-danger': li.closing_balance < 0}">{{li.closing_balance | number}}</td>
                 <!-- <td>{{li.wallet}}</td> -->
                 <td>
                     <a class="btn btn-primary btn-xs" href="<?php echo SITE_URL . "pages/suppliers/update.php?id=" ?>{{li.id}}">Edit</a>

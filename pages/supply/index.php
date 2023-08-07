@@ -228,7 +228,7 @@ echo mainFooter();
         }
 
         $scope.searchProduct = function(term) {
-            const filteredArray = window.mainList.records.filter(r => r.id == term || r.code == term || r.barcode == term || r.searchString.includes(term + '|') || r.searchString.includes('|' + term) || r.searchString.includes('|' + term + '|'));
+            const filteredArray = window.mainList.records.filter(r => r.id == term || r.code == term || r.barcode == term || r.searchString.split('|').pop()?.toLowerCase().includes(term?.toLowerCase()) || r.searchString.includes(term + '|') || r.searchString.includes('|' + term) || r.searchString.includes('|' + term + '|'));
             const secondfilteredArray = !filteredArray.length ? window.mainList.records.filter(obj => obj.searchString.toLowerCase().includes(term?.toLowerCase() || term)) : filteredArray;
             return secondfilteredArray.slice(0, 30);
         }
