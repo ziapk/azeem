@@ -527,12 +527,12 @@ echo mainFooter();
             const params = {};
             if ($scope.focus === true) {
                 params.term = parseFloat(term.split('-')[0]);
-                const item = window.mainList.records.find(r => r.id == params.term || r.code == params.term || r.barcode == params.term || r.searchString.split('|').pop()?.toLowerCase().includes('|' + params.term?.toLowerCase()));
+                const item = window.mainList.records.find(r => r.id == params.term || r.code == params.term || r.barcode == params.term || r.searchString.split('|').pop()?.toLowerCase().includes(params.term?.toLowerCase()));
                 $scope.product = '';
                 $scope.selectProduct(item);
                 return [];
             } else {
-                const filteredArray = window.mainList.records.filter(r => r.id == term || r.code == term || r.barcode == term || r.searchString.split('|').pop()?.toLowerCase().includes('|' + term?.toLowerCase()) || r.searchString.includes(term + '|') || r.searchString.includes('|' + term) || r.searchString.includes('|' + term + '|'));
+                const filteredArray = window.mainList.records.filter(r => r.id == term || r.code == term || r.barcode == term || r.searchString.split('|').pop()?.toLowerCase().includes(term?.toLowerCase()) || r.searchString.includes(term + '|') || r.searchString.includes('|' + term) || r.searchString.includes('|' + term + '|'));
                 const secondfilteredArray = !filteredArray.length ? window.mainList.records.filter(obj => obj.searchString.toLowerCase().includes(term?.toLowerCase() || term)) : filteredArray;
                 return secondfilteredArray.slice(0, 30);
             }
