@@ -22,6 +22,11 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
         .text-bold {
             font-weight: bold;
         }
+
+        .dropdown-height .dropdown-menu {
+            max-height: 300px;
+            overflow: auto;
+        }
     </style>
     <div ng-controller="cartController">
         <div class="container">
@@ -95,7 +100,7 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                                         </div>
                                     </th>
                                     <th width="100">
-                                        <div class="dropdown-wrapper align-right">
+                                        <div class="dropdown-wrapper align-right dropdown-height">
                                             <input type="text" class="form-control" id="searchProduct" ng-model="product" placeholder="Search Products" uib-typeahead="address as address.full_name for address in searchProduct($viewValue)" typeahead-on-select="selectProduct($item)" ng-model-options="{debounce: 100}" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="1">
                                         </div>
                                     </th>
