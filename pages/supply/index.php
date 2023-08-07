@@ -306,10 +306,12 @@ echo mainFooter();
                 });
         }
 
-        $scope.calculateSum = () => {
+        $scope.calculateSum = (price) => {
             let subtotal = 0;
             $scope.items.map((product) => {
-                // product.pprice = Math.round(product.price * ((100 - (parseFloat(product.discount || 0))) / 100));
+                if (price) {
+                    product.pprice = Math.round(product.price * ((100 - (parseFloat(product.discount || 0))) / 100));
+                }
                 subtotal += Math.round(product.pprice * product.qty);
                 product.total = Math.round(product.pprice * product.qty)
 
