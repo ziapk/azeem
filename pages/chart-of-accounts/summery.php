@@ -115,7 +115,7 @@ mainHeader();
                     <td><?php echo $value['transaction_date']; ?></td>
                     <td>
                         <?php if (!empty($value['order_ref'])) { ?>
-                            <a href="javascript:void(0)" onclick="openRecipt(<?php echo $value['order_ref']; ?>)"><?php echo $value['order_ref']; ?></a>
+                            <a href="javascript:void(0)" onclick="openRecipt(<?php echo $value['order_ref']; ?>)"><?php echo $value['order_custom_id']; ?></a>
                         <?php } elseif (!empty($value['supply_ref'])) { ?>
                             <a href="javascript:void(0)" onclick="openRecipt2(<?php echo $value['supply_ref']; ?>)"><?php echo $value['supply_ref']; ?></a>
                         <?php } elseif (!empty($value['return_ref'])) { ?>
