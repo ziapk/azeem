@@ -5,6 +5,7 @@
  */
 class DoubleEntry extends Connection
 {
+	private $table_orders = 'orders';
 	private $table = 'accounts';
 	private $table_modes = 'payment_modes';
 	private $table_types = 'account_types';
@@ -234,7 +235,7 @@ class DoubleEntry extends Connection
 			$summery = $prepare->fetch(PDO::FETCH_ASSOC);
 
 
-			$stmt = "SELECT transaction_id, transaction_date, order_ref, supply_ref, return_ref, transsaction_type, v_description, debitAmount, creditAmount, balance, reference  FROM
+			$stmt = "SELECT transaction_id, transaction_date, order_ref, order_custom_id, supply_ref, return_ref, transsaction_type, v_description, debitAmount, creditAmount, balance, reference  FROM
 			(SELECT
 			*
 			,COALESCE(debitAmount)  as debits
@@ -242,7 +243,7 @@ class DoubleEntry extends Connection
 			,(@running_balance := IF(@curr_account_id < account_id,         opening_balance,@running_balance)) prev_runnng_bal
 			,(@curr_account_id := IF(@curr_account_id < account_id,account_id,@curr_account_id)) curr_account_id
 			,(@running_balance := @running_balance + $str) as balance
-			FROM (SELECT t.transsaction_type, t.reference, e.transaction_id, e.payment_mode, a.parent_id, a.code, e.account_id, a.opening_balance, a.account_type, a.title, e.entry_type, t.transaction_date, amount, t.order_ref, t.supply_ref, t.return_ref, t.description as v_description, (CASE WHEN e.entry_type = 'D' THEN e.amount ELSE 0 END) AS debitAmount, (CASE WHEN e.entry_type = 'C' THEN e.amount ELSE 0 END) AS creditAmount FROM `$this->table_transactions` t LEFT JOIN `$this->table_ledger_entries` e ON e.transaction_id = t.id LEFT JOIN `$this->table` a ON a.id = e.account_id and a.status = 1 $where) as acc_account_transactions,(SELECT @running_balance := 0,@curr_account_id := 0) r
+			FROM (SELECT t.transsaction_type, t.reference, e.transaction_id, e.payment_mode, a.parent_id, a.code, e.account_id, a.opening_balance, a.account_type, a.title, e.entry_type, t.transaction_date, amount, o.order_custom_id, t.order_ref, t.supply_ref, t.return_ref, t.description as v_description, (CASE WHEN e.entry_type = 'D' THEN e.amount ELSE 0 END) AS debitAmount, (CASE WHEN e.entry_type = 'C' THEN e.amount ELSE 0 END) AS creditAmount FROM `$this->table_transactions` t LEFT JOIN `$this->table_ledger_entries` e ON e.transaction_id = t.id LEFT JOIN `$this->table` a ON a.id = e.account_id and a.status = 1 left join `$this->table_orders` as o on o.id=t.order_ref $where) as acc_account_transactions,(SELECT @running_balance := 0,@curr_account_id := 0) r
 			ORDER BY transaction_id) A";
 
 
