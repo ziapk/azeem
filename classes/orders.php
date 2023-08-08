@@ -4,6 +4,7 @@ class Orders extends Connection
 {
 
     private $table = 'orders';
+    private $table_store = 'store';
     private $table_sub = 'order_items';
     private $table_services = 'services';
     private $table_oservice = 'order_services';
@@ -22,6 +23,20 @@ class Orders extends Connection
         $prepare->execute();
         $result = $prepare->fetchAll(PDO::FETCH_ASSOC);
         return $result;
+    }
+    public function getNextId($shopId)
+    {
+        $stmt = "UPDATE `{$this->table_store}` SET last_bill_no = last_bill_no+1 where id=:shopId";
+        $prepare = $this->dbh->prepare($stmt);
+        $prepare->bindParam(':shopId', $shopId, PDO::PARAM_STR);
+        $prepare->execute();
+
+        $stmt = "SELECT last_bill_no from `{$this->table_store}` where id=:shopId";
+        $prepare = $this->dbh->prepare($stmt);
+        $prepare->bindParam(':shopId', $shopId, PDO::PARAM_STR);
+        $prepare->execute();
+        $result = $prepare->fetch(PDO::FETCH_ASSOC);
+        return $result['last_bill_no'];
     }
 
     public function updateOrderAdjustment($array)
@@ -67,8 +82,10 @@ class Orders extends Connection
                 $result = $prepare->rowCount();
                 return $array['id'];
             } else {
-                $stmt = "INSERT INTO `{$this->table}` (`user_id`, `customer_id`, `customer_name`, `status`, `price`, `paid_amount`, `discount`, `shopId`, `order_date`, `gst`, `service_charges`, `summery`, `ref_no`, `show_discount`, `status_id`, `expected_delivery_date`) VALUES (:user_id, :customer_id, :customer_name, :status, :price, :paid_amount, :discount, :shopId, :order_date, :gst, :service_charges, :summery, :ref_no, :show_discount, :status_id, :expected_delivery_date)";
+                $id = $this->getNextId($array['shopId']);
+                $stmt = "INSERT INTO `{$this->table}` (`order_custom_id`,`user_id`, `customer_id`, `customer_name`, `status`, `price`, `paid_amount`, `discount`, `shopId`, `order_date`, `gst`, `service_charges`, `summery`, `ref_no`, `show_discount`, `status_id`, `expected_delivery_date`) VALUES (:order_custom_id, :user_id, :customer_id, :customer_name, :status, :price, :paid_amount, :discount, :shopId, :order_date, :gst, :service_charges, :summery, :ref_no, :show_discount, :status_id, :expected_delivery_date)";
                 $prepare = $this->dbh->prepare($stmt);
+                $prepare->bindParam(':order_custom_id', $id, PDO::PARAM_STR);
                 $prepare->bindParam(':user_id', $array['user_id'], PDO::PARAM_STR);
                 $prepare->bindParam(':customer_id', $array['customer_id'], PDO::PARAM_STR);
                 $prepare->bindParam(':customer_name', $array['customer_name'], PDO::PARAM_STR);
@@ -522,7 +539,7 @@ class Orders extends Connection
             }
 
             if (!empty($params['orderId'])) {
-                $toCondition = " AND o.id='" . $params['orderId'] . "' ";
+                $toCondition = " AND o.order_custom_id='" . $params['orderId'] . "' ";
             }
 
             $stmt = "SELECT o.*, full_name, account_id FROM `{$this->table}` AS o LEFT JOIN customers AS c ON c.id = o.customer_id WHERE o.shopId=:shopId " . $toCondition . ' ' . $flagCondition . ' and ((o.flag = 1) or (o.flag = 2 and o.status IN (5,6,7))) ORDER BY id desc';
@@ -605,10 +622,11 @@ class Orders extends Connection
     {
         try {
 
-            $toCondition = " AND o.order_date>='" . $date . "' AND o.order_date<='" . $to . "'";
+            $toCondition = " AND o.order_date>='" . $date . "' AND o.order_date<='" . $to . "' ";
             if (!empty($ids)) {
-                $toCondition .= " AND sub.product_id IN (" . implode(',', $ids) . ")";
-                $stmt = "SELECT sub.*, o.order_date, p.full_name as productName, c.full_name FROM `{$this->table_sub}` AS sub left join `{$this->table_pro}` as p on p.id = sub.product_id left join `{$this->table}` as o on sub.order_id = o.id LEFT JOIN customers AS c ON c.id = o.customer_id WHERE o.shopId=:shopId " . $toCondition . ' and o.flag = 1 ORDER BY id asc';
+                print_r($ids);
+                $toCondition .= " AND sub.product_id IN (" . implode(',', $ids) . ") ";
+                $stmt = "SELECT sub.*, o.order_custom_id, o.order_date, p.full_name as productName, c.full_name FROM `{$this->table_sub}` AS sub left join `{$this->table_pro}` as p on p.id = sub.product_id left join `{$this->table}` as o on sub.order_id = o.id LEFT JOIN customers AS c ON c.id = o.customer_id WHERE o.shopId=:shopId " . $toCondition . ' and o.flag = 1 ORDER BY id asc';
             } else {
                 $stmt = "SELECT o.*, full_name FROM `{$this->table}` AS o LEFT JOIN customers AS c ON c.id = o.customer_id left join `{$this->table_sub}` as sub on sub.order_id = o.id WHERE o.shopId=:shopId " . $toCondition . ' and o.flag = 1 ORDER BY id asc';
             }

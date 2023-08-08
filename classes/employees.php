@@ -4,6 +4,7 @@ class Employees extends Connection
 {
 
 	private $table = 'employees';
+	private $table_loans = 'loans';
 	private $table_salary = 'salaries';
 
 	public function searchEmployee($shopId, $search, $accountsOnly = false)
@@ -38,6 +39,26 @@ class Employees extends Connection
 			$prepare->bindParam(':emg_contact_2', $array['emg_contact_2'], PDO::PARAM_STR);
 			$prepare->bindParam(':salary', $array['salary'], PDO::PARAM_STR);
 			$prepare->bindParam(':account_id', $array['account_id'], PDO::PARAM_STR);
+			$prepare->execute();
+			$result = $this->dbh->lastInsertId();
+			return $result;
+		} catch (PDOException $e) {
+			die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
+	public function insertLoan($array)
+	{
+		try {
+			$stmt = "INSERT INTO `{$this->table_loans}` (`shop_id`, `description`,`applied_date`, `issued_date`, `installment_amount`, `load_issued`, `loan_applied`, `status`) VALUES (:shop_id, :description, :applied_date, :issued_date, :installment_amount, :load_issued, :loan_applied, :status)";
+			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':shop_id', $array['shop_id'], PDO::PARAM_STR);
+			$prepare->bindParam(':description', $array['description'], PDO::PARAM_STR);
+			$prepare->bindParam(':applied_date', $array['applied_date'], PDO::PARAM_STR);
+			$prepare->bindParam(':issued_date', $array['issued_date'], PDO::PARAM_STR);
+			$prepare->bindParam(':installment_amount', $array['installment_amount'], PDO::PARAM_STR);
+			$prepare->bindParam(':load_issued', $array['load_issued'], PDO::PARAM_STR);
+			$prepare->bindParam(':loan_applied', $array['loan_applied'], PDO::PARAM_STR);
+			$prepare->bindParam(':status', $array['status'], PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $this->dbh->lastInsertId();
 			return $result;
@@ -100,6 +121,19 @@ class Employees extends Connection
 	{
 		try {
 			$stmt = "SELECT *  FROM `{$this->table}` WHERE `shop_id`=:shop_id";
+			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':shop_id', $shopId, PDO::PARAM_STR);
+			$prepare->execute();
+			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
+			return $result;
+		} catch (PDOException $e) {
+			die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
+	public function getLoans($shopId = null)
+	{
+		try {
+			$stmt = "SELECT *  FROM `{$this->table_loans}` WHERE `shop_id`=:shop_id";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':shop_id', $shopId, PDO::PARAM_STR);
 			$prepare->execute();
@@ -206,6 +240,34 @@ class Employees extends Connection
 		}
 	}
 
+	public function getLoansPagination($params)
+	{
+		try {
+
+			$stmt = "SELECT COUNT(id) as total FROM `{$this->table_loans}` where shop_id=:shop_id";
+			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':shop_id', $params['shopId'], PDO::PARAM_INT);
+			$prepare->execute();
+			$result = $prepare->fetch(PDO::FETCH_ASSOC);
+
+			$no_of_records_per_page = !empty($params['perPage']) ? $params['perPage'] : 10;
+			$total_rows = $result['total'];
+			$total_pages = ceil($total_rows / $no_of_records_per_page);
+			$currentPage = $total_pages >= $params['page'] ? $params['page'] : $total_pages;
+			$offset = (($currentPage - 1) < 0 ? 0 : ($currentPage - 1)) * $no_of_records_per_page;
+			$search = " AND (`description` LIKE '%" . $params["search"] . "%' OR loan_applied LIKE '%" . $params["search"] . "%' OR load_issued LIKE '%" . $params["search"] . "%' ) ";
+			$stmt = "SELECT * FROM `{$this->table_loans}` WHERE shop_id=:shop_id $search LIMIT :offset, :perPage";
+			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':offset', $offset, PDO::PARAM_INT);
+			$prepare->bindParam(':perPage', $no_of_records_per_page, PDO::PARAM_INT);
+			$prepare->bindParam(':shop_id', $params['shopId'], PDO::PARAM_INT);
+			$prepare->execute();
+			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
+			return ['page' => $currentPage, 'totalRecords' => $total_rows, 'perPage' => $no_of_records_per_page, 'records' => $result];
+		} catch (PDOException $e) {
+			die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
 	public function getEmployeesPagination($params)
 	{
 		try {

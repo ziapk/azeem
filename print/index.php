@@ -197,7 +197,7 @@ if ($largeView) {
                                 <td width="40" class="text-right">Customer:</td>
                                 <th width="40" style="white-space: nowrap;"><?php echo !empty($order['order']['customer_name']) ? $order['order']['customer_name'] : $foodpanda['full_name']; ?></th>
                                 <th style="text-align: center;">
-                                    <span style="font-size: 1.5em;">Sales Invoice</span> (<?php echo $_GET['id']; ?>)
+                                    <span style="font-size: 1.5em;">Sales Invoice</span> (<?php echo $order['order']['order_custom_id']; ?>)
                                 </th>
                                 <td width="40" class="text-right">Date:</td>
                                 <th width="40"><?php echo date('d/m/Y', strtotime($order['order']['created_at'])); ?></th>
@@ -414,7 +414,7 @@ if ($largeView) {
         </div>
         <span class="pull-left ref"><span style="font-size: 10px">Customer Name:</span> <strong><?php echo !empty($order['order']['customer_name']) ? $order['order']['customer_name'] : $foodpanda['full_name']; ?></strong></span>
         <div style="clear: both;"></div>
-        <span class="pull-left ref">Ref. RSV0<?php echo $_GET['id']; ?></span>
+        <span class="pull-left ref">Ref. RSV0<?php echo $order['order']['order_custom_id']; ?></span>
         <span class="pull-right date"><?php echo date('d/m/Y H:i', strtotime($order['order']['created_at'])); ?></span>
         <table width="100%" cellpadding="0" cellspacing="0">
             <thead>
