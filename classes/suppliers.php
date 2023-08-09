@@ -198,6 +198,15 @@ class Suppliers extends Connection
 				$closingTotal += $c['balance'];
 			}
 
+			if (!function_exists("cmp2")) {
+				function cmp2($a, $b)
+				{
+					return $b["closing_balance"] - $a["closing_balance"];
+				}
+			}
+
+			usort($result, "cmp2");
+
 			return ['page' => $currentPage, 'closing_total' => $closingTotal, 'totalRecords' => $total_rows, 'perPage' => $no_of_records_per_page, 'records' => $result];
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
