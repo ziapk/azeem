@@ -62,8 +62,6 @@ switch ($reportType) {
 			$ob = $reportDataOther['opening_balance']['amount'];
 		}
 
-		var_dump($reportData);
-
 		$subtitle = 'Closing Balance' . $subtitle;
 		$kkk = [];
 		$titles = [];
