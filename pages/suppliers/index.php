@@ -34,6 +34,7 @@ echo mainHeader(['page' => 'supplier']);
                 <td>
                     <a class="btn btn-primary btn-xs" href="<?php echo SITE_URL . "pages/suppliers/update.php?id=" ?>{{li.id}}">Edit</a>
                     <?php if ($userData['role'] === 'owner' || $userData['role'] === 'manager') { ?><a class="btn btn-default btn-xs" href="../chart-of-accounts/summery.php?t=s&id={{li.account_id}}">Ledger</a><?php } ?>
+                    <?php if ($userData['role'] === 'owner' || $userData['role'] === 'manager') { ?><a ng-click="deleteCustomer(li.id)" class="btn btn-danger btn-xs" href="javascript:void(0)"><span class="fa fa-remove"><span></a><?php } ?>
                     <a class="btn btn-danger btn-xs" href="<?php echo SITE_URL . "pages/suppliers/invoices.php?id=" ?>{{li.id}}">Bills</a>
                     <a class="btn btn-danger btn-xs" href="<?php echo SITE_URL . "pages/suppliers/adjustment.php?id=" ?>{{li.id}}">Payment</a>
                 </td>
@@ -138,6 +139,13 @@ echo mainHeader(['page' => 'supplier']);
 
         $scope.searchSupplier = () => {
             $scope.getSuppliers(1);
+        }
+
+        $scope.deleteCustomer = function(id) {
+            if (window.confirm('Are you sure ?')) {
+                window.open("<?php echo SITE_URL; ?>pages/suppliers/delete.php?id=" + id, "", "width=300,height=400");
+                window.location.reload();
+            }
         }
 
         $scope.getSuppliers($scope.currentPage);
