@@ -319,7 +319,7 @@ foreach ($publishersArr as $key => $value) {
         $scope.form = {
             full_name: item.full_name,
             sale_date: item.sale_date,
-            closing_balance: closingReport?.other?.opening_balance?.amount || 0,
+            closing_balance: closingReport?.other?.totalNetSale || 0,
         }
         $scope.ok = function() {
             $uibModalInstance.close({
