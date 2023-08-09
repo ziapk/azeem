@@ -36,11 +36,11 @@ $ownerStores = $stores->getOwnerStores($userId);
                         <li ng-repeat="(k, l) in li">
                             <a href="javascript:void(0)" ng-class="{'text-danger text-bold': selectedSize == k }">{{k}}</a>
 
-                            <ul class="dropdown-menu dropdown-submenu" style="min-width: 250px; max-height: 300px;">
+                            <ul class="dropdown-menu dropdown-submenu" style="min-width: 250px;">
                                 <li ng-repeat="(dd, i) in l">
                                     <a href="javascript:void(0)" ng-if="!key.toLowerCase().includes('uniform')" ng-click="addAllBooks(i.items)">{{dd}}</a>
                                     <a href="javascript:void(0)" ng-if="key.toLowerCase().includes('uniform')">{{dd}}</a>
-                                    <ul class="dropdown-menu dropdown-submenu" style="min-width: 250px; max-height: 300px;" ng-if="key.toLowerCase().includes('uniform')">
+                                    <ul class="dropdown-menu dropdown-submenu" style="min-width: 250px;" ng-if="key.toLowerCase().includes('uniform')">
                                         <li ng-repeat="book in i.items">
                                             <a href="javascript:void(0)" ng-click="selectProduct(book, 's', undefined, $event)">{{book.full_name}}</a>
                                         </li>
