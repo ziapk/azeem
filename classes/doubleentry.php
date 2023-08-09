@@ -235,7 +235,7 @@ class DoubleEntry extends Connection
 			$summery = $prepare->fetch(PDO::FETCH_ASSOC);
 
 
-			$stmt = "SELECT transaction_id, transaction_date, order_ref, order_custom_id, supply_ref, return_ref, transsaction_type, v_description, debitAmount, creditAmount, balance, reference  FROM
+			$stmt = "SELECT transaction_id, title, transaction_date, order_ref, order_custom_id, supply_ref, return_ref, transsaction_type, v_description, debitAmount, creditAmount, balance, reference  FROM
 			(SELECT
 			*
 			,COALESCE(debitAmount)  as debits
@@ -269,6 +269,7 @@ class DoubleEntry extends Connection
 					}
 				}
 			}
+
 			return ['count' => sizeof($result), 'rows' => $final, 'first' => $beforeEntry, 'summery' => $summery];
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");

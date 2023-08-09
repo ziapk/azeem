@@ -1,7 +1,7 @@
 <?php
 
 include_once dirname(__FILE__) . '/../../include/settings.php';
-include_once dirname(__FILE__) . '/../../../portal/mpdf/mpdf.php';
+include_once dirname(__FILE__) . '/../../../fee/mpdf/mpdf.php';
 $doubleEntry = new DoubleEntry();
 
 $params = array();
@@ -30,7 +30,7 @@ foreach ($accountsData as $a) {
 
 $reportTitle = $shop['full_name'] . ' - ' . $shop['city'];
 
-$subtitle = "Payment Details";
+$subtitle = "Payment Details for " . $entries['first']['title'];
 
 //$time = new datetime('Y');
 $d = new DateTime('Y');
