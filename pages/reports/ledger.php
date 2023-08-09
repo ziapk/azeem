@@ -101,7 +101,7 @@ ob_start();
 
 <?php
 
-foreach ($entiresFinal['rows'] as $key => $rows) {
+foreach ($entiresFinal as $key => $rows) {
 ?>
     <table id="resultTable" width="100%" style="border-collapse: collapse" border="0">
         <thead>
