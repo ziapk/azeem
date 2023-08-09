@@ -9,12 +9,12 @@ $from = $_POST['from'];
 $to = $_POST['to'];
 $account_id = $_POST['account_id'];
 $entries = $doubleEntry->getLedgerByAccount($_POST);
-$entiresFinal = $entries['rows'];
-// foreach ($entries['rows'] as $key => $value) {
-//     $entiresFinal[date('F-Y', strtotime($value['transaction_date']))]['rows'][] = $value;
-//     $entiresFinal[date('F-Y', strtotime($value['transaction_date']))]['totals']['credit'] += $value['creditAmount'];
-//     $entiresFinal[date('F-Y', strtotime($value['transaction_date']))]['totals']['debit'] += $value['debitAmount'];
-// }
+// $entiresFinal = $entries['rows'];
+foreach ($entries['rows'] as $key => $value) {
+    $entiresFinal[date('F-Y', strtotime($value['transaction_date']))]['rows'][] = $value;
+    $entiresFinal[date('F-Y', strtotime($value['transaction_date']))]['totals']['credit'] += $value['creditAmount'];
+    $entiresFinal[date('F-Y', strtotime($value['transaction_date']))]['totals']['debit'] += $value['debitAmount'];
+}
 
 $headers         = array();
 $columns         = array();
@@ -90,54 +90,57 @@ ob_start();
 
     <?php } ?>
 </style>
-<?php
-?>
-<table id="resultTable" width="100%" style="border-collapse: collapse" border="0">
+<table width="100%" style="border-collapse: collapse" border="0">
     <thead>
         <tr>
-            <th style="border-width: 0; font-size: 14px; font-style: italic; font-family: 'Times New Roman', Times, serif; line-height: 1.8" colspan="5">Payment Details for the month of <?php echo $key; ?></th>
-        </tr>
-        <tr>
-            <th style="border: 1px solid">Sr.#</th>
-            <th style="border: 1px solid">Date</th>
-            <th style="border: 1px solid">Narration</th>
-            <th style="border: 1px solid">Debit</th>
-            <th style="border: 1px solid">Credit</th>
-            <th style="border: 1px solid">Balance</th>
+            <th style="border: 1px solid">Opening Balance</th>
+            <th style="border: 1px solid"><?php echo number_format($entries['first']['balance']); ?></th>
         </tr>
     </thead>
-    <tbody>
-        <tr>
-            <td style="border: 1px solid">1</td>
-            <td style="border: 1px solid">Opening Balance</td>
-            <td style="border: 1px solid">--</td>
-            <td style="border: 1px solid" align="right">--</td>
-            <td style="border: 1px solid" align="right">--</td>
-            <td style="border: 1px solid" align="right"><?php echo number_format($entries['first']['balance']); ?></td>
-        </tr>
-        <?php foreach ($entiresFinal as $k => $v) { ?>
-            <tr>
-                <td style="border: 1px solid"><?php echo ($k + 2); ?></td>
-                <td style="border: 1px solid"><?php echo $v['transaction_date']; ?></td>
-                <td style="border: 1px solid"><?php echo $v['v_description']; ?></td>
-                <td style="border: 1px solid" align="right"><?php echo number_format($v['debitAmount']); ?></td>
-                <td style="border: 1px solid" align="right"><?php echo number_format($v['creditAmount']); ?></td>
-                <td style="border: 1px solid" align="right"><?php echo number_format($v['balance']); ?></td>
-            </tr>
-        <?php } ?>
-    </tbody>
-    <tfoot>
-        <tr>
-            <th style="font-size: 14px; font-style: italic; font-family: 'Times New Roman', Times, serif; text-align: right; padding-right: 10px" colspan="3">Total</th>
-            <th style="border: 1px solid" align="right"><?php // echo number_format($rows['totals']['debit']); 
-                                                        ?></th>
-            <th style="border: 1px solid" align="right"><?php // echo number_format($rows['totals']['credit']); 
-                                                        ?></th>
-        </tr>
-    </tfoot>
 </table>
+
 <?php
 
+foreach ($entiresFinal['rows'] as $key => $rows) {
+?>
+    <table id="resultTable" width="100%" style="border-collapse: collapse" border="0">
+        <thead>
+            <tr>
+                <th style="border-width: 0; font-size: 14px; font-style: italic; font-family: 'Times New Roman', Times, serif; line-height: 1.8" colspan="5">Payment Details for the month of <?php echo $key; ?></th>
+            </tr>
+            <tr>
+                <th style="border: 1px solid">Sr.#</th>
+                <th style="border: 1px solid">Date</th>
+                <th style="border: 1px solid">Narration</th>
+                <th style="border: 1px solid">Debit</th>
+                <th style="border: 1px solid">Credit</th>
+                <th style="border: 1px solid">Balance</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach ($rows['rows'] as $k => $v) { ?>
+                <tr>
+                    <td style="border: 1px solid"><?php echo ($k + 2); ?></td>
+                    <td style="border: 1px solid"><?php echo $v['transaction_date']; ?></td>
+                    <td style="border: 1px solid"><?php echo $v['v_description']; ?></td>
+                    <td style="border: 1px solid" align="right"><?php echo number_format($v['debitAmount']); ?></td>
+                    <td style="border: 1px solid" align="right"><?php echo number_format($v['creditAmount']); ?></td>
+                    <td style="border: 1px solid" align="right"><?php echo number_format($v['balance']); ?></td>
+                </tr>
+            <?php } ?>
+        </tbody>
+        <tfoot>
+            <tr>
+                <th style="font-size: 14px; font-style: italic; font-family: 'Times New Roman', Times, serif; text-align: right; padding-right: 10px" colspan="3">Total</th>
+                <th style="border: 1px solid" align="right"><?php // echo number_format($rows['totals']['debit']); 
+                                                            ?></th>
+                <th style="border: 1px solid" align="right"><?php // echo number_format($rows['totals']['credit']); 
+                                                            ?></th>
+            </tr>
+        </tfoot>
+    </table>
+<?php
+}
 $html = ob_get_contents();
 ob_clean();
 
