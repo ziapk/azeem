@@ -397,6 +397,259 @@ class DoubleEntry extends Connection
 	}
 	public function getClosingBalanceReport($array)
 	{
+		$shopAccounts = new ShopAccounts();
+		$accountsData = $shopAccounts->getSAs($array['shopId']);
+		$store = [];
+		foreach ($accountsData as $a) {
+			$store[$a['key_value']] = $a['account_id'];
+		}
+		$array['parent_ids'][] = $store['receivable'];
+		$array['parent_ids'][] = $store['payable'];
+		$array['account_ids'][] = $store['sale_discount'];
+		$array['account_ids'][] = $store['receiving'];
+		$array['account_ids'][] = $store['sale_returns'];
+		$array['account_ids'][] = $store['purchase_returns'];
+		$array['parent_ids'][] = $store['expense'];
+		try {
+			$fromDate = !empty($array['fromDate']) ? $array['fromDate'] : '';
+			$toDate = !empty($array['toDate']) ? $array['toDate'] : '';
+			$shopId = !empty($array['shopId']) ? $array['shopId'] : '';
+			$parent_ids = !empty($array['parent_ids']) ? $array['parent_ids'] : [];
+			$account_ids = !empty($array['account_ids']) ? $array['account_ids'] : [];
+
+			$shopIdCondition = "";
+			$accountCondition = "";
+
+			if (!empty($shopId)) {
+				$shopIdCondition = "and t.shopId = $shopId";
+			}
+
+			if (!empty($account_ids)) {
+				$accountCondition = "and (a.parent_id in (" . implode(',', $parent_ids) . ") or a.id in (" . implode(',', $account_ids) . "))";
+			}
+
+			$stmt = "SELECT t.transsaction_type,  e.transaction_id, e.payment_mode, a.parent_id, a.code, e.account_id, a.account_type, a.title, e.entry_type, t.transaction_date, amount FROM `$this->table_transactions` t LEFT JOIN `$this->table_ledger_entries` e ON e.transaction_id = t.id LEFT JOIN `$this->table` a ON a.id = e.account_id and a.status = 1 WHERE (t.flag=1 $shopIdCondition $accountCondition) and (DATE(t.transaction_date) BETWEEN :fromDate AND :toDate)";
+			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':fromDate', $fromDate, PDO::PARAM_STR);
+			$prepare->bindParam(':toDate', $toDate, PDO::PARAM_STR);
+			$prepare->execute();
+			$result['rows'] = $prepare->fetchAll(PDO::FETCH_ASSOC);
+			$result['opening_balance'] = $this->getOBForReport($array);
+
+			$reportDataRaw = $result;
+
+
+			$rows = [];
+			$exp = $store['sale_discount'];
+			$expHead = $store['expense'];
+			$count = 0;
+			$expenses = ['total' => 0, 'rows' => []];
+			$otherList = [];
+			$otherTotals = [];
+			$purchaseReturnsList = [];
+			$exchange = 0;
+			$payments = 0;
+			$receivings = 0;
+			$cashSale = 0;
+			$sale_returns = 0;
+			$purchase_returns = 0;
+			$receivingList = 0;
+			$final = [];
+			$modes = [];
+			$cashTotals = [];
+			$modesList = $this->getPaymentModes(['page' => 1, 'perPage' => 10000, 'search' => '', 'shopId' => $array['shopId']]);
+			$cashModeId = 0;
+			foreach ($modesList['records'] as $key => $value) {
+				$amodesList[$value['id']] = $value;
+				if ($value['code'] == 'CASH') {
+					$cashModeId = $value['id'];
+				}
+			}
+			foreach ($reportDataRaw['rows'] as $key => $value) {
+				if ($value['transsaction_type'] == 'SALE' || $value['transsaction_type'] == 'EXPENSE') {
+					if ($value['parent_id'] == $store['receivable']) { // exclude expense
+						if ($value['entry_type'] == 'D') {
+							$rows[$value['account_id']]['row'] = $value;
+							$rows[$value['account_id']]['totalCredit'] += $value['amount'];
+						} else {
+							$rows[$value['account_id']]['row'] = $value;
+							$modes[$value['payment_mode']] += $value['amount'];
+							$rows[$value['account_id']]['totalPaid'] += $value['amount'];
+							$rows[$value['account_id']]['paid'][$value['payment_mode']] += $value['amount'];
+						}
+					} else if ($value['parent_id'] == $expHead) {
+						if ($cashModeId == $value['payment_mode']) {
+							$cashTotals["exp"] += $value['amount'];
+						}
+						if (empty($expenses['rows'][$value['transaction_date']]['row'][$value['account_id']][$value['payment_mode']])) {
+							$expenses['rows'][$value['transaction_date']]['row'][$value['account_id']][$value['payment_mode']] = $value;
+						} else {
+							$expenses['rows'][$value['transaction_date']]['row'][$value['account_id']][$value['payment_mode']]['amount'] += $value['amount'];
+						}
+						$expenses['rows'][$value['transaction_date']]['total'][$value['payment_mode']] += $value['amount'];
+						$expenses['total'][$value['payment_mode']] += $value['amount'];
+					}
+				} elseif (in_array($value['transsaction_type'], ['DIRECT_RECEIVING', 'CASH_RECEIVED'])) {
+					if ($store['receivable'] == $value['parent_id']) {
+
+						$k = "RECEIVING";
+
+						$m = $value['payment_mode'];
+
+						$otherTotals['accounts'][$value['account_id']][$k][$m] += $value['amount'];
+						$otherTotals['totals'][$k][$m] += $value['amount'];
+
+						if (empty($otherList[$value['account_id']][$k][$m])) {
+							$otherList[$value['account_id']][$k][$m] = $value;
+						} else {
+							$otherList[$value['account_id']][$k][$m]['amount'] += $value['amount'];
+						}
+
+						if ($cashModeId == $value['payment_mode']) {
+							$receivings += $value['amount'];
+						}
+					}
+				} else {
+					$consider = true;
+
+					if (in_array($value['transsaction_type'], ['ROYALTY PAYMENT', 'PURCHASE_PAYMENT', 'DIRECT_PAYMENT'])) {
+						if ($cashModeId == $value['payment_mode']) {
+							$payments += $value['amount'];
+						}
+					}
+					if (in_array($value['transsaction_type'], ['EXCHANGE'])) {
+						$exchange += $value['amount'];
+					}
+					if (in_array($value['transsaction_type'], ['SALE_RETURN'])) {
+						if ($store['receivable'] == $value['parent_id'] && $value['entry_type'] == 'D') {
+							if ($cashModeId == $value['payment_mode']) {
+								$sale_returns += $value['amount'];
+							}
+						} else {
+							$consider = false;
+						}
+					}
+
+					if (in_array($value['transsaction_type'], ['PURCHASE'])) {
+						if ($value['entry_type'] == 'D') {
+							if ($cashModeId == $value['payment_mode']) {
+								$payments += $value['amount'];
+							}
+						} else {
+							$consider = false;
+						}
+					}
+
+					if ($consider) {
+						$otherTotals['accounts'][$value['account_id']][$value['transsaction_type']][$value['payment_mode']] += $value['amount'];
+						$otherTotals['totals'][$value['transsaction_type']][$value['payment_mode']] += $value['amount'];
+						if (empty($otherList[$value['account_id']][$value['transsaction_type']][$value['payment_mode']])) {
+							$otherList[$value['account_id']][$value['transsaction_type']][$value['payment_mode']] = $value;
+						} else {
+							$otherList[$value['account_id']][$value['transsaction_type']][$value['payment_mode']]['amount'] += $value['amount'];
+						}
+					}
+				}
+
+				$count++;
+			}
+
+
+			// $rows2 = [];
+			$totals = ['expense' => 0, 'gross' => 0, 'net' => 0];
+			$count = 0;
+			$reportData1 = [];
+			foreach ($rows as $accountId => $transaction) {
+				// if(empty($transactions['isReceiving'])) {
+				$final[$accountId]['id'] = $transaction['row']['transaction_id'];
+				$final[$accountId]['code'] = $transaction['row']['code'];
+				$final[$accountId]['title'] = $transaction['row']['title'];
+				$final[$accountId]['grossCredit'] += $transaction['totalCredit'];
+				$final[$accountId]['totalCredit'] += $transaction['totalCredit'];
+				foreach ($modesList['records'] as $m) {
+					if ($m['code'] == 'CASH') {
+						$cashSale += $transaction['paid'][$m['id']];
+					}
+					$final[$accountId][$m['id']] += $transaction['paid'][$m['id']];
+				}
+
+
+				$final[$accountId]['totalPaid'] += $transaction['totalPaid'];
+				$final[$accountId]['totalDiscount'] += $transaction['discount'];
+				// }
+				if (!empty($final)) {
+					$reportData1 = array_values($final);
+				}
+			}
+			$reportData = [];
+
+			$count = 0;
+			$footer = [];
+			$finalSummeryDateWise = [];
+
+			foreach ($reportData1 as $key => $value) {
+				if (empty($value['title'])) {
+					unset($reportData1);
+				} else {
+					$reportData['records'][$count] = $value;
+					$reportData['records'][$count]['grossCreditSales'] = !empty($value['grossCredit'] - $value['totalPaid']) ? $value['grossCredit'] - $value['totalPaid'] + $value['totalDiscount'] : 0;
+					$reportData['records'][$count]['grossCashSales'] = !empty($value['totalPaid']) ? $value['totalPaid'] + $value['totalDiscount'] : 0;
+					// $reportData['records'][$count]['discount'] = $value['totalDiscount'];
+					$reportData['records'][$count]['netCreditSales'] = $value['totalCredit'] - $value['totalPaid'];
+					$reportData['records'][$count]['netCashSales'] = $value['totalPaid'];
+					$reportData['records'][$count]['finalCashSales'] = $value['totalPaid'];
+
+					foreach ($modesList['records'] as $m) {
+						$reportData['records'][$count][$m['id']] = $value[$m['id']];
+						$footer[$m['id']] += $value[$m['id']];
+					}
+
+					$footer['grossCreditSales'] += !empty($value['grossCredit'] - $value['totalPaid']) ? $value['grossCredit'] - $value['totalPaid'] + $value['totalDiscount'] : 0;
+					$footer['grossCashSales'] += !empty($value['totalPaid']) ? $value['totalPaid'] + $value['totalDiscount'] : 0;
+					$footer['discount'] += $value['totalDiscount'];
+					$footer['netCreditSales'] += $value['totalCredit'] - $value['totalPaid'];
+					$footer['netCashSales'] += $value['totalPaid'];
+					$footer['finalCashSales'] += $value['totalPaid'];
+
+					$finalSummeryDateWise[$value['transaction_date']] += $value['totalPaid'];
+					$count++;
+				}
+			}
+
+			$reportData['other']['expenses'] = $expenses;
+			$reportData['other']['cashTotals'] = $cashTotals;
+			$reportData['other']['footer'] = $footer;
+			$reportData['other']['cashSale'] = $cashSale;
+			$reportData['other']['otherList'] = $otherList;
+			$reportData['other']['otherTotals'] = $otherTotals;
+			$reportData['other']['receivings'] = $receivings;
+			$reportData['other']['purchase_returns'] = $purchase_returns;
+			$reportData['other']['sale_returns'] = $sale_returns;
+			$reportData['other']['payments'] = $payments;
+
+
+			$tsale = $reportData['other']['cashSale'];
+			$creditsale = empty($footer['netCreditSales']) ? 0 : $footer['netCreditSales'];
+			$texpense = $reportData['other']['cashTotals']["exp"];
+			$cash = ($tsale + $receivings + $purchase_returns);
+			$deduction = ($sale_returns + $texpense + $payments);
+			$netCash = ($tsale + $receivings + $purchase_returns) - $deduction;
+
+			$reportData['other']['cash'] = $cash;
+			$reportData['other']['deduction'] = $deduction;
+			$reportData['other']['netCash'] = $netCash;
+			$reportData['other']['texpense'] = $texpense;
+			$reportData['other']['creditsale'] = $creditsale;
+			$reportData['other']['totalSale'] = $reportDataRaw['opening_balance'] + $cash;
+			$reportData['other']['totalNetSale'] = $reportData['other']['totalSale'] - $deduction;
+
+			return $reportData;
+		} catch (PDOException $e) {
+			die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
+	public function getClosingBalanceReportBKPORIGINAL($array)
+	{
 		try {
 			$fromDate = !empty($array['fromDate']) ? $array['fromDate'] : '';
 			$toDate = !empty($array['toDate']) ? $array['toDate'] : '';
