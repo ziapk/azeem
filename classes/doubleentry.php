@@ -268,6 +268,8 @@ class DoubleEntry extends Connection
 						$final[] = $value;
 					}
 				}
+			} else {
+				$final = $result;
 			}
 
 			return ['count' => sizeof($result), 'rows' => $final, 'first' => $beforeEntry, 'summery' => $summery];
