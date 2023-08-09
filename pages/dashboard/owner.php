@@ -155,6 +155,7 @@ foreach ($publishersArr as $key => $value) {
         $scope.maxSize = 5;
         $scope.checkbox = {}
         $scope.showPicker = {};
+        $scope.closingReport = {};
         $scope.form = {
 
         }
@@ -227,8 +228,15 @@ foreach ($publishersArr as $key => $value) {
         }
 
         $scope.applyClosing = (id, store) => {
-            console.log('id, store', id, store);
-            $scope.shopClosing(store);
+            $http.post('<?php echo SITE_URL; ?>api/getSaleClosingReport.php', $httpParamSerializerJQLike({
+                shopId: id
+            }), {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            }).then((response) => {
+                $scope.shopClosing(store, response.data);
+            })
             // $scope.showPicker = {};
             // $scope.showPicker[id] = true;
             // $timeout(() => {
@@ -274,7 +282,7 @@ foreach ($publishersArr as $key => $value) {
                 })
             }
         }
-        $scope.shopClosing = function(item) {
+        $scope.shopClosing = function(item, closingReport) {
             $uibModal.open({
                 ariaLabelledBy: 'modal-title',
                 ariaDescribedBy: 'modal-body',
@@ -282,7 +290,10 @@ foreach ($publishersArr as $key => $value) {
                 controller: 'ModalInstanceCtrl',
                 resolve: {
                     parentData: function() {
-                        return item
+                        return {
+                            item,
+                            closingReport
+                        }
                     }
                 }
             }).result.then(function(response) {
@@ -300,16 +311,21 @@ foreach ($publishersArr as $key => $value) {
         };
     });
     app.controller('ModalInstanceCtrl', function($scope, $http, $window, $uibModalInstance, $httpParamSerializerJQLike, parentData) {
+
+        const {
+            item,
+            closingReport
+        } = parentData;
         $scope.form = {
-            full_name: parentData.full_name,
-            sale_date: parentData.sale_date,
-            closing_amount: 0,
+            full_name: item.full_name,
+            sale_date: item.sale_date,
+            closing_balance: closingReport?.other?.opening_balance?.amount || 0,
         }
         $scope.ok = function() {
             $uibModalInstance.close({
                 ...$scope.form,
                 sale_date: moment($scope.form.sale_date).format('YYYY-MM-DD'),
-                id: parentData.id,
+                id: item.id,
             });
         };
 

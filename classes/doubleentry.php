@@ -403,6 +403,9 @@ class DoubleEntry extends Connection
 		foreach ($accountsData as $a) {
 			$store[$a['key_value']] = $a['account_id'];
 		}
+
+		$storeInfo = new Store();
+		$storeData = $storeInfo->getStore($array['shopId']);
 		$array['parent_ids'][] = $store['receivable'];
 		$array['parent_ids'][] = $store['payable'];
 		$array['account_ids'][] = $store['sale_discount'];
@@ -411,8 +414,8 @@ class DoubleEntry extends Connection
 		$array['account_ids'][] = $store['purchase_returns'];
 		$array['parent_ids'][] = $store['expense'];
 		try {
-			$fromDate = !empty($array['fromDate']) ? $array['fromDate'] : '';
-			$toDate = !empty($array['toDate']) ? $array['toDate'] : '';
+			$array['fromDate'] = $fromDate = !empty($array['fromDate']) ? $array['fromDate'] : $storeData['sale_date'];
+			$array['toDate'] = $toDate = !empty($array['toDate']) ? $array['toDate'] : $storeData['sale_date'];
 			$shopId = !empty($array['shopId']) ? $array['shopId'] : '';
 			$parent_ids = !empty($array['parent_ids']) ? $array['parent_ids'] : [];
 			$account_ids = !empty($array['account_ids']) ? $array['account_ids'] : [];
@@ -1408,7 +1411,7 @@ class DoubleEntry extends Connection
 	public function getOBForReport($array)
 	{
 		try {
-			$stmt = "SELECT * FROM `{$this->table_ob}` WHERE shop_id=:shop_id and (DATE(sale_date) BETWEEN :fromDate AND :toDate)";
+			$stmt = "SELECT * FROM `{$this->table_ob}` WHERE shop_id=:shop_id and flag=1 and (DATE(sale_date) BETWEEN :fromDate AND :toDate)";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':fromDate', $array['fromDate'], PDO::PARAM_STR);
 			$prepare->bindParam(':toDate', $array['toDate'], PDO::PARAM_STR);
