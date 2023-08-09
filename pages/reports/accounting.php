@@ -55,8 +55,12 @@ switch ($reportType) {
 		$search = !empty($_GET['search']) ? $_GET['search'] : "";
 		$balances = $customers->getCustomersPagination(['page' => $page, 'perPage' => $perPage, 'search' => $search, 'shopId' => $shop['id']]);
 
-
-		$reportData = $doubleEntry->getClosingBalanceReport($params);
+		try {
+			$reportData = $doubleEntry->getClosingBalanceReport($params);
+		} catch (Exception $e) {
+			var_dump($e);
+			die();
+		}
 		$reportDataOther = $reportData['other'];
 		$reportData = $reportData['records'];
 
