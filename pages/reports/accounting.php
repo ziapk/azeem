@@ -1,9 +1,6 @@
 <?php
 
 include_once dirname(__FILE__) . '/../../include/settings.php';
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
 
 $doubleEntry = new DoubleEntry();
 
@@ -58,8 +55,6 @@ switch ($reportType) {
 		$balances = $customers->getCustomersPagination(['page' => $page, 'perPage' => $perPage, 'search' => $search, 'shopId' => $shop['id']]);
 
 		$reportData = $doubleEntry->getClosingBalanceReport($params);
-		var_dump($reportData);
-		exit;
 		$reportDataOther = $reportData['other'];
 		$reportData = $reportData['records'];
 
