@@ -1,7 +1,7 @@
 <?php
 
 include_once dirname(__FILE__) . '/../../include/settings.php';
-include_once dirname(__FILE__) . '/../../../fee/mpdf/mpdf.php';
+include_once dirname(__FILE__) . '/../../../portal/mpdf/mpdf.php';
 $doubleEntry = new DoubleEntry();
 
 $params = array();
@@ -144,17 +144,14 @@ foreach ($entiresFinal['rows'] as $key => $rows) {
 $html = ob_get_contents();
 ob_clean();
 
-echo $html;
+$footer = 'Today: ' . date('d-m-Y h:i:s');
+$mpdf = new mPDF('c', 'A4', null, 10, 10, 10, '35');
+$mpdf->setHeader($header);
+$mpdf->setFooter($footer);
+$mpdf->WriteHTML($html);
 
-
-// $footer = 'Today: ' . date('d-m-Y h:i:s');
-// $mpdf = new mPDF('c', 'A4', null, 10, 10, 10, '35');
-// $mpdf->setHeader($header);
-// $mpdf->setFooter($footer);
-// $mpdf->WriteHTML($html);
-
-// $mpdf->Output($shop['full_name'] . '-Balances.pdf', 'I');
-// exit;
+$mpdf->Output($shop['full_name'] . '-Balances.pdf', 'I');
+exit;
 
 
 
