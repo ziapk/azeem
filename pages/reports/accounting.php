@@ -21,7 +21,6 @@ foreach ($modesList['records'] as $key => $value) {
 		$cashModeId = $value['id'];
 	}
 }
-$ob = !empty($opening_balance) ? $opening_balance : 0;
 
 $headers 		= array();
 $columns 		= array();
@@ -55,12 +54,9 @@ switch ($reportType) {
 		$search = !empty($_GET['search']) ? $_GET['search'] : "";
 		$balances = $customers->getCustomersPagination(['page' => $page, 'perPage' => $perPage, 'search' => $search, 'shopId' => $shop['id']]);
 
-		try {
-			$reportData = $doubleEntry->getClosingBalanceReport($params);
-		} catch (Exception $e) {
-			var_dump($e);
-			die();
-		}
+		$reportData = $doubleEntry->getClosingBalanceReport($params);
+		var_dump($reportData);
+		exit;
 		$reportDataOther = $reportData['other'];
 		$reportData = $reportData['records'];
 
@@ -376,7 +372,7 @@ ob_start();
 
 		<tr>
 			<th align="left">Total</th>
-			<th align="right"><?php echo number_format($reportDataOther['cash'] + $ob, 0); ?></th>
+			<th align="right"><?php echo number_format($reportDataOther['totalSale'], 0); ?></th>
 			<th align="left">Total</th>
 			<th align="right"><?php echo number_format($reportDataOther['deduction'], 0); ?></th>
 		</tr>
