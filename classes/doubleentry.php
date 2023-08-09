@@ -640,7 +640,7 @@ class DoubleEntry extends Connection
 			$reportData['other']['netCash'] = $netCash;
 			$reportData['other']['texpense'] = $texpense;
 			$reportData['other']['creditsale'] = $creditsale;
-			$reportData['other']['totalSale'] = $reportDataRaw['opening_balance'] + $cash;
+			$reportData['other']['totalSale'] = $result['opening_balance']['amount'] + $cash;
 			$reportData['other']['totalNetSale'] = $reportData['other']['totalSale'] - $deduction;
 
 			return $reportData;
