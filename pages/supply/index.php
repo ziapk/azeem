@@ -310,10 +310,10 @@ echo mainFooter();
             let subtotal = 0;
             $scope.items.map((product) => {
                 if (price) {
-                    product.pprice = Math.round(product.price * ((100 - (parseFloat(product.discount || 0))) / 100));
+                    product.pprice = parseFloat((product.price * ((100 - (parseFloat(product.discount || 0))) / 100)).toFixed(2));
                 }
-                subtotal += Math.round(product.pprice * product.qty);
-                product.total = Math.round(product.pprice * product.qty)
+                subtotal += parseFloat((product.pprice * product.qty).toFixed(2));
+                product.total = parseFloat((product.pprice * product.qty).toFixed(2))
 
                 return Object.assign({}, product);
             })
@@ -322,7 +322,7 @@ echo mainFooter();
         }
 
         $scope.calculatePercent = product => {
-            product.discount = Math.round(((1 - (product.pprice / product.price)) * 100).toFixed(1))
+            product.discount = parseFloat(((1 - (product.pprice / product.price)) * 100).toFixed(2))
             $scope.calculateSum()
         }
 
