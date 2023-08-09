@@ -1,7 +1,7 @@
 <?php
 
 include_once dirname(__FILE__) . '/../../include/settings.php';
-include_once dirname(__FILE__) . '/../../../fee/mpdf/mpdf.php';
+include_once dirname(__FILE__) . '/../../../portal/mpdf/mpdf.php';
 $doubleEntry = new DoubleEntry();
 
 $params = array();
