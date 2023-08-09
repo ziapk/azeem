@@ -13,7 +13,7 @@ class Publishers extends Connection
 
 			$search = "(pu.full_name LIKE '%" . $params["search"] . "%' ) ";
 
-			$stmt = "select count(total) as count from (SELECT count(p.id) as total, pu.* FROM `{$this->table}` as pu left join `{$this->table_products}` as p on p.publisher_id=pu.id left join `{$this->table_stproducts}` as st on  st.product_id = p.id and st.shopId = :shopId WHERE $search  group by p.publisher_id, pu.full_name, pu.id, pu.discount_type, pu.discount_amount, pu.discount_status) as t";
+			$stmt = "select count(total) as count from (SELECT count(p.id) as total, pu.* FROM `{$this->table}` as pu left join `{$this->table_products}` as p on p.publisher_id=pu.id left join `{$this->table_stproducts}` as st on  st.product_id = p.id and st.shopId = :shopId WHERE $search  group by p.publisher_id, pu.full_name, pu.id, pu.discount_type, pu.discount_amount, pu.discount_status) as t order by count desc";
 			// $stmt = "SELECT count(pu.id) FROM `{$this->table}` as pu left join `{$this->table_products}` as p on p.publisher_id=pu.id left join `{$this->table_stproducts}` as st on  st.product_id = p.id WHERE $search";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':shopId', $params['shopId'], PDO::PARAM_INT);
