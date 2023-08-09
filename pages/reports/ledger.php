@@ -129,15 +129,6 @@ foreach ($entiresFinal as $key => $rows) {
                 </tr>
             <?php } ?>
         </tbody>
-        <tfoot>
-            <tr>
-                <th style="font-size: 14px; font-style: italic; font-family: 'Times New Roman', Times, serif; text-align: right; padding-right: 10px" colspan="3">Total</th>
-                <th style="border: 1px solid" align="right"><?php // echo number_format($rows['totals']['debit']); 
-                                                            ?></th>
-                <th style="border: 1px solid" align="right"><?php // echo number_format($rows['totals']['credit']); 
-                                                            ?></th>
-            </tr>
-        </tfoot>
     </table>
 <?php
 }
