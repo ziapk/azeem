@@ -626,6 +626,7 @@ class DoubleEntry extends Connection
 			$reportData['other']['purchase_returns'] = $purchase_returns;
 			$reportData['other']['sale_returns'] = $sale_returns;
 			$reportData['other']['payments'] = $payments;
+			$reportData['other']['opening_balance'] = $result['opening_balance'];
 
 
 			$tsale = $reportData['other']['cashSale'];
