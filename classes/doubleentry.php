@@ -215,13 +215,13 @@ class DoubleEntry extends Connection
 				$str = "(acc_account_transactions.creditAmount - acc_account_transactions.debitAmount)";
 			}
 
-			if (!empty($arr['from']) && !empty($arr['to'])) {
+			// if (!empty($arr['from']) && !empty($arr['to'])) {
 
-				$to = $arr['to'];
-				$from = $arr['from'];
-				$where .= " and t.transaction_date between '$from' AND '$to'";
-				$countwhere .= " and t.transaction_date between '$from' AND '$to'";
-			}
+			// 	$to = $arr['to'];
+			// 	$from = $arr['from'];
+			// 	$where .= " and t.transaction_date between '$from' AND '$to'";
+			// 	$countwhere .= " and t.transaction_date between '$from' AND '$to'";
+			// }
 
 			if (!empty($account_id)) {
 				$where .= " and a.id = $account_id";
@@ -247,13 +247,29 @@ class DoubleEntry extends Connection
 			ORDER BY transaction_id) A";
 
 
-
-
 			// $stmt = "SELECT a.*, t.transaction_date, t.reference, a.description, t.description as v_description, m.title as payment_mode from `$this->table_ledger_entries` as a left join `$this->table_transactions` as t on t.id = a.transaction_id left join `$this->table_modes` as m on m.id = a.payment_mode $where order by id";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->execute();
 			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
-			return ['rows' => $result, 'summery' => $summery];
+			$final = [];
+			$other = 0;
+			$match = 0;
+			$beforeEntry = [];
+			if (!empty($arr['from']) && !empty($arr['to'])) {
+				$first = false;
+				foreach ($result as $key => $value) {
+					if (date($arr['from']) <= date($value['transaction_date']) && date($value['transaction_date']) <= date($arr['to'])) {
+						if ($first == false) {
+							$first = true;
+							if (!empty($result[$key - 1])) {
+								$beforeEntry = $result[$key - 1];
+							}
+						}
+						$final[] = $value;
+					}
+				}
+			}
+			return ['count' => sizeof($result), 'rows' => $final, 'first' => $beforeEntry, 'summery' => $summery];
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
 		}
