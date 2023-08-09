@@ -26,17 +26,20 @@ class Orders extends Connection
     }
     public function getNextId($shopId)
     {
-        $stmt = "UPDATE `{$this->table_store}` SET last_bill_no = last_bill_no+1 where id=:shopId";
-        $prepare = $this->dbh->prepare($stmt);
-        $prepare->bindParam(':shopId', $shopId, PDO::PARAM_STR);
-        $prepare->execute();
-
         $stmt = "SELECT last_bill_no from `{$this->table_store}` where id=:shopId";
         $prepare = $this->dbh->prepare($stmt);
         $prepare->bindParam(':shopId', $shopId, PDO::PARAM_STR);
         $prepare->execute();
         $result = $prepare->fetch(PDO::FETCH_ASSOC);
-        return $result['last_bill_no'];
+        return $result['last_bill_no'] + 1;
+    }
+    public function setNextId($shopId, $id)
+    {
+        $stmt = "UPDATE `{$this->table_store}` SET last_bill_no = :last_bill_no where id=:shopId";
+        $prepare = $this->dbh->prepare($stmt);
+        $prepare->bindParam(':shopId', $shopId, PDO::PARAM_STR);
+        $prepare->bindParam(':last_bill_no', $id, PDO::PARAM_STR);
+        $prepare->execute();
     }
 
     public function updateOrderAdjustment($array)
@@ -104,6 +107,9 @@ class Orders extends Connection
                 $prepare->bindParam(':expected_delivery_date', $array['expected_delivery_date'], PDO::PARAM_STR);
                 $prepare->execute();
                 $result = $this->dbh->lastInsertId();
+                if (!empty($result)) {
+                    $this->setNextId($array['shopId'], $id);
+                }
                 return $result;
             }
         } catch (PDOException $e) {
