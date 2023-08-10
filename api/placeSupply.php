@@ -74,6 +74,8 @@ $items = [];
 $status = $_POST['status'] ? $_POST['status'] : 2;
 $purchaseValue = 0;
 $productsValue = 0;
+$fixAssetsValue = 0;
+$fixAssetsPurchaseValue = 0;
 $demandProducts = [];
 if (sizeof($_POST['items'])) {
     foreach ($_POST['items'] as $item) {
@@ -86,8 +88,13 @@ if (sizeof($_POST['items'])) {
                 ];
             }
 
-            $purchaseValue += ($item['pprice'] * $item['qty']);
-            $productsValue += ($item['price'] * $item['qty']);
+            if ($item['product_type'] == 4) {
+                $fixAssetsValue += ($item['price'] * $item['qty']);
+                $fixAssetsPurchaseValue += ($item['price'] * $item['qty']);
+            } else {
+                $productsValue += ($item['price'] * $item['qty']);
+                $purchaseValue += ($item['pprice'] * $item['qty']);
+            }
             $items[] = [
                 'pprice' => $item['pprice'],
                 'price' => $item['price'],
@@ -181,25 +188,43 @@ if ($supply_id) {
         $makeTransactionId = $de->makeTransaction($makeTransaction);
 
         $totalDiscount = $productsValue - $purchaseValue;
+        $totalDiscount += $fixAssetsValue - $fixAssetsPurchaseValue;
 
         $assetPrice = $productsValue;
+        $assetFAPrice = $fixAssetsValue;
+
         $purchaseDiscount = $totalDiscount + $data['discount'];
-        $payableAmount = $purchaseValue - $data['discount'];
+        $payableAmount = ($purchaseValue + $fixAssetsValue) - $data['discount'];
 
         // assets debit entry - debit
         // liability payable entry - credit
         // purchase discount entry - credit
-        $entry = [
-            'transaction_id' => $makeTransactionId,
-            'account_id' => $storeAccounts['assets'],
-            'entry_type' => 'D',
-            'description' => '',
-            'amount' => $assetPrice, // 2000
-            'payment_mode' => $_POST['payment_mode'],
-            'user_id' => $_SESSION['user_credentials']['id'],
-        ];
+        if (!empty($assetPrice)) {
+            $entry = [
+                'transaction_id' => $makeTransactionId,
+                'account_id' => $storeAccounts['assets'],
+                'entry_type' => 'D',
+                'description' => '',
+                'amount' => $assetPrice, // 2000
+                'payment_mode' => $_POST['payment_mode'],
+                'user_id' => $_SESSION['user_credentials']['id'],
+            ];
+            $a[] = $de->makeEntry($entry);
+        }
 
-        $a[] = $de->makeEntry($entry);
+        if (!empty($fixAssetsValue)) {
+            $entry = [
+                'transaction_id' => $makeTransactionId,
+                'account_id' => $storeAccounts['fix_assets'],
+                'entry_type' => 'D',
+                'description' => '',
+                'amount' => $fixAssetsValue, // 2000
+                'payment_mode' => $_POST['payment_mode'],
+                'user_id' => $_SESSION['user_credentials']['id'],
+            ];
+            $a[] = $de->makeEntry($entry);
+        }
+
 
         // payable credit entry
         $entry = [

@@ -38,7 +38,7 @@ if (empty($_POST['description']) || empty($_POST['installment_amount']) || empty
         $storeAccounts[$a['key_value']] = $a['account_id'];
     }
 
-    $loanId = $customerObj->createEmployee($data);
+    // $loanId = $customerObj->createEmployee($data);
 
     $storeDATA = $storeObj->getStore($shop['id']);
 
