@@ -81,8 +81,8 @@ $publishers = $publisherObj->getPublishers($ownerId);
                 <a href="javascript:void(0)" ng-click="addToCart(li)" class="btn-cart" uib-tooltip="Add to cart"><img width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/002-add-to-cart-red.svg" alt="" /></a>
                 <a ng-if="li.pin != '1'" href="javascript:void(0)" ng-click="addBookmark(li)" class="btn-bookmark" uib-tooltip="Pin as running"><span class="fa fa-heart-o"></span></a>
                 <a ng-if="li.pin == '1'" href="javascript:void(0)" ng-click="removeBookmark(li)" class="btn-bookmark" uib-tooltip="Added in Running list"><span class="fa fa-heart"></span></a>
-                <a ng-if="li.priority == '1'" href="javascript:void(0)" ng-click="setPriority(li)" class="btn btn-priority" uib-tooltip="Mark No Priority"><span class="fa fa-2x fa-check-circle text-success"></span></a>
-                <a ng-if="li.priority != '1'" href="javascript:void(0)" ng-click="setPriority(li)" class="btn btn-priority" uib-tooltip="Mark Priority"><span class="fa fa-2x fa-check-circle-o text-mute"></span></a>
+                <a ng-if="li.priority == '1'" href="javascript:void(0)" ng-click="setPriority(li)" class="btn btn-priority" uib-tooltip="Mark No Priority"><span class="fa fa-lg fa-check-circle text-success"></span></a>
+                <a ng-if="li.priority != '1'" href="javascript:void(0)" ng-click="setPriority(li)" class="btn btn-priority" uib-tooltip="Mark Priority"><span class="fa fa-lg fa-check-circle-o text-mute"></span></a>
                 <span class="price">{{li.price}} <em>{{li.currency || 'PKR'}}</em> <?php if ($userData['role'] === 'owner') { ?><span style="color: #888; font-size: 0.75em">| {{li.pprice}} <em>{{li.currency || 'PKR'}}</em></span> <?php } ?></span>
 
                 <span class="qty"><strong>{{li.qty < 0 ? 0 : li.qty}}</strong> Available</span>
