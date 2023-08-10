@@ -409,7 +409,9 @@ body {
 }
 
 .feature-product .btn-priority {
-  bottom: -90px;
+  bottom: auto;
+  top: 0;
+  right: 40px;
 }
 
 .feature-product .btn-dup {
