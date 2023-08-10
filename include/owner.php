@@ -254,6 +254,9 @@ $customersList = $customerObj->getCustomers($shop['id']);
         <li class="<?php if ($params['page'] == 'product') {
                       echo 'active';
                     } ?>"><a uib-tooltip="Products" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/product/products.php?status=0"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/product.svg" alt="" /> <span class="nav-menu-text">In-Active Products</span></a></li>
+        <li class="<?php if ($params['page'] == 'product') {
+                      echo 'active';
+                    } ?>"><a uib-tooltip="Products (Fix Assets)" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/product/products.php?product_type=4"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/product.svg" alt="" /> <span class="nav-menu-text">Shop Assets</span></a></li>
         <li class="<?php if ($params['page'] == 'racks' && (empty($_GET["status"]) && $_GET["status"] != '0')) {
                       echo 'active';
                     } ?>"><a uib-tooltip="Product Racks" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/product/racks.php"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/product.svg" alt="" /> <span class="nav-menu-text">Product Racks</span></a></li>

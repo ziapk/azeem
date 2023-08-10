@@ -141,6 +141,7 @@ $programs = $programObj->getPrograms();
         const search = $window.location.search;
         const url = new URLSearchParams(search);
         $scope.publisher_id = url.get('publisher_id') || '';
+        $scope.product_type = url.get('product_type') || '';
         $scope.status = url.get('status') || '';
         $scope.maxSize = 5;
 
@@ -166,6 +167,7 @@ $programs = $programObj->getPrograms();
                         searchBy: $scope.searchBy,
                         courceId: $scope.courceId,
                         publisher_id: $scope.publisher_id,
+                        product_type: $scope.product_type,
                         status: $scope.status
                     }
                 })

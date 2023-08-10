@@ -41,6 +41,10 @@ class Products extends Connection
 				$publisher_query = " AND p.publisher_id = '" . $params['publisher_id'] . "' ";
 			}
 
+			if (!empty($params['product_type'])) {
+				$publisher_query = " AND p.product_type = '" . $params['product_type'] . "' ";
+			}
+
 			$status_query = "";
 			if ($params['status'] == 0) {
 				$status_query = " AND p.is_active = 0 ";
