@@ -354,4 +354,10 @@
     }
     $scope.loadProduct();
   });
+
+  app.filter('roundup', function() {
+    return function(value) {
+      return Math.ceil(value);
+    };
+  })
 </script>

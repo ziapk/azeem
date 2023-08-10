@@ -25,9 +25,24 @@ $ownerStores = $stores->getOwnerStores($userId);
 </style>
 <div ng-controller="cartController">
     <div class="container">
-        <div class="dropdown">
-            <a style="padding: 3px 6px" class="dropdown-item btn btn-primary" href="#" data-toggle="dropdown"><span class="nav-menu-icon" style="margin-right: 6px"></span><span class="nav-menu-text">Syllabus</span>
-                <div class="fa fa-caret-right"></div>
+        <!-- <div class="form-group" ng-if="pinPrograms && key.toLowerCase().includes('uniform')" ng-repeat="(key, li) in pinPrograms">
+            <a href="javascript:void(0)">{{key}}</a>
+            >
+
+            <span ng-repeat="(k, l) in li">
+                <a href="javascript:void(0)" ng-class="{'text-danger text-bold': selectedSize == k }">{{k}}</a>
+                > <span ng-repeat="(dd, i) in l">
+                    <a class="btn btn-xs" ng-class="{'btn-danger': dd == 'Girls', 'btn-primary': dd == 'Boys'}" style="border-radius: 4px" href="#" ng-click="setSelectedProgramItems(i.items, dd, k)">{{dd}}</a>
+                    <a href="javascript:void(0)" class="btn btn-default btn-xs" ng-click="addAllBooks(i.items)">All</a>
+                </span>
+            </span>
+        </div>
+        <div class="form-group" ng-if="selectedProgramItems.length">
+            <span ng-repeat="row in selectedProgramItems" style="display: inline-block; padding: 2px"><a href="javascript:void(0)" class="btn" style="border-radius: 4px; padding: 2px 6px" ng-class="{'btn-danger': selectedUniform == 'Girls', 'btn-primary': selectedUniform == 'Boys', 'btn-default': selectedUniform && !['Boys', 'Girls'].includes(selectedUniform)}" ng-click="selectProduct(row)"><strong>{{row.full_name}}</strong> <span class="badge badge-warning">{{row.board}}</span></a></span>
+        </div> -->
+        <span class="btn-group btn-group-sm form-group dropdown">
+            <a class="dropdown-item btn btn-primary" href="#" data-toggle="dropdown"><span class="nav-menu-icon" style="margin-right: 6px"></span><span class="nav-menu-text">Syllabus</span>
+                <div class="fa fa-caret-down"></div>
             </a>
             <ul class="dropdown-menu" style="min-width: 250px; max-height: 300px;">
                 <li ng-if="pinPrograms" ng-repeat="(key, li) in pinPrograms">
@@ -51,24 +66,6 @@ $ownerStores = $stores->getOwnerStores($userId);
                     </ul>
                 </li>
             </ul>
-        </div>
-        <!-- <div class="form-group" ng-if="pinPrograms && key.toLowerCase().includes('uniform')" ng-repeat="(key, li) in pinPrograms">
-            <a href="javascript:void(0)">{{key}}</a>
-            >
-
-            <span ng-repeat="(k, l) in li">
-                <a href="javascript:void(0)" ng-class="{'text-danger text-bold': selectedSize == k }">{{k}}</a>
-                > <span ng-repeat="(dd, i) in l">
-                    <a class="btn btn-xs" ng-class="{'btn-danger': dd == 'Girls', 'btn-primary': dd == 'Boys'}" style="border-radius: 4px" href="#" ng-click="setSelectedProgramItems(i.items, dd, k)">{{dd}}</a>
-                    <a href="javascript:void(0)" class="btn btn-default btn-xs" ng-click="addAllBooks(i.items)">All</a>
-                </span>
-            </span>
-        </div>
-        <div class="form-group" ng-if="selectedProgramItems.length">
-            <span ng-repeat="row in selectedProgramItems" style="display: inline-block; padding: 2px"><a href="javascript:void(0)" class="btn" style="border-radius: 4px; padding: 2px 6px" ng-class="{'btn-danger': selectedUniform == 'Girls', 'btn-primary': selectedUniform == 'Boys', 'btn-default': selectedUniform && !['Boys', 'Girls'].includes(selectedUniform)}" ng-click="selectProduct(row)"><strong>{{row.full_name}}</strong> <span class="badge badge-warning">{{row.board}}</span></a></span>
-        </div> -->
-        <h5><strong class="text-danger">Running Products</strong> <small class="text-danger"><strong>Click to Add</strong></small></h5>
-        <span class="btn-group btn-group-sm form-group">
             <a class="btn btn-default" ng-repeat="l in pinList" href="javascript:void(0)" ng-click="selectProduct(l, 's')">{{l.full_name}}</a>
         </span>
         <h5 class="text-danger"><strong>Today's Parked Bills</strong></h5>

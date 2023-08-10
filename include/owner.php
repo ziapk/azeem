@@ -29,15 +29,23 @@ $customersList = $customerObj->getCustomers($shop['id']);
 
 ?>
 <div ng-controller="headerController">
-  <table width="50%" style="margin: auto">
-    <tr>
-      <td>
-        <input type="range" ng-model="fontsize" min="13" max="40" ng-change="updateFont(fontsize)" />
-      </td>
-      <td>{{fontsize}}</td>
-    </tr>
-  </table>
-  <nav class="navbar navbar-fixed-top">
+
+  <div class="dropdown navbar-fixed-top" style=" top: 60px; right: 0; left: auto; z-index: 1070">
+    <a href="#" class="nav-menu-item btn btn-primary" data-toggle="dropdown" uib-tooltip="Settings" tooltip-placement="left" title="">
+      <span class="fa fa-cog"></span>
+    </a>
+    <div class="dropdown-menu pull-right" style="padding: 15px; width: 320px">
+      <table width="100%" style="margin: auto; float: right">
+        <tr>
+          <td>
+            <input type="range" ng-model="fontsize" min="13" max="40" ng-change="updateFont(fontsize)" />
+          </td>
+          <td style="font-size: 14px;">Font:{{fontsize}}</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+  <nav class="navbar navbar-fixed-top" style="z-index: 1075">
     <div class="container-fluid">
       <!-- Brand and toggle get grouped for better mobile display -->
       <div class="navbar-header">
@@ -258,6 +266,9 @@ $customersList = $customerObj->getCustomers($shop['id']);
         <li class="<?php if ($params['page'] == 'employees') {
                       echo 'active';
                     } ?>"><a uib-tooltip="Employees" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/employees"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/product.svg" alt="" /> <span class="nav-menu-text">Employees</span></a></li>
+        <li class="<?php if ($params['page'] == 'loans') {
+                      echo 'active';
+                    } ?>"><a uib-tooltip="Loans" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/employees/loans.php"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/product.svg" alt="" /> <span class="nav-menu-text">Loans</span></a></li>
         <li class="<?php if ($params['page'] == 'supplies') {
                       echo 'active';
                     } ?>"><a uib-tooltip="Supplies" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/supply/list.php"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/sales.svg" alt="" /> <span class="nav-menu-text">Purchase Orders</span></a></li>

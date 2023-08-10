@@ -6,15 +6,22 @@ $ownerId = $userData['role'] == 'owner' ? $userData['id'] : $userData['created_b
 $list = $productCls->getOwnerProducts($ownerId);
 ?>
 <div ng-controller="headerController">
-  <table width="50%" style="margin: auto">
-    <tr>
-      <td>
-        <input type="range" ng-model="fontsize" min="13" max="40" ng-change="updateFont(fontsize)" />
-      </td>
-      <td>{{fontsize}}</td>
-    </tr>
-  </table>
-  <nav class="navbar navbar-fixed-top">
+  <div class="dropdown navbar-fixed-top" style=" top: 60px; right: 0; left: auto; z-index: 1070">
+    <a href="#" class="nav-menu-item btn btn-primary" data-toggle="dropdown" uib-tooltip="Settings" tooltip-placement="left" title="">
+      <span class="fa fa-cog"></span>
+    </a>
+    <div class="dropdown-menu pull-right" style="padding: 15px; width: 320px">
+      <table width="100%" style="margin: auto; float: right">
+        <tr>
+          <td>
+            <input type="range" ng-model="fontsize" min="13" max="40" ng-change="updateFont(fontsize)" />
+          </td>
+          <td style="font-size: 14px;">Font:{{fontsize}}</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+  <nav class="navbar navbar-fixed-top" style="z-index: 1075">
     <div class="container-fluid">
       <!-- Brand and toggle get grouped for better mobile display -->
       <div class="navbar-header">
