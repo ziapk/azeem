@@ -123,6 +123,7 @@ $productTypes = array(
     '1' => 'Ready Made',
     '2' => 'Service',
     '3' => 'Raw Material',
+    '4' => 'Asset',
 );
 
 $statusArr = [
