@@ -61,13 +61,14 @@ class Store extends Connection
 	public function updateStore($array)
 	{
 		try {
-			$stmt = "UPDATE `{$this->table}` SET full_name=:full_name, store_type=:store_type,status=:status, location=:location, city=:city, postalCode=:postalCode, phoneNumber1=:phoneNumber1, phoneNumber2=:phoneNumber2, phoneNumber3=:phoneNumber3, image=:image WHERE id=:id";
+			$stmt = "UPDATE `{$this->table}` SET full_name=:full_name, store_type=:store_type,status=:status, location=:location, city=:city, company_email=:company_email, postalCode=:postalCode, phoneNumber1=:phoneNumber1, phoneNumber2=:phoneNumber2, phoneNumber3=:phoneNumber3, image=:image WHERE id=:id";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':full_name', $array['full_name'], PDO::PARAM_STR);
 			$prepare->bindParam(':store_type', $array['store_type'], PDO::PARAM_STR);
 			$prepare->bindParam(':status', $array['status'], PDO::PARAM_STR);
 			$prepare->bindParam(':location', $array['location'], PDO::PARAM_STR);
 			$prepare->bindParam(':city', $array['city'], PDO::PARAM_STR);
+			$prepare->bindParam(':company_email', $array['company_email'], PDO::PARAM_STR);
 			$prepare->bindParam(':postalCode', $array['postalCode'], PDO::PARAM_STR);
 			$prepare->bindParam(':phoneNumber1', $array['phoneNumber1'], PDO::PARAM_STR);
 			$prepare->bindParam(':phoneNumber2', $array['phoneNumber2'], PDO::PARAM_STR);
@@ -85,13 +86,14 @@ class Store extends Connection
 	public function createStore($array)
 	{
 		try {
-			$stmt = "INSERT INTO `{$this->table}` (full_name, store_type, status, location, city, postalCode, phoneNumber1, phoneNumber2, phoneNumber3, image) VALUES (:full_name, :store_type, :status, :location, :city, :postalCode, :phoneNumber1, :phoneNumber2, :phoneNumber3, :image)";
+			$stmt = "INSERT INTO `{$this->table}` (full_name, store_type, status, location, city, company_email, postalCode, phoneNumber1, phoneNumber2, phoneNumber3, image) VALUES (:full_name, :store_type, :status, :location, :city, :company_email, :postalCode, :phoneNumber1, :phoneNumber2, :phoneNumber3, :image)";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':full_name', $array['full_name'], PDO::PARAM_STR);
 			$prepare->bindParam(':store_type', $array['store_type'], PDO::PARAM_STR);
 			$prepare->bindParam(':status', $array['status'], PDO::PARAM_STR);
 			$prepare->bindParam(':location', $array['location'], PDO::PARAM_STR);
 			$prepare->bindParam(':city', $array['city'], PDO::PARAM_STR);
+			$prepare->bindParam(':company_email', $array['company_email'], PDO::PARAM_STR);
 			$prepare->bindParam(':postalCode', $array['postalCode'], PDO::PARAM_STR);
 			$prepare->bindParam(':phoneNumber1', $array['phoneNumber1'], PDO::PARAM_STR);
 			$prepare->bindParam(':phoneNumber2', $array['phoneNumber2'], PDO::PARAM_STR);

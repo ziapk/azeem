@@ -29,6 +29,7 @@ if (!empty($_POST) && isset($_POST['update'])) {
             'status' => $_POST['status'],
             'location' => !empty($_POST['location']) ? $_POST['location'] : "",
             'city' => !empty($_POST['city']) ? $_POST['city'] : "",
+            'company_email' => !empty($_POST['company_email']) ? $_POST['company_email'] : "",
             'postalCode' => !empty($_POST['postalCode']) ? $_POST['postalCode'] : "",
             'phoneNumber1' => !empty($_POST['phoneNumber1']) ? $_POST['phoneNumber1'] : "",
             'phoneNumber2' => !empty($_POST['phoneNumber2']) ? $_POST['phoneNumber2'] : "",
@@ -113,6 +114,9 @@ $storeTypesArr = $storeObj->getStoreTypes();
             </div>
             <div class="col-sm-4 form-group">
                 <input name="city" type="text" class="form-control" placeholder="City" value="<?php echo $storeData['city']; ?>">
+            </div>
+            <div class="col-sm-4 form-group">
+                <input name="company_email" type="text" class="form-control" placeholder="company_email" value="<?php echo $storeData['company_email']; ?>">
             </div>
             <div class="col-sm-4 form-group">
                 <input name="postalCode" type="text" class="form-control" placeholder="Postal code" value="<?php echo $storeData['postalCode']; ?>">

@@ -26,6 +26,7 @@ if (!empty($_POST) && isset($_POST['update'])) {
             'code' => $_POST['code'],
             'title' => $_POST['title'],
             'company' => $_POST['company'],
+            'email' => $_POST['email'],
             'type' => $_POST['type'],
             'phoneNumber' => $_POST['phoneNumber'],
             'type' => $_POST['type'],
@@ -86,11 +87,15 @@ echo mainHeader();
                 <input name="company" type="text" class="form-control" placeholder="company" value="<?php echo $store['company']; ?>">
             </div>
             <div class="col-sm-4 form-group">
+                <input name="email" type="email" class="form-control" placeholder="email" value="<?php echo $store['email']; ?>">
+            </div>
+            <div class="col-sm-4 form-group">
                 <input name="address" type="text" class="form-control" placeholder="address" value="<?php echo $store['address']; ?>">
             </div>
             <div class="col-sm-4 form-group">
                 <input name="phoneNumber" type="text" class="form-control" placeholder="phoneNumber" value="<?php echo $store['phoneNumber']; ?>">
             </div>
+            <div class="clearfix"></div>
             <div class="col-sm-4 form-group">
                 <label for="type">Show on Closing Report</label>
                 <select name="type" id="type" class="form-control">

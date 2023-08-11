@@ -26,6 +26,9 @@ class Newsletter extends Connection
             foreach ($array['sentTo'] as $value) {
                 $mail->addAddress($value['email'], $value['name']); // Add a recipient
             }
+            foreach ($array['ccEmails'] as $value) {
+                $mail->addCC($value['email'], $value['name']); // Add a recipient
+            }
 
             $mail->addReplyTo('support@reclinesolutions.com', 'Software Support');
             $mail->isHTML(true);

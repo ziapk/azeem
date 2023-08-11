@@ -28,11 +28,12 @@ class Customers extends Connection
 	public function createCustomer($array)
 	{
 		try {
-			$stmt = "INSERT INTO `{$this->table}` (`full_name`, `address`,`type`, `company`, `title`, `phoneNumber`, `shopId`, `account_id`, `code`) VALUES (:full_name, :address, :type, :company, :title, :phoneNumber, :shopId, :account_id, :code)";
+			$stmt = "INSERT INTO `{$this->table}` (`full_name`, `address`,`type`, `company`, `email`, `title`, `phoneNumber`, `shopId`, `account_id`, `code`) VALUES (:full_name, :address, :type, :company, :email, :title, :phoneNumber, :shopId, :account_id, :code)";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':full_name', $array['full_name'], PDO::PARAM_STR);
 			$prepare->bindParam(':phoneNumber', $array['phoneNumber'], PDO::PARAM_STR);
 			$prepare->bindParam(':company', $array['company'], PDO::PARAM_STR);
+			$prepare->bindParam(':email', $array['email'], PDO::PARAM_STR);
 			$prepare->bindParam(':title', $array['title'], PDO::PARAM_STR);
 			$prepare->bindParam(':address', $array['address'], PDO::PARAM_STR);
 			$prepare->bindParam(':type', $array['type'], PDO::PARAM_INT);
@@ -65,13 +66,14 @@ class Customers extends Connection
 	public function updateCustomer($array)
 	{
 		try {
-			$stmt = "UPDATE `{$this->table}` SET full_name=:full_name, address=:address, phoneNumber=:phoneNumber, company=:company, title=:title, code=:code, type=:type WHERE id=:id";
+			$stmt = "UPDATE `{$this->table}` SET full_name=:full_name, address=:address, phoneNumber=:phoneNumber, company=:company, email=:email, title=:title, code=:code, type=:type WHERE id=:id";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':full_name', $array['full_name'], PDO::PARAM_STR);
 			$prepare->bindParam(':id', $array['id'], PDO::PARAM_STR);
 			$prepare->bindParam(':code', $array['code'], PDO::PARAM_STR);
 			$prepare->bindParam(':phoneNumber', $array['phoneNumber'], PDO::PARAM_STR);
 			$prepare->bindParam(':company', $array['company'], PDO::PARAM_STR);
+			$prepare->bindParam(':email', $array['email'], PDO::PARAM_STR);
 			$prepare->bindParam(':title', $array['title'], PDO::PARAM_STR);
 			$prepare->bindParam(':type', $array['type'], PDO::PARAM_STR);
 			$prepare->bindParam(':address', $array['address'], PDO::PARAM_STR);

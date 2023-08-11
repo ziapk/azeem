@@ -283,6 +283,10 @@ echo mainFooter();
                 <input id="sname" type="text" ng-model="form.full_name" class="form-control" placeholder="Customer's Name">
             </div>
             <div class="form-group">
+                <label for="semail">Email</label>
+                <input id="semail" type="text" ng-model="form.email" class="form-control" placeholder="Customer's Email">
+            </div>
+            <div class="form-group">
                 <label for="scontact">Contact</label>
                 <input id="scontact" type="text" ng-model="form.contact" class="form-control" placeholder="Customer's Contact">
             </div>

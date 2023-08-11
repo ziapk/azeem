@@ -26,6 +26,7 @@ if (empty($_POST['full_name'])) {
         'title' => $_POST['title'],
         'full_name' => $_POST['full_name'],
         'company' => $_POST['company'],
+        'email' => $_POST['email'],
         'type' => !empty($_POST['type']) ? 2 : 1,
         'address' => !empty($_POST['address']) ? $_POST['address'] : "",
         'phoneNumber' => !empty($_POST['phoneNumber']) ? $_POST['phoneNumber'] : "",
