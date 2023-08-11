@@ -1,7 +1,7 @@
-<?php 
+<?php
 
 
-class Connection 
+class Connection
 {
 	private $host = 'localhost';
 	private $dbname = 'reclydmy_azeem';
@@ -9,23 +9,32 @@ class Connection
 	private $pass = ';4B)pQC=K0&v';
 
 	public $dbh;
-	
+
 	function __construct()
 	{
 		$this->connection();
 	}
 	private function connection()
 	{
-		try{
-			$this->dbh = new PDO('mysql:host='.$this->host.';dbname='.$this->dbname, $this->user, $this->pass,array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION));	
-		}catch (PDOException $e){
+		try {
+			$this->dbh = new PDO('mysql:host=' . $this->host . ';dbname=' . $this->dbname, $this->user, $this->pass, array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION));
+		} catch (PDOException $e) {
 			print "Error!: " . $e->getMessage() . "<br/>";
-		    die();
+			die();
 		}
+	}
+	public function drawInvoice($id)
+	{
+		ob_start();
+		$_GET['id'] = $id;
+		$_GET['detail'] = 'true';
+		$_GET['largeView'] = 'large';
+		include dirname(__FILE__) . '/../print/index.php';
+		$html = ob_get_clean();
+		return $html;
 	}
 	public function normalToPassword($password)
 	{
 		return md5($password);
 	}
-	
 }

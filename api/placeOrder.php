@@ -206,6 +206,12 @@ try {
                     }
                 }
             }
+            $newsletter = new Newsletter();
+            $newsletter->send([
+                'subject' => "Order.#" . $order_id . " has been generated",
+                'body' => $newsletter->drawInvoice($order_id),
+                'sentTo' => ['zia.pccr@yahoo.com']
+            ]);
         }
 
         echo json_encode(['status' => 200, 'message' => 'successfully done', 'order' => ['id' => $order_id]]);
