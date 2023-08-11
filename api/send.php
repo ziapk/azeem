@@ -12,7 +12,7 @@ try {
     $mail->SMTPAuth = true; // Enable SMTP authentication
     $mail->Username = 'customer@reclinesolutions.com'; // SMTP username
     $mail->Password = 'nKDa#%BB),Q9'; // SMTP password
-    $mail->SMTPSecure = 'tls'; // Enable TLS encryption, [ICODE]ssl[/ICODE] also accepted
+    $mail->SMTPSecure = 'ssl'; // Enable TLS encryption, [ICODE]ssl[/ICODE] also accepted
     $mail->Port = 465; // TCP port to connect to
 
 
