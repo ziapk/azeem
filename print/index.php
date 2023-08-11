@@ -184,6 +184,9 @@ if ($largeView) {
                 <tr>
                     <th style="padding: 0;">
                         <div class="head text-left">
+                            <span>
+                                <?php echo $siteUrl . "assets/clients/" . $shop['image']; ?>
+                            </span>
                             <span class="pull-right">
                                 <img width="120" height="60" style="vertical-align: middle; margin-right: 5px; filter: grayscale(100%);" src="<?php echo $siteUrl; ?>assets/clients/<?php echo $shop['image']; ?>" />
                             </span>
