@@ -1,18 +1,12 @@
-<?php
-
-
-
-require_once dirname(__FILE__) . "/../vendor/autoload.php"; //PHPMailer Object 
+<?php require_once dirname(__FILE__) . "/../vendor/autoload.php"; //PHPMailer Object 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
-
-include_once dirname(__FILE__) . "/drawInvoice.php";
 
 try {
 
     $mail = new PHPMailer; //From email address and name 
 
-    // $mail->SMTPDebug = 2; // Enable verbose debug output
+    $mail->SMTPDebug = 2; // Enable verbose debug output
     $mail->isSMTP(); // Set mailer to use SMTP
     $mail->Host = 'mail.reclinesolutions.com'; // Specify main and backup SMTP servers
     // $mail->Host = 'premium212.web-hosting.com'; // Specify main and backup SMTP servers
@@ -22,17 +16,19 @@ try {
     $mail->SMTPSecure = 'ssl'; // Enable TLS encryption, [ICODE]ssl[/ICODE] also accepted
     $mail->Port = 465; // TCP port to connect to
 
-    $order_id = 2908;
+
 
     //Recipients
-    $mail->setFrom('customer@reclinesolutions.com', 'Mailer');
+    $mail->setFrom('zia.pccr@gmail.com', 'Mailer');
     $mail->addAddress('zia.pccr@yahoo.com', 'Zia ur Rehman'); // Add a recipient
     $mail->addAddress('zia.pccr@hotmail.com', 'Zia ur Rehman'); // Name is optional
     $mail->addReplyTo('support@reclinesolutions.com', 'Information');
+    $mail->addCC('cc@example.com');
+    $mail->addBCC('bcc@example.com');
 
     $mail->isHTML(true);
-    $mail->Subject = "Order.#" . $order_id . " has been generated";
-    $mail->Body = drawInvoice();
+    $mail->Subject = "Pending Invoice 001";
+    $mail->Body = "<i>Mail body in HTML</i>";
     $mail->AltBody = "This is the plain text version of the email content";
     if (!$mail->send()) {
         echo "Mailer Error: " . $mail->ErrorInfo;
