@@ -2,7 +2,7 @@
 include_once dirname(__FILE__) . '/../include/settings.php';
 global $shop;
 
-$siteUrl = !empty(SITE_URL) ? SITE_URL : '/';
+$siteUrl = !empty(SITE_URL) ? SITE_URL : 'https://azeem.reclinesolutions.com/';
 
 $id = !empty($_GET['id']) ? $_GET['id'] : 0;
 if (empty($id)) {
