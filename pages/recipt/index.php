@@ -654,6 +654,8 @@ echo mainFooter();
                         $window.sessionStorage.setItem('shopping', JSON.stringify($scope.items))
                         // $window.location.assign('<?php echo SITE_URL ?>')
                         $scope.searchCustomer('', true)
+                        $scope.summery = "";
+                        $scope.ref_no = "";
 
                     }).catch(err => {
                         $scope.loading = false;

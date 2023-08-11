@@ -758,6 +758,8 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                                 // $window.sessionStorage.setItem('shopping', JSON.stringify($scope.items))
                                 $window.location.assign('<?php echo SITE_URL ?>')
                                 $scope.customersList.length && $scope.selectCustomer($scope.customersList[0]);
+                                $scope.summery = '';
+                                $scope.ref_no = '';
                             }
                         }).catch(err => {
                             $scope.loading = false;

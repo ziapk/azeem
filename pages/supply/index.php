@@ -43,7 +43,11 @@ echo mainHeader();
         </div>
         <div class="col-sm-3">
             <label>&nbsp;</label><br />
-            <a href="javascript:void(0)" title="Add Fresh Product" ng-click="addFreshProduct()" class="btn btn-danger">Add Fresh Product</a>
+            <a href="javascript:void(0)" title="Add Product" ng-click="addFreshProduct()" class="btn btn-danger">Add Product</a>
+        </div>
+        <div class="col-sm-12 form-group">
+            <label>Description</label>
+            <textarea type="text" rows="3" class="form-control" ng-model="description" placeholder="Summery"></textarea>
         </div>
     </div>
     <?php
@@ -58,6 +62,7 @@ echo mainFooter();
         $scope.shopId = '<?php echo $userData['shopId']; ?>';
         $scope.supplierName = "";
         $scope.ref_no = "";
+        $scope.description = "";
         $scope.supplierId = "";
         $scope.product = "";
         $scope.shopId = '4';
@@ -278,6 +283,7 @@ echo mainFooter();
             $scope.form = {
                 supplierId: $scope.supplierId,
                 ref_no: $scope.ref_no,
+                description: $scope.description,
                 subTotal: $scope.subTotal,
                 payable: $scope.grandTotal,
                 discount: $scope.discount,

@@ -126,6 +126,7 @@ $data = [
     'supplier_id' => !empty($supplierId) ? $supplierId : 1,
     'status' => $status,
     'ref_no' => $_POST['ref_no'],
+    'description' => !empty($_POST['summery']) ? $_POST['summery'] : '',
     'price' => $_POST['payable'],
     'payment_amount' => $cash,
     'payment_with_credit' => $payment_with_credit,
@@ -175,7 +176,7 @@ if ($supply_id) {
         $credit_amount = !empty($_POST['payment_with_credit']) ? $_POST['payment_with_credit'] : 0;
 
         $makeTransaction = [
-            'description' => !empty($_POST['summery']) ? $_POST['summery'] : "Supply Invoice: " . $supply_id . " PLACED",
+            'description' => !empty($data['description']) ? $data['description'] : "Supply Invoice: " . $supply_id . " PLACED",
             'transaction_date' => $storeDATA['sale_date'],
             'reference' => $data['ref_no'],
             'transaction_type' => !empty($credit_amount) ? 'EXCHANGE' : 'PURCHASE',
@@ -204,7 +205,7 @@ if ($supply_id) {
                 'transaction_id' => $makeTransactionId,
                 'account_id' => $storeAccounts['assets'],
                 'entry_type' => 'D',
-                'description' => '',
+                'description' => !empty($data['description']) ? $data['description'] : '',
                 'amount' => $assetPrice, // 2000
                 'payment_mode' => $_POST['payment_mode'],
                 'user_id' => $_SESSION['user_credentials']['id'],
@@ -217,7 +218,7 @@ if ($supply_id) {
                 'transaction_id' => $makeTransactionId,
                 'account_id' => $storeAccounts['fix_assets'],
                 'entry_type' => 'D',
-                'description' => '',
+                'description' => !empty($data['description']) ? $data['description'] : '',
                 'amount' => $fixAssetsValue, // 2000
                 'payment_mode' => $_POST['payment_mode'],
                 'user_id' => $_SESSION['user_credentials']['id'],
@@ -231,7 +232,7 @@ if ($supply_id) {
             'transaction_id' => $makeTransactionId,
             'account_id' => $account_id,
             'entry_type' => 'C',
-            'description' => '',
+            'description' => !empty($data['description']) ? $data['description'] : '',
             'amount' => $payableAmount,
             'payment_mode' => $_POST['payment_mode'],
             'user_id' => $_SESSION['user_credentials']['id'],
@@ -244,7 +245,7 @@ if ($supply_id) {
                 'transaction_id' => $makeTransactionId,
                 'account_id' => $storeAccounts['purchase_discount'],
                 'entry_type' => 'C',
-                'description' => '',
+                'description' => !empty($data['description']) ? $data['description'] : '',
                 'amount' => $purchaseDiscount, // 200 @ 10%
                 'payment_mode' => $_POST['payment_mode'],
                 'user_id' => $_SESSION['user_credentials']['id'],
