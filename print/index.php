@@ -1,6 +1,9 @@
 <?php
 include_once dirname(__FILE__) . '/../include/settings.php';
 global $shop;
+
+$siteUrl = !empty(SITE_URL) ? SITE_URL : '/';
+
 $id = !empty($_GET['id']) ? $_GET['id'] : 0;
 if (empty($id)) {
     echo "Invalid data";
@@ -182,7 +185,7 @@ if ($largeView) {
                     <th style="padding: 0;">
                         <div class="head text-left">
                             <span class="pull-right">
-                                <img width="120" height="60" style="vertical-align: middle; margin-right: 5px; filter: grayscale(100%);" src="<?php echo SITE_URL; ?>assets/clients/<?php echo $shop['image']; ?>" />
+                                <img width="120" height="60" style="vertical-align: middle; margin-right: 5px; filter: grayscale(100%);" src="<?php echo $siteUrl; ?>assets/clients/<?php echo $shop['image']; ?>" />
                             </span>
                             <h3>
                                 <div style="padding: 0"><?php echo strtoupper($shop['full_name']); ?>
@@ -404,7 +407,7 @@ if ($largeView) {
     <div class="recipt">
         <div class="head">
             <h3 style="display: flex; text-align: left;">
-                <img width="60" height="60" style="vertical-align: middle; margin-right: 5px; filter: grayscale(100%);" src="<?php echo SITE_URL; ?>assets/clients/<?php echo $shop['image']; ?>" />
+                <img width="60" height="60" style="vertical-align: middle; margin-right: 5px; filter: grayscale(100%);" src="<?php echo $siteUrl; ?>assets/clients/<?php echo $shop['image']; ?>" />
                 <div style="padding-top: 10px"><?php echo strtoupper($shop['full_name']); ?>
                     <p class="mt-0"><?php echo $shop['location']; ?>, <?php echo $shop['city']; ?> <br>
                         <strong><small><?php echo implode(", ", $result); ?></small></strong>
