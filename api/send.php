@@ -1,6 +1,12 @@
-<?php require_once dirname(__FILE__) . "/../vendor/autoload.php"; //PHPMailer Object 
+<?php
+
+
+
+require_once dirname(__FILE__) . "/../vendor/autoload.php"; //PHPMailer Object 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
+
+include_once dirname(__FILE__) . "/drawInvoice.php";
 
 try {
 
@@ -16,7 +22,7 @@ try {
     $mail->SMTPSecure = 'ssl'; // Enable TLS encryption, [ICODE]ssl[/ICODE] also accepted
     $mail->Port = 465; // TCP port to connect to
 
-
+    $order_id = 2908;
 
     //Recipients
     $mail->setFrom('customer@reclinesolutions.com', 'Mailer');
@@ -25,8 +31,8 @@ try {
     $mail->addReplyTo('support@reclinesolutions.com', 'Information');
 
     $mail->isHTML(true);
-    $mail->Subject = "Pending Invoice 001";
-    $mail->Body = "<i>Mail body in HTML</i>";
+    $mail->Subject = "Order.#" . $order_id . " has been generated";
+    $mail->Body = drawInvoice();
     $mail->AltBody = "This is the plain text version of the email content";
     if (!$mail->send()) {
         echo "Mailer Error: " . $mail->ErrorInfo;
