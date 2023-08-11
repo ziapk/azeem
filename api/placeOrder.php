@@ -210,7 +210,7 @@ try {
             $send = $newsletter->send([
                 'subject' => "Order.#" . $order_id . " has been generated",
                 'body' => $newsletter->drawInvoice($order_id),
-                'sentTo' => [['email' => !empty($customer) ? $customer['company'] : 'zia.pccr@yahoo.com', 'name' => $_POST['customer_name']]],
+                'sentTo' => [['email' => !empty($customer) ? $customer['company_email'] : 'zia.pccr@yahoo.com', 'name' => $_POST['customer_name']]],
                 'ccEmails' => [['email' => $shop['company_email'], 'name' => $shop['full_name']]]
             ]);
         }
