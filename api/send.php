@@ -9,6 +9,7 @@ try {
     $mail->SMTPDebug = 2; // Enable verbose debug output
     $mail->isSMTP(); // Set mailer to use SMTP
     $mail->Host = 'mail.reclinesolutions.com'; // Specify main and backup SMTP servers
+    // $mail->Host = 'premium212.web-hosting.com'; // Specify main and backup SMTP servers
     $mail->SMTPAuth = true; // Enable SMTP authentication
     $mail->Username = 'customer@reclinesolutions.com'; // SMTP username
     $mail->Password = 'nKDa#%BB),Q9'; // SMTP password
@@ -18,12 +19,10 @@ try {
 
 
     //Recipients
-    $mail->setFrom('zia.pccr@gmail.com', 'Mailer');
+    $mail->setFrom('customer@reclinesolutions.com', 'Mailer');
     $mail->addAddress('zia.pccr@yahoo.com', 'Zia ur Rehman'); // Add a recipient
     $mail->addAddress('zia.pccr@hotmail.com', 'Zia ur Rehman'); // Name is optional
     $mail->addReplyTo('support@reclinesolutions.com', 'Information');
-    $mail->addCC('cc@example.com');
-    $mail->addBCC('bcc@example.com');
 
     $mail->isHTML(true);
     $mail->Subject = "Pending Invoice 001";
