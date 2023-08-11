@@ -1,4 +1,4 @@
-<?php require_once "vendor/autoload.php"; //PHPMailer Object 
+<?php require_once dirname(__FILE__) . "/../vendor/autoload.php"; //PHPMailer Object 
 $mail = new PHPMailer; //From email address and name 
 $mail->SMTPDebug = 2;
 $mail->isSMTP();
