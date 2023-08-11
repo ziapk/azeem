@@ -8,7 +8,7 @@ try {
 
     $mail->SMTPDebug = 2; // Enable verbose debug output
     $mail->isSMTP(); // Set mailer to use SMTP
-    $mail->Host = 'mail.reclinesolutions.com'; // Specify main and backup SMTP servers
+    $mail->Host = 'premium212.web-hosting.com'; // Specify main and backup SMTP servers
     $mail->SMTPAuth = true; // Enable SMTP authentication
     $mail->Username = 'customer@reclinesolutions.com'; // SMTP username
     $mail->Password = 'nKDa#%BB),Q9'; // SMTP password
