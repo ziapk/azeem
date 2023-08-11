@@ -207,14 +207,14 @@ try {
                 }
             }
             $newsletter = new Newsletter();
-            $newsletter->send([
+            $send = $newsletter->send([
                 'subject' => "Order.#" . $order_id . " has been generated",
                 'body' => $newsletter->drawInvoice($order_id),
-                'sentTo' => ['zia.pccr@yahoo.com']
+                'sentTo' => [['email' => 'zia.pccr@yahoo.com', 'name' => $_POST['customer_name']]]
             ]);
         }
 
-        echo json_encode(['status' => 200, 'message' => 'successfully done', 'order' => ['id' => $order_id]]);
+        echo json_encode(['status' => 200, 'send' => $send, 'message' => 'successfully done', 'order' => ['id' => $order_id]]);
     }
 } catch (PDOException $e) {
     die("Error!: " . $e->getMessage() . "<br/>");

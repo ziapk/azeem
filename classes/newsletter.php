@@ -33,9 +33,9 @@ class Newsletter extends Connection
             $mail->Body = $array['body'];
             $mail->AltBody = "EMPTY";
             if (!$mail->send()) {
-                return ['status' => 200, 'message' => $mail->ErrorInfo];
+                return ['status' => 400, 'message' => $mail->ErrorInfo];
             } else {
-                return ['status' => 400, 'message' =>  "Message has been sent successfully"];
+                return ['status' => 200, 'message' =>  "Message has been sent successfully"];
             }
         } catch (Exception $e) {
             return ['status' => 400, 'message' =>  "Message could not be sent. Mailer Error: {$mail->ErrorInfo}"];
