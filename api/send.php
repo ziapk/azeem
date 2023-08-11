@@ -6,7 +6,7 @@ try {
 
     $mail = new PHPMailer; //From email address and name 
 
-    $mail->SMTPDebug = 2; // Enable verbose debug output
+    // $mail->SMTPDebug = 2; // Enable verbose debug output
     $mail->isSMTP(); // Set mailer to use SMTP
     $mail->Host = 'mail.reclinesolutions.com'; // Specify main and backup SMTP servers
     // $mail->Host = 'premium212.web-hosting.com'; // Specify main and backup SMTP servers
