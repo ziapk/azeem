@@ -5,15 +5,6 @@ use PHPMailer\PHPMailer\Exception;
 try {
 
     $mail = new PHPMailer; //From email address and name 
-    $mail->SMTPDebug = 2;
-    $mail->isSMTP();
-    $mail->Host = "mail.reclinesolutions.com";
-    $mail->From = "customer@reclinesolutions.com";
-    $mail->Username = 'customer@reclinesolutions.com'; // SMTP username
-    $mail->Password = 'nKDa#%BB),Q9'; // SMTP password
-    $mail->FromName = "Zia ur Rehman"; //To address and name 
-    $mail->Port = 465;
-
 
     $mail->SMTPDebug = 2; // Enable verbose debug output
     $mail->isSMTP(); // Set mailer to use SMTP
