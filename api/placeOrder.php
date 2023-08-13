@@ -208,7 +208,7 @@ try {
             }
             $newsletter = new Newsletter();
             $send = $newsletter->send([
-                'subject' => "Order.#" . $orderDetail['order_custom_id'] . " has been generated",
+                'subject' => "Order.#" . $orderDetail['order']['order_custom_id'] . " has been generated",
                 'body' => $newsletter->drawInvoice($order_id),
                 'sentTo' => [['email' => !empty($customer['email']) ? $customer['email'] : 'zia.pccr@yahoo.com', 'name' => $_POST['customer_name']]],
                 'ccEmails' => [['email' => $shop['company_email'], 'name' => $shop['full_name']]],
