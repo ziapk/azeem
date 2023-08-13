@@ -124,10 +124,10 @@ class Products extends Connection
 			if (!empty($shopId)) {
 				$column = ", (sp.qty - sp.stock_out) as qty, sp.min_qty ";
 				if (!empty($params['minQty'])) {
-					$minQry = " HAVING qty <= sp.min_qty order by p.priority desc, code desc ";
+					$minQry = " HAVING qty <= sp.min_qty order by p.priority desc, price desc, code desc ";
 				}
 			} else {
-				$minQry = " order by code desc ";
+				$minQry = " order by code desc, price desc ";
 			}
 
 			$mobileCols = "p.id,p.full_name";
