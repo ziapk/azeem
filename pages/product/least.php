@@ -65,7 +65,7 @@ $programs = $programObj->getPrograms();
                 <a ng-if="li.dup == 1" href="javascript:void(0)" ng-click="removeDuplicate(li)" class="btn btn-dup" uib-tooltip="Remove from duplicate"><span class="fa fa-copy text-danger"></span></a>
                 <a ng-if="li.pin != '1'" href="javascript:void(0)" ng-click="addBookmark(li)" class="btn-bookmark" uib-tooltip="Pin as running"><span class="fa fa-heart-o"></span></a>
                 <a ng-if="li.pin == '1'" href="javascript:void(0)" ng-click="removeBookmark(li)" class="btn-bookmark" uib-tooltip="Added in Running list"><span class="fa fa-heart"></span></a>
-                ----{{li.priority}}----
+                ----{{li}}----
                 <a ng-if="li.priority == '1'" href="javascript:void(0)" ng-click="setPriority(li)" class="btn btn-priority" uib-tooltip="Mark No Priority"><span class="fa fa-lg fa-check-circle text-success"></span></a>
                 <a ng-if="li.priority != '1'" href="javascript:void(0)" ng-click="setPriority(li)" class="btn btn-priority" uib-tooltip="Mark Priority"><span class="fa fa-lg fa-check-circle-o text-mute"></span></a>
                 <span class="price">{{li.price}} <em>{{li.currency || 'PKR'}}</em> <?php if ($userData['role'] === 'owner') { ?><span style="color: #888; font-size: 0.75em">| {{li.pprice}} <em>{{li.currency || 'PKR'}}</em></span> <?php } ?></span>
