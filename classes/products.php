@@ -181,7 +181,7 @@ class Products extends Connection
 
 			$allCols = "p.*, (sp.qty - sp.stock_out) as qty, sp.min_qty, concat(p.id, ' | ', p.full_name) as full_name";
 
-			$stmt = "SELECT $allCols  FROM `{$this->table}` as p $innerJoin LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id LEFT JOIN {$this->table_rack_products} as rp ON rp.product_id = p.id LEFT JOIN `{$this->table_rack}` as r on r.id = rp.rack_id LEFT JOIN program_books as c ON c.product_id = p.id LEFT JOIN publishers as pub on p.publisher_id = pub.id  WHERE p.`owner_id`=:owner_id GROUP BY p.id $minQry";
+			$stmt = "SELECT $allCols  FROM `{$this->table}` as p $innerJoin LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id LEFT JOIN {$this->table_rack_products} as rp ON rp.product_id = p.id LEFT JOIN `{$this->table_rack}` as r on r.id = rp.rack_id LEFT JOIN program_books as c ON c.product_id = p.id LEFT JOIN publishers as pub on p.publisher_id = pub.id  WHERE p.`owner_id`=:owner_id and p.priority = 1 GROUP BY p.id $minQry";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':owner_id', $owner_id, PDO::PARAM_STR);
 			$prepare->execute();
