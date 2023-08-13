@@ -21,7 +21,7 @@ class Newsletter extends Connection
             $mail->Port = 465; // TCP port to connect to
 
             //Recipients
-            $mail->setFrom('customer@reclinesolutions.com', 'Zia ur Rehman');
+            $mail->setFrom('customer@reclinesolutions.com', $array['client']);
 
             foreach ($array['sentTo'] as $value) {
                 $mail->addAddress($value['email'], $value['name']); // Add a recipient
