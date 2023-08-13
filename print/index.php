@@ -235,7 +235,7 @@ if ($largeView) {
                                     <tr>
                                         <td class="text-left"><?php echo $key + 1; ?></td>
                                         <td class="text-left" style="padding: 0 6px"><?php echo $item['product_id']; ?></td>
-                                        <td class="text-left"><?php echo substr($item['product_title'], 0, 47) . (strlen($item['product_title']) > 47 ? '...' : ''); ?></td>
+                                        <td class="text-left"><?php echo $item['product_title']; ?></td>
                                         <td class="text-right"><?php echo abs(($item['quantity'])); ?></td>
                                         <td class="text-right"><?php echo abs(($item['price'])); ?></td>
                                         <td class="text-right"><?php echo abs(($item['discount'] / $item['price']) * 100) . '%'; ?></td>
