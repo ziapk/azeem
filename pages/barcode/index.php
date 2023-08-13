@@ -51,15 +51,13 @@ if (!empty($_GET['all']) && $_GET['all'] == '1') {
                 <thead>
                     <tr>
                         <th>Select Shop for Demand</th>
-                        <th>
-                            <div class="col-md-3 col-sm-4 form-group">
-                                <label for="">Select Store</label>
-                                <select id="shop_id" class="form-control">
-                                    <?php foreach ($ownerStores as $type) { ?>
-                                        <option value="<?php echo $type['id']; ?>"><?php echo $type['full_name']; ?></option>
-                                    <?php } ?>
-                                </select>
-                            </div>
+                        <th colspan="2">
+                            <label for="">Select Store</label>
+                            <select id="shop_id" class="form-control">
+                                <?php foreach ($ownerStores as $type) { ?>
+                                    <option value="<?php echo $type['id']; ?>"><?php echo $type['full_name']; ?></option>
+                                <?php } ?>
+                            </select>
                         </th>
                     </tr>
                 </thead>
@@ -89,7 +87,9 @@ if (!empty($_GET['all']) && $_GET['all'] == '1') {
         </table>
 
         <input type="submit" class="btn btn-primary" value="Print Tags" />
-        <input type="button" class="btn btn-danger pull-right" value="Create Demand" ng-click="createDemand()" />
+        <?php if ($userData['role'] == 'owner' || $userData['role'] == 'manager') { ?>
+            <input type="button" class="btn btn-danger pull-right" value="Create Demand" ng-click="createDemand()" />
+        <?php } ?>
 
         <script>
             app.controller('categoryController', function($scope, $http, $httpParamSerializerJQLike, $filter, $window, $document, $uibModal, $log, $location, $anchorScroll, $timeout) {
