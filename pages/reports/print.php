@@ -141,7 +141,14 @@ switch ($reportType) {
 		include_once dirname(__FILE__) . '/onlineSummery.php';
 		exit;
 		break;
-
+	case '16':
+		$ownerId = $userData['role'] == 'owner' ? $userData['id'] : $userData['created_by'];
+		$search = $productObj->getOwnerProductsByPriority($ownerId, $shopId);
+		$orders = $search;
+		$stores = new Store();
+		$selectShop = $stores->getStore($shopId);
+		include_once dirname(__FILE__) . '/shop_products.php';
+		exit;
 	default:
 		# code...
 		break;

@@ -163,6 +163,34 @@ class Products extends Connection
 			die("Error!: " . $e->getMessage() . "<br/>");
 		}
 	}
+	public function getOwnerProductsByPriority($owner_id, $shopId = null)
+	{
+		try {
+
+
+			$innerJoin = "";
+			if (!empty($shopId)) {
+				$innerJoin .= " INNER JOIN {$this->table_st} as sp on sp.product_id = p.id and shopId=$shopId and sp.status = 1 ";
+			}
+
+			$minQry = "";
+
+			if (!empty($shopId)) {
+				$minQry = " HAVING qty <= sp.min_qty order by p.priority desc, code desc ";
+			}
+
+			$allCols = "p.*, (sp.qty - sp.stock_out) as qty, sp.min_qty, concat(p.id, ' | ', p.full_name) as full_name";
+
+			$stmt = "SELECT $allCols  FROM `{$this->table}` as p $innerJoin LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id LEFT JOIN {$this->table_rack_products} as rp ON rp.product_id = p.id LEFT JOIN `{$this->table_rack}` as r on r.id = rp.rack_id LEFT JOIN program_books as c ON c.product_id = p.id LEFT JOIN publishers as pub on p.publisher_id = pub.id  WHERE p.`owner_id`=:owner_id GROUP BY p.id $minQry";
+			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':owner_id', $owner_id, PDO::PARAM_STR);
+			$prepare->execute();
+			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
+			return $result;
+		} catch (PDOException $e) {
+			die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
 
 	public function getRackByTitle($title, $shopId = null)
 	{

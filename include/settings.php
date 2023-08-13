@@ -178,9 +178,10 @@ $reportsArray = [
     10 => ['id' => 10, 'title' => 'Closing Balance Report', 'access' => ['shopkeeper', 'owner', 'manager']],
     11 => array('id' => 11, 'access' => ['owner', 'manager'], 'title' => 'Trial Balance'),
     12 => array('id' => 12, 'access' => ['owner', 'manager'], 'title' => 'Profit and Loss'),
-    13 => ['id' => 13, 'title' => 'Payments', 'access' => ['owner', 'manager']],
+    13 => ['id' => 13, 'title' => 'Account Ledger', 'access' => ['owner', 'manager']],
     14 => ['id' => 14, 'title' => 'EasyPaisa &amp; Bank Report', 'access' => ['owner', 'manager']],
     15 => ['id' => 15, 'title' => 'EasyPaisa &amp; Bank Report (Summery)', 'access' => ['owner', 'manager']],
+    13 => ['id' => 16, 'title' => 'Pin Products (Min Qty)', 'access' => ['owner', 'manager']],
 ];
 
 $returnArray = [
