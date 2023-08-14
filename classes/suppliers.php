@@ -22,10 +22,11 @@ class Suppliers extends Connection
 	public function createSupplier($array)
 	{
 		try {
-			$stmt = "INSERT INTO `{$this->table}` (`name`, `contact`, `address`,`wallet`, `company`, `title`, `user_id`, `shopId`, `type`, `account_id`) VALUES (:name, :contact, :address, :wallet, :company, :title, :user_id, :shopId, :type, :account_id)";
+			$stmt = "INSERT INTO `{$this->table}` (`name`, `contact`, `email`, `address`,`wallet`, `company`, `title`, `user_id`, `shopId`, `type`, `account_id`) VALUES (:name, :contact, :address, :wallet, :company, :title, :user_id, :shopId, :type, :account_id)";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':name', $array['name'], PDO::PARAM_STR);
 			$prepare->bindParam(':contact', $array['contact'], PDO::PARAM_STR);
+			$prepare->bindParam(':email', $array['email'], PDO::PARAM_STR);
 			$prepare->bindParam(':address', $array['address'], PDO::PARAM_STR);
 			$prepare->bindParam(':wallet', $array['wallet'], PDO::PARAM_INT);
 			$prepare->bindParam(':company', $array['company'], PDO::PARAM_STR);
@@ -60,10 +61,11 @@ class Suppliers extends Connection
 	public function updateSupplier($array)
 	{
 		try {
-			$stmt = "UPDATE `{$this->table}` SET name=:name, contact=:contact, address=:address, company=:company, title=:title WHERE id=:id";
+			$stmt = "UPDATE `{$this->table}` SET name=:name, contact=:contact, email=:email, address=:address, company=:company, title=:title WHERE id=:id";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':name', $array['name'], PDO::PARAM_STR);
 			$prepare->bindParam(':contact', $array['contact'], PDO::PARAM_STR);
+			$prepare->bindParam(':email', $array['email'], PDO::PARAM_STR);
 			$prepare->bindParam(':address', $array['address'], PDO::PARAM_STR);
 			$prepare->bindParam(':company', $array['company'], PDO::PARAM_STR);
 			$prepare->bindParam(':title', $array['title'], PDO::PARAM_STR);

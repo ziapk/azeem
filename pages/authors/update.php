@@ -23,6 +23,7 @@ if (!empty($_POST) && isset($_POST['update'])) {
             'id' => $_GET['id'],
             'name' => $_POST['name'],
             'contact' => $_POST['contact'],
+            'email' => $_POST['email'],
             'company' => $_POST['company'],
             'title' => $_POST['title'],
             'address' => $_POST['address']
@@ -69,6 +70,10 @@ if (empty($supplier)) {
             <div class="col-sm-4 form-group">
                 <label>Contact</label>
                 <input name="contact" type="text" class="form-control" placeholder="Contact" value="<?php echo $supplier['contact']; ?>">
+            </div>
+            <div class="col-sm-4 form-group">
+                <label>Email</label>
+                <input name="email" type="text" class="form-control" placeholder="Email" value="<?php echo $supplier['email']; ?>">
             </div>
             <div class="col-sm-4 form-group">
                 <label>Designation</label>

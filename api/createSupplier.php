@@ -11,6 +11,7 @@ if (empty($_POST['name'])) {
         'name' => $_POST['name'],
         'address' => !empty($_POST['address']) ? $_POST['address'] : "",
         'contact' => !empty($_POST['contact']) ? $_POST['contact'] : "",
+        'email' => !empty($_POST['email']) ? $_POST['email'] : "",
         'wallet' => !empty($_POST['wallet']) ? $_POST['wallet'] : 0,
         'company' => !empty($_POST['company']) ? $_POST['company'] : "",
         'title' => !empty($_POST['title']) ? $_POST['title'] : "",

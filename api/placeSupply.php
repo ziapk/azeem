@@ -29,6 +29,7 @@ if (empty($_POST['supplierId']) && !empty($_POST['supplierName'])) {
         'name' => $_POST['supplierName'],
         'contact' => !empty($_POST['supplierContact']) ? $_POST['supplierContact'] : "",
         'address' => "",
+        'email' => "",
         'wallet' => 0,
         'company' => "",
         'title' => "",
@@ -121,6 +122,7 @@ if (sizeof($items)) {
     }
 }
 $supply = new Supply();
+$supplier = $supplierObj->getSupplier($supplierId);
 $data = [
     'user_id' => $userData['id'],
     'supplier_id' => !empty($supplierId) ? $supplierId : 1,
@@ -279,6 +281,14 @@ if ($supply_id) {
             ];
             $a[] = $de->makeEntry($entry);
         }
+        $newsletter = new Newsletter();
+        $send = $newsletter->send([
+            'subject' => $makeTransaction['description'],
+            'body' => $newsletter->drawSupply($supply_id),
+            'sentTo' => [['email' => !empty($supplier['email']) ? $supplier['email'] : 'zia.pccr@yahoo.com', 'name' => !empty($_POST['supplierName']) ? $_POST['supplierName'] : $supplier['name']]],
+            'ccEmails' => [['email' => $shop['company_email'], 'name' => $shop['full_name']]],
+            'client' => $shop['full_name'],
+        ]);
     }
 
     echo json_encode(['status' => 200, 'message' => 'successfully done', 'supply' => ['id' => $supply_id]]);

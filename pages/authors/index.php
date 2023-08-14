@@ -53,9 +53,19 @@ echo mainHeader(['page' => 'authors']);
         </div>
         <div class="modal-body" id="modal-body">
             <div uib-alert ng-if="alert" ng-class="'alert-'+(alert.type || 'warning')" close="closeAlert()">{{alert.message}}</div>
-            <div class="form-group">
-                <label for="sname">Name</label>
-                <input id="sname" type="text" ng-model="form.name" class="form-control" placeholder="Name">
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label for="sname">Name</label>
+                        <input id="sname" type="text" ng-model="form.name" class="form-control" placeholder="Name">
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label for="semail">Title</label>
+                        <input id="semail" type="text" ng-model="form.email" class="form-control" placeholder="Email">
+                    </div>
+                </div>
             </div>
             <div class="row">
                 <div class="col-sm-6">
@@ -66,7 +76,7 @@ echo mainHeader(['page' => 'authors']);
                 </div>
                 <div class="col-sm-6">
                     <div class="form-group">
-                        <label for="stitle">Title</label>
+                        <label for="stitle">Email</label>
                         <input id="stitle" type="text" ng-model="form.title" class="form-control" placeholder="Title">
                     </div>
                 </div>
@@ -196,6 +206,7 @@ echo mainHeader(['page' => 'authors']);
         $scope.form = {
             name: "",
             contact: "",
+            email: "",
             address: "",
             wallet: 0,
             type: 2
