@@ -57,13 +57,9 @@ switch ($reportType) {
 		exit;
 	case '1':
 		$product_ids = [];
-		foreach ($_POST['product_id'] as $pid) {
-			if (!empty($pid)) {
-				$product_ids[] = $pid;
-			}
+		if (!empty($_POST['product_id'])) {
+			$product_ids[] = $_POST['product_id'];
 		}
-		print_r($_POST);
-		print_r($product_ids);
 		if (!empty($product_ids)) {
 			$orders = $ordersObj->ordersReport($shopId, $from, $to, $product_ids);
 			include_once dirname(__FILE__) . '/salesProductsReport.php';
