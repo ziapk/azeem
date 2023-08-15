@@ -8,6 +8,7 @@ $details = !empty($_GET['detail']) && $_GET['detail'] == 'true' ? true : false;
 $largeView = !empty($_GET['largeView']) && $_GET['largeView'] == 'large' ? true : false;
 $ordersObj = new Supply();
 $order = $ordersObj->getOrder($id, true);
+print_r($order);
 $customers = new DoubleEntry();
 
 if ($order['order']['supplier_type'] == 2) {
