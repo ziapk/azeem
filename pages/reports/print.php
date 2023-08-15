@@ -62,12 +62,13 @@ switch ($reportType) {
 				$product_ids[] = $pid;
 			}
 		}
+		print_r($_POST);
+		print_r($product_ids);
 		if (!empty($product_ids)) {
 			$orders = $ordersObj->ordersReport($shopId, $from, $to, $product_ids);
-			print_r($orders);
 			include_once dirname(__FILE__) . '/salesProductsReport.php';
 		} else {
-			print_r($orders);
+			print_r($product_ids);
 			$orders = $ordersObj->ordersReport($shopId, $from, $to, $product_ids);
 			include_once dirname(__FILE__) . '/salesReport.php';
 		}
