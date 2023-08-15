@@ -9,32 +9,33 @@ $totals = ['price' => 0, 'discount' => 0, 'paid' => 0, 'balance' => 0];
     <thead>
         <tr>
             <th>Sr.#</th>
+            <th>Date</th>
             <th>Order #</th>
             <th>Customer</th>
             <th>Item</th>
-            <th>Date</th>
+            <th>Qty</th>
             <th>Price</th>
             <th>Discount</th>
-            <th>Qty</th>
         </tr>
     </thead>
     <tbody>
         <?php $count = 1;
         foreach ($orders as $s) {
 
+            $totals['qty'] += $s['quantity'];
             $totals['price'] += $s['price'];
             $totals['discount'] += $s['discount'];
 
         ?>
             <tr>
                 <td><?php echo $count; ?></td>
+                <td><?php echo dateToSimple($s['order_date']); ?></td>
                 <td><?php echo $s['order_custom_id']; ?></td>
                 <td><?php echo $s['full_name']; ?></td>
                 <td><?php echo $s['productName']; ?></td>
-                <td><?php echo dateToSimple($s['order_date']); ?></td>
+                <td><?php echo $s['quantity']; ?></td>
                 <td><?php echo $s['price']; ?></td>
                 <td><?php echo $s['discount']; ?></td>
-                <td><?php echo $s['quantity']; ?></td>
             </tr>
         <?php $count++;
         } ?>
@@ -50,6 +51,10 @@ $totals = ['price' => 0, 'discount' => 0, 'paid' => 0, 'balance' => 0];
         <tr>
             <th align="left">Total Price</th>
             <td><?php echo $totals['price']; ?></td>
+        </tr>
+        <tr>
+            <th align="left">Total Products</th>
+            <td><?php echo $totals['qty']; ?></td>
         </tr>
         <tr>
             <th align="left">Total Discount</th>
