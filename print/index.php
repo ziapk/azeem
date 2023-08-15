@@ -204,7 +204,7 @@ if ($largeView) {
                                     <span style="font-size: 1.5em;">Sales Invoice</span> (<?php echo $order['order']['order_custom_id']; ?>)
                                 </th>
                                 <td width="40" class="text-right">Date:</td>
-                                <th width="40"><?php echo date('d/m/Y', strtotime($order['order']['created_at'])); ?></th>
+                                <th width="80"><?php echo date('d/m/Y', strtotime($order['order']['created_at'])); ?></th>
                             </tr>
                             <span class="ref"><strong></strong> </span>
                             <span class="date"></span>
