@@ -64,7 +64,6 @@ switch ($reportType) {
 			$orders = $ordersObj->ordersReport($shopId, $from, $to, $product_ids);
 			include_once dirname(__FILE__) . '/salesProductsReport.php';
 		} else {
-			print_r($product_ids);
 			$orders = $ordersObj->ordersReport($shopId, $from, $to, $product_ids);
 			include_once dirname(__FILE__) . '/salesReport.php';
 		}
