@@ -282,6 +282,9 @@ if ($supply_id) {
             $a[] = $de->makeEntry($entry);
         }
         $newsletter = new Newsletter();
+        print_r($makeTransaction);
+        print_r($supplier);
+        print_r($shop);
         try {
             $send = $newsletter->send([
                 'subject' => $makeTransaction['description'],
