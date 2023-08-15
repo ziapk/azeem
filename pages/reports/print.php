@@ -56,6 +56,7 @@ switch ($reportType) {
 		include_once dirname(__FILE__) . '/shop_products.php';
 		exit;
 	case '1':
+		$product_ids = [];
 		foreach ($_POST['product_id'] as $pid) {
 			if (!empty($pid)) {
 				$product_ids[] = $pid;
@@ -66,6 +67,7 @@ switch ($reportType) {
 			print_r($orders);
 			include_once dirname(__FILE__) . '/salesProductsReport.php';
 		} else {
+			print_r($orders);
 			$orders = $ordersObj->ordersReport($shopId, $from, $to, $product_ids);
 			include_once dirname(__FILE__) . '/salesReport.php';
 		}
