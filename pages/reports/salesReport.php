@@ -30,7 +30,7 @@ $totals = ['price' => 0, 'discount' => 0, 'paid' => 0, 'balance' => 0];
             <tr>
                 <td><?php echo $count; ?></td>
                 <td><?php echo $s['id']; ?></td>
-                <td><?php echo $s['full_name']; ?></td>
+                <td><?php echo !empty($s['full_name']) ? $s['full_name'] : $s['name']; ?></td>
                 <td><?php echo dateToSimple($s['order_date']); ?></td>
                 <td><?php echo $s['price']; ?></td>
                 <td><?php echo $s['discount']; ?></td>

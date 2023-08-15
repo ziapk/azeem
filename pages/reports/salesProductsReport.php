@@ -31,7 +31,7 @@ $totals = ['price' => 0, 'discount' => 0, 'paid' => 0, 'balance' => 0];
                 <td><?php echo $count; ?></td>
                 <td><?php echo dateToSimple($s['order_date']); ?></td>
                 <td><?php echo $s['order_custom_id']; ?></td>
-                <td><?php echo $s['full_name']; ?></td>
+                <td><?php echo !empty($s['full_name']) ? $s['full_name'] : $s['name']; ?></td>
                 <td><?php echo $s['productName']; ?></td>
                 <td><?php echo $s['quantity']; ?></td>
                 <td><?php echo $s['price']; ?></td>
