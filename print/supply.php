@@ -1,6 +1,7 @@
 <?php
 include_once dirname(__FILE__) . '/../include/settings.php';
 $id = !empty($_GET['id']) ? $_GET['id'] : 0;
+$siteUrl = 'https://azeem.reclinesolutions.com/';
 if (empty($id)) {
     echo "Invalid data";
 }
@@ -186,7 +187,7 @@ $qty = 0; ?>
                 <th>
                     <div class="head text-left">
                         <span class="pull-right">
-                            <img width="120" height="60" style="vertical-align: middle; margin-right: 5px; filter: grayscale(100%);" src="<?php echo SITE_URL; ?>assets/clients/<?php echo $shop['image']; ?>" />
+                            <img width="120" height="60" style="vertical-align: middle; margin-right: 5px; filter: grayscale(100%);" src="<?php echo $siteUrl; ?>assets/clients/<?php echo $shop['image']; ?>" />
                         </span>
                         <h3>
                             <div style="padding-top: 10px"><?php echo strtoupper($shop['full_name']); ?>
