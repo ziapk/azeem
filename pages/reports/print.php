@@ -81,7 +81,6 @@ switch ($reportType) {
 		}
 		if (!empty($product_ids)) {
 			$orders = $ordersObj->ordersReport($shopId, $from, $to, $product_ids);
-			print_r($orders);
 			include_once dirname(__FILE__) . '/salesProductsReport.php';
 		} else {
 			$orders = $ordersObj->ordersReport($shopId, $from, $to, $product_ids);
