@@ -10,9 +10,6 @@ $ordersObj = new Supply();
 $order = $ordersObj->getOrder($id, true);
 $customers = new DoubleEntry();
 
-print_r($order);
-exit;
-
 if ($order['order']['supplier_type'] == 2) {
     $blc = $customers->getOpeningBalance($order['customer']['account_id'], 'c');
 } else {

@@ -285,12 +285,10 @@ if ($supply_id) {
             $a[] = $de->makeEntry($entry);
         }
         $newsletter = new Newsletter();
-        $html = $newsletter->drawSupply($supply_id);
-        print_r($html);
         try {
             $send = $newsletter->send([
                 'subject' => $makeTransaction['description'],
-                'body' => $html,
+                'body' => $newsletter->drawSupply($supply_id),
                 'sentTo' => [['email' => !empty($supplier['email']) ? $supplier['email'] : 'zia.pccr@yahoo.com', 'name' => !empty($_POST['supplierName']) ? $_POST['supplierName'] : $supplier['name']]],
                 'ccEmails' => [['email' => $shop['company_email'], 'name' => $shop['full_name']]],
                 'client' => $shop['full_name'],
