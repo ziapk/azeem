@@ -71,6 +71,12 @@ echo mainHeader(['page' => 'supplier']);
                 </div>
                 <div class="col-sm-6">
                     <div class="form-group">
+                        <label for="semail">Email</label>
+                        <input id="semail" type="text" ng-model="form.email" class="form-control" placeholder="Supplier's Email">
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group">
                         <label for="stitle">Title</label>
                         <input id="stitle" type="text" ng-model="form.title" class="form-control" placeholder="Supplier's Title">
                     </div>
@@ -206,6 +212,7 @@ echo mainHeader(['page' => 'supplier']);
         $scope.form = {
             name: "",
             contact: "",
+            email: "",
             address: "",
             wallet: 0
         }
