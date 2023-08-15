@@ -4,6 +4,7 @@ class Supply extends Connection
 {
 
     private $table = 'supply';
+    private $table_pro = 'products';
     private $table_sub = 'supply_items';
     private $table_rs = 'supply_returns';
     private $table_transaction = 'supply_transaction';
@@ -26,6 +27,27 @@ class Supply extends Connection
             $stmt = "ALTER TABLE `{$this->table}` ADD COLUMN IF NOT EXISTS `ref_no` varchar(20) NULL DEFAULT NULL AFTER `supply_date`";
             $prepare = $this->dbh->prepare($stmt);
             $prepare->execute();
+        } catch (PDOException $e) {
+            die("Error!: " . $e->getMessage() . "<br/>");
+        }
+    }
+
+    public function ordersReport($shopId, $date, $to, $ids = [])
+    {
+        try {
+
+            $toCondition = " AND o.supply_date>='" . $date . "' AND o.supply_date<='" . $to . "' ";
+            if (!empty($ids)) {
+                $toCondition .= " AND sub.product_id IN (" . implode(',', $ids) . ") ";
+                $stmt = "SELECT sub.*, sub.supply_id as order_custom_id, o.supply_date, p.full_name as productName, c.full_name, s.name FROM `{$this->table_sub}` AS sub left join `{$this->table_pro}` as p on p.id = sub.product_id left join `{$this->table}` as o on sub.supply_id = o.id LEFT JOIN customers AS c ON c.id = o.supplier_id and o.supplier_type = 2 LEFT JOIN `{$this->table_suppliers}` AS s ON s.id = o.supplier_id and o.supplier_type = 1 WHERE o.shopId=:shopId " . $toCondition . ' and o.flag = 1 ORDER BY o.supply_date asc, sub.quantity desc';
+            } else {
+                $stmt = "SELECT o.*, c.full_name, s.name FROM `{$this->table}` AS o  LEFT JOIN customers AS c ON c.id = o.supplier_id and o.supplier_type = 2 LEFT JOIN `{$this->table_suppliers}` AS s ON s.id = o.supplier_id and o.supplier_type = 1 left join `{$this->table_sub}` as sub on sub.supply_id = o.id WHERE o.shopId=:shopId " . $toCondition . ' and o.flag = 1 ORDER BY id asc';
+            }
+            $prepare = $this->dbh->prepare($stmt);
+            $prepare->bindParam(':shopId', $shopId, PDO::PARAM_STR);
+            $prepare->execute();
+            $result = $prepare->fetchAll(PDO::FETCH_ASSOC);
+            return $result;
         } catch (PDOException $e) {
             die("Error!: " . $e->getMessage() . "<br/>");
         }

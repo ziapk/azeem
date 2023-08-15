@@ -73,6 +73,25 @@ switch ($reportType) {
 		// $sum = ['price', 'discount', 'paid_amount'];
 
 		break;
+	case '17':
+		$ordersObj = new Supply();
+		$product_ids = [];
+		if (!empty($_POST['product_id'])) {
+			$product_ids[] = $_POST['product_id'];
+		}
+		if (!empty($product_ids)) {
+			$orders = $ordersObj->ordersReport($shopId, $from, $to, $product_ids);
+			include_once dirname(__FILE__) . '/salesProductsReport.php';
+		} else {
+			$orders = $ordersObj->ordersReport($shopId, $from, $to, $product_ids);
+			include_once dirname(__FILE__) . '/salesReport.php';
+		}
+		exit;
+		// $headers = ['Order #', 'Date', 'Customer Name', 'Price', 'Discount.', 'Paid', 'Status'];
+		// $columns = ['id', 'order_date', 'full_name', 'price', 'discount','paid_amount', 'status'];
+		// $sum = ['price', 'discount', 'paid_amount'];
+
+		break;
 	case '2':
 		$orders = $ordersObj->ordersReportProductWise($shopId, $from, $to);
 		include_once dirname(__FILE__) . '/salesReportProductWise.php';
