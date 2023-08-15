@@ -1,5 +1,8 @@
 <?php
 include_once dirname(__FILE__) . '/../include/settings.php';
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 $ownerId = $userData['role'] == 'owner' ? $userData['id'] : $userData['created_by'];
 
 // 1. add supplier if not get id or if didn't get id or name set no supplier [done]
