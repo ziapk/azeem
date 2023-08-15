@@ -13,7 +13,7 @@ $customers = new DoubleEntry();
 if ($order['order']['supplier_type'] == 2) {
     $blc = $customers->getOpeningBalance($order['customer']['account_id'], 'c');
 } else {
-    $blc = $customers->getOpeningBalance($order['customer']['account_id'], 's');
+    $blc = $customers->getOpeningBalance($order['supplier']['account_id'], 's');
 }
 
 
@@ -433,7 +433,13 @@ if ($largeView) {
             </h3>
 
         </div>
-        <span class="pull-left ref"><span style="font-size: 10px">Customer Name:</span> <strong><?php echo !empty($order['order']['customer_name']) ? $order['order']['customer_name'] : $foodpanda['full_name']; ?></strong></span>
+        <span class="pull-left ref"><span style="font-size: 10px">Customer Name:</span> <strong><?php
+                                                                                                if ($order['order']['supplier_type'] == 2) {
+                                                                                                    echo !empty($order['order']['customer_name']) ? $order['order']['customer_name'] : $foodpanda['full_name'];
+                                                                                                } else {
+                                                                                                    echo !empty($order['supplier']['name']) ? $order['supplier']['name'] : '';
+                                                                                                }
+                                                                                                ?></strong></span>
         <div style="clear: both;"></div>
         <span class="pull-left ref">Ref. RSV0<?php echo $_GET['id']; ?></span>
         <span class="pull-right date"><?php echo date('d/m/Y H:i', strtotime($order['order']['created_at'])); ?></span>
