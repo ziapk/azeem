@@ -282,13 +282,17 @@ if ($supply_id) {
             $a[] = $de->makeEntry($entry);
         }
         $newsletter = new Newsletter();
-        $send = $newsletter->send([
-            'subject' => $makeTransaction['description'],
-            'body' => $newsletter->drawSupply($supply_id),
-            'sentTo' => [['email' => !empty($supplier['email']) ? $supplier['email'] : 'zia.pccr@yahoo.com', 'name' => !empty($_POST['supplierName']) ? $_POST['supplierName'] : $supplier['name']]],
-            'ccEmails' => [['email' => $shop['company_email'], 'name' => $shop['full_name']]],
-            'client' => $shop['full_name'],
-        ]);
+        try {
+            $send = $newsletter->send([
+                'subject' => $makeTransaction['description'],
+                'body' => $newsletter->drawSupply($supply_id),
+                'sentTo' => [['email' => !empty($supplier['email']) ? $supplier['email'] : 'zia.pccr@yahoo.com', 'name' => !empty($_POST['supplierName']) ? $_POST['supplierName'] : $supplier['name']]],
+                'ccEmails' => [['email' => $shop['company_email'], 'name' => $shop['full_name']]],
+                'client' => $shop['full_name'],
+            ]);
+        } catch (Exception $e) {
+            print_r($e);
+        }
     }
 
     echo json_encode(['status' => 200, 'message' => 'successfully done', 'supply' => ['id' => $supply_id]]);
