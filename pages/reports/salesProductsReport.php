@@ -29,7 +29,9 @@ $totals = ['price' => 0, 'discount' => 0, 'paid' => 0, 'balance' => 0];
         ?>
             <tr>
                 <td><?php echo $count; ?></td>
-                <td><?php echo dateToSimple(date('Y-m-d', strtotime($s['order_date']))); ?></td>
+                <td><?php
+                    print_r($s['order_date']);
+                    echo dateToSimple(date('Y-m-d', strtotime($s['order_date']))); ?></td>
                 <td><?php echo $s['order_custom_id']; ?></td>
                 <td><?php echo !empty($s['full_name']) ? $s['full_name'] : $s['name']; ?></td>
                 <td><?php echo $s['productName']; ?></td>
