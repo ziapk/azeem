@@ -202,7 +202,7 @@ if ($largeView) {
                         <table class="table" style="width: 100%">
                             <tr>
                                 <td width="140" class="text-right">Supplier Name:</td>
-                                <th><?php echo $foodpanda['full_name']; ?></th>
+                                <th><?php echo $foodpanda['name']; ?></th>
                                 <td width="120" class="text-right">Bill Ref.</td>
                                 <th>0000<?php echo $_GET['id'];
                                         if ($order['order']['ref_no']) {
