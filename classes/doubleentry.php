@@ -191,7 +191,7 @@ class DoubleEntry extends Connection
 				}
 			}
 
-			$stmt = "SELECT a.*, t.transaction_date, t.reference, a.description, t.description as v_description from `$this->table_ledger_entries` as a left join `$this->table_transactions` as t on t.id = a.transaction_id $where";
+			$stmt = "SELECT a.*, t.transaction_date, t.reference, a.description, t.description as v_description from `$this->table_ledger_entries` as a left join `$this->table_transactions` as t on t.id = a.transaction_id $where order by t.id desc";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->execute();
 			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
