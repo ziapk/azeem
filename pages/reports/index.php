@@ -38,7 +38,7 @@ echo mainHeader(['page' => 'reports']);
     }
 </style>
 <div class="container" ng-controller="reportController">
-    <form method="POST" action="print.php">
+    <form method="POST" action="print.php" target="_blank">
         <h4>Reports</h4>
         <div class="row datepicker-parent">
             <div class="col-sm-4 col-md-3 form-group">
