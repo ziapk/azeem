@@ -9,9 +9,9 @@ $totals = ['price' => 0, 'discount' => 0, 'paid' => 0, 'balance' => 0];
     <thead>
         <tr>
             <th>Sr.#</th>
+            <th>Date</th>
             <th>Order #</th>
             <th>Customer</th>
-            <th>Date</th>
             <th>Price</th>
             <th>Discount</th>
             <th>Paid</th>
