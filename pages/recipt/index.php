@@ -113,7 +113,12 @@ $ownerStores = $stores->getOwnerStores($userId);
                                 </th>
                                 <th width="100">
                                     <div class="dropdown-wrapper align-right dropdown-height">
-                                        <input type="text" autocomplete="off" class="form-control" id="searchProduct" ng-model="product" placeholder="Search Products" uib-typeahead="address as address.full_name for address in searchProduct($viewValue)" typeahead-on-select="selectProduct($item)" ng-model-options="{debounce: 100}" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="1">
+                                        <div class="input-group">
+                                            <input type="text" autocomplete="off" class="form-control" id="searchProduct" ng-model="product" placeholder="Search Products" uib-typeahead="address as address.full_name for address in searchProduct($viewValue)" typeahead-on-select="selectProduct($item)" ng-model-options="{debounce: 100}" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="productCode ? 0 : 1">
+                                            <span class="input-group-btn" style="width: 90px">
+                                                <input type="text" ng-model="productCode" class="form-control" id="exampleInputAmount" placeholder="CODE">
+                                            </span>
+                                        </div>
                                     </div>
                                 </th>
                             </tr>
@@ -177,7 +182,7 @@ echo mainFooter();
         $scope.list = [];
         $scope.focus = false;
         $scope.qf = true;
-
+        $scope.productCode = "";
         $scope.selectedList = {};
         $scope.indexes = [];
         $scope.setList = list => {
@@ -534,9 +539,23 @@ echo mainFooter();
                 $scope.selectProduct(item);
                 return [];
             } else {
-                const filteredArray = window.mainList.records.filter(r => r.id == term || r.code == term || r.barcode == term || r.searchString.split('|').pop()?.toLowerCase().includes(term?.toLowerCase()) || r.searchString.includes(term + '|') || r.searchString.includes('|' + term) || r.searchString.includes('|' + term + '|'));
-                const secondfilteredArray = !filteredArray.length ? window.mainList.records.filter(obj => obj.searchString.toLowerCase().includes(term?.toLowerCase() || term)) : filteredArray;
-                return secondfilteredArray.slice(0, 30);
+                if ($scope.productCode) {
+                    const filteredArray = mainList.records.filter(r => {
+                        const txt = r.searchString.split('|').pop()?.toLowerCase();
+                        const exits = txt?.split(',')?.filter(tt => tt?.startsWith($scope.productCode?.toLowerCase()));
+                        console.log('exits', txt, exits);
+                        return exits.length;
+                    });
+                    console.log('filteredArray', $scope.productCode?.toLowerCase(), filteredArray.length)
+                    const secondfilteredArray = term ? filteredArray.filter(obj => obj.searchString.toLowerCase().includes(term?.toLowerCase() || term)) : filteredArray;
+                    console.log('secondfilteredArray', secondfilteredArray)
+                    return secondfilteredArray.slice(0, 30);
+                } else {
+                    const filteredArray = window.mainList.records.filter(r => r.id == term || r.code == term || r.barcode == term || r.searchString.split('|').pop()?.toLowerCase().includes(term?.toLowerCase()) || r.searchString.includes(term + '|') || r.searchString.includes('|' + term) || r.searchString.includes('|' + term + '|'))
+                    const secondfilteredArray = !filteredArray.length ? window.mainList.records.filter(obj => obj.searchString.toLowerCase().includes(term?.toLowerCase() || term)) : filteredArray;
+                    return secondfilteredArray.slice(0, 30);
+
+                }
             }
         }
         $scope.searchCustomer = function(value, onloading) {
