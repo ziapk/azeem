@@ -654,7 +654,7 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                             return exits.length;
                         });
                         const secondfilteredArray = term ? filteredArray.filter(obj => obj.searchString.toLowerCase().includes(term?.toLowerCase() || term)) : filteredArray;
-                        return secondfilteredArray.slice(0, 30);
+                        return secondfilteredArray;
                     } else {
                         const filteredArray = window.mainList.records.filter(r => r.id == term || r.code == term || r.barcode == term || r.searchString.split('|').pop()?.toLowerCase().includes(term?.toLowerCase()) || r.searchString.includes(term + '|') || r.searchString.includes('|' + term) || r.searchString.includes('|' + term + '|'))
                         const secondfilteredArray = !filteredArray.length ? window.mainList.records.filter(obj => obj.searchString.toLowerCase().includes(term?.toLowerCase() || term)) : filteredArray;

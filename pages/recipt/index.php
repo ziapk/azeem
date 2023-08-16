@@ -543,13 +543,10 @@ echo mainFooter();
                     const filteredArray = mainList.records.filter(r => {
                         const txt = r.searchString.split('|').pop()?.toLowerCase();
                         const exits = txt?.split(',')?.filter(tt => tt?.startsWith($scope.productCode?.toLowerCase()));
-                        console.log('exits', txt, exits);
                         return exits.length;
                     });
-                    console.log('filteredArray', $scope.productCode?.toLowerCase(), filteredArray.length)
                     const secondfilteredArray = term ? filteredArray.filter(obj => obj.searchString.toLowerCase().includes(term?.toLowerCase() || term)) : filteredArray;
-                    console.log('secondfilteredArray', secondfilteredArray)
-                    return secondfilteredArray.slice(0, 30);
+                    return secondfilteredArray;
                 } else {
                     const filteredArray = window.mainList.records.filter(r => r.id == term || r.code == term || r.barcode == term || r.searchString.split('|').pop()?.toLowerCase().includes(term?.toLowerCase()) || r.searchString.includes(term + '|') || r.searchString.includes('|' + term) || r.searchString.includes('|' + term + '|'))
                     const secondfilteredArray = !filteredArray.length ? window.mainList.records.filter(obj => obj.searchString.toLowerCase().includes(term?.toLowerCase() || term)) : filteredArray;
