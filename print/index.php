@@ -264,8 +264,10 @@ if ($largeView) {
                                         <table class="table" style="border-collapse: collapse; margin: 0">
                                             <tr>
                                                 <td style="border: 0; font-weight: 600;">Note: Books once sold nerver be returned or exchanged.</td>
-                                                <td width="120">Current Balance:</td>
-                                                <th width="60" style="text-align: right"><?php echo abs(($currentBalance)); ?></th>
+                                                <?php if (empty($foodpanda['is_default'])) { ?>
+                                                    <td width="120">Current Balance:</td>
+                                                    <th width="60" style="text-align: right"><?php echo abs(($currentBalance)); ?></th>
+                                                <?php } ?>
                                             </tr>
                                         </table>
                                     </th>
