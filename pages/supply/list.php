@@ -36,7 +36,7 @@ echo mainHeader(['page' => 'supplies']);
                 <td>{{row.id}}</td>
                 <td>{{row.ref_no}}</td>
                 <td>{{row.customer_name || row.full_name}}</td>
-                <td>{{row.price - row.discount}}</td>
+                <td>{{row.price}}</td>
                 <td>{{statusArr[row.status].full_name}}</td>
                 <td>{{row.order_date}}</td>
                 <td align="right">

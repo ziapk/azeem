@@ -91,7 +91,7 @@ if (sizeof($_POST['items'])) {
 
             if ($item['product_type'] == 4) {
                 $fixAssetsValue += ($item['price'] * $item['qty']);
-                $fixAssetsPurchaseValue += ($item['price'] * $item['qty']);
+                $fixAssetsPurchaseValue += ($item['pprice'] * $item['qty']);
             } else {
                 $productsValue += ($item['price'] * $item['qty']);
                 $purchaseValue += ($item['pprice'] * $item['qty']);

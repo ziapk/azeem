@@ -29,7 +29,7 @@
             <td><input type="number" class="form-control" ng-change="calculatePercent(row)" ng-model="row.pprice" /></td>
             <td><input type="number" class="form-control" ng-model="row.price" /></td>
             <td><input type="number" class="form-control" ng-change="calculateSum()" ng-model="row.qty" ng-keydown="initCheckKeypress($event)" /></td>
-            <td>{{row.total | number: 0}}</td>
+            <td>{{row.total | number: 2}}</td>
             <td><a href="#" class="btn btn-xs btn-danger pull-right" ng-click="remove($index)">Delete</a></td>
         </tr>
     </tbody>
