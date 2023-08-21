@@ -804,7 +804,7 @@ class Orders extends Connection
                 $join = " LEFT JOIN `{$this->table_sub}` AS oi ON oi.order_id=o.id LEFT JOIN `{$this->table_pro}` AS p on p.id=oi.product_id ";
                 $toCondition .= " and p.publisher_id = $publisher_id ";
             }
-            $stmt = "SELECT count(o.id) AS total, SUM(o.price) AS gross, SUM(o.discount) AS dist, SUM(o.paid_amount) AS paid, SUM(o.`price` - o.`discount` - o.`paid_amount`) AS balance FROM `{$this->table}` AS o " . $join . " WHERE o.shopId=:shopId " . $toCondition . ' and o.flag = 1 ORDER BY o.id desc';
+            $stmt = "SELECT count(o.id) AS total, ROUND(SUM(o.price), 2) AS gross, ROUND(SUM(o.discount), 2) AS dist, ROUND(SUM(o.paid_amount), 2) AS paid, ROUND(SUM(o.`price` - o.`discount` - o.`paid_amount`), 2) AS balance FROM `{$this->table}` AS o " . $join . " WHERE o.shopId=:shopId " . $toCondition . ' and o.flag = 1 ORDER BY o.id desc';
             $prepare = $this->dbh->prepare($stmt);
             $prepare->bindParam(':shopId', $shopId, PDO::PARAM_STR);
             $prepare->execute();
@@ -866,7 +866,7 @@ class Orders extends Connection
                 $join = " LEFT JOIN `{$this->table_sub}` AS oi ON oi.order_id=o.id LEFT JOIN `{$this->table_pro}` AS p on p.id=oi.product_id ";
                 $toCondition .= " and  p.publisher_id = $publisher_id ";
             }
-            $stmt = "SELECT o.order_date, sum(o.price) AS price, sum(o.discount) AS discount, sum(o.paid_amount) AS paid_amount, sum(o.price - o.discount - o.paid_amount) AS balance FROM `{$this->table}` AS o " . $join . " WHERE o.shopId=:shopId " . $toCondition . ' and o.flag = 1 GROUP BY o.order_date ORDER BY o.id asc';
+            $stmt = "SELECT o.order_date, ROUND(sum(o.price), 2) AS price, ROUND(sum(o.discount), 2) AS discount, ROUND(sum(o.paid_amount), 2) AS paid_amount, ROUND(sum(o.price - o.discount - o.paid_amount), 2) AS balance FROM `{$this->table}` AS o " . $join . " WHERE o.shopId=:shopId " . $toCondition . ' and o.flag = 1 GROUP BY o.order_date ORDER BY o.id asc';
             $prepare = $this->dbh->prepare($stmt);
             $prepare->bindParam(':shopId', $shopId, PDO::PARAM_STR);
             $prepare->execute();
