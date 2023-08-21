@@ -11,7 +11,7 @@ class Suppliers extends Connection
 		if (!empty($shopId)) {
 			$shopCondition = " and shopId=$shopId";
 		}
-		$stmt = "SELECT *, name as full_name FROM `{$this->table}`  WHERE flag=1 and type=:type and (name LIKE '" . $search . "%' OR contact LIKE '" . $search . "%' OR address LIKE '" . $search . "%') $shopCondition LIMIT 10";
+		$stmt = "SELECT *, name as full_name FROM `{$this->table}`  WHERE flag=1 and type=:type and (name LIKE '" . $search . "%' OR contact or name LIKE '" . $search . "%' OR email LIKE '" . $search . "%' OR company LIKE '" . $search . "%' OR title LIKE '" . $search . "%' OR address LIKE '" . $search . "%') $shopCondition LIMIT 10";
 		$prepare = $this->dbh->prepare($stmt);
 		$prepare->bindParam(':type', $type, PDO::PARAM_STR);
 		$prepare->execute();
