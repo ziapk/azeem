@@ -94,13 +94,15 @@ switch ($reportType) {
 
 		break;
 	case '2':
-		$orders = $ordersObj->ordersReportProductWise($shopId, $from, $to);
+		$publisher_id = !empty($_POST['publisher_id']) ? $_POST['publisher_id'] : "";
+		$orders = $ordersObj->ordersReportProductWise($shopId, $from, $to, $publisher_id);
 		include_once dirname(__FILE__) . '/salesReportProductWise.php';
 		exit;
 		break;
 
 	case '3':
-		$orders = $ordersObj->ordersReportDateWise($shopId, $from, $to);
+		$publisher_id = !empty($_POST['publisher_id']) ? $_POST['publisher_id'] : "";
+		$orders = $ordersObj->ordersReportDateWise($shopId, $from, $to, $publisher_id);
 		include_once dirname(__FILE__) . '/salesReportDateWise.php';
 		exit;
 		break;

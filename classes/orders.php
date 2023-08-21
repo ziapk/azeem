@@ -794,12 +794,17 @@ class Orders extends Connection
     }
 
 
-    public function ordersReportSummery($shopId, $date, $to)
+    public function ordersReportSummery($shopId, $date, $to, $publisher_id = null)
     {
         try {
 
             $toCondition = " AND o.order_date>='" . $date . "' AND o.order_date<='" . $to . "'";
-            $stmt = "SELECT count(id) AS total, SUM(price) AS gross, SUM(discount) AS dist, SUM(paid_amount) AS paid, SUM(`price` - `discount` - `paid_amount`) AS balance FROM `{$this->table}` AS o WHERE o.shopId=:shopId " . $toCondition . ' and o.flag = 1 ORDER BY id desc';
+            $join = "";
+            if (!empty($publisher_id)) {
+                $join = " LEFT JOIN `{$this->table_sub}` AS oi ON oi.order_id=o.id LEFT JOIN `{$this->table_pro}` AS p on p.id=oi.product_id ";
+                $toCondition .= " and p.publisher_id = $publisher_id ";
+            }
+            $stmt = "SELECT count(o.id) AS total, SUM(o.price) AS gross, SUM(o.discount) AS dist, SUM(o.paid_amount) AS paid, SUM(o.`price` - o.`discount` - o.`paid_amount`) AS balance FROM `{$this->table}` AS o " . $join . " WHERE o.shopId=:shopId " . $toCondition . ' and o.flag = 1 ORDER BY id desc';
             $prepare = $this->dbh->prepare($stmt);
             $prepare->bindParam(':shopId', $shopId, PDO::PARAM_STR);
             $prepare->execute();
@@ -810,13 +815,18 @@ class Orders extends Connection
         }
     }
 
-    public function ordersReportProductWise($shopId, $date, $to)
+    public function ordersReportProductWise($shopId, $date, $to, $publisher_id = null)
     {
         try {
 
-            $summery = $this->ordersReportSummery($shopId, $date, $to);
+            $summery = $this->ordersReportSummery($shopId, $date, $to, $publisher_id);
 
             $toCondition = " AND o.order_date>='" . $date . "' AND o.order_date<='" . $to . "'";
+
+            if (!empty($publisher_id)) {
+                $toCondition .= " and p.publisher_id = $publisher_id ";
+            }
+
             $stmt = "SELECT oi.product_id, oi.price AS price, sum(oi.quantity) AS quantity, p.full_name  FROM `{$this->table}` AS o LEFT JOIN `{$this->table_sub}` AS oi ON oi.order_id=o.id LEFT JOIN `{$this->table_pro}` AS p on p.id=oi.product_id  WHERE o.shopId=:shopId " . $toCondition . ' and o.flag = 1 GROUP BY oi.product_id ORDER BY quantity desc';
             $prepare = $this->dbh->prepare($stmt);
             $prepare->bindParam(':shopId', $shopId, PDO::PARAM_STR);
@@ -844,14 +854,19 @@ class Orders extends Connection
         }
     }
 
-    public function ordersReportDateWise($shopId, $date, $to)
+    public function ordersReportDateWise($shopId, $date, $to, $publisher_id = null)
     {
         try {
 
-            $summery = $this->ordersReportSummery($shopId, $date, $to);
+            $summery = $this->ordersReportSummery($shopId, $date, $to, $publisher_id);
 
             $toCondition = " AND o.order_date>='" . $date . "' AND o.order_date<='" . $to . "'";
-            $stmt = "SELECT o.order_date, sum(o.price) AS price, sum(o.discount) AS discount, sum(o.paid_amount) AS paid_amount, sum(o.price - o.discount - o.paid_amount) AS balance FROM `{$this->table}` AS o WHERE o.shopId=:shopId " . $toCondition . ' and o.flag = 1 GROUP BY o.order_date ORDER BY o.id asc';
+            $join = "";
+            if (!empty($publisher_id)) {
+                $join = " LEFT JOIN `{$this->table_sub}` AS oi ON oi.order_id=o.id LEFT JOIN `{$this->table_pro}` AS p on p.id=oi.product_id ";
+                $toCondition .= " and  p.publisher_id = $publisher_id ";
+            }
+            $stmt = "SELECT o.order_date, sum(o.price) AS price, sum(o.discount) AS discount, sum(o.paid_amount) AS paid_amount, sum(o.price - o.discount - o.paid_amount) AS balance FROM `{$this->table}` AS o " . $join . " WHERE o.shopId=:shopId " . $toCondition . ' and o.flag = 1 GROUP BY o.order_date ORDER BY o.id asc';
             $prepare = $this->dbh->prepare($stmt);
             $prepare->bindParam(':shopId', $shopId, PDO::PARAM_STR);
             $prepare->execute();
