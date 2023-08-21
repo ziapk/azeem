@@ -624,13 +624,19 @@ class Orders extends Connection
         }
     }
 
-    public function ordersReport($shopId, $date, $to, $ids = [])
+    public function ordersReport($shopId, $date, $to, $ids = [], $publisher_id = null)
     {
         try {
 
             $toCondition = " AND o.order_date>='" . $date . "' AND o.order_date<='" . $to . "' ";
-            if (!empty($ids)) {
-                $toCondition .= " AND sub.product_id IN (" . implode(',', $ids) . ") ";
+
+            if (!empty($publisher_id) || !empty($ids)) {
+                if (!empty($ids)) {
+                    $toCondition .= " AND sub.product_id IN (" . implode(',', $ids) . ") ";
+                }
+                if (!empty($publisher_id)) {
+                    $toCondition .= " AND p.publisher_id= $publisher_id ";
+                }
                 $stmt = "SELECT sub.*, o.order_custom_id, o.order_date, p.full_name as productName, c.full_name FROM `{$this->table_sub}` AS sub left join `{$this->table_pro}` as p on p.id = sub.product_id left join `{$this->table}` as o on sub.order_id = o.id LEFT JOIN customers AS c ON c.id = o.customer_id WHERE o.shopId=:shopId " . $toCondition . ' and o.flag = 1 ORDER BY o.order_date asc, sub.quantity desc';
             } else {
                 $stmt = "SELECT o.*, full_name FROM `{$this->table}` AS o LEFT JOIN customers AS c ON c.id = o.customer_id WHERE o.shopId=:shopId " . $toCondition . ' and o.flag = 1 ORDER BY id asc';
