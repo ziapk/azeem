@@ -51,6 +51,19 @@ class Connection
 		ob_clean();
 		return $html;
 	}
+
+	public function drawReceiving($id)
+	{
+		ob_start();
+		$_GET['id'] = $id;
+		$_GET['detail'] = 'true';
+		$_GET['largeView'] = 'large';
+		include dirname(__FILE__) . '/../print/receiving.php';
+		$html = ob_get_clean();
+		ob_clean();
+		return $html;
+	}
+
 	public function normalToPassword($password)
 	{
 		return md5($password);

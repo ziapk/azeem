@@ -420,7 +420,7 @@ if ($largeView) {
         </div>
         <span class="pull-left ref"><span style="font-size: 10px">Customer Name:</span> <strong><?php echo !empty($order['order']['customer_name']) ? $order['order']['customer_name'] : $foodpanda['full_name']; ?></strong></span>
         <div style="clear: both;"></div>
-        <span class="pull-left ref">Ref. RSV0<?php echo $order['order']['order_custom_id']; ?></span>
+        <span class="pull-left ref">Ref. <strong>RSV0<?php echo $order['order']['order_custom_id']; ?></strong></span>
         <span class="pull-right date"><?php echo date('d/m/Y H:i', strtotime($order['order']['created_at'])); ?></span>
         <table width="100%" cellpadding="0" cellspacing="0">
             <thead>

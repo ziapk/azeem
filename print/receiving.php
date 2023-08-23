@@ -19,20 +19,23 @@ foreach ($accountsData as $a) {
 
 $recevingEntry = $de->getLedgerByTID($id);
 $userEntry = [];
-$configs = ['title' => 'Receiving Invoice', 'label' => 'Customer\'s Name'];
+$blc = [];
+$configs = ['title' => 'Receiving Invoice', 'label' => 'Customer\'s Name', 'sign_label' => 'Customer\'s Sign'];
 foreach ($recevingEntry as $row) {
     if ($row['entry_type'] == 'C' && $row['transsaction_type'] == 'DIRECT_RECEIVING') {
         $userEntry = $row;
+        $blc = $de->getOpeningBalance($row['account_id'], 'c');
     } else {
         $configs['title'] = 'Payment Invoice';
         $configs['label'] = 'Supplier\'s Name';
+        $configs['sign_label'] = 'Supplier\'s Sign';
         if (in_array($row['parent_id'], [$storeAccounts['payable'], $storeAccounts['receivable']])) {
             $userEntry = $row;
             $userEntry['creditAmount'] = $row['amount'];
+            $blc = $de->getOpeningBalance($row['account_id'], 's');
         }
     }
 }
-
 $gst = 0;
 $service_charges = 0;
 $price = $userEntry['creditAmount'];
@@ -181,12 +184,6 @@ $qty = 0; ?>
         margin-bottom: 20px;
         font-size: inherit;
     }
-
-    @page {
-        @bottom-left {
-            content: counter(page) "/" counter(pages);
-        }
-    }
 </style>
 <div class="recipt large">
     <table width="100%">
@@ -212,11 +209,11 @@ $qty = 0; ?>
                             <td width="140" class="text-right"><?php echo $configs['label']; ?>:</td>
                             <th><?php echo $userEntry['title']; ?></th>
                             <td width="120" class="text-right">Bill Ref.</td>
-                            <th>0000<?php echo $_GET['id']; ?></th>
+                            <th style="font-size: 20px;"><?php echo $_GET['id']; ?></th>
                         </tr>
                         <tr>
                             <td class="text-right">Contact No.</td>
-                            <th><?php if (!empty($foodpanda['phoneNumber'])) { ?><?php echo $foodpanda['phoneNumber']; ?><?php } ?></th>
+                            <th></th>
                             <td width="120" class="text-right">Date Time:</td>
                             <th><?php echo date('d/m/Y', strtotime($userEntry['transaction_date'])); ?></th>
                         </tr>
@@ -252,7 +249,15 @@ $qty = 0; ?>
                                 </th>
                             </tr>
                             <tr>
-                                <th colspan="4" style="border: 0; height: 100px">
+                                <th colspan="4" style="border: 0; height: 100px;">
+                                    <table class="table" style="border-collapse: collapse; margin: 0 auto;">
+                                        <tr>
+                                            <?php if (empty($foodpanda['is_default'])) { ?>
+                                                <td width="120">Current Balance:</td>
+                                                <th width="60" style="text-align: right"><?php echo number_format(($currentBalance), 0); ?></th>
+                                            <?php } ?>
+                                        </tr>
+                                    </table>
                                 </th>
                             <tr>
                                 <th colspan="4" style="border: 0">
@@ -264,7 +269,7 @@ $qty = 0; ?>
                                             </td>
                                             <td style="border: 0"></td>
                                             <td style="border: 0; text-align: left">
-                                                Customer's Sign
+                                                <?php echo $configs['sign_label']; ?>
                                             </td>
                                         </tr>
                                         <tr>

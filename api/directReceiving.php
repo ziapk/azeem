@@ -88,6 +88,16 @@ try {
         $a[] = $doubleEntry->makeEntry($entry);
     }
 
+    $newsletter = new Newsletter();
+    $send = $newsletter->send([
+        'subject' => $settings['summery'],
+        'body' => $newsletter->drawReceiving($makeTransactionId),
+        'sentTo' => [['email' => !empty($customer['email']) ? $customer['email'] : 'zia.pccr@yahoo.com', 'name' => $_POST['customer_name']]],
+        'ccEmails' => [['email' => $shop['company_email'], 'name' => $shop['full_name']]],
+        'client' => $shop['full_name'],
+    ]);
+
+
     echo json_encode(['status' => 200, 'message' => 'successfully done', 'supply' => ['id' => $makeTransactionId]]);
 } catch (PDOException $e) {
     die("Error!: " . $e->getMessage() . "<br/>");
