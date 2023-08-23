@@ -642,7 +642,7 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                 const params = {};
                 if ($scope.focus === true) {
                     params.term = parseFloat(term.split('-')[0]);
-                    const item = window.mainList.records.find(r => r.id == params.term || r.code == params.term || r.barcode == params.term || r.searchString.split('|').pop()?.toLowerCase().includes(params.term?.toLowerCase()));
+                    const item = window.mainList.records.find(r => r.id == params.term || r.code == params.term || r.barcode == params.term || r.searchString?.split('|')?.pop()?.toLowerCase()?.includes(params?.term?.toString()?.toLowerCase()));
                     $scope.product = '';
                     $scope.selectProduct(item);
                     return [];

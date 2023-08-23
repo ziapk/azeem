@@ -534,7 +534,7 @@ echo mainFooter();
             const params = {};
             if ($scope.focus === true) {
                 params.term = parseFloat(term.split('-')[0]);
-                const item = window.mainList.records.find(r => r.id == params.term || r.code == params.term || r.barcode == params.term || r.searchString.split('|').pop()?.toLowerCase().includes(params.term?.toLowerCase()));
+                const item = window.mainList.records.find(r => r.id == params.term || r.code == params.term || r.barcode == params.term || r.searchString?.split('|')?.pop()?.toLowerCase()?.includes(params?.term?.toString()?.toLowerCase()));
                 $scope.product = '';
                 $scope.selectProduct(item);
                 return [];
@@ -786,11 +786,10 @@ echo mainFooter();
     })
 </script>
 
-
 <script type="text/ng-template" id="row.html">
     <a style="display: flex; justify-content: space-between; align-items: center">
         <span class="{{match.model.code ? 'text-danger' : ''}}" ng-bind-html="match.model.full_name | uibTypeaheadHighlight:query"></span>
-        <span class="label label-danger" style="font-size: 14px">{{match.model.price}}</span>
+        <span class="label label-success" style="font-size: 14px">{{match.model.qty}}</span> | <span class="label label-danger" style="font-size: 14px">{{match.model.price}}</span>
     </a>
 </script>
 <script type="text/ng-template" id="customer.html">
