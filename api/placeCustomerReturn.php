@@ -106,11 +106,27 @@ if ($isSupplier == 1) {
     $supplier = $supplierObj->getSupplier($supplierId);
 }
 
-$makeTransaction = [
+$config = [
     'description' => !empty($_POST['summery']) ? $_POST['summery'] : ($returnType == 1 ? "Sale Return PLACED" : "Purchase Return PLACED"),
+    'transaction_type' => ($returnType == 1 ? 'SALE_RETURN' : 'PURCHASE_RETURN'),
+    'shop_entry' => 'D',
+    'customer_entry' => 'C',
+    'customer_cash_entry' => 'D',
+    'shop_cash_entry' => 'C',
+];
+
+if ($returnType == 2) {
+    $config['shop_entry'] = 'C';
+    $config['customer_entry'] = 'D';
+    $config['customer_cash_entry'] = 'C';
+    $config['shop_cash_entry'] = 'D';
+}
+
+$makeTransaction = [
+    'description' => $config['description'],
     'transaction_date' => $storeDATA['sale_date'],
     'reference' => $_POST['ref_no'],
-    'transaction_type' => ($returnType == 1 ? 'SALE_RETURN' : 'PURCHASE_RETURN'),
+    'transaction_type' => $config['transaction_type'],
     'shopId' => $shopId,
     'created_by' => $_SESSION['user_credentials']['id'],
     'return_ref' => $returnId
@@ -126,7 +142,7 @@ $returnAmount = $purchaseValue - $discount; // C 800
 $entry = [
     'transaction_id' => $makeTransactionId,
     'account_id' => $storeAccounts['assets'],
-    'entry_type' => 'D',
+    'entry_type' => $config['shop_entry'],
     'description' => '',
     'amount' => $assetPrice, // 2000
     'payment_mode' => $_POST['payment_mode'],
@@ -139,7 +155,7 @@ $a[] = $doubleEntry->makeEntry($entry);
 $entry = [
     'transaction_id' => $makeTransactionId,
     'account_id' => $supplier['account_id'],
-    'entry_type' => 'C',
+    'entry_type' => $config['customer_entry'],
     'description' => '',
     'amount' => $returnAmount,
     'payment_mode' => $_POST['payment_mode'],
@@ -153,7 +169,7 @@ if (!empty($saleDiscount)) {
     $entry = [
         'transaction_id' => $makeTransactionId,
         'account_id' => $returnType == 1 ? $storeAccounts['sale_discount'] : $storeAccounts['purchase_discount'],
-        'entry_type' => 'C',
+        'entry_type' => $config['customer_entry'], // as per customer
         'description' => '',
         'amount' => $saleDiscount, // 200 @ 10%
         'payment_mode' => $_POST['payment_mode'],
@@ -174,7 +190,7 @@ if (!empty($payment_amount)) {
     $entry = [
         'transaction_id' => $makeTransactionId,
         'account_id' => $supplier['account_id'],
-        'entry_type' => 'D',
+        'entry_type' => $config['customer_cash_entry'],
         'description' => '',
         'amount' => $payment_amount,
         'payment_mode' => $_POST['payment_mode'],
@@ -185,7 +201,7 @@ if (!empty($payment_amount)) {
     $entry = [
         'transaction_id' => $makeTransactionId,
         'account_id' => $returnType == 1 ? $storeAccounts['sale_returns'] : $storeAccounts['purchase_returns'],
-        'entry_type' => 'C',
+        'entry_type' => $config['shop_cash_entry'],
         'description' => '',
         'amount' => $payment_amount, // 200 @ 10%
         'payment_mode' => $_POST['payment_mode'],
