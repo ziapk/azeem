@@ -414,7 +414,7 @@ class Orders extends Connection
                 $prepare->execute();
                 $result['order_items'] = $prepare->fetchAll(PDO::FETCH_ASSOC);
                 $de = new DoubleEntry();
-                if ($result['order']['return_type'] == 2) {
+                if ($result['order']['is_supplier'] == 2) {
                     $c = new Suppliers();
                     $result['customer'] = $c->getSupplier($result['order']['customer_id']);
                 } else {
@@ -766,9 +766,9 @@ class Orders extends Connection
         $flag = 1;
         try {
             if (!empty($array['id'])) {
-                $stmt = "UPDATE `{$this->table_ro}` SET `amount`=:amount, `paid`=:paid, `discount`=:discount, `ref_no`=:ref_no, `shopId`=:shopId, `owner_id`=:owner_id, `order_id`=:order_id, `customer_id`=:customer_id, `customer_name`=:customer_name, `return_date`=:return_date, `return_type`=:return_type, `flag`=:flag where id=:id";
+                $stmt = "UPDATE `{$this->table_ro}` SET `amount`=:amount, `paid`=:paid, `discount`=:discount, `ref_no`=:ref_no, `shopId`=:shopId, `owner_id`=:owner_id, `order_id`=:order_id, `customer_id`=:customer_id, `customer_name`=:customer_name, `return_date`=:return_date, `return_type`=:return_type, `is_supplier`=:is_supplier, `flag`=:flag where id=:id";
             } else {
-                $stmt = "INSERT INTO `{$this->table_ro}` (`amount`, `paid`, `discount`, `ref_no`, `shopId`, `owner_id`, `order_id`, `customer_id`, `customer_name`, `return_date`, `return_type`, `flag`) VALUES (:amount, :paid, :discount, :ref_no, :shopId, :owner_id, :order_id, :customer_id, :customer_name, :return_date, :return_type, :flag)";
+                $stmt = "INSERT INTO `{$this->table_ro}` (`amount`, `paid`, `discount`, `ref_no`, `shopId`, `owner_id`, `order_id`, `customer_id`, `customer_name`, `return_date`, `return_type`, `is_supplier`, `flag`) VALUES (:amount, :paid, :discount, :ref_no, :shopId, :owner_id, :order_id, :customer_id, :customer_name, :return_date, :return_type, :is_supplier, :flag)";
             }
             $prepare = $this->dbh->prepare($stmt);
             $prepare->bindParam(':amount', $array['amount'], PDO::PARAM_STR);
@@ -782,6 +782,7 @@ class Orders extends Connection
             $prepare->bindParam(':customer_id', $array['customer_id'], PDO::PARAM_STR);
             $prepare->bindParam(':customer_name', $array['customer_name'], PDO::PARAM_STR);
             $prepare->bindParam(':return_type', $array['return_type'], PDO::PARAM_STR);
+            $prepare->bindParam(':is_supplier', $array['is_supplier'], PDO::PARAM_STR);
             $prepare->bindParam(':flag', $flag, PDO::PARAM_STR);
             if (!empty($array['id'])) {
                 $prepare->bindParam(':id', $array['id'], PDO::PARAM_STR);

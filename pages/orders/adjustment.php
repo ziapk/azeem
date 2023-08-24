@@ -24,9 +24,10 @@ echo mainHeader();
         <div class="col-sm-3 form-group">
             <label>Customer's Name</label>
             <input type="hidden" class="form-control" ng-model="supplierId">
-            <input ng-if="return_type == 1" type="text" class="form-control" ng-model="supplierName" placeholder="Customer's Name" typeahead-on-select="selectSupplier($item)" uib-typeahead="address as address.full_name for address in searchCustomer($viewValue)" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="0">
-            <input ng-if="return_type == 2" type="text" class="form-control" ng-model="supplierName" placeholder="Supplier's Name" typeahead-on-select="selectSupplier($item)" uib-typeahead="address as address.full_name for address in searchSupplier($viewValue)" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="0">
-            <label><input type="checkbox" ng-model="return_type" ng-true-value="2" ng-false-value="1" ng-change="resetUsers(return_type)"> Is Supply Return </label>
+            <input ng-if="is_supplier == 1" type="text" class="form-control" ng-model="supplierName" placeholder="Customer's Name" typeahead-on-select="selectSupplier($item)" uib-typeahead="address as address.full_name for address in searchCustomer($viewValue)" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="0">
+            <input ng-if="is_supplier == 2" type="text" class="form-control" ng-model="supplierName" placeholder="Supplier's Name" typeahead-on-select="selectSupplier($item)" uib-typeahead="address as address.full_name for address in searchSupplier($viewValue)" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="0">
+            <label><input type="checkbox" ng-model="return_type" ng-true-value="2" ng-false-value="1" ng-change="resetUsers(return_type)"> Supply </label>
+            <label><input type="checkbox" ng-model="is_supplier" ng-true-value="2" ng-false-value="1" ng-change="resetUsers(return_type)"> Is Supplier </label>
         </div>
         <div class="col-sm-3 form-group">
             <label>Ref. No</label>
@@ -166,6 +167,7 @@ echo mainFooter();
         $scope.shopId = '';
         $scope.order = <?php echo json_encode($order) ?>;
         $scope.returnOrder = <?php echo json_encode($return) ?>;
+        $scope.is_supplier = parseInt($scope.order?.order?.is_supplier || 1);
         $scope.return_type = parseInt($scope.order?.order?.return_type || 1);
 
         $scope.items = $scope.order?.order_items?.map(r => ({
@@ -290,7 +292,7 @@ echo mainFooter();
             $http.get("<?php echo SITE_URL ?>api/getOpeningBalance.php", {
                 params: {
                     account_id: p.account_id,
-                    type: $scope.return_type == 1 ? 'c' : 's'
+                    type: $scope.is_supplier == 1 ? 'c' : 's'
                 }
             }).then(res => {
                 $scope.supplierId = p.id
@@ -424,6 +426,7 @@ echo mainFooter();
                 subTotal: $scope.subTotal,
                 discount: $scope.discount,
                 return_type: $scope.return_type,
+                is_supplier: $scope.is_supplier,
                 givenDiscount: $scope.givenDiscount,
                 order_id: $scope.returnOrder ? $scope.order.order.order_id : $scope.order.order.id,
                 items: $scope.items.map(({

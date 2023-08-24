@@ -34,6 +34,7 @@ $payment_amount = !empty($_POST['payment_amount']) ? $_POST['payment_amount'] : 
 $shopId = $_POST['shopId'];
 $productsForReturn = [];
 $returnType = !empty($_POST['return_type']) ? $_POST['return_type'] : 1; // 1 = sale return, 2 = purchase return
+$isSupplier = !empty($_POST['is_supplier']) ? $_POST['is_supplier'] : 1; // 1 = customer, 2 = supplier
 
 $storeDATA = $storeObj->getStore($shopId);
 
@@ -73,6 +74,7 @@ $returnId = $orders->makeReturn([
     "customer_id" => $supplierId,
     "customer_name" => $_POST['supplierName'],
     "return_type" => $returnType,
+    "is_supplier" => $isSupplier
 ]);
 
 $products = [];
@@ -97,7 +99,7 @@ foreach ($products as $id => $row) {
 }
 
 
-if ($returnType == 1) {
+if ($isSupplier == 1) {
     $supplier = $supplierObj->getCustomer($supplierId);
 } else {
     $supplierObj = new Suppliers();
@@ -182,7 +184,7 @@ if (!empty($payment_amount)) {
     // cash credit entry
     $entry = [
         'transaction_id' => $makeTransactionId,
-        'account_id' => $storeAccounts['sale_returns'],
+        'account_id' => $returnType == 1 ? $storeAccounts['sale_returns'] : $storeAccounts['purchase_returns'],
         'entry_type' => 'C',
         'description' => '',
         'amount' => $payment_amount, // 200 @ 10%

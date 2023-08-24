@@ -199,10 +199,10 @@ if ($largeView) {
                         <?php $net = abs($price); ?>
                         <table class="table" style="width: 100%; margin-bottom: 0">
                             <tr>
-                                <td width="40" class="text-right">Customer:</td>
+                                <td width="40" class="text-right"><?php echo $order['order']['return_type'] == 2 ? "Supplier" : "Customer"; ?></td>
                                 <th width="40" style="white-space: nowrap;"><?php echo !empty($order['order']['customer_name']) ? $order['order']['customer_name'] : $foodpanda['full_name']; ?></th>
                                 <th style="text-align: center;">
-                                    <span style="font-size: 1.5em;">Sales Return Invoice</span> (<?php echo $_GET['id']; ?>)
+                                    <span style="font-size: 1.5em;"><?php echo $order['order']['return_type'] == 2 ? "Sales " : "Purchase "; ?> Return Invoice</span> (<?php echo $_GET['id']; ?>)
                                 </th>
                                 <td width="40" class="text-right">Date:</td>
                                 <th width="40"><?php echo date('d/m/Y', strtotime($order['order']['return_date'])); ?></th>
