@@ -789,7 +789,7 @@ echo mainFooter();
 <script type="text/ng-template" id="row.html">
     <a style="display: flex; justify-content: space-between; align-items: center">
         <span class="{{match.model.code ? 'text-danger' : ''}}" ng-bind-html="match.model.full_name | uibTypeaheadHighlight:query"></span>
-        <span class="label label-success" style="font-size: 14px">{{match.model.qty}}</span> | <span class="label label-danger" style="font-size: 14px">{{match.model.price}}</span>
+        <span class="label label-success" style="margin-left: auto; font-size: 14px">{{match.model.qty}}</span> | <span class="label label-danger" style="font-size: 14px">{{match.model.price}}</span>
     </a>
 </script>
 <script type="text/ng-template" id="customer.html">
