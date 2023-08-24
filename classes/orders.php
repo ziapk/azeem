@@ -117,7 +117,7 @@ class Orders extends Connection
         }
     }
 
-    public function orderReturnAll($array)
+    public function orderReturnAll($array, $reverse = false)
     {
         try {
             $stmt = "INSERT INTO `{$this->table_rp}` (`user_id`, `shopId`, `order_id`, `product_id`, `quantity`, `price`, `discount`, `discount_type`, `discount_value`, `type`) VALUES (:user_id, :shopId, :order_id, :product_id, :quantity, :price, :discount, :discount_type, :discount_value, :type)";
@@ -135,7 +135,8 @@ class Orders extends Connection
             $prepare->execute();
             $result = $this->dbh->lastInsertId();
             $products = new Products();
-            $products->addProductQty($array['product_id'], $array['quantity'], $array['shopId']);
+            $qty = $reverse ? (-1 * $array['quantity']) : $array['quantity'];
+            $products->addProductQty($array['product_id'], $qty, $array['shopId']);
             // $this->orderReturn($array['order_id'], ($action + 4));
             // if(!empty($delete)) {
             //     $this->deleteOrderItem($array['order_id'], $array['product_id']);
@@ -412,10 +413,15 @@ class Orders extends Connection
                 $prepare->bindParam(':id', $id, PDO::PARAM_STR);
                 $prepare->execute();
                 $result['order_items'] = $prepare->fetchAll(PDO::FETCH_ASSOC);
-                $c = new Customers();
                 $de = new DoubleEntry();
-                $result['customer'] = $c->getCustomer($result['order']['customer_id']);
-                $result['transactions'] = $de->getPaymentTransactionsByAccountId($result['order']['id'], $result['customer']['account_id']);
+                if ($result['order']['return_type'] == 2) {
+                    $c = new Suppliers();
+                    $result['customer'] = $c->getSupplier($result['order']['customer_id']);
+                } else {
+                    $c = new Customers();
+                    $result['customer'] = $c->getCustomer($result['order']['customer_id']);
+                }
+                $result['transactions'] = $de->getReturnTransactionsByAccountId($result['order']['id'], $result['customer']['account_id']);
             }
             return $result;
         } catch (PDOException $e) {
@@ -760,9 +766,9 @@ class Orders extends Connection
         $flag = 1;
         try {
             if (!empty($array['id'])) {
-                $stmt = "UPDATE `{$this->table_ro}` SET `amount`=:amount, `paid`=:paid, `discount`=:discount, `ref_no`=:ref_no, `shopId`=:shopId, `owner_id`=:owner_id, `order_id`=:order_id, `customer_id`=:customer_id, `customer_name`=:customer_name, `return_date`=:return_date, `flag`=:flag where id=:id";
+                $stmt = "UPDATE `{$this->table_ro}` SET `amount`=:amount, `paid`=:paid, `discount`=:discount, `ref_no`=:ref_no, `shopId`=:shopId, `owner_id`=:owner_id, `order_id`=:order_id, `customer_id`=:customer_id, `customer_name`=:customer_name, `return_date`=:return_date, `return_type`=:return_type, `flag`=:flag where id=:id";
             } else {
-                $stmt = "INSERT INTO `{$this->table_ro}` (`amount`, `paid`, `discount`, `ref_no`, `shopId`, `owner_id`, `order_id`, `customer_id`, `customer_name`, `return_date`, `flag`) VALUES (:amount, :paid, :discount, :ref_no, :shopId, :owner_id, :order_id, :customer_id, :customer_name, :return_date, :flag)";
+                $stmt = "INSERT INTO `{$this->table_ro}` (`amount`, `paid`, `discount`, `ref_no`, `shopId`, `owner_id`, `order_id`, `customer_id`, `customer_name`, `return_date`, `return_type`, `flag`) VALUES (:amount, :paid, :discount, :ref_no, :shopId, :owner_id, :order_id, :customer_id, :customer_name, :return_date, :return_type, :flag)";
             }
             $prepare = $this->dbh->prepare($stmt);
             $prepare->bindParam(':amount', $array['amount'], PDO::PARAM_STR);
@@ -775,6 +781,7 @@ class Orders extends Connection
             $prepare->bindParam(':order_id', $array['order_id'], PDO::PARAM_STR);
             $prepare->bindParam(':customer_id', $array['customer_id'], PDO::PARAM_STR);
             $prepare->bindParam(':customer_name', $array['customer_name'], PDO::PARAM_STR);
+            $prepare->bindParam(':return_type', $array['return_type'], PDO::PARAM_STR);
             $prepare->bindParam(':flag', $flag, PDO::PARAM_STR);
             if (!empty($array['id'])) {
                 $prepare->bindParam(':id', $array['id'], PDO::PARAM_STR);

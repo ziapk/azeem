@@ -24,7 +24,9 @@ echo mainHeader();
         <div class="col-sm-3 form-group">
             <label>Customer's Name</label>
             <input type="hidden" class="form-control" ng-model="supplierId">
-            <input type="text" class="form-control" ng-model="supplierName" placeholder="Customer's Name" typeahead-on-select="selectSupplier($item)" uib-typeahead="address as address.full_name for address in searchSupplier($viewValue)" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="0">
+            <input ng-if="return_type == 1" type="text" class="form-control" ng-model="supplierName" placeholder="Customer's Name" typeahead-on-select="selectSupplier($item)" uib-typeahead="address as address.full_name for address in searchCustomer($viewValue)" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="0">
+            <input ng-if="return_type == 2" type="text" class="form-control" ng-model="supplierName" placeholder="Supplier's Name" typeahead-on-select="selectSupplier($item)" uib-typeahead="address as address.full_name for address in searchSupplier($viewValue)" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="0">
+            <label><input type="checkbox" ng-model="return_type" ng-true-value="2" ng-false-value="1" ng-change="resetUsers(return_type)"> Is Supply Return </label>
         </div>
         <div class="col-sm-3 form-group">
             <label>Ref. No</label>
@@ -47,8 +49,8 @@ echo mainHeader();
                 <th>Product Name</th>
                 <th width="100">Discount</th>
                 <th></th>
-                <th width="100">Sold. Price</th>
-                <th width="100">Sold Qty</th>
+                <th width="100">Price</th>
+                <th width="100">Qty</th>
                 <th></th>
             </tr>
             <tr>
@@ -164,6 +166,7 @@ echo mainFooter();
         $scope.shopId = '';
         $scope.order = <?php echo json_encode($order) ?>;
         $scope.returnOrder = <?php echo json_encode($return) ?>;
+        $scope.return_type = parseInt($scope.order?.order?.return_type || 1);
 
         $scope.items = $scope.order?.order_items?.map(r => ({
             ...r,
@@ -208,6 +211,11 @@ echo mainFooter();
             qty: 1,
         }
 
+        $scope.resetUsers = (return_type) => {
+            $scope.supplierName = "";
+            $scope.supplierId = "";
+        }
+
         $scope.resetFields = () => {
             $scope.supplierName = "";
             $scope.supplierId = "";
@@ -231,7 +239,7 @@ echo mainFooter();
 
         $scope.searchSupplier = function(term, init) {
             $scope.supplierId = ""
-            return $http.get("<?php echo SITE_URL ?>api/getCustomer.php", {
+            return $http.get("<?php echo SITE_URL ?>api/getSupplier.php", {
                     params: {
                         term,
                         shopId: $scope.shopId,
@@ -243,6 +251,25 @@ echo mainFooter();
                         $scope.selectSupplier(response.data[0])
                     }
                     if ($scope.order.customer) {
+                        $scope.selectSupplier($scope.order.customer);
+                    }
+                    return response.data
+                });
+        }
+        $scope.searchCustomer = function(term, init) {
+            $scope.supplierId = ""
+            return $http.get("<?php echo SITE_URL ?>api/getCustomer.php", {
+                    params: {
+                        term,
+                        shopId: $scope.shopId,
+                        accountsOnly: true
+                    }
+                })
+                .then(function(response) {
+                    if (init && !$scope.order.customer) {
+                        $scope.selectSupplier(response.data[0])
+                    }
+                    if (init && $scope.order.customer) {
                         $scope.selectSupplier($scope.order.customer);
                     }
                     return response.data
@@ -263,15 +290,14 @@ echo mainFooter();
             $http.get("<?php echo SITE_URL ?>api/getOpeningBalance.php", {
                 params: {
                     account_id: p.account_id,
-                    type: 'c'
+                    type: $scope.return_type == 1 ? 'c' : 's'
                 }
             }).then(res => {
-
-                console.log(res, ((parseFloat(res.data.opening_balance || 0) + parseFloat(res.data.debitAmount || 0)) - parseFloat(res.data.creditAmount || 0)));
                 $scope.supplierId = p.id
-                $scope.supplierName = p.full_name
+                $scope.supplierName = p.full_name || p.name
                 $scope.supplier = {
                     ...p,
+                    full_name: p.full_name || p.name,
                     opening_balance: ((parseFloat(res.data.opening_balance || 0) + parseFloat(res.data.debitAmount || 0)) - parseFloat(res.data.creditAmount || 0))
                 };
                 $scope.shopId = p.shopId;
@@ -351,7 +377,6 @@ echo mainFooter();
             if ($scope.shopId == $scope.currentShopId) {
                 const filteredArray = window.mainList.records.filter(r => r.id == term || r.code == term || r.barcode == term || r.searchString.split('|').pop()?.toLowerCase().includes(term?.toLowerCase()) || r.searchString.includes(term + '|') || r.searchString.includes('|' + term) || r.searchString.includes('|' + term + '|'));
                 const secondfilteredArray = !filteredArray.length ? window.mainList.records.filter(obj => obj.searchString.toLowerCase().includes(term?.toLowerCase() || term)) : filteredArray;
-
                 return secondfilteredArray.slice(0, 30);
             } else {
                 return $http.get("<?php echo SITE_URL ?>api/getProducts.php", {
@@ -380,7 +405,7 @@ echo mainFooter();
 
         $scope.searchMode();
 
-        $scope.searchSupplier('', true);
+        $scope.searchCustomer('', true);
 
         $scope.clearSearch = () => {
             $scope.product = "";
@@ -398,6 +423,7 @@ echo mainFooter();
                 ref_no: $scope.ref_no,
                 subTotal: $scope.subTotal,
                 discount: $scope.discount,
+                return_type: $scope.return_type,
                 givenDiscount: $scope.givenDiscount,
                 order_id: $scope.returnOrder ? $scope.order.order.order_id : $scope.order.order.id,
                 items: $scope.items.map(({

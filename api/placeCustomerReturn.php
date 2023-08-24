@@ -33,6 +33,7 @@ $productsValue = $purchaseValue;
 $payment_amount = !empty($_POST['payment_amount']) ? $_POST['payment_amount'] : 0;
 $shopId = $_POST['shopId'];
 $productsForReturn = [];
+$returnType = !empty($_POST['return_type']) ? $_POST['return_type'] : 1; // 1 = sale return, 2 = purchase return
 
 $storeDATA = $storeObj->getStore($shopId);
 
@@ -63,7 +64,6 @@ if (!empty($_POST['returnOrder'])) {
 $returnId = $orders->makeReturn([
     "id" => $_POST['returnOrder'],
     "amount" => $purchaseValue,
-    "amount" => $purchaseValue,
     "paid" => $payment_amount,
     "discount" => $discount,
     "shopId" => $shopId,
@@ -72,6 +72,7 @@ $returnId = $orders->makeReturn([
     "order_id" => !empty($_POST['order_id']) ? $_POST['order_id'] : null,
     "customer_id" => $supplierId,
     "customer_name" => $_POST['supplierName'],
+    "return_type" => $returnType,
 ]);
 
 $products = [];
@@ -90,21 +91,24 @@ foreach ($_POST['items'] as $key => $value) {
     ];
 }
 
-
 $res = [];
 foreach ($products as $id => $row) {
-    $res[$row['product_id']][] = $orders->orderReturnAll($row);
+    $res[$row['product_id']][] = $orders->orderReturnAll($row, $returnType == 1 ? false : true);
 }
 
-$supplier = $supplierObj->getCustomer($supplierId);
 
-
+if ($returnType == 1) {
+    $supplier = $supplierObj->getCustomer($supplierId);
+} else {
+    $supplierObj = new Suppliers();
+    $supplier = $supplierObj->getSupplier($supplierId);
+}
 
 $makeTransaction = [
-    'description' => !empty($_POST['summery']) ? $_POST['summery'] : "Sale Return PLACED",
+    'description' => !empty($_POST['summery']) ? $_POST['summery'] : ($returnType == 1 ? "Sale Return PLACED" : "Purchase Return PLACED"),
     'transaction_date' => $storeDATA['sale_date'],
     'reference' => $_POST['ref_no'],
-    'transaction_type' => 'SALE_RETURN',
+    'transaction_type' => ($returnType == 1 ? 'SALE_RETURN' : 'PURCHASE_RETURN'),
     'shopId' => $shopId,
     'created_by' => $_SESSION['user_credentials']['id'],
     'return_ref' => $returnId
@@ -146,7 +150,7 @@ if (!empty($saleDiscount)) {
     // saleDiscount credit entry
     $entry = [
         'transaction_id' => $makeTransactionId,
-        'account_id' => $storeAccounts['sale_discount'],
+        'account_id' => $returnType == 1 ? $storeAccounts['sale_discount'] : $storeAccounts['purchase_discount'],
         'entry_type' => 'C',
         'description' => '',
         'amount' => $saleDiscount, // 200 @ 10%

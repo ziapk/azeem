@@ -357,6 +357,21 @@ class DoubleEntry extends Connection
 			die("Error!: " . $e->getMessage() . "<br/>");
 		}
 	}
+	public function getReturnTransactionsByAccountId($order_id, $account_id)
+	{
+		try {
+
+			$stmt = "SELECT e.payment_mode, e.amount FROM `$this->table_transactions` t LEFT JOIN `$this->table_ledger_entries` e ON e.transaction_id = t.id LEFT JOIN `$this->table` a ON a.id = e.account_id and a.status = 1 WHERE t.return_ref = :order_id and e.account_id=:account_id and e.entry_type = 'C' and t.flag =1";
+			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':order_id', $order_id, PDO::PARAM_STR);
+			$prepare->bindParam(':account_id', $account_id, PDO::PARAM_STR);
+			$prepare->execute();
+			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
+			return $result;
+		} catch (PDOException $e) {
+			die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
 
 	public function getOpeningBalance($account_id, $type = '')
 	{

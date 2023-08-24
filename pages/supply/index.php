@@ -24,8 +24,8 @@ echo mainHeader();
         <div class="col-sm-3 form-group">
             <label>Supplier's Name</label>
             <input type="hidden" class="form-control" ng-model="supplierId">
-            <input ng-if="!toggleForm.searchMode" type="text" class="form-control" ng-model="supplierName" placeholder="Supplier's Name" typeahead-on-select="selectSupplier($item)" uib-typeahead="address as address.name for address in searchSupplier($viewValue)" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="0">
-            <input ng-if="toggleForm.searchMode" type="text" class="form-control" ng-model="supplierName" placeholder="Customer's Name" typeahead-on-select="selectSupplier($item)" uib-typeahead="address as address.name for address in searchCustomer($viewValue)" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="0">
+            <input ng-if="!toggleForm.searchMode" type="text" class="form-control" ng-model="supplierName" placeholder="Supplier's Name" typeahead-on-select="selectSupplier($item)" uib-typeahead="address as address.name for address in searchSupplier($viewValue)" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="0" ng-model-options="{debounce: 500}">
+            <input ng-if="toggleForm.searchMode" type="text" class="form-control" ng-model="supplierName" placeholder="Customer's Name" typeahead-on-select="selectSupplier($item)" uib-typeahead="address as address.name for address in searchCustomer($viewValue)" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="0" ng-model-options="{debounce: 500}">
             <label><input type="checkbox" ng-model="toggleForm.searchMode"> Exchange Supply with Customer</label>
             <span>Balance: {{supplier.opening_balance | number}} </span>
         </div>
@@ -81,7 +81,7 @@ echo mainFooter();
                 $scope.supplierName = p.full_name || p.name
                 $scope.supplier = {
                     ...p,
-                    opening_balance: $scope.toggleForm.searchMode ? ((parseFloat(res.data.opening_balance || 0) + parseFloat(res.data.debitAmount || 0)) - parseFloat(res.data.creditAmount || 0)) : ((parseFloat(res.data.opening_balance || 0) + parseFloat(res.data.creditAmount || 0) - parseFloat(res.data.debitAmount || 0)))
+                    opening_balance: parseFloat(res.data.balance || 0)
                 };
                 $scope.shopId = p.shopId;
                 // $scope.items = [];

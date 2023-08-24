@@ -9,4 +9,3 @@ if(!empty($_SESSION['shopInfo'])) {
     $search = $customers->searchCustomer($shopId, $_GET['term'], $accountsOnly);
 };
 echo json_encode($search);
-?>
