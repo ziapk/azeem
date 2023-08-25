@@ -46,7 +46,7 @@ echo mainHeader();
         <thead>
             <tr>
                 <th>Sr.#</th>
-                <th width="200">Product Id</th>
+                <th width="100">Product Id</th>
                 <th>Product Name</th>
                 <th width="100">Discount</th>
                 <th></th>
