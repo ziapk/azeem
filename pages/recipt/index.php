@@ -769,17 +769,11 @@ echo mainFooter();
                     }
                 })
                 .then(function(response) {
-                    if (response.data.status === 200) {
-                        toaster.success({
-                            body: response.data.message
-                        });
-                        form.newBarCode = '';
-                    } else {
-                        toaster.success({
-                            body: response.data.message
-                        });
-                        form.newBarCode = '';
-                    }
+                    toaster.success({
+                        body: response.data.message
+                    });
+                    form.newBarCode = '';
+                    form.rackNo = '';
                 })
         }
 

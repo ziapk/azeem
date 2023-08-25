@@ -11,31 +11,39 @@ $publishers = $publisherObj->getPublishers($shop['owner_id']);
 $ownerId = $userData['role'] == 'owner' || $userData['role'] == 'owner' ? $userData['id'] : $userData['created_by'];
 $userId = $userData['id'];
 
-$products = $productObj->getRackByTitle($_POST['rackNo'], $shop['id']);
-$exits = [];
-$id = '';
-foreach ($products as $value) {
-    if ($value['product_id'] == $_GET['id']) {
-        $exits = $value;
+if (!empty($_POST['rackNo'])) {
+    $rackNo = $_POST['rackNo'];
+    foreach (explode(',', $rackNo) as $rackTitle) {
+        $currentRack = trim($rackTitle);
+        if (!empty($currentRack)) {
+            $products = $productObj->getRackByTitle($currentRack, $shop['id']);
+            $exits = [];
+            $id = '';
+            foreach ($products as $value) {
+                if ($value['product_id'] == $_GET['id']) {
+                    $exits = $value;
+                }
+                $id = $value['rack_id'];
+            }
+            if (!empty($currentRack) && empty($exits)) {
+                if (empty($products)) {
+                    $data = [
+                        'title' => $currentRack,
+                        'shop_id' => $shop['id'],
+                        'owner_id' => $shop['owner_id'],
+                        'status' => 1,
+                    ];
+                    $id = $productObj->createRack($data);
+                }
+                $childData = [
+                    'product_id' => $_GET['id'],
+                    'rack_id' => $id,
+                    'status' => 1
+                ];
+                $childId = $productObj->createRackProducts($childData);
+            }
+        }
     }
-    $id = $value['rack_id'];
-}
-if (!empty($_POST['rackNo']) && empty($exits)) {
-    if (empty($products)) {
-        $data = [
-            'title' => $_POST['rackNo'],
-            'shop_id' => $shop['id'],
-            'owner_id' => $shop['owner_id'],
-            'status' => 1,
-        ];
-        $id = $productObj->createRack($data);
-    }
-    $childData = [
-        'product_id' => $_GET['id'],
-        'rack_id' => $id,
-        'status' => 1
-    ];
-    $childId = $productObj->createRackProducts($childData);
 }
 
 $error = "";
