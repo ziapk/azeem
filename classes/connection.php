@@ -63,6 +63,17 @@ class Connection
 		ob_clean();
 		return $html;
 	}
+	public function drawReturn($id)
+	{
+		ob_start();
+		$_GET['id'] = $id;
+		$_GET['detail'] = 'true';
+		$_GET['largeView'] = 'large';
+		include dirname(__FILE__) . '/../print/return.php';
+		$html = ob_get_clean();
+		ob_clean();
+		return $html;
+	}
 
 	public function normalToPassword($password)
 	{

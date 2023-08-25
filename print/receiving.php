@@ -260,6 +260,7 @@ $qty = 0; ?>
                                         </tr>
                                     </table>
                                 </th>
+                            </tr>
                             <tr>
                                 <th colspan="4" style="border: 0">
                                     <table border="0" class="table" width="100%" style="border-collapse: collapse; border: 0">

@@ -210,4 +210,13 @@ if (!empty($payment_amount)) {
     $a[] = $doubleEntry->makeEntry($entry);
 }
 
+$newsletter = new Newsletter();
+$send = $newsletter->send([
+    'subject' => $config['description'],
+    'body' => $newsletter->drawReturn($returnId),
+    'sentTo' => [['email' => !empty($supplier['email']) ? $supplier['email'] : 'zia.pccr@yahoo.com', 'name' => $_POST['supplierName']]],
+    'ccEmails' => [['email' => $storeDATA['company_email'], 'name' => $storeDATA['full_name']]],
+    'client' => $storeDATA['full_name'],
+]);
+
 echo json_encode(['status' => 200, 'message' => 'successfully done', 'order' => ['id' => $returnId]]);

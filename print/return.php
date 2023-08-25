@@ -11,7 +11,7 @@ $ordersObj = new Orders();
 $order = $ordersObj->getReturnOrder($id, true);
 $customers = new DoubleEntry();
 
-$blc = $customers->getOpeningBalance($order['customer']['account_id'], 'c');
+$blc = $customers->getOpeningBalance($order['customer']['account_id'], ($order['order']['is_supplier'] == 2 ? 's' : 'c'));
 
 
 $gst = 0;
@@ -262,6 +262,14 @@ if ($largeView) {
                                 </tr>
                                 <tr class="no-border">
                                     <th rowspan="2" style="border: 0; padding: 0" valign="middle" colspan="4">
+                                        <table class="table" style="border-collapse: collapse; margin: 0 auto;">
+                                            <tr>
+                                                <?php if (empty($foodpanda['is_default'])) { ?>
+                                                    <td width="120">Current Balance:</td>
+                                                    <th width="60" style="text-align: right"><?php echo number_format(($currentBalance), 0); ?></th>
+                                                <?php } ?>
+                                            </tr>
+                                        </table>
                                     </th>
                                     <td class="text-right ref" style="border: 0" colspan="2">Additional Discount</td>
                                     <th class="text-right ref"><?php echo abs(($order['order']['discount'])); ?></th>
@@ -279,7 +287,6 @@ if ($largeView) {
                                     <th rowspan="3" style="border: 0; vertical-align: top" colspan="4" class="text-right">
 
                                     </th>
-
                                 </tr>
                                 <?php if (!empty($order['order']['paid_amount'])) { ?>
 
