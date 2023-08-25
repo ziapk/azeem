@@ -197,14 +197,10 @@ $customersList = $customerObj->getCustomers($shop['id']);
               <input type="submit" value="Submit" class="btn btn-primary">
             </form>
           </li>
-          <li class="dropdown" style="padding: 0; margin-right: -1px">
-            <a class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+          <li style="padding: 0; margin-right: -1px">
+            <a class="nav-menu-item btn btn-primary" href="<?php echo SITE_URL . 'pages/orders/adjustment.php'; ?>">
               Returns
             </a>
-            <ul class="dropdown-menu">
-              <li><a class="dropdown-item" href="<?php echo SITE_URL . 'pages/supply/adjustment.php'; ?>">Supply Return</a></li>
-              <li><a class="dropdown-item" href="<?php echo SITE_URL . 'pages/orders/adjustment.php'; ?>">Sale Return</a></li>
-            </ul>
           </li>
           <li class="dropdown" style="padding: 0">
             <a href="#" class="nav-menu-item btn btn-primary" data-toggle="dropdown">
