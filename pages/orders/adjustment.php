@@ -22,6 +22,8 @@ echo mainHeader();
 <div class="container" ng-controller="reportController">
     <div class="row">
         <div class="col-sm-3 form-group">
+            <label ng-if="is_supplier == 1">Customer's Name</label>
+            <label ng-if="is_supplier == 2">Supplier's Name</label>
             <label>Customer's Name</label>
             <input type="hidden" class="form-control" ng-model="supplierId">
             <input ng-if="is_supplier == 1" type="text" class="form-control" ng-model="supplierName" placeholder="Customer's Name" typeahead-on-select="selectSupplier($item)" uib-typeahead="address as address.full_name for address in searchCustomer($viewValue)" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="0">
