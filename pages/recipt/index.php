@@ -175,7 +175,7 @@ echo mainFooter();
             });
         };
     });
-    app.controller('cartController', function($scope, $http, $httpParamSerializerJQLike, $filter, $window, $timeout, $location, $anchorScroll) {
+    app.controller('cartController', function($scope, $http, $httpParamSerializerJQLike, $filter, $window, $timeout, $location, $anchorScroll, toaster) {
         $scope.mainList = $window.mainList?.records || [];
 
         $scope.pinList = [];

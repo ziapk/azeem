@@ -44,6 +44,9 @@ if (!empty($_POST['rackNo'])) {
             }
         }
     }
+
+    echo json_encode(['status' => 200, "message" => "Product racks updated successfully!"]);
+    exit;
 }
 
 $error = "";
