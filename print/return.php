@@ -1,5 +1,6 @@
 <?php
 include_once dirname(__FILE__) . '/../include/settings.php';
+global $shop;
 $id = !empty($_GET['id']) ? $_GET['id'] : 0;
 $siteUrl = 'https://azeem.reclinesolutions.com/';
 if (empty($id)) {
