@@ -52,10 +52,11 @@ echo mainHeader();
                 <th></th>
                 <th width="100">Price</th>
                 <th width="100">Qty</th>
+                <th>Total</th>
                 <th></th>
             </tr>
             <tr>
-                <td colspan="7"><input type="text" class="form-control" id="searchProduct" ng-model="product" placeholder="Search Product to add" typeahead-on-select="selectProduct($item, row)" uib-typeahead="address as address.full_name for address in searchProduct($viewValue)" typeahead-template-url="row2.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="1" ng-model-options="{debounce: 500}" class="form-control" ng-model="row.product_name" /></td>
+                <td colspan="9"><input type="text" class="form-control" id="searchProduct" ng-model="product" placeholder="Search Product to add" typeahead-on-select="selectProduct($item, row)" uib-typeahead="address as address.full_name for address in searchProduct($viewValue)" typeahead-template-url="row2.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="1" ng-model-options="{debounce: 500}" class="form-control" ng-model="row.product_name" /></td>
             </tr>
         </thead>
         <tbody>
@@ -88,41 +89,42 @@ echo mainHeader();
                 <td width="100">
                     <input type="number" class="form-control" ng-change="isValid(row,  calculateSum)" max="row.maxQty" ng-model="row.qty" ng-keydown="initCheckKeypress($event)" />
                 </td>
+                <td width="60">{{((row.price || 0) - (row.discount || 0)) * (row.qty || 0)}}</td>
                 <td width="60"><a href="#" class="btn btn-xs btn-danger pull-right" ng-click="remove(row)">Delete</a></td>
             </tr>
         </tbody>
         <tbody>
             <tr>
                 <th rowspan="10"></th>
-                <th class="text-right" colspan="5">Sub Total</th>
+                <th class="text-right" colspan="7">Sub Total</th>
                 <th>{{subTotal}}</th>
             </tr>
             <tr>
-                <td class="text-right" colspan="5">Given Discount</td>
+                <td class="text-right" colspan="7">Given Discount</td>
                 <td><strong>{{givenDiscount | number: 2}}</strong></td>
             </tr>
             <tr ng-if="order.order.paid_amount">
-                <th class="text-right" colspan="5">Paid Total</th>
+                <th class="text-right" colspan="7">Paid Total</th>
                 <th>{{order.order.paid_amount}}</th>
             </tr>
             <tr>
-                <th class="text-right" colspan="5">Discount</td>
+                <th class="text-right" colspan="7">Discount</td>
                 <td width="150"><input type="search" ng-model="discountAmount" class="form-control" on-enter-press="addDiscount(discountAmount)"></td>
             </tr>
             <tr>
-                <td class="text-right" colspan="5">Additional Discount</td>
+                <td class="text-right" colspan="7">Additional Discount</td>
                 <td><strong>{{discount | number: 2}}</strong></td>
             </tr>
             <tr ng-if="grandTotal">
-                <th class="text-right" colspan="5">Grand Total</th>
+                <th class="text-right" colspan="7">Grand Total</th>
                 <th>{{grandTotal}}</th>
             </tr>
             <tr ng-if="grandTotal">
-                <th class="text-right" colspan="5">Pay Amount</th>
+                <th class="text-right" colspan="7">Pay Amount</th>
                 <th width="200"><input type="number" ng-model="payment_amount" ng-change="calcBalanc(payment_amount)" class="form-control"></th>
             </tr>
             <tr ng-if="grandTotal">
-                <th class="text-right" colspan="5">Closing Balance</th>
+                <th class="text-right" colspan="7">Closing Balance</th>
                 <th width="200">{{ payment_amount - grandTotal }}</th>
             </tr>
         </tbody>
