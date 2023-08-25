@@ -266,6 +266,9 @@ $customersList = $customerObj->getCustomers($shop['id']);
         <li class="<?php if ($params['page'] == 'product-create') {
                       echo 'active';
                     } ?>"><a uib-tooltip="Today's Transactions" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/chart-of-accounts/ledger_transactions.php"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/accounting.png" alt="" /> <span class="nav-menu-text">Today Entries</span></a></li>
+        <li class="<?php if ($params['page'] == 'supplies') {
+                      echo 'active';
+                    } ?>"><a uib-tooltip="Supplies" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/supply/list.php"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/sales.svg" alt="" /> <span class="nav-menu-text">Purchase Orders</span></a></li>
         <li class="<?php if ($params['page'] == 'expense') {
                       echo 'active';
                     } ?>"><a uib-tooltip="Expenses" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/expenses"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/expense.svg" alt="" /> <span class="nav-menu-text">Expenses</span></a></li>
@@ -285,11 +288,6 @@ $customersList = $customerObj->getCustomers($shop['id']);
         <li class="<?php if ($params['page'] == 'racks' && (empty($_GET["status"]) && $_GET["status"] != '0')) {
                       echo 'active';
                     } ?>"><a uib-tooltip="Product Racks" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/product/racks.php"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/product.svg" alt="" /> <span class="nav-menu-text">Product Racks</span></a></li>
-        <li class="<?php if ($params['page'] == 'supplies') {
-                      echo 'active';
-                    } ?>"><a uib-tooltip="Supplies" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/supply/list.php"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/sales.svg" alt="" /> <span class="nav-menu-text">Purchase Orders</span></a></li>
-
-
         <li class="<?php if ($params['page'] == 'loans') {
                       echo 'active';
                     } ?>"><a uib-tooltip="Loans" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/employees/loans.php"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/product.svg" alt="" /> <span class="nav-menu-text">Loans</span></a></li>
