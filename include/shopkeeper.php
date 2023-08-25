@@ -28,7 +28,7 @@ $categoryProducts = $productCls->getCategoryProducts($shop['owner_id'], $ids, $s
       </table>
     </div>
   </div>
-  <nav class="navbar navbar-fixed-top" style="z-index: 1075">
+  <nav class="navbar navbar-fixed-top" style="z-index: 1031">
     <div class="container-fluid">
       <!-- Brand and toggle get grouped for better mobile display -->
       <div class="navbar-header">

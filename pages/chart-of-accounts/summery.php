@@ -51,7 +51,7 @@ mainHeader();
             <td width="300">
                 <table width="100%">
                     <tr>
-                        <td>Openin¡¡g Balance:</td>
+                        <td>Openining Balance:</td>
                         <td width="140"><?php echo number_format($user['account']['opening_balance'], 0); ?><br /></td>
                     </tr>
                     <tr>
@@ -88,6 +88,7 @@ mainHeader();
                 <th>Debit</th>
                 <th>Credit</th>
                 <th>Running Balance</th>
+                <th></th>
             </tr>
             <!-- <tr>
                     <th>
@@ -109,37 +110,35 @@ mainHeader();
                 </tr> -->
         </thead>
         <tbody>
-            <?php foreach ($journel['rows'] as $key => $value) { ?>
-                <tr>
-                    <td><?php echo $value['transaction_id']; ?></td>
-                    <td><?php echo $value['transaction_date']; ?></td>
-                    <td>
-                        <?php if (!empty($value['order_ref'])) { ?>
-                            <a href="javascript:void(0)" onclick="openRecipt(<?php echo $value['order_ref']; ?>)"><?php echo $value['order_custom_id']; ?></a>
-                        <?php } elseif (!empty($value['supply_ref'])) { ?>
-                            <a href="javascript:void(0)" onclick="openRecipt2(<?php echo $value['supply_ref']; ?>)"><?php echo $value['supply_ref']; ?></a>
-                        <?php } elseif (!empty($value['return_ref'])) { ?>
-                            <a href="javascript:void(0)" onclick="openRecipt3(<?php echo $value['return_ref']; ?>)"><?php echo $value['return_ref']; ?></a>
-                        <?php } ?>
-                    </td>
-                    <td><?php echo $value['reference']; ?></td>
-                    <td><?php echo $value['v_description']; ?></td>
-                    <td><?php echo $value['transsaction_type']; ?></td>
-                    <td style="text-align: right"><?php echo number_format($value['debitAmount'], 0); ?></td>
-                    <td style="text-align: right"><?php echo number_format($value['creditAmount'], 0); ?></td>
-                    <td style="text-align: right; <?php if ($value['balance'] < 0) {
-                                                        echo "color: red";
-                                                    } ?>"><?php echo number_format($value['balance'], 0); ?></td>
-                </tr>
-            <?php } ?>
+            <tr ng-repeat="row in rows">
+                <td>{{row.transaction_id}}</td>
+                <td>{{row.transaction_date}}</td>
+                <td>
+                    <a ng-if="row.order_ref" href="javascript:void(0)" ng-click="openRecipt(row.order_ref)">{{row.order_custom_id}}</a>
+                    <a ng-if="row.supply_ref" href="javascript:void(0)" ng-click="openRecipt2(row.supply_ref)">{{row.supply_ref}}</a>
+                    <a ng-if="row.return_ref" href="javascript:void(0)" ng-click="openRecipt3(row.return_ref)">{{row.return_ref}}</a>
+                </td>
+                <td>{{row.reference}}</td>
+                <td>{{row.v_description}}</td>
+                <td>{{row.transsaction_type}}</td>
+                <td style="text-align: right">{{row.debitAmount | number: 0}}</td>
+                <td style="text-align: right">{{row.creditAmount | number: 0}}</td>
+                <td style="text-align: right;" ng-class="{'text-danger': row.balance < 0}">{{row.balance | number: 0}}</td>
+                <td>
+                    <?php if ($userData['role'] === 'owner') { ?>
+                        <a ng-if="['DIRECT_RECEIVING', 'DIRECT_PAYMENT', 'ROYALTY PAYMENT', 'ADJUSTMENT', 'EXPENSE'].includes(row.transsaction_type) " href="javascript:void(0)" class="text-danger" ng-click="addCustomer(row)">EDIT</a>
+                    <?php } ?>
+                </td>
+            </tr>
         </tbody>
     </table>
     <!-- </form> -->
 </div>
 
 <script>
-    app.controller('coaController', function($scope, $http, $httpParamSerializerJQLike) {
+    app.controller('coaController', function($scope, $http, $httpParamSerializerJQLike, $window, $uibModal) {
         var site_url = '<?php echo SITE_URL ?>';
+        $scope.rows = <?php echo safe_json_encode($journel['rows']); ?>;
         $scope.startDate = moment('<?php echo $_GET['from']; ?>' || moment());
         $scope.endDate = moment('<?php echo $_GET['to']; ?>' || moment());
         $scope.form = {
@@ -153,24 +152,98 @@ mainHeader();
             $scope.startDate = range.startDate?.format('YYYY-MM-DD');
             $scope.endDate = range.endDate?.format('YYYY-MM-DD');
         }
+
+        $scope.addCustomer = function(item) {
+            console.log('item', item);
+            $scope.form = null
+            $uibModal.open({
+                ariaLabelledBy: 'modal-title',
+                ariaDescribedBy: 'modal-body',
+                templateUrl: 'addCustomer.html',
+                controller: 'ModalInstanceCtrl',
+                resolve: {
+                    parentData: function() {
+                        return item
+                    }
+                }
+            }).closed.then(function() {
+                $window.location.reload();
+            });
+        };
+
+        $scope.openRecipt = (id) => {
+            $window.open("<?php echo SITE_URL; ?>print?id=" + id + "&detail=true&largeView=large", "", "width=800,height=600");
+        }
+
+        $scope.openRecipt2 = (id) => {
+            $window.open("<?php echo SITE_URL; ?>print/supply.php?id=" + id + "&detail=true&largeView=large", "", "width=800,height=600");
+        }
+
+        $scope.openRecipt3 = (id) => {
+            $window.open("<?php echo SITE_URL; ?>print/return.php?id=" + id + "&detail=true&largeView=large", "", "width=800,height=600");
+        }
+    });
+
+    app.controller('ModalInstanceCtrl', function($scope, $uibModalInstance, $http, $httpParamSerializerJQLike, parentData) {
+        $scope.form = {
+            transaction_id: parentData.transaction_id,
+            amount: parseFloat(parentData.creditAmount) || parseFloat(parentData.debitAmount)
+        }
+
+        $scope.alert = null;
+
+        $scope.closeAlert = function(index) {
+            $scope.alert = null;
+        };
+
+        $scope.ok = function() {
+            $http.post('updateTransaction.php', $httpParamSerializerJQLike($scope.form), {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            }).then(function(res) {
+                if (res.data.success) {
+                    $scope.alert = {
+                        type: 'success',
+                        message: res.data.message
+                    }
+                } else {
+                    $scope.alert = {
+                        type: 'danger',
+                        message: res.data.message
+                    }
+                }
+                // $uibModalInstance.close($scope.form);
+            });
+        };
+
+
+
+        $scope.cancel = function() {
+            $uibModalInstance.dismiss('cancel');
+        };
     });
 </script>
+<script type="text/ng-template" id="addCustomer.html">
+    <form ng-submit="ok()">
+                                    <div class="modal-header">
+                                        <h3 class="modal-title" id="modal-title">Add Customer</h3>
+                                    </div>
+                                    <div class="modal-body" id="modal-body">
+                                        <div uib-alert ng-if="alert" ng-class="'alert-'+(alert.type || 'warning')" close="closeAlert()">{{alert.message}}</div>
+                                        <div class="form-group">
+                                            <label for="samount">Transaction Amount [TID: {{form.transaction_id}}]</label>
+                                            <input id="samount" type="text" ng-model="form.amount" class="form-control" placeholder="Amount">
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button class="btn btn-default" type="button" ng-click="cancel()">Close</button>
+                                        <button class="btn btn-primary" type="submit">Submit Form</button>
+                                    </div>
+                                </form>
+                                </script>
 
 <?php
 
 mainFooter();
 ?>
-
-<script>
-    function openRecipt(id) {
-        window.open("<?php echo SITE_URL; ?>print?id=" + id + "&detail=true&largeView=large", "", "width=800,height=600");
-    }
-
-    function openRecipt2(id) {
-        window.open("<?php echo SITE_URL; ?>print/supply.php?id=" + id + "&detail=true&largeView=large", "", "width=800,height=600");
-    }
-
-    function openRecipt3(id) {
-        window.open("<?php echo SITE_URL; ?>print/return.php?id=" + id + "&detail=true&largeView=large", "", "width=800,height=600");
-    }
-</script>
