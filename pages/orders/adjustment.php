@@ -71,11 +71,13 @@ echo mainHeader();
                     <div class="input-group">
                         <input type="number" class="form-control input-add-dist" ng-model="row.discount_value" ng-change="calculateSum()" style="padding-right: 6px">
                         <span class="dropdown input-group-btn">
-                            <button class="dropdown-toggle btn btn-default" data-toggle="dropdown" style="padding-inline: 8px">{{row.discount_type == 2 ? 'FIX' : '%'}}</button>
+                            <button class="btn btn-default" style="padding-inline: 8px" ng-click="row.discount_type = (row.discount_type == 1 ? 2 : 1); calculateSum();">{{row.discount_type == 2 ? 'FIX' : '%'}}</button>
+                            <!-- data-toggle="dropdown" -->
+                            <!-- <button class="dropdown-toggle btn btn-default" data-toggle="dropdown" style="padding-inline: 8px">{{row.discount_type == 2 ? 'FIX' : '%'}}</button>
                             <ul class="dropdown-menu">
                                 <li><a href="javascript:void(0)" ng-click="row.discount_type = 1; calculateSum()">%</a></li>
                                 <li><a href="javascript:void(0)" ng-click="row.discount_type = 2; calculateSum()">Fix</a></li>
-                            </ul>
+                            </ul> -->
                         </span>
                     </div>
                 </td>

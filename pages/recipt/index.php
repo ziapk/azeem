@@ -696,7 +696,6 @@ echo mainFooter();
             $scope.discountPercentValue = 0;
             $scope.items.map((product) => {
                 if (product.product_type == 1 || product.product_type != 1 && !product.services?.length && !product.raw_items?.length) {
-                    console.log('product.discount_type', product.discount_type);
                     if (product.discount_type == 2) {
                         product.discount = product.discount_value
                         product.discount_value = parseFloat(product.discount_value);

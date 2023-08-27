@@ -111,6 +111,7 @@ echo mainFooter();
         $scope.toggleForm = {
             searchMode: $scope.orderData?.customer ? true : false
         }
+        $scope.ref_no = $scope.orderData?.order?.ref_no;
 
         if ($scope.orderData?.customer || $scope.orderData?.supplier) {
             $scope.selectSupplier($scope.orderData.customer || $scope.orderData.supplier);
