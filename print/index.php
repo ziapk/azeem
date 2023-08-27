@@ -47,6 +47,13 @@ if (!empty($shop['phoneNumber3'])) {
 }
 $result = array_filter($a, 'strlen');
 if ($largeView) {
+
+    $cashInvoice = "Cash Sales Invoice";
+
+    if (!empty($order['order']['price']) && empty($order['order']['paid_amount'])) {
+        $cashInvoice = "Credit Sales Invoice";
+    }
+
     $distTotal = 0;
     $qty = 0; ?>
     <style>
@@ -189,10 +196,10 @@ if ($largeView) {
                             </span>
                             <h3>
                                 <div style="padding: 0"><?php echo strtoupper($shop['full_name']); ?>
-                                    <p style="margin: 0"><?php echo $shop['location']; ?>, <?php echo $shop['city']; ?> <br>
+                                    <p style="margin: 0"><?php echo $shop['location']; ?>, <?php echo $shop['city']; ?> <br />
                                         <strong><small><?php echo implode(", ", $result); ?></small></strong>
                                     </p>
-                                    <div>
+                                </div>
                             </h3>
                         </div>
                         <?php $net = abs(($price - $order['order']['discount'])); ?>
@@ -201,7 +208,7 @@ if ($largeView) {
                                 <td width="40" class="text-right">Customer:</td>
                                 <th width="40" style="white-space: nowrap;"><?php echo !empty($order['order']['customer_name']) ? $order['order']['customer_name'] : $foodpanda['full_name']; ?></th>
                                 <th style="text-align: center;">
-                                    <span style="font-size: 1.5em;">Sales Invoice</span> (<?php echo $order['order']['order_custom_id']; ?>)
+                                    <span style="font-size: 1.5em;"><?php echo $cashInvoice; ?></span> (<?php echo $order['order']['order_custom_id']; ?>)
                                 </th>
                                 <td width="40" class="text-right">Date:</td>
                                 <th width="80"><?php echo date('d/m/Y', strtotime($order['order']['created_at'])); ?></th>
