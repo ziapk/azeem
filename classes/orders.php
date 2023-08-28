@@ -554,6 +554,16 @@ class Orders extends Connection
                 $toCondition = " AND o.order_custom_id='" . $params['orderId'] . "' ";
             }
 
+            if ($params['orderType'] == 'cash') {
+                $toCondition .= " AND o.paid_amount > 0 ";
+            }
+            if ($params['orderType'] == 'credit') {
+                $toCondition .= " AND o.price > 0 and o.paid_amount = 0 ";
+            }
+            if ($params['orderType'] == 'sample') {
+                $toCondition .= " AND o.price = 0 and o.paid_amount = 0 ";
+            }
+
             $stmt = "SELECT o.*, full_name, account_id FROM `{$this->table}` AS o LEFT JOIN customers AS c ON c.id = o.customer_id WHERE o.shopId=:shopId " . $toCondition . ' ' . $flagCondition . ' and ((o.flag = 1) or (o.flag = 2 and o.status IN (5,6,7))) ORDER BY id desc';
             $prepare = $this->dbh->prepare($stmt);
             $prepare->bindParam(':shopId', $shopId, PDO::PARAM_STR);
@@ -679,6 +689,20 @@ class Orders extends Connection
             $stmt = "UPDATE `{$this->table_rp}` SET type=3 WHERE id=:id AND type=2";
             $prepare = $this->dbh->prepare($stmt);
             $prepare->bindParam(':id', $id, PDO::PARAM_STR);
+            $prepare->execute();
+            $result = $prepare->rowCount();
+            return $result;
+        } catch (PDOException $e) {
+            die("Error!: " . $e->getMessage() . "<br/>");
+        }
+    }
+    public function reconcileBill($id, $recon)
+    {
+        try {
+            $stmt = "UPDATE `{$this->table}` SET recon=:recon WHERE id=:id";
+            $prepare = $this->dbh->prepare($stmt);
+            $prepare->bindParam(':id', $id, PDO::PARAM_STR);
+            $prepare->bindParam(':recon', $recon, PDO::PARAM_STR);
             $prepare->execute();
             $result = $prepare->rowCount();
             return $result;

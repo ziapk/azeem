@@ -35,40 +35,81 @@ echo mainHeader(['page' => 'order']);
             </div>
         </div>
     </form>
+    <uib-tabset active="activePill">
+        <uib-tab select="getReport($event)" index="0" data-tab="all" heading="All Orders"></uib-tab>
+        <uib-tab select="getReport($event)" index="1" data-tab="cash" heading="Paid"></uib-tab>
+        <uib-tab select="getReport($event)" index="2" data-tab="credit" heading="Un-Paid"></uib-tab>
+        <uib-tab select="getReport($event)" index="3" data-tab="sample" heading="Samples"></uib-tab>
+    </uib-tabset>
     <table class="table">
         <thead>
             <tr>
                 <th>Sr.#</th>
+                <th>Reconcile</th>
                 <th>Order. #</th>
                 <th>Customer</th>
                 <th>Price</th>
                 <th ng-repeat="mode in modes">{{mode.title}}</th>
                 <th>Status</th>
                 <th>Date/time</th>
-                <th></th>
+                <th width="120"></th>
             </tr>
         </thead>
         <tbody>
             <tr ng-repeat="row in data.records">
                 <td>{{$index + 1}}</td>
+                <td>
+                    <?php if ($userData['role'] == 'owner' || $userData['role'] == 'manager') { ?>
+                        <a ng-if="row.recon == 0" class="btn btn-xs btn-danger" ng-click="reconcileRecipt(row.id, 1)" href="javascript:void(0)"><span class="fa fa-check"></span></a>
+                        <a ng-if="row.recon == 1" class="btn btn-xs btn-success" ng-click="reconcileRecipt(row.id, 0)" href="javascript:void(0)"><span class="fa fa-check"></span></a>
+                    <?php } else { ?>
+                        <a ng-if="row.recon == 0" class="btn btn-xs btn-danger" href="javascript:void(0)"><span class="fa fa-check"></span></a>
+                        <a ng-if="row.recon == 1" class="btn btn-xs btn-success" href="javascript:void(0)"><span class="fa fa-check"></span></a>
+                    <?php } ?>
+                </td>
                 <td>{{row.order_custom_id}}</td>
                 <td>{{row.customer_name || row.full_name}}</td>
                 <td>{{row.price - row.discount | number: 0}}</td>
                 <td ng-repeat="mode in modes">{{row.prices[mode.id]}}</td>
                 <td>{{statusArr[row.status].full_name}}</td>
                 <td>{{row.order_date}}</td>
-                <td align="right">
+                <td align="right" class="dropdown">
                     <?php if ($userData['role'] == 'owner') { ?>
-                        <a class="btn btn-xs btn-default" ng-if="row.status != 5" href="{{'<?php echo SITE_URL; ?>pages/recipt/edit.php?id=' + row.id }}" target="_blank">Edit</a>
+                        <a uib-tooltip="EDIT" class="btn btn-default btn-xs" ng-if="row.status != 5" href="{{'<?php echo SITE_URL; ?>pages/recipt/edit.php?id=' + row.id }}" target="_blank"><span class="fa fa-edit"></span></a>
                     <?php } else { ?>
-                        <a class="btn btn-xs btn-default" ng-if="row.status == 1" href="{{'<?php echo SITE_URL; ?>pages/recipt/edit.php?id=' + row.id }}" target="_blank">Edit</a>
+                        <a uib-tooltip="EDIT" class="btn btn-default btn-xs" ng-if="row.status == 1" href="{{'<?php echo SITE_URL; ?>pages/recipt/edit.php?id=' + row.id }}" target="_blank"><span class="fa fa-edit"></span></a>
                     <?php } ?>
-                    <a class="btn btn-xs btn-danger" ng-if="row.status == 2" href="{{'<?php echo SITE_URL; ?>pages/orders/adjustment.php?id=' + row.id }}">Return</a>
-                    <a class="btn btn-xs btn-danger" ng-click="deleteRecipt(row.id)" href="javascript:void(0)">Delete</a>
-                    <a class="btn btn-xs btn-default" href="{{'<?php echo SITE_URL; ?>pages/recipt/edit.php?dup=' + row.id }}">Duplicate</a>
-                    <a class="btn btn-xs btn-info" ng-click="openRecipt(row.id)" href="javascript:void(0)">Print</a>
-                    <a class="btn btn-xs btn-default" ng-click="openRecipt(row.id, 'details')" href="javascript:void(0)">View</a>
-                    <a class="btn btn-xs btn-default" ng-click="openRecipt(row.id, 'details', 'large')" href="javascript:void(0)">Large View</a>
+                    <a uib-tooltip="Print" class="btn btn-default btn-xs" ng-click="openRecipt(row.id)" href="javascript:void(0)"><span class="fa fa-print"></span></a>
+                    <a uib-tooltip="Large View" class="btn btn-default btn-xs" ng-click="openRecipt(row.id, 'details', 'large')" href="javascript:void(0)"><span class="fa fa-file"></span></a>
+                    <a uib-tooltip="More" class="btn btn-default btn-xs" href="javascript:void(0)" data-toggle="dropdown"><span class="fa fa-chevron-down"></span></a>
+                    <ul class="dropdown-menu pull-right">
+                        <li>
+                            <?php if ($userData['role'] == 'owner') { ?>
+                                <a ng-if="row.status != 5" href="{{'<?php echo SITE_URL; ?>pages/recipt/edit.php?id=' + row.id }}" target="_blank"><span class="fa fa-edit"></span> Edit</a>
+                            <?php } else { ?>
+                                <a ng-if="row.status == 1" href="{{'<?php echo SITE_URL; ?>pages/recipt/edit.php?id=' + row.id }}" target="_blank"><span class="fa fa-edit"></span> Edit</a>
+                            <?php } ?>
+                        </li>
+                        <li>
+                            <a ng-if="row.status == 2" href="{{'<?php echo SITE_URL; ?>pages/orders/adjustment.php?id=' + row.id }}">Return</a>
+                        </li>
+                        <li>
+                            <a ng-click="deleteRecipt(row.id)" href="javascript:void(0)"><span class="fa fa-remove"></span> Delete</a>
+                        </li>
+                        <li>
+                            <a href="{{'<?php echo SITE_URL; ?>pages/recipt/edit.php?dup=' + row.id }}"><span class="fa fa-copy"></span> Duplicate</a>
+                        </li>
+                        <li>
+                            <a ng-click="openRecipt(row.id)" href="javascript:void(0)"><span class="fa fa-print"></span> Print</a>
+                        </li>
+                        <li>
+                            <a ng-click="openRecipt(row.id, 'details')" href="javascript:void(0)"><span class="fa fa-eye"></span> View</a>
+                        </li>
+                        <li>
+                            <a ng-click="openRecipt(row.id, 'details', 'large')" href="javascript:void(0)"><span class="fa fa-file"></span> Large View</a>
+                        </li>
+                    </ul>
+
                 </td>
             </tr>
         </tbody>
@@ -120,14 +161,18 @@ echo mainFooter();
         };
         $scope.orderId = '';
 
-        $scope.statusArr = <?php echo json_encode($orderStatusArr); ?>
-
-        $scope.getReport = form => {
+        $scope.statusArr = <?php echo json_encode($orderStatusArr); ?>;
+        $scope.activePill = 0;
+        $scope.activeValue = 'all';
+        $scope.getReport = (form, activeValue) => {
+            const orderType = form?.currentTarget?.parentNode?.getAttribute('data-tab') || 'all';
+            $scope.activeValue = orderType || activeValue || 'all';
             $http.get("<?php echo SITE_URL ?>api/getSaleReport.php", {
                     params: {
                         from: moment($scope.datePicker.date.startDate).format('YYYY-MM-DD'),
                         to: moment($scope.datePicker.date.endDate).format('YYYY-MM-DD'),
-                        orderId: $scope.orderId
+                        orderId: $scope.orderId,
+                        orderType
                     }
                 })
                 .then(function(response) {
@@ -165,6 +210,13 @@ echo mainFooter();
                     //$scope.getPublishers(1);
                 });
             }
+        }
+        $scope.reconcileRecipt = function(id, flag) {
+            $http.get('reconcile.php?id=' + id + '&flag=' + flag).then(function(response) {
+                if (response && response.data && response.data.success) {
+                    $scope.getReport(null, $scope.activeValue);
+                }
+            })
         }
 
         $scope.returnOrder = function(id) {
