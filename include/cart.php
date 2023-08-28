@@ -89,7 +89,9 @@
             'Content-Type': 'application/x-www-form-urlencoded'
           }
         }).then((response) => {
-          alert(response.data.message);
+          toaster.success({
+            body: response.data.message
+          });
           if (response.data.status == 200) {
             $scope.exp.expense = '';
             $scope.exp.description = '';
@@ -133,7 +135,9 @@
             'Content-Type': 'application/x-www-form-urlencoded'
           }
         }).then((response) => {
-          alert(response.data.message);
+          toaster.success({
+            body: response.data.message
+          });
           if (response.data.status == 200) {
             $scope.payment.summery = '';
             for (let k in $scope.payment.mode) {
@@ -159,7 +163,9 @@
             'Content-Type': 'application/x-www-form-urlencoded'
           }
         }).then((response) => {
-          alert(response.data.message);
+          toaster.success({
+            body: response.data.message
+          });
           if (response.data.status == 200) {
             $scope.printRecipt(response.data.supply.id);
             $scope.payment.customer = '';
@@ -168,8 +174,6 @@
               $scope.payment.mode[k] = '';
             }
           }
-
-
         })
       }
     }
