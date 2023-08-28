@@ -558,7 +558,7 @@ class Orders extends Connection
                 $toCondition .= " AND o.paid_amount > 0 ";
             }
             if ($params['orderType'] == 'credit') {
-                $toCondition .= " AND o.price > 0 and o.paid_amount = 0 ";
+                $toCondition .= " AND o.price > 0 and o.paid_amount = 0 AND o.status != 1";
             }
             if ($params['orderType'] == 'park') { // all parked
                 $toCondition = " ";
