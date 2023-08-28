@@ -39,7 +39,8 @@ echo mainHeader(['page' => 'order']);
         <uib-tab select="getReport($event)" index="0" data-tab="all" heading="All Orders"></uib-tab>
         <uib-tab select="getReport($event)" index="1" data-tab="cash" heading="Paid"></uib-tab>
         <uib-tab select="getReport($event)" index="2" data-tab="credit" heading="Un-Paid"></uib-tab>
-        <uib-tab select="getReport($event)" index="3" data-tab="sample" heading="Samples"></uib-tab>
+        <uib-tab select="getReport($event)" index="3" data-tab="park" heading="Parked"></uib-tab>
+        <uib-tab select="getReport($event)" index="4" data-tab="sample" heading="Samples"></uib-tab>
     </uib-tabset>
     <table class="table">
         <thead>
