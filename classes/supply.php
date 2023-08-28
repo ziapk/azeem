@@ -99,10 +99,11 @@ class Supply extends Connection
     public function createSupplyDetails($array)
     {
         try {
-            $stmt = "INSERT INTO `{$this->table_sub}` (`supply_id`, `product_id`, `quantity`, `price`, `discount`) VALUES (:supply_id, :product_id, :quantity, :price, :discount)";
+            $stmt = "INSERT INTO `{$this->table_sub}` (`supply_id`, `product_id`, `product_title`, `quantity`, `price`, `discount`) VALUES (:supply_id, :product_id, :product_title, :quantity, :price, :discount)";
             $prepare = $this->dbh->prepare($stmt);
             $prepare->bindParam(':supply_id', $array['supply_id'], PDO::PARAM_STR);
             $prepare->bindParam(':product_id', $array['product_id'], PDO::PARAM_STR);
+            $prepare->bindParam(':product_title', $array['product_title'], PDO::PARAM_STR);
             $prepare->bindParam(':quantity', $array['quantity'], PDO::PARAM_STR);
             $prepare->bindParam(':price', $array['price'], PDO::PARAM_STR);
             $prepare->bindParam(':discount', $array['discount'], PDO::PARAM_STR);
@@ -184,7 +185,7 @@ class Supply extends Connection
             $prepare->execute();
             $result['orders'] = $prepare->fetchAll(PDO::FETCH_ASSOC);
             foreach ($result['orders'] as $key => $order) {
-                $stmt = "SELECT item.*, p.full_name AS product_title FROM `{$this->table_sub}` as item LEFT JOIN products as p ON item.product_id = p.id WHERE item.supply_id=:id";
+                $stmt = "SELECT item.*, p.full_name FROM `{$this->table_sub}` as item LEFT JOIN products as p ON item.product_id = p.id WHERE item.supply_id=:id";
                 $prepare = $this->dbh->prepare($stmt);
                 $prepare->bindParam(':id', $order['id'], PDO::PARAM_STR);
                 $prepare->execute();

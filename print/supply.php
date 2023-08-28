@@ -249,7 +249,7 @@ $qty = 0; ?>
                                 <tr>
                                     <td class="text-left"><?php echo $key + 1; ?></td>
                                     <td class="text-left" style="padding: 0 6px"><?php echo $item['product_id']; ?></td>
-                                    <td class="text-left"><?php echo $item['full_name']; ?></td>
+                                    <td class="text-left"><?php echo !empty($item['product_title']) ? $item['product_title'] : $item['full_name']; ?></td>
                                     <td class="text-right"><?php echo abs(($item['quantity'])); ?></td>
                                     <td class="text-right"><?php echo abs(($item['price'])); ?></td>
                                     <td class="text-right"><?php echo $item['discount'] . '%'; ?></td>

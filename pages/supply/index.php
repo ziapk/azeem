@@ -94,6 +94,7 @@ echo mainFooter();
         $scope.priceList = [];
         $scope.items = $scope.orderData?.order_items?.map(item => ({
             ...item,
+            full_name: item.product_title || item.full_name,
             price: parseFloat(item.price),
             quantity: parseFloat(item.quantity),
             qty: parseFloat(item.quantity),
@@ -115,9 +116,7 @@ echo mainFooter();
 
         if ($scope.orderData?.customer || $scope.orderData?.supplier) {
             $scope.selectSupplier($scope.orderData.customer || $scope.orderData.supplier);
-
         }
-
 
         $scope.newData = {
             barcode: "",

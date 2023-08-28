@@ -104,6 +104,7 @@ if (sizeof($_POST['items'])) {
                 'stock_out' => 0,
                 'pin' => $item['pin'],
                 'minQty' => $item['minQty'],
+                'full_name' => $item['full_name'],
                 'product_id' => $item['id'],
                 'shopId' => $_POST['shopId'],
                 'owner_id' => $ownerId,
@@ -164,6 +165,7 @@ if ($supply_id) {
             $d = [
                 'supply_id' => $supply_id,
                 'product_id' => $item['product_id'],
+                'product_title' => $item['full_name'],
                 'quantity' => $item['qty'],
                 'discount' => !empty($item['discount']) ? $item['discount'] : 0,
                 'price' => $item['price'],

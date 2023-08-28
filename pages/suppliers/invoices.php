@@ -65,7 +65,7 @@ echo mainHeader();
                         <td align="right"><span class="fa text-danger fa-arrow-right"></span></td>
                         <td><?php echo $k + 1; ?></td>
                         <td><?php echo $v['product_id']; ?></td>
-                        <td><?php echo $v['product_title']; ?></td>
+                        <td><?php echo !empty($v['product_title']) ? $v['product_title'] : $v['full_name']; ?></td>
                         <td><?php echo $v['quantity']; ?></td>
                         <td><?php echo number_format($v['price'], 0); ?></td>
                     </tr>
