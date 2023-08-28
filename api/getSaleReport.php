@@ -25,7 +25,9 @@ foreach ($orders as $row) {
     } else {
         $data['totalReturn'] += $row['paid_amount'];
     }
-    $data['credit'] += $row['price'] - $row['discount'] - $row['paid_amount'];
+    if ($row['status'] != 1) {
+        $data['credit'] += $row['price'] - $row['discount'] - $row['paid_amount'];
+    }
     if ($row['status'] == 1) {
         $data['park'] += $row['price'] - $row['discount'];
     } else {
