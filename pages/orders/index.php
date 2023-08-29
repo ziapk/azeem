@@ -8,13 +8,13 @@ $start = $end = $shop['sale_date'];
 if (isset($_GET['report'])) {
     $from = $_GET['from'];
     $to = $_GET['to'];
-    $orders = $ordersObj->userOrders($shop['id'], $_GET);
+    // $orders = $ordersObj->userOrders($shop['id'], $_GET);
     $dateLabel .= '<strong>' . $from . '</strong> to <strong>' . $to . '</strong>';
     $start = date('Y-m-d', strtotime($from));
     $end = date('Y-m-d', strtotime($to));
 } else {
     $data = ['from' => $shop['sale_date']];
-    $orders = $ordersObj->userOrders($shop['id'], $data);
+    // $orders = $ordersObj->userOrders($shop['id'], $data);
     $dateLabel .= '<strong>' . $shop['sale_date'] . '</strong>';
     $start = $shop['sale_date'];
     $end = $shop['sale_date'];
@@ -51,6 +51,7 @@ echo mainHeader(['page' => 'order']);
                 <th>Customer</th>
                 <th>Price</th>
                 <th ng-repeat="mode in modes">{{mode.title}}</th>
+                <th>Running</th>
                 <th>Status</th>
                 <th>Date/time</th>
                 <th width="120"></th>
@@ -72,6 +73,7 @@ echo mainHeader(['page' => 'order']);
                 <td>{{row.customer_name || row.full_name}}</td>
                 <td>{{row.price - row.discount | number: 0}}</td>
                 <td ng-repeat="mode in modes">{{row.prices[mode.id]}}</td>
+                <td>{{row.runningTotal | number: 0}}</td>
                 <td>{{statusArr[row.status].full_name}}</td>
                 <td>{{row.order_date}}</td>
                 <td align="right" class="dropdown">
@@ -116,7 +118,7 @@ echo mainHeader(['page' => 'order']);
         </tbody>
         <tfoot>
             <tr>
-                <th colspan="{{8 + modes.length}}">
+                <th colspan="{{9 + modes.length}}">
                     <table style="text-align: right" width="100%" cellspacing="0" cellpadding="0">
                         <tr>
                             <th style="text-align: right">Number of Orders</th>

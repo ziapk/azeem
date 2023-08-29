@@ -11,10 +11,18 @@ $data = [
     'orderType' => !empty($_GET['orderType']) ? $_GET['orderType'] : 'all'
 ];
 $orders = $ordersObj->userOrders($userData['shopId'], $data);
+array_multisort(array_column($orders, 'order_custom_id'), SORT_ASC, $orders);
+$total = 0;
+foreach ($orders as $key => $row) {
+    $total += $row['price'] - $row['discount'];
+    $orders[$key]['runningTotal'] = $total;
+}
+array_multisort(array_column($orders, 'order_custom_id'), SORT_DESC, $orders);
+
 $data = [];
 $data['records'] = $orders;
 $data['income'] = 0;
-foreach ($orders as $row) {
+foreach ($orders as $key => $row) {
     if ($row['flag'] == 1) {
         $data['totalIncome'] += $row['price'] - $row['discount'];
         if (!empty($row['prices'])) {

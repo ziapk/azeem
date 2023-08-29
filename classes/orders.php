@@ -553,9 +553,8 @@ class Orders extends Connection
             if (!empty($params['orderId'])) {
                 $toCondition = " AND o.order_custom_id='" . $params['orderId'] . "' ";
             }
-
             if ($params['orderType'] == 'cash') {
-                $toCondition .= " AND o.paid_amount > 0 ";
+                $toCondition .= " AND o.paid_amount > 0 and o.status = 2 ";
             }
             if ($params['orderType'] == 'credit') {
                 $toCondition .= " AND o.price > 0 and o.price != o.discount and o.paid_amount = 0 AND o.status != 1";
