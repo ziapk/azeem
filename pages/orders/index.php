@@ -121,24 +121,24 @@ echo mainHeader(['page' => 'order']);
                     <table class="table table-hover" style="box-shadow: none; text-align: right" width="100%" cellspacing="0" cellpadding="0">
                         <tr>
                             <td style="text-align: right">Number of Orders</td>
-                            <td style="text-align: right; font-weight: bold; font-size: 1.5em">{{data.total}}</td>
+                            <td style="text-align: right; font-weight: bold; font-size: 1.5em">{{data.total || 0}}</td>
                         </tr>
 
                         <tr ng-repeat="(k, d) in data.via">
                             <td style="text-align: right">Pay via {{modeNames[k]}}</td>
-                            <td style="text-align: right; font-weight: bold; font-size: 1.5em">{{d | number: 2}}</td>
+                            <td style="text-align: right; font-weight: bold; font-size: 1.5em">{{(d || 0) | number: 2}}</td>
                         </tr>
                         <tr>
                             <td style="text-align: right">Total Credit</td>
-                            <td style="text-align: right; font-weight: bold; font-size: 1.5em">{{data.credit | number: 2}}</td>
+                            <td style="text-align: right; font-weight: bold; font-size: 1.5em">{{(data.credit || 0) | number: 2}}</td>
                         </tr>
                         <tr>
                             <td style="text-align: right">Total Parked</td>
-                            <td style="text-align: right; font-weight: bold; font-size: 1.5em">{{data.park | number: 2}}</td>
+                            <td style="text-align: right; font-weight: bold; font-size: 1.5em">{{(data.park || 0) | number: 2}}</td>
                         </tr>
                         <tr>
                             <td style="text-align: right">G. Total</td>
-                            <td style="text-align: right; font-weight: bold; font-size: 1.5em">{{data.totalIncome | number: 2}}</td>
+                            <td style="text-align: right; font-weight: bold; font-size: 1.5em">{{(data.totalIncome || 0) | number: 2}}</td>
                         </tr>
                         <tr>
                             <td style="text-align: right">Total Return</td>
