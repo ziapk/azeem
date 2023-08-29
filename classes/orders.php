@@ -558,14 +558,14 @@ class Orders extends Connection
                 $toCondition .= " AND o.paid_amount > 0 ";
             }
             if ($params['orderType'] == 'credit') {
-                $toCondition .= " AND o.price > 0 and o.paid_amount = 0 AND o.status != 1";
+                $toCondition .= " AND o.price > 0 and o.price != o.discount and o.paid_amount = 0 AND o.status != 1";
             }
             if ($params['orderType'] == 'park') { // all parked
                 $toCondition = " ";
                 $flagCondition = " AND o.status = 1 ";
             }
             if ($params['orderType'] == 'sample') {
-                $toCondition .= " AND o.price = 0 and o.paid_amount = 0 ";
+                $toCondition .= " AND o.price = o.discount ";
             }
 
             $stmt = "SELECT o.*, full_name, account_id FROM `{$this->table}` AS o LEFT JOIN customers AS c ON c.id = o.customer_id WHERE o.shopId=:shopId " . $toCondition . ' ' . $flagCondition . ' and ((o.flag = 1) or (o.flag = 2 and o.status IN (5,6,7))) ORDER BY id desc';
