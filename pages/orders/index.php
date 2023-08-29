@@ -46,7 +46,6 @@ echo mainHeader(['page' => 'order']);
         <thead>
             <tr>
                 <th>Sr.#</th>
-                <th>Reconcile</th>
                 <th>Order. #</th>
                 <th>Customer</th>
                 <th>Price</th>
@@ -68,8 +67,8 @@ echo mainHeader(['page' => 'order']);
                         <a ng-if="row.recon == 0" class="btn btn-xs btn-danger" href="javascript:void(0)"><span class="fa fa-check"></span></a>
                         <a ng-if="row.recon == 1" class="btn btn-xs btn-success" href="javascript:void(0)"><span class="fa fa-check"></span></a>
                     <?php } ?>
+                    <span>{{row.order_custom_id}}</span>
                 </td>
-                <td>{{row.order_custom_id}}</td>
                 <td>{{row.customer_name || row.full_name}}</td>
                 <td>{{row.price - row.discount | number: 0}}</td>
                 <td ng-repeat="mode in modes">{{row.prices[mode.id] | number: 0}}</td>
@@ -118,32 +117,32 @@ echo mainHeader(['page' => 'order']);
         </tbody>
         <tfoot>
             <tr>
-                <th colspan="{{9 + modes.length}}">
-                    <table style="text-align: right" width="100%" cellspacing="0" cellpadding="0">
+                <th colspan="{{8 + modes.length}}">
+                    <table class="table table-hover" style="box-shadow: none; text-align: right" width="100%" cellspacing="0" cellpadding="0">
                         <tr>
-                            <th style="text-align: right">Number of Orders</th>
-                            <th style="text-align: right">{{data.total}}</th>
+                            <td style="text-align: right">Number of Orders</td>
+                            <td style="text-align: right; font-weight: bold; font-size: 1.5em">{{data.total}}</td>
                         </tr>
 
                         <tr ng-repeat="(k, d) in data.via">
-                            <th style="text-align: right">Pay via {{modeNames[k]}}</th>
-                            <th style="text-align: right">{{d | number: 2}}</th>
+                            <td style="text-align: right">Pay via {{modeNames[k]}}</td>
+                            <td style="text-align: right; font-weight: bold; font-size: 1.5em">{{d | number: 2}}</td>
                         </tr>
                         <tr>
-                            <th style="text-align: right">Total Credit</th>
-                            <th style="text-align: right">{{data.credit | number: 2}}</th>
+                            <td style="text-align: right">Total Credit</td>
+                            <td style="text-align: right; font-weight: bold; font-size: 1.5em">{{data.credit | number: 2}}</td>
                         </tr>
                         <tr>
-                            <th style="text-align: right">Total Parked</th>
-                            <th style="text-align: right">{{data.park | number: 2}}</th>
+                            <td style="text-align: right">Total Parked</td>
+                            <td style="text-align: right; font-weight: bold; font-size: 1.5em">{{data.park | number: 2}}</td>
                         </tr>
                         <tr>
-                            <th style="text-align: right">G. Total</th>
-                            <th style="text-align: right">{{data.totalIncome | number: 2}}</th>
+                            <td style="text-align: right">G. Total</td>
+                            <td style="text-align: right; font-weight: bold; font-size: 1.5em">{{data.totalIncome | number: 2}}</td>
                         </tr>
                         <tr>
-                            <th style="text-align: right">Total Return</th>
-                            <th style="text-align: right">{{data.return | number: 2}}</th>
+                            <td style="text-align: right">Total Return</td>
+                            <td style="text-align: right; font-weight: bold; font-size: 1.5em">{{(data.return || 0) | number: 2}}</td>
                         </tr>
                     </table>
                 </th>
