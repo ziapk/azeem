@@ -212,14 +212,19 @@ class Supply extends Connection
         }
     }
 
-    public function userOrders($shopId, $date, $to = null)
+    public function userOrders($shopId, $params)
     {
         try {
+
             $toCondition = "";
-            if (!empty($to)) {
-                $toCondition .= " AND DATE(o.supply_date)>='" . $date . "' AND DATE(o.supply_date)<='" . $to . "'";
-            } else {
-                $toCondition .= " AND DATE(o.supply_date)>='" . $date . "'";
+            if (!empty($params['to'])) {
+                $toCondition .= " AND DATE(o.supply_date) BETWEEN '" . $params['from'] . "' AND '" . $params['to'] . "'";
+            } else if (!empty($date)) {
+                $toCondition .= " AND DATE(o.supply_date) BETWEEN '" . $params['from'] . "' AND '" . $params['from'] . "'";
+            }
+
+            if (!empty($params['orderId'])) {
+                $toCondition = " AND o.id='" . $params['orderId'] . "' ";
             }
 
             $stmt = "SELECT o.*, c.full_name as c_full_name, s.name as s_full_name FROM `{$this->table}` AS o LEFT JOIN customers AS c ON o.supplier_type = 2 and c.id = o.supplier_id LEFT JOIN suppliers AS s ON o.supplier_type = 1 and s.id = o.supplier_id WHERE o.shopId=:shopId " . $toCondition . ' and o.flag = 1 ORDER BY id desc';

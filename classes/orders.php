@@ -601,15 +601,21 @@ class Orders extends Connection
             die("Error!: " . $e->getMessage() . "<br/>");
         }
     }
-    public function userReturnOrders($shopId, $date, $to = null)
+    public function userReturnOrders($shopId, $params)
     {
         try {
+
             $toCondition = "";
-            if (!empty($to)) {
-                $toCondition .= " AND DATE(o.return_date) BETWEEN '" . $date . "' AND '" . $to . "'";
+            if (!empty($params['to'])) {
+                $toCondition .= " AND DATE(o.return_date) BETWEEN '" . $params['from'] . "' AND '" . $params['to'] . "'";
             } else if (!empty($date)) {
-                $toCondition .= " AND DATE(o.return_date) BETWEEN '" . $date . "' AND '" . $date . "'";
+                $toCondition .= " AND DATE(o.return_date) BETWEEN '" . $params['from'] . "' AND '" . $params['from'] . "'";
             }
+
+            if (!empty($params['orderId'])) {
+                $toCondition = " AND o.id='" . $params['orderId'] . "' ";
+            }
+
             $stmt = "SELECT o.*, o.amount as price, full_name, account_id FROM `{$this->table_ro}` AS o LEFT JOIN customers AS c ON c.id = o.customer_id WHERE o.shopId=:shopId " . $toCondition . '  ' . ' and (o.flag = 1) ORDER BY id desc';
             $prepare = $this->dbh->prepare($stmt);
             $prepare->bindParam(':shopId', $shopId, PDO::PARAM_STR);
@@ -722,20 +728,19 @@ class Orders extends Connection
             $prepare->bindParam(':id', $id, PDO::PARAM_STR);
             $prepare->execute();
             $result = $prepare->fetch(PDO::FETCH_ASSOC);
-            $items = $this->getFaultyReturnProducts($result['ids']);
+            $items = $this->getFaultyReturnProducts($result['id']);
             return ['data' => $result, 'items' => $items];
         } catch (PDOException $e) {
             die("Error!: " . $e->getMessage() . "<br/>");
         }
     }
 
-    public function getFaultyReturnProducts($ids)
+    public function getFaultyReturnProducts($id)
     {
         try {
-            $json = json_decode($ids, true);
-            $final = implode(',', $json);
-            $stmt = "SELECT rp.product_id, sum(quantity) as quantity, p.full_name as product_name FROM `{$this->table_rp}` AS rp LEFT JOIN `{$this->table_pro}` AS p ON rp.product_id=p.id WHERE rp.id IN ($final) GROUP BY product_id ORDER BY rp.id desc";
+            $stmt = "SELECT rp.product_id, sum(quantity) as quantity, p.full_name as product_name FROM `{$this->table_rp}` AS rp LEFT JOIN `{$this->table_pro}` AS p ON rp.product_id=p.id WHERE rp.order_id = :id GROUP BY product_id ORDER BY rp.id desc";
             $prepare = $this->dbh->prepare($stmt);
+            $prepare->bindParam(':id', $id, PDO::PARAM_STR);
             $prepare->execute();
             $result = $prepare->fetchAll(PDO::FETCH_ASSOC);
             return $result;
@@ -744,11 +749,12 @@ class Orders extends Connection
         }
     }
 
-    public function getReturnRecords()
+    public function getReturnRecords($array = [])
     {
         try {
-            $stmt = "SELECT * FROM `{$this->table_ro}`";
+            $stmt = "SELECT * FROM `{$this->table_ro}` where flag=1 and owner_id=:owner_id";
             $prepare = $this->dbh->prepare($stmt);
+            $prepare->bindParam(':owner_id', $array['owner_id'], PDO::PARAM_STR);
             $prepare->execute();
             $result = $prepare->fetchAll(PDO::FETCH_ASSOC);
             return $result;
@@ -761,7 +767,7 @@ class Orders extends Connection
     {
         try {
             $ids = implode(',', $array);
-            $stmt = "SELECT id FROM `{$this->table_rp}` WHERE type=2 AND product_id IN (" . $ids . ")";
+            $stmt = "SELECT id FROM `{$this->table_rp}` WHERE product_id IN (" . $ids . ")";
             $prepare = $this->dbh->prepare($stmt);
             $prepare->execute();
             $result = $prepare->fetchAll(PDO::FETCH_ASSOC);
@@ -774,7 +780,7 @@ class Orders extends Connection
     public function getFaultyProducts()
     {
         try {
-            $stmt = "SELECT rp.product_id, rp.id, sum(quantity) as quantity, p.full_name as product_name FROM `{$this->table_rp}` AS rp LEFT JOIN `{$this->table_pro}` AS p ON rp.product_id=p.id WHERE rp.type=2 GROUP BY product_id ORDER BY rp.id desc";
+            $stmt = "SELECT rp.product_id, rp.id, sum(quantity) as quantity, p.full_name as product_name FROM `{$this->table_rp}` AS rp LEFT JOIN `{$this->table_pro}` AS p ON rp.product_id=p.id GROUP BY product_id ORDER BY rp.id desc";
             $prepare = $this->dbh->prepare($stmt);
             $prepare->execute();
             $result = $prepare->fetchAll(PDO::FETCH_ASSOC);
@@ -788,10 +794,10 @@ class Orders extends Connection
     {
         // $idJson = json_encode($ids);
 
-
-        $ref_no = !empty($array['ref_no']) ? $array['ref_no'] : null;
-        $flag = 1;
         try {
+
+            $ref_no = !empty($array['ref_no']) ? $array['ref_no'] : null;
+            $flag = 1;
             if (!empty($array['id'])) {
                 $stmt = "UPDATE `{$this->table_ro}` SET `amount`=:amount, `paid`=:paid, `discount`=:discount, `ref_no`=:ref_no, `shopId`=:shopId, `owner_id`=:owner_id, `order_id`=:order_id, `customer_id`=:customer_id, `customer_name`=:customer_name, `return_date`=:return_date, `return_type`=:return_type, `is_supplier`=:is_supplier, `flag`=:flag where id=:id";
             } else {
@@ -821,6 +827,8 @@ class Orders extends Connection
             } else {
                 $result = $this->dbh->lastInsertId();
             }
+
+            var_dump($result);
 
             return $result;
         } catch (PDOException $e) {

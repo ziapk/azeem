@@ -1,9 +1,12 @@
 <?php
 include_once dirname(__FILE__) . '/../include/settings.php';
 $ordersObj = new Supply();
-$from = $_GET['from'];
-$to = $_GET['to'];
-$orders = $ordersObj->userOrders($userData['shopId'], $from, $to);
+$data = [
+    'from' => $_GET['from'],
+    'to' => $_GET['to'],
+    'orderId' => $_GET['orderId'],
+];
+$orders = $ordersObj->userOrders($userData['shopId'], $data);
 $data = [];
 $data['records'] = $orders;
 $data['income'] = 0;

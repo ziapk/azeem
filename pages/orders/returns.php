@@ -23,6 +23,9 @@ echo mainHeader(['page' => 'sale_returns']);
     <form method="GET" ng-submit="getReport()" class="form-group">
         <h4><?php echo $dateLabel; ?></h4>
         <div class="input-group">
+            <div class="input-group-btn">
+                <input type="text" value="" name="orderId" ng-model="orderId" class="form-control" style="width: 150px" placeholder="Order Number #" />
+            </div>
             <input date-range-picker class="form-control date-picker" type="text" ng-model="datePicker.date" options="{ locale: {format: 'DD/MM/YYYY'}}" />
             <div class="input-group-btn">
                 <input type="submit" value="Submit" name="report" class="btn btn-primary" />
@@ -102,7 +105,8 @@ echo mainFooter();
             $http.get("<?php echo SITE_URL ?>api/getSaleReturnReport.php", {
                     params: {
                         from: moment($scope.datePicker.date.startDate).format('YYYY-MM-DD'),
-                        to: moment($scope.datePicker.date.endDate).format('YYYY-MM-DD')
+                        to: moment($scope.datePicker.date.endDate).format('YYYY-MM-DD'),
+                        orderId: $scope.orderId
                     }
                 })
                 .then(function(response) {
