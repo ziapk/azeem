@@ -34,6 +34,7 @@ if (!empty($_POST) && isset($_POST['update'])) {
             'phoneNumber1' => !empty($_POST['phoneNumber1']) ? $_POST['phoneNumber1'] : "",
             'phoneNumber2' => !empty($_POST['phoneNumber2']) ? $_POST['phoneNumber2'] : "",
             'phoneNumber3' => !empty($_POST['phoneNumber3']) ? $_POST['phoneNumber3'] : "",
+            'sale_terms' => !empty($_POST['sale_terms']) ? $_POST['sale_terms'] : "",
             'status' => !empty($_POST['status']) ? $_POST['status'] : 1,
         ];
 
@@ -138,6 +139,9 @@ $storeTypesArr = $storeObj->getStoreTypes();
                                                             }; ?>><?php echo $type; ?></option>
                     <?php } ?>
                 </select>
+            </div>
+            <div class="col-sm-12 form-group">
+                <textarea rows="4" name="sale_terms" maxlength="255" type="text" class="form-control" placeholder="Sales Terms and Conditions (Max: 255 characters)"><?php echo $storeData['sale_terms']; ?></textarea>
             </div>
             <div class="col-sm-12">
                 <p class="text-right">

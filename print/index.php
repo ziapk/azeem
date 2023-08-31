@@ -462,32 +462,33 @@ if ($largeView) {
                     </tr>
                 <?php } ?>
                 <tr class="no-border">
-                    <td class="text-right ref" colspan="5">Gross Total</td>
+                    <td class="text-left" rowspan="5" colspan="3" valign="bottom" style="font-size: 10px; font-weight: bold; padding: 10px"><?php echo !empty($shop['sale_terms']) ? 'Note: ' . $shop['sale_terms'] : null; ?></td>
+                    <td class="text-right ref" colspan="2">Gross Total</td>
                     <td class="text-right ref"><?php echo abs(($aprice)); ?></td>
                 </tr>
                 <tr class="no-border">
-                    <th class="text-right ref" colspan="5">Disc</th>
+                    <th class="text-right ref" colspan="2">Disc</th>
                     <th class="text-right ref"><?php echo abs(($totalDist)); ?></th>
                 </tr>
                 <tr class="no-border">
-                    <td class="text-right ref" colspan="5">Net Total</td>
+                    <td class="text-right ref" colspan="2">Net Total</td>
                     <th class="text-right ref"><?php echo abs(($price - $order['order']['discount'])); ?></th>
                 </tr>
                 <?php if (!empty($order['order']['paid_amount'])) { ?>
 
                     <tr class="no-border">
-                        <td class="text-right ref" colspan="5">Deposit</td>
+                        <td class="text-right ref" colspan="2">Deposit</td>
                         <th class="text-right ref"><?php echo abs(($order['order']['paid_amount'])); ?></th>
                     </tr>
                     <tr class="no-border">
-                        <td class="text-right ref" colspan="5">Balance</td>
+                        <td class="text-right ref" colspan="2">Balance</td>
                         <th class="text-right ref"><?php echo abs(($balance)); ?></th>
                     </tr>
                 <?php } ?>
                 </tfoot>
         </table>
-        <footer>
-            Powered by: Zia ur Rehman Ph.# <strong>03245120412</strong>
+        <footer style="font-size: 10px; padding-top: 10px">
+            Software Developed by: <strong>Zia ur Rehman</strong> <br /> Ph.# <strong>0324 5120412</strong>
         </footer>
     </div>
 <?php } ?>
