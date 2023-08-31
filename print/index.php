@@ -244,14 +244,14 @@ if ($largeView) {
                                         <td class="text-left" style="padding: 0 6px"><?php echo $item['product_id']; ?></td>
                                         <td class="text-left"><?php echo $item['product_title']; ?></td>
                                         <td class="text-right"><?php echo abs(($item['quantity'])); ?></td>
-                                        <td class="text-right"><?php echo abs(($item['price'])); ?></td>
+                                        <td class="text-right"><?php echo number_format(abs(($item['price']))); ?></td>
                                         <td class="text-right"><?php echo abs(($item['discount'] / $item['price']) * 100) . '%'; ?></td>
-                                        <td class="text-right"><?php echo abs(($item['price'] - $item['discount'])); ?></td>
+                                        <td class="text-right"><?php echo number_format(abs(($item['price'] - $item['discount']))); ?></td>
                                         <td class="text-right"><?php
                                                                 $aprice += $item['quantity'] * ($item['price']);
                                                                 $distTotal += $item['quantity'] * ($item['discount']);
                                                                 $qty += $item['quantity'];
-                                                                echo abs(($item['quantity'] * ($item['price'] - $item['discount']))); ?></td>
+                                                                echo number_format(abs(($item['quantity'] * ($item['price'] - $item['discount'])))); ?></td>
                                     </tr>
                                     <?php if (!empty($item['description'])) { ?>
                                         <tr>
@@ -264,7 +264,7 @@ if ($largeView) {
                                     <td valign="top" style="border: 0" class="text-right" colspan="3">Total Quantity</td>
                                     <td valign="top" style="border: 0" class="text-right"><strong><?php echo abs(($qty)); ?></strong></td>
                                     <td class="text-right ref" style="border: 0" colspan="3">Invoice Total</td>
-                                    <th class="text-right ref"><?php echo abs(($aprice)); ?></th>
+                                    <th class="text-right ref"><?php echo number_format(abs(($aprice))); ?></th>
                                 </tr>
                                 <tr class="no-border">
                                     <th rowspan="2" style="border: 0; padding: 0" valign="middle" colspan="5">
@@ -273,22 +273,22 @@ if ($largeView) {
                                                 <td style="border: 0; font-weight: 600;">Note: Books once sold nerver be returned or exchanged.</td>
                                                 <?php if (empty($foodpanda['is_default'])) { ?>
                                                     <td width="120">Current Balance:</td>
-                                                    <th width="60" style="text-align: right"><?php echo abs(($currentBalance)); ?></th>
+                                                    <th width="60" style="text-align: right"><?php echo number_format(abs(($currentBalance))); ?></th>
                                                 <?php } ?>
                                             </tr>
                                         </table>
                                     </th>
                                     <td class="text-right ref" style="border: 0" colspan="2">Additional Discount</td>
-                                    <th class="text-right ref"><?php echo abs(($order['order']['discount'])); ?></th>
+                                    <th class="text-right ref"><?php echo number_format(abs(($order['order']['discount']))); ?></th>
                                 </tr>
                                 <tr class="no-border">
                                     <td class="text-right ref" style="border: 0" colspan="2">Total Discount</td>
-                                    <th class="text-right ref"><?php echo abs(($order['order']['discount'] + $distTotal)); ?></th>
+                                    <th class="text-right ref"><?php echo number_format(abs(($order['order']['discount'] + $distTotal))); ?></th>
                                 </tr>
                                 <tr class="no-border">
                                     <td colspan="5" style="border: 0; font-weight: 600; text-align: right">Net in words: <?php echo convertNumberToWord($net); ?></td>
                                     <td class="text-right ref" style="border: 0" colspan="2">Net Invoice</td>
-                                    <th class="text-right ref"><?php echo abs($net); ?></th>
+                                    <th class="text-right ref"><?php echo number_format(abs($net)); ?></th>
                                 </tr>
                                 <tr class="no-border">
                                     <th rowspan="3" style="border: 0; vertical-align: top" colspan="4" class="text-right">
@@ -300,11 +300,11 @@ if ($largeView) {
 
                                     <tr class="no-border">
                                         <th class="text-right ref" style="border: 0" colspan="3">Amount Paid</th>
-                                        <th class="text-right ref"><?php echo abs(($order['order']['paid_amount'])); ?></th>
+                                        <th class="text-right ref"><?php echo number_format(abs(($order['order']['paid_amount']))); ?></th>
                                     </tr>
                                     <tr class="no-border">
                                         <td class="text-right ref" style="border: 0" colspan="3">Balance</td>
-                                        <th class="text-right ref"><?php echo abs(($balance)); ?></th>
+                                        <th class="text-right ref"><?php echo number_format(abs(($balance))); ?></th>
                                     </tr>
                                 <?php } ?>
                                 </tfoot>
