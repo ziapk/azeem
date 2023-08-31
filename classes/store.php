@@ -61,7 +61,11 @@ class Store extends Connection
 	public function updateStore($array)
 	{
 		try {
-			$stmt = "UPDATE `{$this->table}` SET full_name=:full_name, store_type=:store_type,status=:status, location=:location, city=:city, company_email=:company_email, postalCode=:postalCode, phoneNumber1=:phoneNumber1, phoneNumber2=:phoneNumber2, phoneNumber3=:phoneNumber3, image=:image, sale_terms=:sale_terms WHERE id=:id";
+			$imgTxt = "";
+			if (!empty($array['image'])) {
+				$imgTxt = ", image=:image ";
+			}
+			$stmt = "UPDATE `{$this->table}` SET full_name=:full_name, store_type=:store_type,status=:status, location=:location, city=:city, company_email=:company_email, postalCode=:postalCode, phoneNumber1=:phoneNumber1, phoneNumber2=:phoneNumber2, phoneNumber3=:phoneNumber3, sale_terms=:sale_terms $imgTxt WHERE id=:id";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':full_name', $array['full_name'], PDO::PARAM_STR);
 			$prepare->bindParam(':store_type', $array['store_type'], PDO::PARAM_STR);
@@ -74,7 +78,9 @@ class Store extends Connection
 			$prepare->bindParam(':phoneNumber2', $array['phoneNumber2'], PDO::PARAM_STR);
 			$prepare->bindParam(':phoneNumber3', $array['phoneNumber3'], PDO::PARAM_STR);
 			$prepare->bindParam(':sale_terms', $array['sale_terms'], PDO::PARAM_STR);
-			$prepare->bindParam(':image', $array['image'], PDO::PARAM_STR);
+			if (!empty($array['image'])) {
+				$prepare->bindParam(':image', $array['image'], PDO::PARAM_STR);
+			}
 			$prepare->bindParam(':id', $array['id'], PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $prepare->rowCount();
