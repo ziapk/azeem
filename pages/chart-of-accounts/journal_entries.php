@@ -12,7 +12,7 @@ if ($userData['role'] === 'owner') {
   $ids[] = $shop['id'];
 }
 
-$demands = $doubleEntryObj->getJournals([], $ids);
+$demands = $doubleEntryObj->getJournals(['from' => $shop['sale_date'], 'to' => $shop['sale_date']], $ids);
 $acd_ids = [];
 $grouping = [];
 foreach ($demands as $value) {

@@ -193,9 +193,9 @@ class DoubleEntry extends Connection
 
 			$limitQry = "";
 
-			if (empty($arr)) {
-				$limitQry .= " LIMIT 500";
-			}
+			// if (empty($arr)) {
+			// 	$limitQry .= " LIMIT 500";
+			// }
 
 			$stmt = "SELECT a.*, t.transaction_date, t.reference, a.description, t.description as v_description from `$this->table_ledger_entries` as a left join `$this->table_transactions` as t on t.id = a.transaction_id $where order by t.id desc $limitQry";
 			$prepare = $this->dbh->prepare($stmt);
