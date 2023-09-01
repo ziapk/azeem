@@ -144,6 +144,10 @@ if ($largeView) {
             margin-top: 0;
         }
 
+        .mb-0 {
+            margin-bottom: 0;
+        }
+
         .head h3 {
             font-family: 'Courgette', cursive;
         }
@@ -191,12 +195,12 @@ if ($largeView) {
                 <tr>
                     <th style="padding: 0">
                         <?php $net = abs(($price - $order['order']['discount'])); ?>
-                        <table class="table head text-left" style="width: 100%; margin: 0 0 10px">
+                        <table class="table head text-left" style="width: 100%; margin: 0">
                             <tr>
                                 <td class="text-left" width="250">
                                     <h3>
                                         <div style="padding-top: 10px"><?php echo strtoupper($shop['full_name']); ?>
-                                            <p class="mt-0"><?php echo $shop['location']; ?>, <?php echo $shop['city']; ?> <br>
+                                            <p class="mt-0 mb-0"><?php echo $shop['location']; ?>, <?php echo $shop['city']; ?> <br>
                                                 <strong><small><?php echo implode(", ", $result); ?></small></strong>
                                             </p>
                                             <div>
