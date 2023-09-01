@@ -211,7 +211,7 @@ if ($largeView) {
                                 </td>
                             </tr>
                         </table>
-                        <table class="table" style="width: 100%; margin: 0">
+                        <table class="table" style="width: 100%; margin: 0;">
                             <tr>
                                 <td width="60" class="text-right">Customer:</td>
                                 <th><?php echo !empty($order['order']['customer_name']) ? $order['order']['customer_name'] : $foodpanda['full_name']; ?></th>

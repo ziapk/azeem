@@ -191,7 +191,7 @@ $qty = 0; ?>
     <table width="100%">
         <thead>
             <tr>
-                <th>
+                <th style="padding: 0">
                     <?php $net = abs(($price)); ?>
                     <table class="table head text-left" style="width: 100%; margin: 0 0 10px">
                         <tr>
