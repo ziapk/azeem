@@ -192,36 +192,34 @@ $qty = 0; ?>
         <thead>
             <tr>
                 <th>
-                    <div class="head text-left">
-                        <span class="pull-right">
-                            <img width="120" height="60" style="vertical-align: middle; margin-right: 5px; filter: grayscale(100%);" src="<?php echo $siteUrl; ?>assets/clients/<?php echo $shop['image']; ?>" />
-                        </span>
-                        <h3>
-                            <div style="padding-top: 10px"><?php echo strtoupper($shop['full_name']); ?>
-                                <p class="mt-0"><?php echo $shop['location']; ?>, <?php echo $shop['city']; ?> <br>
-                                    <strong><small><?php echo implode(", ", $result); ?></small></strong>
-                                </p>
-                                <div>
-                        </h3>
-                        <h2 style="text-align: center"><?php echo $configs['title']; ?></h2>
-                    </div>
                     <?php $net = abs(($price)); ?>
-                    <table class="table" style="width: 100%">
+                    <table class="table head text-left" style="width: 100%; margin: 0 0 10px">
+                        <tr>
+                            <td class="text-left" width="250">
+                                <h3>
+                                    <div style="padding-top: 10px"><?php echo strtoupper($shop['full_name']); ?>
+                                        <p class="mt-0"><?php echo $shop['location']; ?>, <?php echo $shop['city']; ?> <br>
+                                            <strong><small><?php echo implode(", ", $result); ?></small></strong>
+                                        </p>
+                                        <div>
+                                </h3>
+                            </td>
+                            <td>
+                                <h2 style="margin: 0 0 10px"><?php echo $configs['title']; ?></h2>
+                                <span style="font-weight: bold; font-size: 14px;">Bill Ref. <?php echo $_GET['id']; ?></span>
+                            </td>
+                            <td class="text-right" width="250">
+                                <img width="120" height="60" style="vertical-align: middle; margin-right: 5px; filter: grayscale(100%);" src="<?php echo $siteUrl; ?>assets/clients/<?php echo $shop['image']; ?>" />
+                            </td>
+                        </tr>
+                    </table>
+                    <table class="table" style="width: 100%; margin: 0">
                         <tr>
                             <td width="140" class="text-right"><?php echo $configs['label']; ?>:</td>
                             <th><?php echo $userEntry['title']; ?></th>
-                            <td width="120" class="text-right">Bill Ref.</td>
-                            <th style="font-size: 20px;"><?php echo $_GET['id']; ?></th>
+                            <td width="120" class="text-right">Date Time</td>
+                            <td width="120" class="text-right"><?php echo date('d/m/Y h:m A', strtotime($userEntry['datetime'])); ?></td>
                         </tr>
-                        <tr>
-                            <td class="text-right">Contact No.</td>
-                            <th></th>
-                            <td width="120" class="text-right">Date Time:</td>
-                            <th><?php echo date('d/m/Y', strtotime($userEntry['transaction_date'])); ?></th>
-                        </tr>
-                        <span class="ref"><strong></strong> </span>
-                        <span class="date"></span>
-                        <span class="ref"><strong></strong> </span>
                     </table>
                 </th>
             </tr>
@@ -251,7 +249,7 @@ $qty = 0; ?>
                                 </th>
                             </tr>
                             <tr>
-                                <th colspan="4" style="border: 0; height: 100px;">
+                                <th colspan="4" style="border: 0; height: 50px;">
                                     <table class="table" style="border-collapse: collapse; margin: 0 auto;">
                                         <tr>
                                             <?php if (empty($foodpanda['is_default'])) { ?>

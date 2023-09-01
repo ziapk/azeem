@@ -48,6 +48,16 @@ if (!empty($shop['phoneNumber3'])) {
     array_push($a, $shop['phoneNumber3']);
 }
 $result = array_filter($a, 'strlen');
+
+$configs = ['title' => 'Purchase Return Invoice', 'label' => 'Supplier', 'sign_label' => 'Supplier\'s Sign'];
+
+
+if ($order['order']['return_type'] == 1) {
+    $configs['title'] = 'Sales Return Invoice';
+    $configs['label'] = 'Customer';
+    $configs['sign_label'] = 'Customer\'s Sign';
+}
+
 if ($largeView) {
     $distTotal = 0;
     $qty = 0; ?>
@@ -184,33 +194,35 @@ if ($largeView) {
         <table width="100%">
             <thead>
                 <tr>
-                    <th style="padding: 0;">
-                        <div class="head text-left">
-                            <span class="pull-right">
-                                <img width="120" height="60" style="vertical-align: middle; margin-right: 5px; filter: grayscale(100%);" src="<?php echo $siteUrl; ?>assets/clients/<?php echo $shop['image']; ?>" />
-                            </span>
-                            <h3>
-                                <div style="padding: 0"><?php echo strtoupper($shop['full_name']); ?>
-                                    <p style="margin: 0"><?php echo $shop['location']; ?>, <?php echo $shop['city']; ?> <br>
-                                        <strong><small><?php echo implode(", ", $result); ?></small></strong>
-                                    </p>
-                                    <div>
-                            </h3>
-                        </div>
-                        <?php $net = abs($price); ?>
-                        <table class="table" style="width: 100%; margin-bottom: 0">
+                    <th>
+                        <?php $net = abs(($price)); ?>
+                        <table class="table head text-left" style="width: 100%; margin: 0 0 10px">
                             <tr>
-                                <td width="40" class="text-right"><?php echo $order['order']['return_type'] == 1 ? "Customer" : "Supplier"; ?></td>
-                                <th width="40" style="white-space: nowrap;"><?php echo !empty($order['order']['customer_name']) ? $order['order']['customer_name'] : $foodpanda['full_name']; ?></th>
-                                <th style="text-align: center;">
-                                    <span style="font-size: 1.5em;"><?php echo $order['order']['return_type'] == 1 ? "Sales " : "Purchase "; ?> Return Invoice</span> (<?php echo $_GET['id']; ?>)
-                                </th>
-                                <td width="40" class="text-right">Date:</td>
-                                <th width="40"><?php echo date('d/m/Y', strtotime($order['order']['return_date'])); ?></th>
+                                <td class="text-left" width="250">
+                                    <h3>
+                                        <div style="padding-top: 10px"><?php echo strtoupper($shop['full_name']); ?>
+                                            <p class="mt-0"><?php echo $shop['location']; ?>, <?php echo $shop['city']; ?> <br>
+                                                <strong><small><?php echo implode(", ", $result); ?></small></strong>
+                                            </p>
+                                            <div>
+                                    </h3>
+                                </td>
+                                <td>
+                                    <h2 style="margin: 0 0 10px"><?php echo $configs['title']; ?></h2>
+                                    <span style="font-weight: bold; font-size: 14px;">Ref.# <?php echo $_GET['id']; ?></span>
+                                </td>
+                                <td class="text-right" width="250">
+                                    <img width="120" height="60" style="vertical-align: middle; margin-right: 5px; filter: grayscale(100%);" src="<?php echo $siteUrl; ?>assets/clients/<?php echo $shop['image']; ?>" />
+                                </td>
                             </tr>
-                            <span class="ref"><strong></strong> </span>
-                            <span class="date"></span>
-                            <span class="ref"><strong></strong> </span>
+                        </table>
+                        <table class="table" style="width: 100%; margin: 0">
+                            <tr>
+                                <td width="60" class="text-left"><?php echo $configs['label']; ?>:</td>
+                                <th><?php echo !empty($order['order']['customer_name']) ? $order['order']['customer_name'] : $foodpanda['full_name']; ?></th>
+                                <td width="120" class="text-right">Date Time</td>
+                                <td width="120" class="text-right"><?php echo date('d/m/Y h:m A', strtotime($order['order']['datetime'])); ?></td>
+                            </tr>
                         </table>
                     </th>
                 </tr>

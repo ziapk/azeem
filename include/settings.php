@@ -3,6 +3,7 @@ if (!isset($_SESSION)) {
     session_start();
 }
 define('SITE_URL', '/');
+date_default_timezone_set('Asia/Karachi');
 
 // ini_set('display_errors', 1);
 // ini_set('display_startup_errors', 1);
