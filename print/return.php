@@ -51,7 +51,6 @@ $result = array_filter($a, 'strlen');
 
 $configs = ['title' => 'Purchase Return Invoice', 'label' => 'Supplier', 'sign_label' => 'Supplier\'s Sign'];
 
-
 if ($order['order']['return_type'] == 1) {
     $configs['title'] = 'Sales Return Invoice';
     $configs['label'] = 'Customer';
@@ -221,7 +220,7 @@ if ($largeView) {
                                 <td width="60" class="text-left"><?php echo $configs['label']; ?>:</td>
                                 <th><?php echo !empty($order['order']['customer_name']) ? $order['order']['customer_name'] : $foodpanda['full_name']; ?></th>
                                 <td width="120" class="text-right">Date Time</td>
-                                <td width="120" class="text-right"><?php echo date('d/m/Y h:m A', strtotime($order['order']['datetime'])); ?></td>
+                                <td width="120" class="text-right"><?php echo dbDateToClient($order['order']['datetime']); ?></td>
                             </tr>
                         </table>
                     </th>

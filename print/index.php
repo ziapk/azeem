@@ -216,7 +216,7 @@ if ($largeView) {
                                 <td width="60" class="text-right">Customer:</td>
                                 <th><?php echo !empty($order['order']['customer_name']) ? $order['order']['customer_name'] : $foodpanda['full_name']; ?></th>
                                 <td width="120" class="text-right">Date Time</td>
-                                <td width="120" class="text-right"><?php echo date('d/m/Y h:m A', strtotime($order['order']['created_at'])); ?></td>
+                                <td width="120" class="text-right"><?php echo dbDateToClient($order['order']['created_at']); ?></td>
                             </tr>
                         </table>
                     </th>

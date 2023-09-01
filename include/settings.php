@@ -202,7 +202,12 @@ $pinArr = [
     1 => 'Yes',
 ];
 
-
+function dbDateToClient($date, $format = 'd/m/Y h:m a', $from = 'US/Eastern', $to = 'Asia/Karachi')
+{
+    $cdate = new DateTime($date, new DateTimeZone($from));
+    $cdate->setTimezone(new DateTimeZone($to));
+    return $cdate->format($format);
+}
 function dateToSimple($date)
 {
     if ($date == '00-00-0000' || $date == '0000-00-00' || empty($date) || !$date || !isset($date)) {
