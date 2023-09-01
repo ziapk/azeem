@@ -202,7 +202,7 @@ $pinArr = [
     1 => 'Yes',
 ];
 
-function dbDateToClient($date, $format = 'd/m/Y h:m a', $from = 'US/Eastern', $to = 'Asia/Karachi')
+function dbDateToClient($date, $format = 'd/m/Y h:i a', $from = 'US/Eastern', $to = 'Asia/Karachi')
 {
     $cdate = new DateTime($date, new DateTimeZone($from));
     $cdate->setTimezone(new DateTimeZone($to));
