@@ -218,7 +218,7 @@ $qty = 0; ?>
                             <td width="140" class="text-right"><?php echo $configs['label']; ?>:</td>
                             <th><?php echo $userEntry['title']; ?></th>
                             <td width="120" class="text-right">Date Time</td>
-                            <td width="120" class="text-right"><?php echo dbDateToClient($userEntry['datetime']); ?></td>
+                            <td width="160" class="text-right"><?php echo dbDateToClient($userEntry['datetime']); ?></td>
                         </tr>
                     </table>
                 </th>

@@ -220,7 +220,7 @@ if ($largeView) {
                                 <td width="60" class="text-left"><?php echo $configs['label']; ?>:</td>
                                 <th><?php echo !empty($order['order']['customer_name']) ? $order['order']['customer_name'] : $foodpanda['full_name']; ?></th>
                                 <td width="120" class="text-right">Date Time</td>
-                                <td width="120" class="text-right"><?php echo dbDateToClient($order['order']['datetime']); ?></td>
+                                <td width="160" class="text-right"><?php echo dbDateToClient($order['order']['datetime']); ?></td>
                             </tr>
                         </table>
                     </th>

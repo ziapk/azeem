@@ -216,7 +216,7 @@ $qty = 0; ?>
                             <td width="60" class="text-left">Name:</td>
                             <th><?php echo !empty($foodpanda['name']) ? $foodpanda['name'] : $foodpanda['full_name']; ?></th>
                             <td width="120" class="text-right">Date Time</td>
-                            <td width="120" class="text-right"><?php echo dbDateToClient($order['order']['created_at']); ?></td>
+                            <td width="160" class="text-right"><?php echo dbDateToClient($order['order']['created_at']); ?></td>
                         </tr>
                     </table>
                 </th>
