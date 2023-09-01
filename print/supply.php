@@ -202,8 +202,8 @@ $qty = 0; ?>
                                 <h2 style="margin: 0 0 10px">Purchase Invoice <?php echo $order['order']['status'] == 1 ? '(Parked)' : null; ?></h2>
                                 <span style="font-weight: bold; font-size: 14px;">Bill.# <?php echo $_GET['id'];
                                                                                             if ($order['order']['ref_no']) {
-                                                                                            ?>?> | R:
-                                <?php echo $order['order']['ref_no'];
+                                                                                            ?> | R:
+                                    <?php echo $order['order']['ref_no'];
                                                                                             } ?></span>
                             </td>
                             <td class="text-right" width="250">
