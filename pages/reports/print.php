@@ -61,8 +61,9 @@ switch ($reportType) {
 			$product_ids[] = $_POST['product_id'];
 		}
 		$publisher_id = !empty($_POST['publisher_id']) ? $_POST['publisher_id'] : "";
-		if (!empty($product_ids) || !empty($publisher_id)) {
-			$orders = $ordersObj->ordersReport($shopId, $from, $to, $product_ids, $publisher_id);
+		$account_id = !empty($_POST['account_id']) ? $_POST['account_id'] : "";
+		if (!empty($product_ids) || !empty($publisher_id) || !empty($account_id)) {
+			$orders = $ordersObj->ordersReport($shopId, $from, $to, $product_ids, $publisher_id, $account_id);
 			include_once dirname(__FILE__) . '/salesProductsReport.php';
 		} else {
 			$orders = $ordersObj->ordersReport($shopId, $from, $to, $product_ids);

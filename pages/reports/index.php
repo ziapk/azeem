@@ -69,7 +69,7 @@ echo mainHeader(['page' => 'reports']);
                         <ui-select-choices group-by="'parent'" repeat="address in accountsList track by $index" refresh="refreshAccounts($select.search)" refresh-delay="0">
                             <div style="white-space: wrap;" ng-bind-html="address.title | highlight: $select.search"></div>
                         </ui-select-choices>
-                    </ui-select>{{publisher.selected.id}}
+                    </ui-select>
                     <input type="hidden" name="account_id" value="{{account.selected.id}}">
                 </div>
                 <div class="col-sm-4 col-md-3 form-group">
@@ -79,7 +79,7 @@ echo mainHeader(['page' => 'reports']);
                         <ui-select-choices repeat="address in publisherList track by $index" refresh="refreshPublishers($select.search)" refresh-delay="0">
                             <div style="white-space: wrap;" ng-bind-html="address.full_name | highlight: $select.search"></div>
                         </ui-select-choices>
-                    </ui-select>{{publisher.selected.id}}
+                    </ui-select>
                     <input type="hidden" name="publisher_id" value="{{publisher.selected.id}}">
                 </div>
 
