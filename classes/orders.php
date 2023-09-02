@@ -649,18 +649,21 @@ class Orders extends Connection
         }
     }
 
-    public function ordersReport($shopId, $date, $to, $ids = [], $publisher_id = null)
+    public function ordersReport($shopId, $date, $to, $ids = [], $publisher_id = null, $account_id = null)
     {
         try {
 
             $toCondition = " AND o.order_date>='" . $date . "' AND o.order_date<='" . $to . "' ";
 
-            if (!empty($publisher_id) || !empty($ids)) {
+            if (!empty($account_id) || !empty($publisher_id) || !empty($ids)) {
                 if (!empty($ids)) {
                     $toCondition .= " AND sub.product_id IN (" . implode(',', $ids) . ") ";
                 }
                 if (!empty($publisher_id)) {
                     $toCondition .= " AND p.publisher_id= $publisher_id ";
+                }
+                if (!empty($account_id)) {
+                    $toCondition .= " AND o.customer_id=c.id and c.account_id=$account_id ";
                 }
                 $stmt = "SELECT sub.*, o.order_custom_id, o.order_date, p.full_name as productName, c.full_name FROM `{$this->table_sub}` AS sub left join `{$this->table_pro}` as p on p.id = sub.product_id left join `{$this->table}` as o on sub.order_id = o.id LEFT JOIN customers AS c ON c.id = o.customer_id WHERE o.shopId=:shopId " . $toCondition . ' and o.flag = 1 ORDER BY o.order_date asc, sub.quantity desc';
             } else {
