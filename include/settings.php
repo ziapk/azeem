@@ -155,7 +155,7 @@ $orderStatusArr = [
     6 => ['id' => 6, 'full_name' => 'Return to Faulty'],
     7 => ['id' => 7, 'full_name' => 'Return as Partial'],
     8 => ['id' => 8, 'full_name' => 'Partial Paid'],
-    9 => ['id' => 9, 'full_name' => 'Not Paid']
+    9 => ['id' => 9, 'full_name' => 'Un-Paid']
 ];
 $orderPriority = [
     1 => 'No Priority',
