@@ -308,7 +308,7 @@ echo mainFooter();
                     $scope.items = $scope.list = [];
                     $scope.subTotal = $scope.discount = $scope.grandTotal = $scope.payment_amount = $scope.payment_with_credit = 0;
                     alert(response.data.message);
-                    // $window.location.reload()
+                    $window.location.reload()
                 });
         }
 
