@@ -92,8 +92,9 @@ if (!empty($_GET['all']) && $_GET['all'] == '1') {
         <?php } ?>
 
         <script>
-            app.controller('categoryController', function($scope, $http, $httpParamSerializerJQLike, $filter, $window, $document, $uibModal, $log, $location, $anchorScroll, $timeout) {
+            app.controller('categoryController', function($scope, $http, $httpParamSerializerJQLike, $filter, $window, $document, $uibModal, $log, $location, $anchorScroll, $timeout, $rootScope) {
                 $scope.list = []; //$scope.data.records;
+                console.log('mainList', $rootScope);
                 $scope.siteUrl = '<?php echo SITE_URL ?>';
                 $scope.demandDetail = <?php echo safe_json_encode($demandDetail); ?>;
                 $scope.shopId = '<?php echo !empty($_GET['shopId']) ? $_GET['shopId'] : $userData['shopId']; ?>';
@@ -140,7 +141,8 @@ if (!empty($_GET['all']) && $_GET['all'] == '1') {
 
                 $scope.searchProduct = function(term) {
                     if ($scope.shopId == $scope.currentShopId) {
-                        const filteredArray = window.mainList.records.filter(r => r.id == term || r.code == term || r.barcode == term || r.searchString.split('|').pop()?.toLowerCase().includes(term?.toLowerCase()) || r.searchString.includes(term + '|') || r.searchString.includes('|' + term) || r.searchString.includes('|' + term + '|'));
+
+                        const filteredArray = window.mainList.records.filter(r => r.id == term || r.code == term || r.barcode == term || r.searchString.split('|').pop()?.toLowerCase().includes(term?.toLowerCase()))
                         const secondfilteredArray = !filteredArray.length ? window.mainList.records.filter(obj => obj.searchString.toLowerCase().includes(term?.toLowerCase() || term)) : filteredArray;
 
                         return secondfilteredArray.slice(0, 30);
@@ -210,10 +212,10 @@ if (!empty($_GET['all']) && $_GET['all'] == '1') {
 
         <script type="text/ng-template" id="row.html">
             <a>
-      <span ng-bind-html="match.model.full_name | uibTypeaheadHighlight:query"></span>
-      <span class="pull-right">{{match.model.price}}</span>
-  </a>
-</script>
+                <span ng-bind-html="match.model.full_name | uibTypeaheadHighlight:query"></span>
+                <span class="pull-right">{{match.model.price}}</span>
+            </a>
+        </script>
 
         <?php
         echo mainFooter();

@@ -28,7 +28,7 @@ $shopId = $userData['role'] == 'owner' ? null : $userData['shopId'];
 
 if (!empty($session)) {
     $users = new Users();
-    $_SESSION['shop'] = $users->getShop($userData['shopId']);
+    $_SESSION['shop'] = $users->getShop($userData);
 }
 
 if (!empty($_SESSION['shopInfo'])) {
