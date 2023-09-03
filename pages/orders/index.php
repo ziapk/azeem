@@ -43,11 +43,12 @@ echo mainHeader(['page' => 'order']);
         <uib-tab select="getReport($event)" index="4" data-tab="sample" heading="Samples"></uib-tab>
     </uib-tabset>
     <table class="table">
-        <thead>
+        <thead style="font-size: .7em;">
             <tr>
                 <th>Sr.#</th>
                 <th>Order. #</th>
                 <th>Customer</th>
+                <th>Summery</th>
                 <th>Price</th>
                 <th ng-repeat="mode in modes">{{mode.title}}</th>
                 <th>Running</th>
@@ -59,7 +60,7 @@ echo mainHeader(['page' => 'order']);
         <tbody>
             <tr ng-repeat="row in data.records">
                 <td>{{$index + 1}}</td>
-                <td>
+                <td style="white-space: nowrap;">
                     <?php if ($userData['role'] == 'owner' || $userData['role'] == 'manager') { ?>
                         <a ng-if="row.recon == 0" class="btn btn-xs btn-danger" ng-click="reconcileRecipt(row.id, 1)" href="javascript:void(0)"><span class="fa fa-check"></span></a>
                         <a ng-if="row.recon == 1" class="btn btn-xs btn-success" ng-click="reconcileRecipt(row.id, 0)" href="javascript:void(0)"><span class="fa fa-check"></span></a>
@@ -70,11 +71,12 @@ echo mainHeader(['page' => 'order']);
                     <span>{{row.order_custom_id}}</span>
                 </td>
                 <td>{{row.customer_name || row.full_name}}</td>
+                <td width="200" style="font-size: .7em;">{{row.summery}}</td>
                 <td>{{row.price - row.discount | number: 0}}</td>
                 <td ng-repeat="mode in modes">{{row.prices[mode.id] | number: 0}}</td>
                 <td>{{row.runningTotal | number: 0}}</td>
-                <td>{{statusArr[row.status].full_name}}</td>
-                <td>{{row.order_date}}</td>
+                <td style="font-size: .8em;font-weight: bold;" ng-class="{'text-success': row.status == 2, 'text-primary': row.status == 1, 'text-danger': row.status == 9}">{{statusArr[row.status].full_name | uppercase}}</td>
+                <td>{{row.order_date | date: 'dd MMM'}}</td>
                 <td align="right" class="dropdown">
                     <?php if ($userData['role'] == 'owner') { ?>
                         <a uib-tooltip="EDIT" class="btn btn-default btn-xs" ng-if="row.status != 5" href="{{'<?php echo SITE_URL; ?>pages/recipt/edit.php?id=' + row.id }}" target="_blank"><span class="fa fa-edit"></span></a>
