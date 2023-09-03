@@ -22,8 +22,15 @@ $correction = !empty($_GET['correction']) ? $_GET['correction'] : false;
 $selectedPublisherId = !empty($_GET['selectedPublisherId']) ? $_GET['selectedPublisherId'] : false;
 $pin = !empty($_GET['bookmark']) ? $_GET['bookmark'] : "";
 $dup = !empty($_GET['dup']) ? $_GET['dup'] : "";
+$session = !empty($_GET['session']) ? $_GET['session'] : "";
 
 $shopId = $userData['role'] == 'owner' ? null : $userData['shopId'];
+
+if (!empty($session)) {
+    $users = new Users();
+    $_SESSION['shop'] = $users->getShop($userData['shopId']);
+}
+
 if (!empty($_SESSION['shopInfo'])) {
     if (!empty($selectedPublisherId) && !empty($correction)) {
         $search = $products->assignProductsPublisher($ownerId, ['page' => (int)$page, 'perPage' => (int)$perPage, 'search' => $search, 'searchBy' => $searchBy, 'courceId' => $courceId, 'group' => $group, 'board' => $board, 'full_name' => $full_name, 'author' => $author, 'sortByField' => $sortByField, 'sortByOrder' => $sortByOrder, 'pin' => $pin, 'dup' => $dup, 'publisher_id' => $publisher_id, 'product_type' => $product_type, 'correction' => $correction, 'selectedPublisherId' => $selectedPublisherId], $shopId);
