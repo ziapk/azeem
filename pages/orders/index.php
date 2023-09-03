@@ -119,7 +119,7 @@ echo mainHeader(['page' => 'order']);
         </tbody>
         <tfoot>
             <tr>
-                <th colspan="{{8 + modes.length}}">
+                <th colspan="{{9 + modes.length}}">
                     <table class="table table-hover" style="box-shadow: none; text-align: right" width="100%" cellspacing="0" cellpadding="0">
                         <tr>
                             <td style="text-align: right">Number of Orders</td>

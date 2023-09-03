@@ -6,21 +6,6 @@ $ownerId = $userData['role'] == 'owner' ? $userData['id'] : $userData['created_b
 $list = $productCls->getOwnerProducts($ownerId);
 ?>
 <div ng-controller="headerController">
-  <div class="dropdown navbar-fixed-top" style=" top: 60px; right: 0; left: auto; z-index: 1070">
-    <a href="#" class="nav-menu-item btn btn-primary" data-toggle="dropdown" uib-tooltip="Settings" tooltip-placement="left" title="">
-      <span class="fa fa-cog"></span>
-    </a>
-    <div class="dropdown-menu pull-right" style="padding: 15px; width: 320px">
-      <table width="100%" style="margin: auto; float: right">
-        <tr>
-          <td>
-            <input type="range" ng-model="fontsize" min="13" max="40" ng-change="updateFont(fontsize)" />
-          </td>
-          <td style="font-size: 14px;">Font:{{fontsize}}</td>
-        </tr>
-      </table>
-    </div>
-  </div>
   <nav class="navbar navbar-fixed-top" style="z-index: 1031">
     <div class="container-fluid">
       <!-- Brand and toggle get grouped for better mobile display -->
@@ -49,6 +34,21 @@ $list = $productCls->getOwnerProducts($ownerId);
               <li><a title="" href="<?php echo SITE_URL; ?>pages/profile">Profile</a></li>
               <li class="divider"></li>
               <li><a title="" href="<?php echo SITE_URL; ?>logout.php">Logout</a></li>
+              <li class="divider"></li>
+              <li style="padding: 0 10px">
+                <table width="100%" style="margin: auto;">
+                  <tr>
+                    <td>
+                      font-size: <strong>{{fontsize}}</strong>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <input type="range" ng-model="fontsize" min="13" max="40" ng-change="updateFont(fontsize)" />
+                    </td>
+                  </tr>
+                </table>
+              </li>
             </ul>
           </li>
         </ul>
