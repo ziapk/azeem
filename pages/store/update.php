@@ -19,9 +19,6 @@ if (!empty($_POST) && isset($_POST['update'])) {
         $error = "Please fill all fields";
     } else {
 
-
-
-
         $data = [
             'id' => $_GET['id'],
             'full_name' => $_POST['full_name'],
@@ -35,6 +32,7 @@ if (!empty($_POST) && isset($_POST['update'])) {
             'phoneNumber2' => !empty($_POST['phoneNumber2']) ? $_POST['phoneNumber2'] : "",
             'phoneNumber3' => !empty($_POST['phoneNumber3']) ? $_POST['phoneNumber3'] : "",
             'sale_terms' => !empty($_POST['sale_terms']) ? $_POST['sale_terms'] : "",
+            'sale_terms_lg' => !empty($_POST['sale_terms_lg']) ? $_POST['sale_terms_lg'] : "",
             'status' => !empty($_POST['status']) ? $_POST['status'] : 1,
         ];
 
@@ -141,7 +139,12 @@ $storeTypesArr = $storeObj->getStoreTypes();
                 </select>
             </div>
             <div class="col-sm-12 form-group">
+                <label>Sales Terms and Condition for Short Bill</label>
                 <textarea rows="4" name="sale_terms" maxlength="255" type="text" class="form-control" placeholder="Sales Terms and Conditions (Max: 255 characters)"><?php echo $storeData['sale_terms']; ?></textarea>
+            </div>
+            <div class="col-sm-12 form-group">
+                <label>Sales Terms and Condition for Large Bill</label>
+                <textarea rows="4" name="sale_terms_lg" maxlength="255" type="text" class="form-control" placeholder="Sales Terms and Conditions (Max: 255 characters)"><?php echo $storeData['sale_terms_lg']; ?></textarea>
             </div>
             <div class="col-sm-12">
                 <p class="text-right">

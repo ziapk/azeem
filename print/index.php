@@ -276,7 +276,7 @@ if ($largeView) {
                                     <th rowspan="2" style="border: 0; padding: 0" valign="middle" colspan="5">
                                         <table class="table" style="border-collapse: collapse; margin: 0">
                                             <tr>
-                                                <td style="border: 0; font-weight: 600;">Note: Books once sold nerver be returned or exchanged.</td>
+                                                <td style="border: 0; font-weight: 600;"><?php echo !empty($shop['sale_terms_lg']) ? 'Note: ' . $shop['sale_terms_lg'] : null; ?></td>
                                                 <?php if (empty($foodpanda['is_default'])) { ?>
                                                     <td width="120">Current Balance:</td>
                                                     <th width="60" style="text-align: right"><?php echo number_format(abs(($currentBalance))); ?></th>
