@@ -1,5 +1,5 @@
 <?php
-$totals = ['price' => 0, 'discount' => 0, 'paid' => 0, 'balance' => 0];
+$totals = ['price' => 0, 'samples_qty' => 0, 'samples' => 0, 'discount' => 0, 'paid' => 0, 'balance' => 0];
 ?>
 <center>
     <h2>Sales Orders</h2>
@@ -21,10 +21,16 @@ $totals = ['price' => 0, 'discount' => 0, 'paid' => 0, 'balance' => 0];
     <tbody>
         <?php $count = 1;
         foreach ($orders as $s) {
+            $tt = $s['price'] - $s['discount'];
 
-            $totals['qty'] += $s['quantity'];
-            $totals['price'] += $s['price'] * $s['quantity'];
-            $totals['discount'] += $s['discount'] * $s['quantity'];
+            if ($tt == 0) {
+                $totals['samples'] += $s['price'] * $s['quantity'];
+                $totals['samples_qty'] += $s['quantity'];
+            } else {
+                $totals['discount'] += $s['discount'] * $s['quantity'];
+                $totals['price'] += $s['price'] * $s['quantity'];
+                $totals['qty'] += $s['quantity'];
+            }
 
         ?>
             <tr>
@@ -56,6 +62,14 @@ $totals = ['price' => 0, 'discount' => 0, 'paid' => 0, 'balance' => 0];
         <tr>
             <th align="left">Total Products</th>
             <td><?php echo $totals['qty']; ?></td>
+        </tr>
+        <tr>
+            <th align="left">Samples Total</th>
+            <td><?php echo $totals['samples']; ?></td>
+        </tr>
+        <tr>
+            <th align="left">Samples QTY</th>
+            <td><?php echo $totals['samples_qty']; ?></td>
         </tr>
         <tr>
             <th align="left">Total Discount</th>
