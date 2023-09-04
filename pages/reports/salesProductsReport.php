@@ -23,8 +23,8 @@ $totals = ['price' => 0, 'discount' => 0, 'paid' => 0, 'balance' => 0];
         foreach ($orders as $s) {
 
             $totals['qty'] += $s['quantity'];
-            $totals['price'] += $s['price'];
-            $totals['discount'] += $s['discount'];
+            $totals['price'] += ($s['price'] - $s['discount']) * $s['quantity'];
+            $totals['discount'] += $s['discount'] * $s['quantity'];
 
         ?>
             <tr>
@@ -36,6 +36,7 @@ $totals = ['price' => 0, 'discount' => 0, 'paid' => 0, 'balance' => 0];
                 <td><?php echo $s['quantity']; ?></td>
                 <td><?php echo $s['price']; ?></td>
                 <td><?php echo $s['discount']; ?></td>
+                <td><?php echo ($s['price'] - $s['discount']) * $s['quantity']; ?></td>
             </tr>
         <?php $count++;
         } ?>
