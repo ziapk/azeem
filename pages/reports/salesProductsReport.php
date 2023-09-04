@@ -53,31 +53,31 @@ $totals = ['price' => 0, 'samples_qty' => 0, 'samples' => 0, 'discount' => 0, 'p
     <table class="table">
         <tr>
             <th align="left">Total Orders</th>
-            <td><?php echo sizeof($orders); ?></td>
+            <td align="right"><?php echo sizeof($orders); ?></td>
         </tr>
         <tr>
             <th align="left">Total Price</th>
-            <td><?php echo $totals['price']; ?></td>
+            <td align="right"><?php echo number_format($totals['price']); ?></td>
         </tr>
         <tr>
             <th align="left">Total Products</th>
-            <td><?php echo $totals['qty']; ?></td>
+            <td align="right"><?php echo $totals['qty']; ?></td>
         </tr>
         <tr>
             <th align="left">Total Discount</th>
-            <td><?php echo $totals['discount']; ?></td>
+            <td align="right"><?php echo number_format($totals['discount']); ?></td>
         </tr>
         <tr>
             <th align="left">Net Total</th>
-            <td><?php echo $totals['price'] - $totals['discount']; ?></td>
+            <td align="right"><?php echo number_format($totals['price'] - $totals['discount']); ?></td>
         </tr>
         <tr style="color: red">
             <th align="left">Samples Total</th>
-            <td><?php echo $totals['samples']; ?></td>
+            <td align="right"><?php echo number_format($totals['samples']); ?></td>
         </tr>
         <tr style="color: red">
             <th align="left">Samples Qty</th>
-            <td><?php echo $totals['samples_qty']; ?></td>
+            <td align="right"><?php echo $totals['samples_qty']; ?></td>
         </tr>
     </table>
 </div>
