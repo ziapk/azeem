@@ -75,7 +75,7 @@ echo mainHeader(['page' => 'order']);
                 <td>{{row.price - row.discount | number: 0}}</td>
                 <td ng-repeat="mode in modes">{{row.prices[mode.id] | number: 0}}</td>
                 <td>{{row.runningTotal | number: 0}}</td>
-                <td style="font-size: .8em;font-weight: bold;" ng-class="{'text-success': row.status == 2, 'text-primary': row.status == 1, 'text-danger': row.status == 9}">{{statusArr[row.status].full_name | uppercase}}</td>
+                <td><span class="label" ng-class="{'label-success': row.status == 2, 'label-primary': row.status == 1, 'label-danger': row.status == 9}">{{statusArr[row.status].full_name | uppercase}}</span></td>
                 <td>{{row.order_date | date: 'dd MMM'}}</td>
                 <td align="right" class="dropdown">
                     <?php if ($userData['role'] == 'owner') { ?>
