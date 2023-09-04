@@ -64,20 +64,20 @@ $totals = ['price' => 0, 'samples_qty' => 0, 'samples' => 0, 'discount' => 0, 'p
             <td><?php echo $totals['qty']; ?></td>
         </tr>
         <tr>
-            <th align="left">Samples Total</th>
-            <td><?php echo $totals['samples']; ?></td>
-        </tr>
-        <tr>
-            <th align="left">Samples QTY</th>
-            <td><?php echo $totals['samples_qty']; ?></td>
-        </tr>
-        <tr>
             <th align="left">Total Discount</th>
             <td><?php echo $totals['discount']; ?></td>
         </tr>
         <tr>
             <th align="left">Net Total</th>
             <td><?php echo $totals['price'] - $totals['discount']; ?></td>
+        </tr>
+        <tr style="color: red">
+            <th align="left">Samples Total</th>
+            <td><?php echo $totals['samples']; ?></td>
+        </tr>
+        <tr style="color: red">
+            <th align="left">Samples Qty</th>
+            <td><?php echo $totals['samples_qty']; ?></td>
         </tr>
     </table>
 </div>
