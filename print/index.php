@@ -190,12 +190,12 @@ if ($largeView) {
         }
     </style>
     <div class="recipt large">
-        <table width="100%">
+        <table width="100%" cellspading="0" cellspacing="0">
             <thead>
                 <tr>
                     <th style="padding: 0">
                         <?php $net = abs(($price - $order['order']['discount'])); ?>
-                        <table class="table head text-left" style="width: 100%; margin: 0">
+                        <table class="table head text-left" style="width: 100%; margin: 0" cellspading="0" cellspacing="0">
                             <tr>
                                 <td class="text-left" width="250">
                                     <h3>
@@ -215,7 +215,7 @@ if ($largeView) {
                                 </td>
                             </tr>
                         </table>
-                        <table class="table" style="width: 100%; margin: 0;">
+                        <table class="table" style="width: 100%; margin: 0;" cellspading="0" cellspacing="0">
                             <tr>
                                 <td width="60" class="text-right">Customer:</td>
                                 <th><?php echo !empty($order['order']['customer_name']) ? $order['order']['customer_name'] : $foodpanda['full_name']; ?></th>

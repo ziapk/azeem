@@ -186,12 +186,12 @@ $qty = 0; ?>
     }
 </style>
 <div class="recipt large">
-    <table width="100%">
+    <table width="100%" cellspading="0" cellspacing="0">
         <thead>
             <tr>
                 <th style="padding: 0">
                     <?php $net = abs(($price)); ?>
-                    <table class="table head text-left" style="width: 100%; margin: 0">
+                    <table class="table head text-left" style="width: 100%; margin: 0" cellspading="0" cellspacing="0">
                         <tr>
                             <td class="text-left" width="250">
                                 <h3>
@@ -215,7 +215,7 @@ $qty = 0; ?>
                             </td>
                         </tr>
                     </table>
-                    <table class="table" style="width: 100%; margin: 0">
+                    <table class="table" style="width: 100%; margin: 0" cellspading="0" cellspacing="0">
                         <tr>
                             <td width="60" class="text-left">Name:</td>
                             <th><?php echo !empty($foodpanda['name']) ? $foodpanda['name'] : $foodpanda['full_name']; ?></th>
@@ -228,7 +228,7 @@ $qty = 0; ?>
         </thead>
         <tbody>
             <tr>
-                <td>
+                <td style="padding: 0">
                     <table class="recipt-table" width="100%" cellpadding="0" cellspacing="0">
                         <thead>
                             <tr>

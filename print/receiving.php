@@ -192,12 +192,12 @@ $qty = 0; ?>
     }
 </style>
 <div class="recipt large">
-    <table width="100%">
+    <table width="100%" cellspading="0" cellspacing="0">
         <thead>
             <tr>
                 <th style="padding: 0">
                     <?php $net = abs(($price)); ?>
-                    <table class="table head text-left" style="width: 100%; margin: 0">
+                    <table class="table head text-left" style="width: 100%; margin: 0" cellspading="0" cellspacing="0">
                         <tr>
                             <td class="text-left" width="250">
                                 <h3>
@@ -217,7 +217,7 @@ $qty = 0; ?>
                             </td>
                         </tr>
                     </table>
-                    <table class="table" style="width: 100%; margin: 0">
+                    <table class="table" style="width: 100%; margin: 0" cellspading="0" cellspacing="0">
                         <tr>
                             <td width="140" class="text-right"><?php echo $configs['label']; ?>:</td>
                             <th><?php echo $userEntry['title']; ?></th>
@@ -230,8 +230,8 @@ $qty = 0; ?>
         </thead>
         <tbody>
             <tr>
-                <td>
-                    <table class="recipt-table" width="100%" cellpadding="0" cellspacing="0">
+                <td style="padding: 0;">
+                    <table class="recipt-table" width="100%" cellpadding="0" cellspacing="0" cellspading="0" cellspacing="0">
                         <thead>
                             <tr>
                                 <th width="40" class="text-left thead">Sr.#</th>
