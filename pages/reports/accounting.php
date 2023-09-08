@@ -243,22 +243,20 @@ ob_start();
 	if (!empty($reportDataOther['expenses']['rows'])) { ?>
 		<h4 style="margin: 10px 0">Expenses Summery</h4>
 		<table class="table" id="resultTable" width="100%" style="border-collapse: collapse" border="1">
-			<?php
-			print_r(array_chunk($reportDataOther['expenses']['rows'], 7));
-			foreach (array_chunk($reportDataOther['expenses']['rows'], 7) as $rows) { ?>
-				<?php foreach ($rows as $date => $value) {
-					$total = 0;
-				?>
+			<?php foreach ($reportDataOther['expenses']['rows'] as $date => $value) {
+				$total = 0;
+				foreach (array_chunk($value['row'], 7) as $mainRows) {
+			?>
 					<tr>
 						<th rowspan="2">Date</th>
-						<?php foreach ($value['row'] as $row) {
+						<?php foreach ($mainRows as $row) {
 							$title = array_values($row)[0]['title'];
 						?>
 							<th colspan="<?php echo count($modesList['records']); ?>"><?php echo $title; ?></th>
 						<?php }; ?>
 					</tr>
 					<tr>
-						<?php foreach ($value['row'] as $row) { ?>
+						<?php foreach ($mainRows as $row) { ?>
 							<?php foreach ($modesList['records'] as $rr) {
 								$tag = ($cashModeId == $rr['id']) ? 'th' : 'td';
 
@@ -270,7 +268,7 @@ ob_start();
 					<tr>
 						<td><?php echo $date; ?></td>
 						<?php
-						foreach ($value['row'] as $id => $row3) {
+						foreach ($mainRows as $id => $row3) {
 							$cashTotals["exp"] += $row3[$cashModeId]['amount'];
 							foreach ($modesList['records'] as $rr) {
 
