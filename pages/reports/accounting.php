@@ -245,7 +245,7 @@ ob_start();
 		<table class="table" id="resultTable" width="100%" style="border-collapse: collapse" border="1">
 			<?php foreach ($reportDataOther['expenses']['rows'] as $date => $value) {
 				$total = 0;
-				foreach (array_chunk($value['row'], 7) as $mainRows) {
+				foreach (array_chunk($value['row'], 6) as $mainRows) {
 			?>
 					<tr>
 						<th rowspan="2">Date</th>
