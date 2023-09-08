@@ -261,7 +261,7 @@ ob_start();
 								$tag = ($cashModeId == $rr['id']) ? 'th' : 'td';
 
 							?>
-								<<?php echo $tag; ?> style="text-align: center"><?php echo $rr['title']; ?></<?php echo $tag; ?>>
+								<<?php echo $tag; ?> style="text-align: center; font-size: 10px"><?php echo $rr['title']; ?></<?php echo $tag; ?>>
 							<?php }; ?>
 						<?php }; ?>
 					</tr>
