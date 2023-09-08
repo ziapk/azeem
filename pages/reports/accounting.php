@@ -243,7 +243,9 @@ ob_start();
 	if (!empty($reportDataOther['expenses']['rows'])) { ?>
 		<h4 style="margin: 10px 0">Expenses Summery</h4>
 		<table class="table" id="resultTable" width="100%" style="border-collapse: collapse" border="1">
-			<?php foreach (array_chunk($reportDataOther['expenses']['rows'], 7) as $rows) { ?>
+			<?php
+			print_r(array_chunk($reportDataOther['expenses']['rows'], 7));
+			foreach (array_chunk($reportDataOther['expenses']['rows'], 7) as $rows) { ?>
 				<?php foreach ($rows as $date => $value) {
 					$total = 0;
 				?>
