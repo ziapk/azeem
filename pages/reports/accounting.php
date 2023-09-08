@@ -243,42 +243,44 @@ ob_start();
 	if (!empty($reportDataOther['expenses']['rows'])) { ?>
 		<h4 style="margin: 10px 0">Expenses Summery</h4>
 		<table class="table" id="resultTable" width="100%" style="border-collapse: collapse" border="1">
-			<?php foreach ($reportDataOther['expenses']['rows'] as $date => $value) {
-				$total = 0;
-			?>
-				<tr>
-					<th rowspan="2">Date</th>
-					<?php foreach ($value['row'] as $row) {
-						$title = array_values($row)[0]['title'];
-					?>
-						<th colspan="<?php echo count($modesList['records']); ?>"><?php echo $title; ?></th>
-					<?php }; ?>
-				</tr>
-				<tr>
-					<?php foreach ($value['row'] as $row) { ?>
-						<?php foreach ($modesList['records'] as $rr) {
-							$tag = ($cashModeId == $rr['id']) ? 'th' : 'td';
-
+			<?php foreach (array_chunk($reportDataOther['expenses']['rows'], 7) as $rows) { ?>
+				<?php foreach ($rows as $date => $value) {
+					$total = 0;
+				?>
+					<tr>
+						<th rowspan="2">Date</th>
+						<?php foreach ($value['row'] as $row) {
+							$title = array_values($row)[0]['title'];
 						?>
-							<<?php echo $tag; ?> style="text-align: center"><?php echo $rr['title']; ?></<?php echo $tag; ?>>
+							<th colspan="<?php echo count($modesList['records']); ?>"><?php echo $title; ?></th>
 						<?php }; ?>
-					<?php }; ?>
-				</tr>
-				<tr>
-					<td><?php echo $date; ?></td>
-					<?php
-					foreach ($value['row'] as $id => $row3) {
-						$cashTotals["exp"] += $row3[$cashModeId]['amount'];
-						foreach ($modesList['records'] as $rr) {
+					</tr>
+					<tr>
+						<?php foreach ($value['row'] as $row) { ?>
+							<?php foreach ($modesList['records'] as $rr) {
+								$tag = ($cashModeId == $rr['id']) ? 'th' : 'td';
 
-							$tag = ($cashModeId == $rr['id']) ? 'th' : 'td';
-					?>
-							<<?php echo $tag; ?> align="right"><?php echo number_format($row3[$rr['id']]['amount'], 0); ?></<?php echo $tag; ?>>
-						<?php };
+							?>
+								<<?php echo $tag; ?> style="text-align: center"><?php echo $rr['title']; ?></<?php echo $tag; ?>>
+							<?php }; ?>
+						<?php }; ?>
+					</tr>
+					<tr>
+						<td><?php echo $date; ?></td>
+						<?php
+						foreach ($value['row'] as $id => $row3) {
+							$cashTotals["exp"] += $row3[$cashModeId]['amount'];
+							foreach ($modesList['records'] as $rr) {
+
+								$tag = ($cashModeId == $rr['id']) ? 'th' : 'td';
 						?>
-					<?php } ?>
-				</tr>
-			<?php } ?>
+								<<?php echo $tag; ?> align="right"><?php echo number_format($row3[$rr['id']]['amount'], 0); ?></<?php echo $tag; ?>>
+							<?php };
+							?>
+						<?php } ?>
+					</tr>
+			<?php }
+			} ?>
 		</table>
 	<?php } ?>
 	<h5 style="margin: 5px 0">Other Totals</h5>
