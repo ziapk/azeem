@@ -266,7 +266,7 @@ ob_start();
 						<?php }; ?>
 					</tr>
 					<tr>
-						<td><?php echo $date; ?></td>
+						<td style="white-space: nowrap;"><?php echo $date; ?></td>
 						<?php
 						foreach ($mainRows as $id => $row3) {
 							$cashTotals["exp"] += $row3[$cashModeId]['amount'];
