@@ -4,7 +4,7 @@ echo mainHeader(['page' => 'publisher']);
 ?>
 
 <div class="container" ng-controller="publisherController">
-    <a href="javascript:void(0)" style="margin-right: 10px" ng-click="addPublisher()" class="btn btn-primary btn-xs pull-right">Add Publisher</a>
+    <a href="javascript:void(0)" style="margin-right: 10px" ng-click="addPublisher({pin: 0})" class="btn btn-primary btn-xs pull-right">Add Publisher</a>
     <h4 class="section-title">All Publisher</h4>
     <div class="form-group">
         <input class="form-control" ng-change="searchPublishers()" ng-model="search" placeholder="Type here for search..." />
