@@ -61,7 +61,7 @@ try {
             // rollback products first
             $products = new Products();
             foreach ($orderDetail['order_items'] as $prod) {
-                $products->addProductQty($prod['product_id'], $prod['quantity'], $orderDetail['order']['shopId']);
+                $products->subProductQty(['product_id' => $prod['product_id'], 'quantity' => -1 * $prod['quantity'], 'pack_qty' => $prod['pack_qty'], 'owner_id' => $userData['role'] == 'owner' ? $userData['id'] : $userData['created_by'], 'shopId' => $orderDetail['order']['shopId']]);
             }
 
             // delete transactions
@@ -88,6 +88,8 @@ try {
                     'order_id' => $order_id,
                     'description' => $item['description'],
                     'quantity' => $item['qty'],
+                    'pack_size' => !empty($item['pack_size']) ? $item['pack_size'] : 0,
+                    'pack_qty' => !empty($item['pack_qty']) ? $item['pack_qty'] : 0,
                     'discount' => !empty($item['discount']) ? $item['discount'] : 0,
                     'discount_type' => !empty($item['discount_type']) ? $item['discount_type'] : 1,
                     'price' => $item['price'],

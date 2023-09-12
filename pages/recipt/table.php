@@ -87,10 +87,21 @@ foreach ($statuses as  $value) {
         <td width="100">
             <input class="form-control text-center" type="number" ng-model="addprice" ng-change="directlyPrice(addprice, cart)" ng-keydown="initCheckKeypress($event)">
         </td>
-        <td>
-            {{(cart.price - cart.discount) * cart.qty | number: 2}}
-            <a href="#" class="btn btn-xs btn-danger pull-right" ng-click="remove(cart)">Delete</a>
+        <td rowspan="2" style="text-align: right;">
+            <strong>{{(cart.price - cart.discount) * cart.qty | number: 2}}</strong>
+            <a style="margin-left: 8px;" href="#" class="btn btn-xs btn-danger pull-right" ng-click="remove(cart)">Delete</a>
         </td>
+    </tr>
+    <tr>
+        <td class="text-right">Bundles</td>
+        <td colspan="{{show_discount ? 2 : 1}}">
+            <input type="number" class="form-control" ng-model="cart.pack_qty" placeholder="No of Bundles" ng-change="calculateSum()" />
+        </td>
+        <td class="text-right">Bundle Size</td>
+        <td colspan="2">
+            <input type="number" class="form-control" ng-model="cart.pack_size" placeholder="Products In Bundle" ng-change="calculateSum()" />
+        </td>
+        <td></td>
     </tr>
     <tr ng-if="cart.product_type == 2">
         <td colspan="2"><strong>Services Items</strong></td>
@@ -203,33 +214,33 @@ foreach ($statuses as  $value) {
             <textarea class="form-control" rows="10" placeholder="Summery" ng-model="summery"></textarea>
         </td>
         <td class="text-right">Sub Total</td>
-        <td>{{(subTotal + discountPercentValue) | number: 2}}</td>
+        <td class="text-right" style="font-weight: bold; font-size: 1.5em">{{(subTotal + discountPercentValue) | number: 2}}</td>
     </tr>
     <tr>
         <td width="150" class="text-right">Add Discount</td>
         <td width="150"><input type="search" ng-model="discountAmount" class="form-control" on-enter-press="addDiscount(discountAmount)"></td>
     </tr>
     <tr>
-        <td class="text-right" style="color: red; front-weight: bold;">Additional Discount</td>
-        <td style="color: red; front-weight: bold;"><strong>{{discount | number: 2}}</strong></td>
+        <td class="text-right" style="color: red; font-weight: bold;">Additional Discount</td>
+        <td style="color: red; font-weight: bold; font-size: 1.5em" class="text-right"><strong>{{discount | number: 2}}</strong></td>
     </tr>
     <tr>
-        <td class="text-right" style="color: red; front-weight: bold;">Total Discount</td>
-        <td style="color: red; front-weight: bold;"><strong>{{(discount + discountPercentValue) | number: 2}}</strong></td>
+        <td class="text-right" style="color: red; font-weight: bold;">Total Discount</td>
+        <td style="color: red; font-weight: bold; font-size: 1.5em" class="text-right"><strong>{{(discount + discountPercentValue) | number: 2}}</strong></td>
     </tr>
     <tr>
         <td class="text-right">Grand Total</td>
-        <td class="text-success">{{grandTotal | number: 2}}</td>
+        <td class="text-success text-right" style="font-weight: bold; font-size: 1.5em">{{grandTotal | number: 2}}</td>
     </tr>
     <tr ng-repeat="m in modes">
-        <td class="text-right text-success" style="front-weight: bold;">Pay with {{modeNames[m.id]}}</td>
+        <td class="text-right text-success" style="font-weight: bold;">Pay with {{modeNames[m.id]}}</td>
         <td>
             <input class="form-control" type="number" ng-change="calculatePayment(payWith)" ng-model="payWith[m.id].amount" />
         </td>
     </tr>
     <tr>
         <td class="text-right">Balance</td>
-        <td>{{grandTotal - payment_total | number: 2}}</td>
+        <td class="text-right" style="font-weight: bold; font-size: 1.5em">{{grandTotal - payment_total | number: 2}}</td>
     </tr>
 </tbody>
 <tbody>

@@ -54,9 +54,20 @@ if (empty($_POST['order_id'])) {
 $doubleEntry = new DoubleEntry();
 if (!empty($_POST['returnOrder'])) {
 
-    $order = $orders->getReturnOrder($_POST['returnOrder']);
+    $orderDetail = $order = $orders->getReturnOrder($_POST['returnOrder']);
 
     if (!empty($order['order']['id'])) {
+
+        // rollback products first
+        foreach ($orderDetail['order_items'] as $prod) {
+            $qty = 0;
+            $pack_qty = 0;
+            if ($returnType == 1) {
+                $products->subProductQty(['product_id' => $prod['product_id'], 'quantity' => $prod['quantity'], 'pack_qty' => $prod['pack_qty'], 'owner_id' => $storeDATA['owner_id'], 'shopId' => $storeDATA['id']]);
+            } else {
+                $products->addProductQty($prod['product_id'], ['qty' => $prod['quantity'], 'pack_qty' => $prod['pack_qty']], $storeDATA['id']);
+            }
+        }
         $orders->deleteReturnOrderItem($order['order']['id']);
         // delete transactions
         $doubleEntry->deleteTransactionByReturnId($_POST['returnOrder']);
@@ -85,6 +96,9 @@ foreach ($_POST['items'] as $key => $value) {
         'order_id' => $returnId,
         'product_id' => $value['product_id'],
         'quantity' => $value['qty'],
+        "owner_id" => $storeDATA['owner_id'],
+        'pack_size' => !empty($value['pack_size']) ? $value['pack_size'] : 0,
+        'pack_qty' => !empty($value['pack_qty']) ? $value['pack_qty'] : 0,
         'price' => $value['price'],
         'discount_type' => !empty($value['discount_type']) ? $value['discount_type'] : 1,
         'discount_value' => !empty($value['discount_value']) ? $value['discount_value'] : 0,

@@ -120,7 +120,7 @@ class Orders extends Connection
     public function orderReturnAll($array, $reverse = false)
     {
         try {
-            $stmt = "INSERT INTO `{$this->table_rp}` (`user_id`, `shopId`, `order_id`, `product_id`, `quantity`, `price`, `discount`, `discount_type`, `discount_value`, `type`) VALUES (:user_id, :shopId, :order_id, :product_id, :quantity, :price, :discount, :discount_type, :discount_value, :type)";
+            $stmt = "INSERT INTO `{$this->table_rp}` (`user_id`, `shopId`, `order_id`, `product_id`, `quantity`, `price`, `discount`, `discount_type`, `discount_value`, `type`, `pack_size`, `pack_qty`) VALUES (:user_id, :shopId, :order_id, :product_id, :quantity, :price, :discount, :discount_type, :discount_value, :type, :pack_size, :pack_qty)";
             $prepare = $this->dbh->prepare($stmt);
             $prepare->bindParam(':user_id', $array['user_id'], PDO::PARAM_STR);
             $prepare->bindParam(':shopId', $array['shopId'], PDO::PARAM_STR);
@@ -132,11 +132,19 @@ class Orders extends Connection
             $prepare->bindParam(':discount_type', $array['discount_type'], PDO::PARAM_STR);
             $prepare->bindParam(':discount_value', $array['discount_value'], PDO::PARAM_STR);
             $prepare->bindParam(':type', $array['type'], PDO::PARAM_STR);
+            $prepare->bindParam(':pack_size', $array['pack_size'], PDO::PARAM_STR);
+            $prepare->bindParam(':pack_qty', $array['pack_qty'], PDO::PARAM_STR);
             $prepare->execute();
             $result = $this->dbh->lastInsertId();
             $products = new Products();
-            $qty = $reverse ? (-1 * $array['quantity']) : $array['quantity'];
-            $products->addProductQty($array['product_id'], $qty, $array['shopId']);
+            $qty = -1 * $array['quantity'];
+            $pack_qty = -1 * $array['pack_qty'];
+            if ($reverse) {
+                $products->addProductQty($array['product_id'], ['qty' => $qty, 'pack_qty' => $pack_qty, 'pack_size' => $array['pack_size']], $array['shopId']);
+            } else {
+                $products->subProductQty(['product_id' => $array['product_id'], 'quantity' => $qty, 'pack_qty' => $pack_qty, 'owner_id' => $array['owner_id'], 'shopId' => $array['shopId']]);
+            }
+
             // $this->orderReturn($array['order_id'], ($action + 4));
             // if(!empty($delete)) {
             //     $this->deleteOrderItem($array['order_id'], $array['product_id']);
@@ -275,7 +283,8 @@ class Orders extends Connection
     public function createOrderDetails($array)
     {
         try {
-            $stmt = "INSERT INTO `{$this->table_sub}` (`order_id`, `product_id`, `quantity`, `price`, `discount`, `discount_type`, `description`, `item_status`, `employee_id`, `start_date`, `end_date`, `priority`) VALUES (:order_id, :product_id, :quantity, :price, :discount, :discount_type, :description, :item_status,:employee_id,:start_date,:end_date, :priority)";
+
+            $stmt = "INSERT INTO `{$this->table_sub}` (`order_id`, `product_id`, `quantity`, `price`, `discount`, `discount_type`, `description`, `item_status`, `employee_id`, `start_date`, `end_date`, `priority`, `pack_size`, `pack_qty`) VALUES (:order_id, :product_id, :quantity, :price, :discount, :discount_type, :description, :item_status,:employee_id,:start_date,:end_date, :priority, :pack_size, :pack_qty)";
             $prepare = $this->dbh->prepare($stmt);
             $prepare->bindParam(':order_id', $array['order_id'], PDO::PARAM_STR);
             $prepare->bindParam(':product_id', $array['product_id'], PDO::PARAM_STR);
@@ -289,6 +298,8 @@ class Orders extends Connection
             $prepare->bindParam(':start_date', $array['start_date'], PDO::PARAM_STR);
             $prepare->bindParam(':end_date', $array['end_date'], PDO::PARAM_STR);
             $prepare->bindParam(':priority', $array['priority'], PDO::PARAM_STR);
+            $prepare->bindParam(':pack_size', $array['pack_size'], PDO::PARAM_STR);
+            $prepare->bindParam(':pack_qty', $array['pack_qty'], PDO::PARAM_STR);
             $prepare->execute();
             $result = $this->dbh->lastInsertId();
             foreach ($array['services'] as $value) {

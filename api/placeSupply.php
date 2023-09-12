@@ -101,6 +101,8 @@ if (sizeof($_POST['items'])) {
                 'price' => $item['price'],
                 'discount' => !empty($item['discount']) ? $item['discount'] : 0,
                 'qty' => $item['qty'],
+                'pack_size' => !empty($item['pack_size']) ? $item['pack_size'] : 0,
+                'pack_qty' => !empty($item['pack_qty']) ? $item['pack_qty'] : 0,
                 'stock_out' => 0,
                 'pin' => $item['pin'],
                 'minQty' => $item['minQty'],
@@ -113,6 +115,18 @@ if (sizeof($_POST['items'])) {
     }
 }
 
+$supply = new Supply();
+
+if (!empty($_POST['id'])) {
+    $orderDetail = $supply->getOrder($_POST['id']);
+    // rollback products first
+    foreach ($orderDetail['order_items'] as $prod) {
+        $products->addProductQty($prod['product_id'], ['qty' => -1 * $prod['quantity'], 'pack_size' => $prod['pack_size'], 'pack_qty' => -1 * $prod['pack_qty']], $orderDetail['order']['shopId']);
+    }
+    // delete transactions
+    $de->deleteTransactionBySupplyId($orderDetail['order']['id']);
+}
+
 if (sizeof($items)) {
 
     foreach ($items as $item) {
@@ -122,7 +136,7 @@ if (sizeof($items)) {
         }
     }
 }
-$supply = new Supply();
+
 $supplier = $supplierObj->getSupplier($supplierId);
 $data = [
     'user_id' => $userData['id'],
@@ -140,9 +154,6 @@ $data = [
     'supply_date' => $shop['sale_date']
 ];
 
-if (!empty($_POST['id'])) {
-    $de->deleteTransactionBySupplyId($_POST['id']);
-}
 $supply_id = $supply->createSupply($data);
 $dd = 0;
 if (sizeof($demandProducts)) {
@@ -169,6 +180,8 @@ if ($supply_id) {
                 'quantity' => $item['qty'],
                 'discount' => !empty($item['discount']) ? $item['discount'] : 0,
                 'price' => $item['price'],
+                'pack_size' => !empty($item['pack_size']) ? $item['pack_size'] : 0,
+                'pack_qty' => !empty($item['pack_qty']) ? $item['pack_qty'] : 0,
             ];
             $supply->createSupplyDetails($d);
         }

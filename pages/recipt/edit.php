@@ -337,6 +337,10 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                 let subtotal = 0;
                 $scope.discountPercentValue = 0;
                 $scope.items.map((product) => {
+                    if (product.pack_qty) {
+                        product.pack_size = product.pack_size || 1;
+                        product.qty = product.pack_size * product.pack_qty;
+                    }
                     if (product.product_type == 1 || product.product_type != 1 && !product.services?.length && !product.raw_items?.length) {
                         if (product.discount_type == 2) {
                             product.discount = parseFloat(product.discount_value)
@@ -443,6 +447,8 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                     full_name: obj?.full_name || row.product_title,
                     discount: row.discount?.toString(),
                     qty: row.quantity,
+                    pack_qty: parseFloat(row.pack_qty || 0),
+                    pack_size: parseFloat(row.pack_size || 0),
                     discount_value: row.discount_type == 2 ? parseFloat(row.discount) : (parseFloat(row.discount || 0) / row.price) * 100,
                 })
             });
@@ -722,6 +728,8 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                             id,
                             description,
                             qty,
+                            pack_size,
+                            pack_qty,
                             discount,
                             discount_type,
                             price,
@@ -735,6 +743,8 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                             id,
                             description,
                             qty,
+                            pack_size,
+                            pack_qty,
                             discount,
                             discount_type,
                             start_date: expected_dates?.startDate ? moment(expected_dates.startDate).format('YYYY-MM-DD') : null,

@@ -96,6 +96,8 @@ echo mainFooter();
             ...item,
             full_name: item.product_title || item.full_name,
             price: parseFloat(item.price),
+            pack_qty: parseFloat(item.pack_qty),
+            pack_size: parseFloat(item.pack_size),
             quantity: parseFloat(item.quantity),
             qty: parseFloat(item.quantity),
             discount: parseFloat(item.discount)
@@ -317,6 +319,9 @@ echo mainFooter();
             $scope.items.map((product) => {
                 if (price) {
                     product.pprice = parseFloat((product.price * ((100 - (parseFloat(product.discount || 0))) / 100)).toFixed(2));
+                }
+                if (product.pack_size) {
+                    product.qty = product.pack_size * product.pack_qty;
                 }
                 subtotal += parseFloat((product.pprice * product.qty).toFixed(2));
                 product.total = parseFloat((product.pprice * product.qty).toFixed(2))

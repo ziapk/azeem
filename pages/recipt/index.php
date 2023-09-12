@@ -363,6 +363,8 @@ echo mainFooter();
             shopCart.map(function(row) {
                 items.push({
                     ...row,
+                    pack_qty: parseFloat(row.pack_qty || 0),
+                    pack_size: parseFloat(row.pack_size || 0),
                     discount: row.discount?.toString(),
                     discount_value: row.discount_value?.toString(),
                 })
@@ -612,6 +614,8 @@ echo mainFooter();
                     items: $scope.items.map(({
                         id,
                         description,
+                        pack_size,
+                        pack_qty,
                         qty,
                         discount,
                         discount_type,
@@ -625,6 +629,8 @@ echo mainFooter();
                     }) => ({
                         id,
                         description,
+                        pack_size,
+                        pack_qty,
                         qty,
                         discount,
                         discount_type,
@@ -695,6 +701,10 @@ echo mainFooter();
             let subtotal = 0;
             $scope.discountPercentValue = 0;
             $scope.items.map((product) => {
+                if (product.pack_qty) {
+                    product.pack_size = product.pack_size || 1;
+                    product.qty = product.pack_size * product.pack_qty;
+                }
                 if (product.product_type == 1 || product.product_type != 1 && !product.services?.length && !product.raw_items?.length) {
                     if (product.discount_type == 2) {
                         product.discount = product.discount_value

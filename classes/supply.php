@@ -99,7 +99,7 @@ class Supply extends Connection
     public function createSupplyDetails($array)
     {
         try {
-            $stmt = "INSERT INTO `{$this->table_sub}` (`supply_id`, `product_id`, `product_title`, `quantity`, `price`, `discount`) VALUES (:supply_id, :product_id, :product_title, :quantity, :price, :discount)";
+            $stmt = "INSERT INTO `{$this->table_sub}` (`supply_id`, `product_id`, `product_title`, `quantity`, `price`, `discount`, `pack_size`, `pack_qty`) VALUES (:supply_id, :product_id, :product_title, :quantity, :price, :discount, :pack_size, :pack_qty)";
             $prepare = $this->dbh->prepare($stmt);
             $prepare->bindParam(':supply_id', $array['supply_id'], PDO::PARAM_STR);
             $prepare->bindParam(':product_id', $array['product_id'], PDO::PARAM_STR);
@@ -107,6 +107,8 @@ class Supply extends Connection
             $prepare->bindParam(':quantity', $array['quantity'], PDO::PARAM_STR);
             $prepare->bindParam(':price', $array['price'], PDO::PARAM_STR);
             $prepare->bindParam(':discount', $array['discount'], PDO::PARAM_STR);
+            $prepare->bindParam(':pack_size', $array['pack_size'], PDO::PARAM_STR);
+            $prepare->bindParam(':pack_qty', $array['pack_qty'], PDO::PARAM_STR);
             $prepare->execute();
             $result = $this->dbh->lastInsertId();
             return $result;
@@ -345,7 +347,8 @@ class Supply extends Connection
             $result = $this->dbh->lastInsertId();
             $products = new Products();
             $array['quantity'] = (-1 * $array['quantity']);
-            $products->addProductQty($array['product_id'], $array['quantity'], $array['shopId'], $type);
+            $array['pack_qty'] = (-1 * $array['pack_qty']);
+            $products->addProductQty($array['product_id'], ['qty' => $array['quantity'], 'pack_size' => $array['pack_size'], 'pack_qty' => $array['pack_qty']], $array['shopId'], $type);
             return $result;
         } catch (PDOException $e) {
             die("Error!: " . $e->getMessage() . "<br/>");

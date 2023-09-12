@@ -196,6 +196,8 @@ if (!empty($_POST) && isset($_POST['update'])) {
             'code' => $_POST['code'],
             'publisher_id' => !empty($_POST['publisher_id']) ? $_POST['publisher_id'] : null,
             'cat_id' => !empty($_POST['cat_id']) ? $_POST['cat_id'] : null,
+            'pack_size' => !empty($_POST['pack_size']) ? $_POST['pack_size'] : 0,
+            'pack_qty' => !empty($_POST['pack_qty']) ? $_POST['pack_qty'] : 0,
             'description' => $_POST['description'],
             'group' => $_POST['group'],
             'author' => $_POST['author'],
@@ -296,10 +298,14 @@ echo mainHeader(['page' => 'product']);
                     <label>Min Qty (Reminder)</label>
                     <input type="text" ng-model="form.min_qty" name="min_qty" placeholder="i.e 6, 12" class="form-control">
                 </div> -->
-            <!-- <div class="col-sm-3 form-group">
-                    <label>Pack Size</label>
-                    <input type="text" ng-model="form.pack_size" name="pack_size" placeholder="i.e 1, 2, 3..." class="form-control">
-                </div> -->
+            <div class="col-sm-3 form-group">
+                <label>No of Bundles</label>
+                <input type="text" ng-model="form.pack_qty" name="pack_qty" placeholder="i.e 1, 2, 3..." class="form-control">
+            </div>
+            <div class="col-sm-3 form-group">
+                <label>Products In a Bundle</label>
+                <input type="text" ng-model="form.pack_size" name="pack_size" placeholder="i.e 1, 2, 3..." class="form-control">
+            </div>
             <div class="col-sm-3 form-group">
                 <label>Board</label>
                 <input type="text" name="board" ng-model="form.board" class="type-ahead-input form-control" typeahead-on-select="selectBoard($item)" uib-typeahead="address as address.board for address in searchBoard($viewValue)" typeahead-template-url="board.html" typeahead-show-hint="true" typeahead-min-length="0">

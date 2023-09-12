@@ -61,7 +61,7 @@ echo mainHeader();
             </tr>
         </thead>
         <tbody>
-            <tr ng-repeat="row in items track by $index">
+            <tr ng-repeat-start="row in items track by $index">
                 <td>{{$index + 1}}</td>
                 <td><input type="text" class="form-control" ng-model="row.product_id" /></td>
                 <td>
@@ -92,9 +92,20 @@ echo mainHeader();
                 <td width="100">
                     <input type="number" class="form-control" ng-change="isValid(row,  calculateSum)" max="row.maxQty" ng-model="row.qty" ng-keydown="initCheckKeypress($event)" />
                 </td>
-                <td width="60">{{((row.price || 0) - (row.discount || 0)) * (row.qty || 0)}}</td>
-                <td width="60"><a href="#" class="btn btn-xs btn-danger pull-right" ng-click="remove(row)">Delete</a></td>
+                <td width="60" style="font-weight: bold;" class="text-right" rowspan="2">{{((row.price || 0) - (row.discount || 0)) * (row.qty || 0)}}</td>
+                <td width="60" rowspan="2"><a href="#" class="btn btn-xs btn-danger pull-right" ng-click="remove(row)">Delete</a></td>
             </tr>
+            <tr ng-repeat-end="row in items track by $index">
+                <td colspan="2" class="text-right">Bundles</td>
+                <td colspan="2">
+                    <input type="number" class="form-control" ng-model="row.pack_qty" placeholder="No of Bundles" ng-change="calculateSum()" />
+                </td>
+                <td class="text-right">Bundle Size</td>
+                <td colspan="2">
+                    <input type="number" class="form-control" ng-model="row.pack_size" placeholder="Products In Bundle" ng-change="calculateSum()" />
+                </td>
+            </tr>
+
         </tbody>
         <tbody>
             <tr>
@@ -180,6 +191,8 @@ echo mainFooter();
             qty: parseFloat(r.quantity),
             pprice: parseFloat(r.price.toString()),
             price: parseFloat(r.price.toString()),
+            pack_qty: parseFloat(r.pack_qty.toString()),
+            pack_size: parseFloat(r.pack_size.toString()),
             maxQty: r.quantity.toString() || "1",
             discount_value: parseInt(r.discount_value || r.discount),
             discount_type: parseInt(r.discount_type) || 2,
@@ -437,6 +450,8 @@ echo mainFooter();
                 items: $scope.items.map(({
                     product_id,
                     qty,
+                    pack_qty,
+                    pack_size,
                     price,
                     discount,
                     discount_type,
@@ -444,6 +459,8 @@ echo mainFooter();
                 }) => ({
                     product_id,
                     qty,
+                    pack_qty,
+                    pack_size,
                     price,
                     discount,
                     discount_type,
@@ -475,6 +492,9 @@ echo mainFooter();
             let subtotal = 0;
             // $scope.discount = 0;
             $scope.items.map((product) => {
+                if (product.pack_qty) {
+                    product.qty = (product.pack_size || 1) * product.pack_qty;
+                }
                 if (product.discount_type == 2) {
                     product.discount = product.discount_value
                     subtotal += ((product.price - product.discount) * product.qty);

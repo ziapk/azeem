@@ -26,6 +26,8 @@ if (!empty($_POST) && isset($_POST['update'])) {
             'min_qty' => !empty($_POST['min_qty']) ? $_POST['min_qty'] : 0,
             'location' => !empty($_POST['location']) ? $_POST['location'] : "",
             'product_id' => !empty($_POST['product_id']) ? $_POST['product_id'] : 0,
+            'pack_size' => !empty($_POST['pack_size']) ? $_POST['pack_size'] : 0,
+            'pack_qty' => !empty($_POST['pack_qty']) ? $_POST['pack_qty'] : 0,
             'shopId' => !empty($_POST['shopId']) ? $_POST['shopId'] : 0,
             'owner_id' => $ownerId,
         ];
@@ -69,17 +71,29 @@ $ownerStores = $stores->getOwnerStores($userData['id']);
         <?php if (!empty($error)) { ?><div class="alert alert-danger"><?php echo $error; ?></div><?php } ?>
         <div class="row">
             <div class="col-sm-3 form-group">
+                <label>Product Title</label>
                 <input type="hidden" name="product_id" value="<?php echo $product['product_id']; ?>">
                 <span class="form-control"><?php echo $productSingle['full_name']; ?></span>
             </div>
             <div class="col-sm-3 form-group">
+                <label>Minimum Stock</label>
                 <input name="min_qty" type="number" class="form-control" placeholder="Minimum Stock" value="<?php echo $product['min_qty']; ?>">
             </div>
             <div class="col-sm-3 form-group">
+                <label>Placed In Store</label>
                 <input name="location" type="text" class="form-control" placeholder="Placed In Store" value="<?php echo $product['location']; ?>">
+            </div>
+            <div class="col-sm-3 form-group">
+                <label>No of Bundles</label>
+                <input name="pack_qty" type="text" class="form-control" placeholder="No of Bundles" value="<?php echo $product['pack_qty']; ?>">
+            </div>
+            <div class="col-sm-3 form-group">
+                <label>Products in a Bundle</label>
+                <input name="pack_size" type="text" class="form-control" placeholder="Products in a Bundle" value="<?php echo $product['pack_size']; ?>">
             </div>
             <?php if ($userData['role'] == 'owner') { ?>
                 <div class="col-sm-3 form-group">
+                    <label>Shop</label>
                     <select name="shopId" class="form-control">
                         <?php foreach ($ownerStores as $type) { ?>
                             <option <?php if ($product['shopId'] == $type['id']) {
@@ -92,6 +106,7 @@ $ownerStores = $stores->getOwnerStores($userData['id']);
                 <input name="shopId" type="hidden" value="<?php echo $userData['shopId']; ?>">
             <?php } ?>
             <div class="col-sm-3 form-group">
+                <label>&nbsp;</label><br />
                 <input type="submit" name="update" value="Save" class="btn btn-success">
             </div>
         </div>

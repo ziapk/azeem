@@ -248,7 +248,10 @@ if ($largeView) {
                                     <tr>
                                         <td class="text-left"><?php echo $key + 1; ?></td>
                                         <td class="text-left" style="padding: 0 6px"><?php echo $item['product_id']; ?></td>
-                                        <td class="text-left"><?php echo $item['product_title']; ?></td>
+                                        <td class="text-left">
+                                            <?php echo $item['product_title']; ?>
+                                            <span style="float: right;"><?php echo !empty($item['pack_qty']) ? '<strong>Bundles: ' . $item['pack_qty'] . 'x' . $item['pack_size'] . '</strong>' : null; ?></span>
+                                        </td>
                                         <td class="text-right"><?php echo abs(($item['quantity'])); ?></td>
                                         <td class="text-right"><?php echo number_format(abs(($item['price']))); ?></td>
                                         <td class="text-right"><?php echo abs(($item['discount'] / $item['price']) * 100) . '%'; ?></td>

@@ -863,7 +863,7 @@ class Products extends Connection
 	public function updateProduct($array)
 	{
 		try {
-			$stmt = "UPDATE `{$this->table}` SET `full_name`=:full_name, `price`=:price, `pprice`=:pprice, `code`=:code, `description`=:description, `group`=:group, `board`=:board, `author`=:author, `image`=:image, `publisher_id`=:publisher_id, `cat_id`=:cat_id WHERE id=:id AND owner_id=:owner_id";
+			$stmt = "UPDATE `{$this->table}` SET `full_name`=:full_name, `price`=:price, `pprice`=:pprice, `code`=:code, `description`=:description, `group`=:group, `board`=:board, `author`=:author, `image`=:image, `publisher_id`=:publisher_id, `cat_id`=:cat_id, pack_size=:pack_size, pack_qty=:pack_qty WHERE id=:id AND owner_id=:owner_id";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':full_name', $array['full_name'], PDO::PARAM_STR);
 			$prepare->bindParam(':price', $array['price'], PDO::PARAM_STR);
@@ -875,6 +875,8 @@ class Products extends Connection
 			$prepare->bindParam(':board', $array['board'], PDO::PARAM_STR);
 			$prepare->bindParam(':author', $array['author'], PDO::PARAM_STR);
 			$prepare->bindParam(':publisher_id', $array['publisher_id'], PDO::PARAM_INT);
+			$prepare->bindParam(':pack_size', $array['pack_size'], PDO::PARAM_STR);
+			$prepare->bindParam(':pack_qty', $array['pack_qty'], PDO::PARAM_STR);
 			$prepare->bindParam(':cat_id', $array['cat_id'], PDO::PARAM_STR);
 			$prepare->bindParam(':id', $array['id'], PDO::PARAM_INT);
 			$prepare->bindParam(':owner_id', $array['owner_id'], PDO::PARAM_INT);
@@ -960,11 +962,13 @@ class Products extends Connection
 	public function updateStoreProduct($array)
 	{
 		try {
-			$stmt = "UPDATE `{$this->table_st}` SET `min_qty`=:min_qty, `location`=:location, shopId=:shopId  WHERE id=:id";
+			$stmt = "UPDATE `{$this->table_st}` SET `min_qty`=:min_qty, `location`=:location, pack_size=:pack_size, pack_qty=:pack_qty, shopId=:shopId  WHERE id=:id";
 
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':min_qty', $array['min_qty'], PDO::PARAM_STR);
 			$prepare->bindParam(':location', $array['location'], PDO::PARAM_STR);
+			$prepare->bindParam(':pack_size', $array['pack_size'], PDO::PARAM_STR);
+			$prepare->bindParam(':pack_qty', $array['pack_qty'], PDO::PARAM_STR);
 			$prepare->bindParam(':shopId', $array['shopId'], PDO::PARAM_STR);
 			$prepare->bindParam(':id', $array['id'], PDO::PARAM_INT);
 			$prepare->execute();
@@ -1004,9 +1008,9 @@ class Products extends Connection
 		try {
 			$minQty = !empty($array['minQty']);
 			if ($minQty) {
-				$stmt = "INSERT INTO `{$this->table_st}` (`qty`, `stock_out`, `product_id`, `shopId`, `owner_id`, `location`, `min_qty`) VALUES (:qty, :stock_out, :product_id, :shopId, :owner_id, :location, :min_qty)";
+				$stmt = "INSERT INTO `{$this->table_st}` (`qty`, `stock_out`, `product_id`, `shopId`, `owner_id`, `location`, `min_qty`, `pack_size`, `pack_qty`) VALUES (:qty, :stock_out, :product_id, :shopId, :owner_id, :location, :min_qty, :pack_size, :pack_qty)";
 			} else {
-				$stmt = "INSERT INTO `{$this->table_st}` (`qty`, `stock_out`, `product_id`, `shopId`, `owner_id`, `location`) VALUES (:qty, :stock_out, :product_id, :shopId, :owner_id, :location)";
+				$stmt = "INSERT INTO `{$this->table_st}` (`qty`, `stock_out`, `product_id`, `shopId`, `owner_id`, `location`, `pack_size`, `pack_qty`) VALUES (:qty, :stock_out, :product_id, :shopId, :owner_id, :location, :pack_size, :pack_qty)";
 			}
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':qty', $array['qty'], PDO::PARAM_STR);
@@ -1015,6 +1019,8 @@ class Products extends Connection
 			$prepare->bindParam(':shopId', $array['shopId'], PDO::PARAM_INT);
 			$prepare->bindParam(':owner_id', $array['owner_id'], PDO::PARAM_INT);
 			$prepare->bindParam(':location', $array['location'], PDO::PARAM_STR);
+			$prepare->bindParam(':pack_size', $array['pack_size'], PDO::PARAM_STR);
+			$prepare->bindParam(':pack_qty', $array['pack_qty'], PDO::PARAM_STR);
 			if ($minQty) {
 				$prepare->bindParam(':min_qty', $array['minQty'], PDO::PARAM_STR);
 			}
@@ -1030,12 +1036,14 @@ class Products extends Connection
 		try {
 			$data['qty'] += $array['qty'];
 			$data['stock_out'] += $array['stock_out'];
+			$data['pack_size'] += $array['pack_size'];
+			$data['pack_qty'] += $array['pack_qty'];
 			$data['minQty'] += $array['minQty'];
 			$minQty = !empty($array['minQty']);
 			if ($minQty) {
-				$stmt = "UPDATE `{$this->table_st}` SET `qty`=:qty, `stock_out`=:stock_out, `min_qty`=:min_qty WHERE id=:id";
+				$stmt = "UPDATE `{$this->table_st}` SET `qty`=:qty, `stock_out`=:stock_out, `min_qty`=:min_qty, `pack_size`=:pack_size, `pack_qty`=:pack_qty WHERE id=:id";
 			} else {
-				$stmt = "UPDATE `{$this->table_st}` SET `qty`=:qty, `stock_out`=:stock_out WHERE id=:id";
+				$stmt = "UPDATE `{$this->table_st}` SET `qty`=:qty, `stock_out`=:stock_out, `pack_size`=:pack_size, `pack_qty`=:pack_qty WHERE id=:id";
 			}
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':qty', $data['qty'], PDO::PARAM_STR);
@@ -1044,6 +1052,8 @@ class Products extends Connection
 				$prepare->bindParam(':min_qty', $data['minQty'], PDO::PARAM_STR);
 			}
 			$prepare->bindParam(':id', $data['id'], PDO::PARAM_INT);
+			$prepare->bindParam(':pack_size', $data['pack_size'], PDO::PARAM_STR);
+			$prepare->bindParam(':pack_qty', $data['pack_qty'], PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $prepare->rowCount();
 			return $result;
@@ -1052,18 +1062,33 @@ class Products extends Connection
 		}
 	}
 
-	public function addProductQty($id, $qty, $shopId, $type = 1)
+	public function addProductQty($id, $array, $shopId, $type = 1)
 	{
 		try {
+
+			$packQuery = "";
+			if (!empty($array['pack_size'])) {
+				$packQuery .= ", pack_size=:pack_size ";
+			}
+			if (!empty($array['pack_qty'])) {
+				$packQuery .= ", pack_qty=pack_qty+:pack_qty ";
+			}
+
 			if ($type == 1 || $type == 3) {
-				$stmt = "UPDATE `{$this->table_st}` SET `qty`=qty+:qty WHERE product_id=:id and shopId = :shopId";
+				$stmt = "UPDATE `{$this->table_st}` SET `qty`=qty+:qty $packQuery WHERE product_id=:id and shopId = :shopId";
 			} elseif ($type == 2) {
-				$stmt = "UPDATE `{$this->table_st}` SET `faulty_qty`=faulty_qty+:qty WHERE  product_id=:id and shopId = :shopId";
+				$stmt = "UPDATE `{$this->table_st}` SET `faulty_qty`=faulty_qty+:qty $packQuery WHERE  product_id=:id and shopId = :shopId";
 			}
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':id', $id, PDO::PARAM_INT);
-			$prepare->bindParam(':qty', $qty, PDO::PARAM_INT);
+			$prepare->bindParam(':qty', $array['qty'], PDO::PARAM_INT);
 			$prepare->bindParam(':shopId', $shopId, PDO::PARAM_INT);
+			if (!empty($array['pack_size'])) {
+				$prepare->bindParam(':pack_size', $array['pack_size'], PDO::PARAM_STR);
+			}
+			if (!empty($array['pack_qty'])) {
+				$prepare->bindParam(':pack_qty', $array['pack_qty'], PDO::PARAM_STR);
+			}
 			$prepare->execute();
 			$result = $prepare->rowCount();
 			return $result;
@@ -1089,13 +1114,28 @@ class Products extends Connection
 	public function addProductSupply($array)
 	{
 		try {
-			$stmt = "UPDATE `{$this->table}` SET `in_hand`=in_hand+:qty, pprice=:pprice, price=:price, barcode=:barcode WHERE id=:id";
+
+			$packQuery = "";
+			if (!empty($array['pack_size'])) {
+				$packQuery .= ", pack_size=:pack_size ";
+			}
+			if (!empty($array['pack_qty'])) {
+				$packQuery .= ", pack_qty=pack_qty+:pack_qty ";
+			}
+
+			$stmt = "UPDATE `{$this->table}` SET `in_hand`=in_hand+:qty, pprice=:pprice, price=:price, barcode=:barcode $packQuery WHERE id=:id";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':id', $array['id'], PDO::PARAM_INT);
 			$prepare->bindParam(':qty', $array['qty'], PDO::PARAM_INT);
 			$prepare->bindParam(':pprice', $array['pprice'], PDO::PARAM_INT);
 			$prepare->bindParam(':price', $array['price'], PDO::PARAM_INT);
 			$prepare->bindParam(':barcode', $array['barcode'], PDO::PARAM_STR);
+			if (!empty($array['pack_size'])) {
+				$prepare->bindParam(':pack_size', $array['pack_size'], PDO::PARAM_STR);
+			}
+			if (!empty($array['pack_qty'])) {
+				$prepare->bindParam(':pack_qty', $array['pack_qty'], PDO::PARAM_STR);
+			}
 			$prepare->execute();
 			$result = $prepare->rowCount();
 			return $result;
@@ -1106,12 +1146,21 @@ class Products extends Connection
 	public function subProductQty($array)
 	{
 		try {
-			$stmt = "UPDATE `{$this->table_st}` SET `stock_out`=stock_out+:stock_out WHERE product_id=:product_id and shopId=:shopId and owner_id=:owner_id";
+
+			$packQuery = "";
+			if (!empty($array['pack_qty'])) {
+				$packQuery .= ", `pack_qty`=pack_qty+:pack_qty";
+			}
+
+			$stmt = "UPDATE `{$this->table_st}` SET `stock_out`=stock_out+:stock_out $packQuery WHERE product_id=:product_id and shopId=:shopId and owner_id=:owner_id";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':shopId', $array['shopId'], PDO::PARAM_STR);
 			$prepare->bindParam(':stock_out', $array['quantity'], PDO::PARAM_STR);
 			$prepare->bindParam(':owner_id', $array['owner_id'], PDO::PARAM_STR);
 			$prepare->bindParam(':product_id', $array['product_id'], PDO::PARAM_STR);
+			if (!empty($array['pack_qty'])) {
+				$prepare->bindParam(':pack_qty', $array['pack_qty'], PDO::PARAM_STR);
+			}
 			$prepare->execute();
 			$result = $prepare->rowCount();
 			return $result;
