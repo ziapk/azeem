@@ -91,6 +91,7 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                                     </th>
                                     <th style="vertical-align: middle">
                                         <label class="pull-left"><span style="vertical-align: middle"><input type="checkbox" ng-model="show_discount"></span> <span style="vertical-align: middle">Add Discount</span></label>
+                                        <label class="pull-left"><span style="vertical-align: middle; margin-left: 10px"><input type="checkbox" ng-model="show_bundle" ng-change="calculateSum()"></span> <span style="vertical-align: middle">Bundles</span></label>
 
                                         <div class="pull-right">
                                             <label><span style="vertical-align: middle">QF</span> <span style="vertical-align: middle; margin-left: 4px;"><input type="checkbox" name="qf" ng-model="qf"><span></label>
@@ -234,7 +235,8 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
             $scope.customerData = {};
             $scope.summery = $scope.data.order.summery;
             $scope.ref_no = $scope.data.order.ref_no;
-            $scope.show_discount = true
+            $scope.show_discount = true;
+            $scope.show_bundle = $scope.data.order.show_bundle ? true : false;
             $scope.gst = $scope.data.order.gst;
             $scope.service_charges = $scope.data.order.service_charges;
             $scope.subTotal = $scope.data.order.price;
@@ -337,31 +339,38 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                 let subtotal = 0;
                 $scope.discountPercentValue = 0;
                 $scope.items.map((product) => {
-                    if (product.pack_qty) {
-                        product.pack_size = product.pack_size || 1;
-                        product.qty = product.pack_size * product.pack_qty;
+                    if (product.pack_qty && $scope.show_bundle) {
+                        product.qty = (product.pack_size || 1) * product.pack_qty;
                     }
+
+                    const qty = $scope.show_bundle ? (product.qty + (product.unpack_qty || 0)) : product.qty;
+                    if (!$scope.show_bundle) {
+                        product.unpack_qty = 0;
+                        product.pack_qty = 0;
+                        product.pack_size = 0;
+                    }
+
                     if (product.product_type == 1 || product.product_type != 1 && !product.services?.length && !product.raw_items?.length) {
                         if (product.discount_type == 2) {
                             product.discount = parseFloat(product.discount_value)
                             product.discount_percent = product.discount_value + "%";
-                            subtotal += ((product.price - product.discount) * product.qty);
+                            subtotal += ((product.price - product.discount) * qty);
                         } else if (!product.discount_value && customerData.discount_array?.length && customerData.discount_array?.filter(r => r.publisher_id == product.publisher_id).length) {
                             const row = customerData.discount_array.find(r => r.publisher_id == product.publisher_id);
                             const price = parseFloat(product.price);
                             product.discount = price * (parseFloat(row.discount_value) / 100);
                             product.discount_percent = row.discount_value + "%";
-                            subtotal += ((product.price - product.discount) * product.qty);
+                            subtotal += ((product.price - product.discount) * qty);
                         } else {
                             const price = parseFloat(product.price);
                             if (product.discount_value) {
                                 product.discount = price * ((product.discount_value || 0) / 100);
-                                $scope.discountPercentValue += (product.discount * product.qty);
+                                $scope.discountPercentValue += (product.discount * qty);
                             } else {
                                 product.discount_percent = '';
                                 product.discount = 0;
                             }
-                            subtotal += ((product.price - product.discount) * product.qty);
+                            subtotal += ((product.price - product.discount) * qty);
                         }
                     } else {
                         product.price = 0;
@@ -371,7 +380,7 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                         product.raw_items?.forEach(row => {
                             product.price += (row.price || 0) * (row.qty || 1)
                         })
-                        subtotal += product.price * product.qty;
+                        subtotal += product.price * qty;
                     }
                 })
                 $scope.subTotal = subtotal;
@@ -446,7 +455,8 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                     id: obj?.id || row.product_id,
                     full_name: obj?.full_name || row.product_title,
                     discount: row.discount?.toString(),
-                    qty: row.quantity,
+                    qty: parseFloat(row.quantity) - parseFloat(row.unpack_qty || 0),
+                    unpack_qty: parseFloat(row.unpack_qty || 0),
                     pack_qty: parseFloat(row.pack_qty || 0),
                     pack_size: parseFloat(row.pack_size || 0),
                     discount_value: row.discount_type == 2 ? parseFloat(row.discount) : (parseFloat(row.discount || 0) / row.price) * 100,
@@ -729,6 +739,7 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                             description,
                             qty,
                             pack_size,
+                            unpack_qty,
                             pack_qty,
                             discount,
                             discount_type,
@@ -745,6 +756,7 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                             qty,
                             pack_size,
                             pack_qty,
+                            unpack_qty,
                             discount,
                             discount_type,
                             start_date: expected_dates?.startDate ? moment(expected_dates.startDate).format('YYYY-MM-DD') : null,

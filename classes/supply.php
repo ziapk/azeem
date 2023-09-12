@@ -58,7 +58,7 @@ class Supply extends Connection
         try {
             if (!empty($array['id'])) {
                 // $this->addColumn();
-                $stmt = "UPDATE `{$this->table}` SET `supplier_id`=:supplier_id, supplier_type=:supplier_type, `status`=:status, `price`=:price, `payment_amount`=:payment_amount, `payment_with_credit`=:payment_with_credit, `discount`=:discount, `supply_date`=:supply_date, `ref_no`=:ref_no WHERE id=:id";
+                $stmt = "UPDATE `{$this->table}` SET `supplier_id`=:supplier_id, supplier_type=:supplier_type, `status`=:status, `price`=:price, `payment_amount`=:payment_amount, `payment_with_credit`=:payment_with_credit, `discount`=:discount, `supply_date`=:supply_date, `ref_no`=:ref_no, `show_bundle`=:show_bundle WHERE id=:id";
                 $prepare = $this->dbh->prepare($stmt);
                 $prepare->bindParam(':supplier_id', $array['supplier_id'], PDO::PARAM_STR);
                 $prepare->bindParam(':supplier_type', $array['supplier_type'], PDO::PARAM_STR);
@@ -69,6 +69,7 @@ class Supply extends Connection
                 $prepare->bindParam(':discount', $array['discount'], PDO::PARAM_STR);
                 $prepare->bindParam(':supply_date', $array['supply_date'], PDO::PARAM_STR);
                 $prepare->bindParam(':ref_no', $array['ref_no'], PDO::PARAM_STR);
+                $prepare->bindParam(':show_bundle', $array['show_bundle'], PDO::PARAM_STR);
                 $prepare->bindParam(':id', $array['id'], PDO::PARAM_STR);
                 $prepare->execute();
                 return $array['id'];
@@ -99,7 +100,7 @@ class Supply extends Connection
     public function createSupplyDetails($array)
     {
         try {
-            $stmt = "INSERT INTO `{$this->table_sub}` (`supply_id`, `product_id`, `product_title`, `quantity`, `price`, `discount`, `pack_size`, `pack_qty`) VALUES (:supply_id, :product_id, :product_title, :quantity, :price, :discount, :pack_size, :pack_qty)";
+            $stmt = "INSERT INTO `{$this->table_sub}` (`supply_id`, `product_id`, `product_title`, `quantity`, `price`, `discount`, `pack_size`, `pack_qty`, `unpack_qty`) VALUES (:supply_id, :product_id, :product_title, :quantity, :price, :discount, :pack_size, :pack_qty, :unpack_qty)";
             $prepare = $this->dbh->prepare($stmt);
             $prepare->bindParam(':supply_id', $array['supply_id'], PDO::PARAM_STR);
             $prepare->bindParam(':product_id', $array['product_id'], PDO::PARAM_STR);
@@ -109,6 +110,7 @@ class Supply extends Connection
             $prepare->bindParam(':discount', $array['discount'], PDO::PARAM_STR);
             $prepare->bindParam(':pack_size', $array['pack_size'], PDO::PARAM_STR);
             $prepare->bindParam(':pack_qty', $array['pack_qty'], PDO::PARAM_STR);
+            $prepare->bindParam(':unpack_qty', $array['unpack_qty'], PDO::PARAM_STR);
             $prepare->execute();
             $result = $this->dbh->lastInsertId();
             return $result;

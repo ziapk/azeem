@@ -106,6 +106,7 @@ $ownerStores = $stores->getOwnerStores($userId);
                                 </th>
                                 <th style="vertical-align: middle">
                                     <label class="pull-left"><span style="vertical-align: middle"><input type="checkbox" ng-model="show_discount"></span> <span style="vertical-align: middle">Add Discount</span></label>
+                                    <label class="pull-left"><span style="vertical-align: middle; margin-left: 10px"><input type="checkbox" ng-model="show_bundle"></span> <span style="vertical-align: middle">Bundles</span></label>
                                     <div class="pull-right">
                                         <label><span style="vertical-align: middle">QF</span> <span style="vertical-align: middle; margin-left: 4px;"><input type="checkbox" name="qf" ng-model="qf"><span></label>
                                         <label><span style="vertical-align: middle">Search Product</span> <span style="vertical-align: middle; margin-left: 4px"><input type="checkbox" name="focus" ng-model="focus"><span></label>
@@ -185,6 +186,7 @@ echo mainFooter();
         $scope.productCode = "";
         $scope.selectedList = {};
         $scope.indexes = [];
+        $scope.show_bundle = false;
         $scope.setList = list => {
             $scope.indexes = [];
             Object.keys(list).forEach((key) => {
@@ -365,6 +367,7 @@ echo mainFooter();
                     ...row,
                     pack_qty: parseFloat(row.pack_qty || 0),
                     pack_size: parseFloat(row.pack_size || 0),
+                    unpack_qty: parseFloat(row.unpack_qty || 0),
                     discount: row.discount?.toString(),
                     discount_value: row.discount_value?.toString(),
                 })
@@ -616,6 +619,7 @@ echo mainFooter();
                         description,
                         pack_size,
                         pack_qty,
+                        unpack_qty,
                         qty,
                         discount,
                         discount_type,
@@ -631,6 +635,7 @@ echo mainFooter();
                         description,
                         pack_size,
                         pack_qty,
+                        unpack_qty,
                         qty,
                         discount,
                         discount_type,
@@ -701,28 +706,35 @@ echo mainFooter();
             let subtotal = 0;
             $scope.discountPercentValue = 0;
             $scope.items.map((product) => {
-                if (product.pack_qty) {
-                    product.pack_size = product.pack_size || 1;
-                    product.qty = product.pack_size * product.pack_qty;
+                if (product.pack_qty && $scope.show_bundle) {
+                    product.qty = (product.pack_size || 1) * product.pack_qty;
                 }
+
+                const qty = $scope.show_bundle ? (product.qty + (product.unpack_qty || 0)) : product.qty;
+                if (!$scope.show_bundle) {
+                    product.unpack_qty = 0;
+                    product.pack_qty = 0;
+                    product.pack_size = 0;
+                }
+
                 if (product.product_type == 1 || product.product_type != 1 && !product.services?.length && !product.raw_items?.length) {
                     if (product.discount_type == 2) {
                         product.discount = product.discount_value
                         product.discount_value = parseFloat(product.discount_value);
                         product.discount_percent = product.discount_value;
-                        subtotal += ((product.price - product.discount) * product.qty);
+                        subtotal += ((product.price - product.discount) * qty);
                     } else if (!product.discount_value && customerData.discount_array?.length && customerData.discount_array?.filter(r => r.publisher_id == product.publisher_id).length) {
                         const row = customerData.discount_array.find(r => r.publisher_id == product.publisher_id);
                         const price = parseFloat(product.price);
                         product.discount = price * (parseFloat(row.discount_value) / 100);
                         product.discount_value = row.discount_value;
                         product.discount_percent = row.discount_value + "%";
-                        subtotal += ((product.price - product.discount) * product.qty);
+                        subtotal += ((product.price - product.discount) * qty);
                     } else {
                         const price = parseFloat(product.price);
                         if (product.discount_value) {
                             product.discount = price * (parseFloat(product.discount_value || 0) / 100);
-                            $scope.discountPercentValue += (product.discount * product.qty);
+                            $scope.discountPercentValue += (product.discount * qty);
                             product.discount_percent = product.discount_value + "%";
                             product.discount_value = parseFloat(product.discount_value);
                             console.log('product', product);
@@ -731,7 +743,7 @@ echo mainFooter();
                             product.discount_value = '';
                             product.discount = 0;
                         }
-                        subtotal += ((product.price - product.discount) * product.qty);
+                        subtotal += ((product.price - product.discount) * qty);
                     }
                 } else {
                     product.price = 0;
@@ -741,7 +753,7 @@ echo mainFooter();
                     product.raw_items?.forEach(row => {
                         product.price += (row.price || 0) * (row.qty || 1)
                     })
-                    subtotal += product.price * product.qty;
+                    subtotal += product.price * qty;
                 }
             })
             $scope.subTotal = subtotal;
@@ -753,7 +765,6 @@ echo mainFooter();
                 const pay = Object.values($scope.payWith);
                 pay.map(p => {
                     if (p.is_default == 1) {
-                        console.log('$scope.payWith[p.id]', $scope.payWith[p.id]);
                         $scope.payWith[p.id].amount = $scope.payment_amount;
                         $scope.payment_total = $scope.payment_amount;
                     } else {

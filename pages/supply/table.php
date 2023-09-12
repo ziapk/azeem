@@ -13,13 +13,14 @@
             <th width="70"></th>
         </tr>
         <tr>
-            <td colspan="9"><input type="text" id="searchProduct" class="form-control" ng-model="product" placeholder="Search Product to add" typeahead-on-select="selectProduct($item, row)" uib-typeahead="address as address.full_name for address in searchProduct($viewValue)" typeahead-template-url="row2.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="1" class="form-control" ng-model="row.product_name" ng-model-options="{debounce: 100}" /></td>
+            <td colspan="7"><input type="text" id="searchProduct" class="form-control" ng-model="product" placeholder="Search Product to add" typeahead-on-select="selectProduct($item, row)" uib-typeahead="address as address.full_name for address in searchProduct($viewValue)" typeahead-template-url="row2.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="1" class="form-control" ng-model="row.product_name" ng-model-options="{debounce: 100}" /></td>
+            <th colspan="2"><label><span style="vertical-align: middle">Bundles</span> <span style="vertical-align: middle; margin-left: 4px;"><input type="checkbox" name="show_bundle" ng-model="show_bundle"><span></label></th>
             <th colspan="1"><label><span style="vertical-align: middle">Qty</span> <span style="vertical-align: middle; margin-left: 4px;"><input type="checkbox" name="qf" ng-model="qf"><span></label></th>
         </tr>
     </thead>
     <tbody>
         <tr ng-repeat-start="row in items track by $index" id="product-{{$index + 1}}">
-            <td rowspan="2" style="text-align: center"><input type="checkbox" ng-model="row.pin" /> {{$index + 1}}</td>
+            <td style="text-align: center"><input type="checkbox" ng-model="row.pin" /> {{$index + 1}}</td>
             <td><input type="text" class="form-control" ng-model="row.minQty" /></td>
             <td><input type="text" class="form-control" ng-model="row.id" />
             </td>
@@ -32,21 +33,29 @@
             <td>
                 <input type="number" class="form-control" ng-change="calculateSum()" ng-model="row.qty" ng-keydown="initCheckKeypress($event)" />
             </td>
-            <td rowspan="2" style="text-align: right">{{row.total | number: 2}}</td>
-            <td rowspan="2"><a href="#" class="btn btn-xs btn-danger pull-right" ng-click="remove($index)">Delete</a></td>
+            <td style="text-align: right">{{row.total | number: 2}}</td>
+            <td><a href="#" class="btn btn-xs btn-danger pull-right" ng-click="remove($index)">Delete</a></td>
         </tr>
-        <tr ng-repeat-end="row in items track by $index">
-            <td colspan="2" class="text-right">
-                Bundles
-            </td>
-            <td>
-                <input type="number" class="form-control" ng-model="row.pack_qty" placeholder="No of Bundles" ng-change="calculateSum()" />
-            </td>
-            <td colspan="2" class="text-right">
-                Bundle Size
-            </td>
-            <td colspan="2">
-                <input type="number" class="form-control" ng-model="row.pack_size" placeholder="Products In Bundle" ng-change="calculateSum()" />
+        <tr ng-repeat-end="row in items track by $index" ng-if="show_bundle">
+            <td colspan="10">
+                <table style="margin-left: auto;" cellpadding="0" cellspacing="0">
+                    <tr>
+                        <td width="100px" style="padding: 8px" class="text-right">Bundles</td>
+                        <td colspan="{{show_discount ? 2 : 1}}">
+                            <input type="number" class="form-control" ng-model="row.pack_qty" placeholder="No of Bundles" ng-change="calculateSum()" />
+                        </td>
+                        <td class="text-right" style="padding: 8px">Bundle Size</td>
+                        <td>
+                            <input type="number" class="form-control" ng-model="row.pack_size" placeholder="Products In Bundle" ng-change="calculateSum()" />
+                        </td>
+                        <td class="text-right" style="padding: 8px">Ex. Items</td>
+                        <td>
+                            <input type="number" class="form-control" ng-model="row.unpack_qty" placeholder="Extra Products" ng-change="calculateSum()" />
+                        </td>
+                        <td style="padding: 8px">Total Qty</td>
+                        <td style="padding: 8px; font-weight: bold; font-size: 1.5em">{{row.qty + row.unpack_qty}}</td>
+                    </tr>
+                </table>
             </td>
         </tr>
     </tbody>

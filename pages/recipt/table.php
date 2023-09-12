@@ -87,21 +87,32 @@ foreach ($statuses as  $value) {
         <td width="100">
             <input class="form-control text-center" type="number" ng-model="addprice" ng-change="directlyPrice(addprice, cart)" ng-keydown="initCheckKeypress($event)">
         </td>
-        <td rowspan="2" style="text-align: right;">
+        <td style="text-align: right;">
             <strong>{{(cart.price - cart.discount) * cart.qty | number: 2}}</strong>
             <a style="margin-left: 8px;" href="#" class="btn btn-xs btn-danger pull-right" ng-click="remove(cart)">Delete</a>
         </td>
     </tr>
-    <tr>
-        <td class="text-right">Bundles</td>
-        <td colspan="{{show_discount ? 2 : 1}}">
-            <input type="number" class="form-control" ng-model="cart.pack_qty" placeholder="No of Bundles" ng-change="calculateSum()" />
+    <tr ng-if="show_bundle">
+        <td colspan="8">
+            <table style="margin-left: auto;" cellpadding="0" cellspacing="0">
+                <tr>
+                    <td width="100px" style="padding: 8px" class="text-right">Bundles</td>
+                    <td colspan="{{show_discount ? 2 : 1}}">
+                        <input type="number" class="form-control" ng-model="cart.pack_qty" placeholder="No of Bundles" ng-change="calculateSum()" />
+                    </td>
+                    <td class="text-right" style="padding: 8px">Bundle Size</td>
+                    <td>
+                        <input type="number" class="form-control" ng-model="cart.pack_size" placeholder="Products In Bundle" ng-change="calculateSum()" />
+                    </td>
+                    <td class="text-right" style="padding: 8px">Ex. Items</td>
+                    <td>
+                        <input type="number" class="form-control" ng-model="cart.unpack_qty" placeholder="Extra Products" ng-change="calculateSum()" />
+                    </td>
+                    <td style="padding: 8px">Total Qty</td>
+                    <td style="padding: 8px; font-weight: bold; font-size: 1.5em">{{cart.qty + cart.unpack_qty}}</td>
+                </tr>
+            </table>
         </td>
-        <td class="text-right">Bundle Size</td>
-        <td colspan="2">
-            <input type="number" class="form-control" ng-model="cart.pack_size" placeholder="Products In Bundle" ng-change="calculateSum()" />
-        </td>
-        <td></td>
     </tr>
     <tr ng-if="cart.product_type == 2">
         <td colspan="2"><strong>Services Items</strong></td>

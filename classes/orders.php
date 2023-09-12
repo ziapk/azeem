@@ -62,7 +62,7 @@ class Orders extends Connection
     {
         try {
             if (!empty($array['id'])) {
-                $stmt = "UPDATE `{$this->table}` SET `user_id`=:user_id, `customer_id`=:customer_id, `customer_name`=:customer_name, `status`=:status, `price`=:price, `paid_amount`=:paid_amount, `discount`=:discount, `shopId`=:shopId, `order_date`=:order_date, `gst`=:gst, `service_charges`=:service_charges, `summery`=:summery, `ref_no`=:ref_no, `show_discount`=:show_discount, status_id=:status_id, expected_delivery_date=:expected_delivery_date WHERE id=:id";
+                $stmt = "UPDATE `{$this->table}` SET `user_id`=:user_id, `customer_id`=:customer_id, `customer_name`=:customer_name, `status`=:status, `price`=:price, `paid_amount`=:paid_amount, `discount`=:discount, `shopId`=:shopId, `order_date`=:order_date, `gst`=:gst, `service_charges`=:service_charges, `summery`=:summery, `ref_no`=:ref_no, `show_discount`=:show_discount, `show_bundle`=:show_bundle, status_id=:status_id, expected_delivery_date=:expected_delivery_date WHERE id=:id";
                 $prepare = $this->dbh->prepare($stmt);
                 $prepare->bindParam(':user_id', $array['user_id'], PDO::PARAM_STR);
                 $prepare->bindParam(':customer_id', $array['customer_id'], PDO::PARAM_STR);
@@ -78,6 +78,7 @@ class Orders extends Connection
                 $prepare->bindParam(':summery', $array['summery'], PDO::PARAM_STR);
                 $prepare->bindParam(':ref_no', $array['ref_no'], PDO::PARAM_STR);
                 $prepare->bindParam(':show_discount', $array['show_discount'], PDO::PARAM_STR);
+                $prepare->bindParam(':show_bundle', $array['show_bundle'], PDO::PARAM_STR);
                 $prepare->bindParam(':id', $array['id'], PDO::PARAM_STR);
                 $prepare->bindParam(':status_id', $array['status_id'], PDO::PARAM_STR);
                 $prepare->bindParam(':expected_delivery_date', $array['expected_delivery_date'], PDO::PARAM_STR);
@@ -86,7 +87,7 @@ class Orders extends Connection
                 return $array['id'];
             } else {
                 $id = $this->getNextId($array['shopId']);
-                $stmt = "INSERT INTO `{$this->table}` (`order_custom_id`,`user_id`, `customer_id`, `customer_name`, `status`, `price`, `paid_amount`, `discount`, `shopId`, `order_date`, `gst`, `service_charges`, `summery`, `ref_no`, `show_discount`, `status_id`, `expected_delivery_date`) VALUES (:order_custom_id, :user_id, :customer_id, :customer_name, :status, :price, :paid_amount, :discount, :shopId, :order_date, :gst, :service_charges, :summery, :ref_no, :show_discount, :status_id, :expected_delivery_date)";
+                $stmt = "INSERT INTO `{$this->table}` (`order_custom_id`,`user_id`, `customer_id`, `customer_name`, `status`, `price`, `paid_amount`, `discount`, `shopId`, `order_date`, `gst`, `service_charges`, `summery`, `ref_no`, `show_discount`, `show_bundle`, `status_id`, `expected_delivery_date`) VALUES (:order_custom_id, :user_id, :customer_id, :customer_name, :status, :price, :paid_amount, :discount, :shopId, :order_date, :gst, :service_charges, :summery, :ref_no, :show_discount, :show_bundle, :status_id, :expected_delivery_date)";
                 $prepare = $this->dbh->prepare($stmt);
                 $prepare->bindParam(':order_custom_id', $id, PDO::PARAM_STR);
                 $prepare->bindParam(':user_id', $array['user_id'], PDO::PARAM_STR);
@@ -103,6 +104,7 @@ class Orders extends Connection
                 $prepare->bindParam(':summery', $array['summery'], PDO::PARAM_STR);
                 $prepare->bindParam(':ref_no', $array['ref_no'], PDO::PARAM_STR);
                 $prepare->bindParam(':show_discount', $array['show_discount'], PDO::PARAM_STR);
+                $prepare->bindParam(':show_bundle', $array['show_bundle'], PDO::PARAM_STR);
                 $prepare->bindParam(':status_id', $array['status_id'], PDO::PARAM_STR);
                 $prepare->bindParam(':expected_delivery_date', $array['expected_delivery_date'], PDO::PARAM_STR);
                 $prepare->execute();
@@ -120,7 +122,7 @@ class Orders extends Connection
     public function orderReturnAll($array, $reverse = false)
     {
         try {
-            $stmt = "INSERT INTO `{$this->table_rp}` (`user_id`, `shopId`, `order_id`, `product_id`, `quantity`, `price`, `discount`, `discount_type`, `discount_value`, `type`, `pack_size`, `pack_qty`) VALUES (:user_id, :shopId, :order_id, :product_id, :quantity, :price, :discount, :discount_type, :discount_value, :type, :pack_size, :pack_qty)";
+            $stmt = "INSERT INTO `{$this->table_rp}` (`user_id`, `shopId`, `order_id`, `product_id`, `quantity`, `price`, `discount`, `discount_type`, `discount_value`, `type`, `pack_size`, `pack_qty`, `unpack_qty` ) VALUES (:user_id, :shopId, :order_id, :product_id, :quantity, :price, :discount, :discount_type, :discount_value, :type, :pack_size, :pack_qty, :unpack_qty)";
             $prepare = $this->dbh->prepare($stmt);
             $prepare->bindParam(':user_id', $array['user_id'], PDO::PARAM_STR);
             $prepare->bindParam(':shopId', $array['shopId'], PDO::PARAM_STR);
@@ -134,6 +136,7 @@ class Orders extends Connection
             $prepare->bindParam(':type', $array['type'], PDO::PARAM_STR);
             $prepare->bindParam(':pack_size', $array['pack_size'], PDO::PARAM_STR);
             $prepare->bindParam(':pack_qty', $array['pack_qty'], PDO::PARAM_STR);
+            $prepare->bindParam(':unpack_qty', $array['unpack_qty'], PDO::PARAM_STR);
             $prepare->execute();
             $result = $this->dbh->lastInsertId();
             $products = new Products();
@@ -284,7 +287,7 @@ class Orders extends Connection
     {
         try {
 
-            $stmt = "INSERT INTO `{$this->table_sub}` (`order_id`, `product_id`, `quantity`, `price`, `discount`, `discount_type`, `description`, `item_status`, `employee_id`, `start_date`, `end_date`, `priority`, `pack_size`, `pack_qty`) VALUES (:order_id, :product_id, :quantity, :price, :discount, :discount_type, :description, :item_status,:employee_id,:start_date,:end_date, :priority, :pack_size, :pack_qty)";
+            $stmt = "INSERT INTO `{$this->table_sub}` (`order_id`, `product_id`, `quantity`, `price`, `discount`, `discount_type`, `description`, `item_status`, `employee_id`, `start_date`, `end_date`, `priority`, `pack_size`, `pack_qty`, `unpack_qty`) VALUES (:order_id, :product_id, :quantity, :price, :discount, :discount_type, :description, :item_status,:employee_id,:start_date,:end_date, :priority, :pack_size, :pack_qty, :unpack_qty)";
             $prepare = $this->dbh->prepare($stmt);
             $prepare->bindParam(':order_id', $array['order_id'], PDO::PARAM_STR);
             $prepare->bindParam(':product_id', $array['product_id'], PDO::PARAM_STR);
@@ -300,6 +303,7 @@ class Orders extends Connection
             $prepare->bindParam(':priority', $array['priority'], PDO::PARAM_STR);
             $prepare->bindParam(':pack_size', $array['pack_size'], PDO::PARAM_STR);
             $prepare->bindParam(':pack_qty', $array['pack_qty'], PDO::PARAM_STR);
+            $prepare->bindParam(':unpack_qty', $array['unpack_qty'], PDO::PARAM_STR);
             $prepare->execute();
             $result = $this->dbh->lastInsertId();
             foreach ($array['services'] as $value) {
@@ -813,9 +817,9 @@ class Orders extends Connection
             $ref_no = !empty($array['ref_no']) ? $array['ref_no'] : null;
             $flag = 1;
             if (!empty($array['id'])) {
-                $stmt = "UPDATE `{$this->table_ro}` SET `amount`=:amount, `paid`=:paid, `discount`=:discount, `ref_no`=:ref_no, `shopId`=:shopId, `owner_id`=:owner_id, `order_id`=:order_id, `customer_id`=:customer_id, `customer_name`=:customer_name, `return_date`=:return_date, `return_type`=:return_type, `is_supplier`=:is_supplier, `flag`=:flag where id=:id";
+                $stmt = "UPDATE `{$this->table_ro}` SET `amount`=:amount, `paid`=:paid, `discount`=:discount, `ref_no`=:ref_no, `shopId`=:shopId, `owner_id`=:owner_id, `order_id`=:order_id, `customer_id`=:customer_id, `customer_name`=:customer_name, `return_date`=:return_date, `return_type`=:return_type, `is_supplier`=:is_supplier, `flag`=:flag, `show_bundle`=:show_bundle where id=:id";
             } else {
-                $stmt = "INSERT INTO `{$this->table_ro}` (`amount`, `paid`, `discount`, `ref_no`, `shopId`, `owner_id`, `order_id`, `customer_id`, `customer_name`, `return_date`, `return_type`, `is_supplier`, `flag`) VALUES (:amount, :paid, :discount, :ref_no, :shopId, :owner_id, :order_id, :customer_id, :customer_name, :return_date, :return_type, :is_supplier, :flag)";
+                $stmt = "INSERT INTO `{$this->table_ro}` (`amount`, `paid`, `discount`, `ref_no`, `shopId`, `owner_id`, `order_id`, `customer_id`, `customer_name`, `return_date`, `return_type`, `is_supplier`, `flag`, `show_bundle`) VALUES (:amount, :paid, :discount, :ref_no, :shopId, :owner_id, :order_id, :customer_id, :customer_name, :return_date, :return_type, :is_supplier, :flag, :show_bundle)";
             }
             $prepare = $this->dbh->prepare($stmt);
             $prepare->bindParam(':amount', $array['amount'], PDO::PARAM_STR);
@@ -831,6 +835,7 @@ class Orders extends Connection
             $prepare->bindParam(':return_type', $array['return_type'], PDO::PARAM_STR);
             $prepare->bindParam(':is_supplier', $array['is_supplier'], PDO::PARAM_STR);
             $prepare->bindParam(':flag', $flag, PDO::PARAM_STR);
+            $prepare->bindParam(':show_bundle', $array['is_supplier'], PDO::PARAM_STR);
             if (!empty($array['id'])) {
                 $prepare->bindParam(':id', $array['id'], PDO::PARAM_STR);
             }

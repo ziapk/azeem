@@ -103,6 +103,7 @@ if (sizeof($_POST['items'])) {
                 'qty' => $item['qty'],
                 'pack_size' => !empty($item['pack_size']) ? $item['pack_size'] : 0,
                 'pack_qty' => !empty($item['pack_qty']) ? $item['pack_qty'] : 0,
+                'unpack_qty' => !empty($item['unpack_qty']) ? $item['unpack_qty'] : 0,
                 'stock_out' => 0,
                 'pin' => $item['pin'],
                 'minQty' => $item['minQty'],
@@ -143,6 +144,7 @@ $data = [
     'supplier_id' => !empty($supplierId) ? $supplierId : 1,
     'status' => $status,
     'ref_no' => $_POST['ref_no'],
+    'show_bundle' => !empty($_POST['show_bundle']) ? 1 : 0,
     'description' => !empty($_POST['summery']) ? $_POST['summery'] : '',
     'price' => $_POST['payable'],
     'payment_amount' => $cash,
@@ -177,11 +179,13 @@ if ($supply_id) {
                 'supply_id' => $supply_id,
                 'product_id' => $item['product_id'],
                 'product_title' => $item['full_name'],
-                'quantity' => $item['qty'],
+                'quantity' => $item['qty']  + (!empty($item['unpack_qty']) ? $item['unpack_qty'] : 0),
                 'discount' => !empty($item['discount']) ? $item['discount'] : 0,
                 'price' => $item['price'],
                 'pack_size' => !empty($item['pack_size']) ? $item['pack_size'] : 0,
                 'pack_qty' => !empty($item['pack_qty']) ? $item['pack_qty'] : 0,
+                'unpack_qty' => !empty($item['unpack_qty']) ? $item['unpack_qty'] : 0,
+                'unpack_qty' => !empty($item['unpack_qty']) ? $item['unpack_qty'] : 0,
             ];
             $supply->createSupplyDetails($d);
         }

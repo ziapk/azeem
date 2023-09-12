@@ -29,6 +29,7 @@ echo mainHeader();
             <input ng-if="is_supplier == 2" type="text" class="form-control" ng-model="supplierName" placeholder="Supplier's Name" typeahead-on-select="selectSupplier($item)" uib-typeahead="address as address.full_name for address in searchSupplier($viewValue)" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="0">
             <label><input type="checkbox" ng-model="return_type" ng-true-value="2" ng-false-value="1" ng-change="resetUsers(return_type)"> Supply </label>
             <label><input type="checkbox" ng-model="is_supplier" ng-true-value="2" ng-false-value="1" ng-change="resetUsers(return_type)"> Is Supplier </label>
+            <label><span style="vertical-align: middle; margin-left: 10px"><input type="checkbox" ng-model="show_bundle"></span> <span style="vertical-align: middle">Bundles</span></label>
         </div>
         <div class="col-sm-3 form-group">
             <label>Ref. No</label>
@@ -92,20 +93,31 @@ echo mainHeader();
                 <td width="100">
                     <input type="number" class="form-control" ng-change="isValid(row,  calculateSum)" max="row.maxQty" ng-model="row.qty" ng-keydown="initCheckKeypress($event)" />
                 </td>
-                <td width="60" style="font-weight: bold;" class="text-right" rowspan="2">{{((row.price || 0) - (row.discount || 0)) * (row.qty || 0)}}</td>
-                <td width="60" rowspan="2"><a href="#" class="btn btn-xs btn-danger pull-right" ng-click="remove(row)">Delete</a></td>
+                <td width="60" style="font-weight: bold;" class="text-right">{{((row.price || 0) - (row.discount || 0)) * (row.qty || 0)}}</td>
+                <td width="60"><a href="#" class="btn btn-xs btn-danger pull-right" ng-click="remove(row)">Delete</a></td>
             </tr>
-            <tr ng-repeat-end="row in items track by $index">
-                <td colspan="2" class="text-right">Bundles</td>
-                <td colspan="2">
-                    <input type="number" class="form-control" ng-model="row.pack_qty" placeholder="No of Bundles" ng-change="calculateSum()" />
-                </td>
-                <td class="text-right">Bundle Size</td>
-                <td colspan="2">
-                    <input type="number" class="form-control" ng-model="row.pack_size" placeholder="Products In Bundle" ng-change="calculateSum()" />
+            <tr ng-repeat-end="row in items track by $index" ng-if="show_bundle">
+                <td colspan="9">
+                    <table style="margin-left: auto;" cellpadding="0" cellspacing="0">
+                        <tr>
+                            <td width="100px" style="padding: 8px" class="text-right">Bundles</td>
+                            <td colspan="{{show_discount ? 2 : 1}}">
+                                <input type="number" class="form-control" ng-model="row.pack_qty" placeholder="No of Bundles" ng-change="calculateSum()" />
+                            </td>
+                            <td class="text-right" style="padding: 8px">Bundle Size</td>
+                            <td>
+                                <input type="number" class="form-control" ng-model="row.pack_size" placeholder="Products In Bundle" ng-change="calculateSum()" />
+                            </td>
+                            <td class="text-right" style="padding: 8px">Ex. Items</td>
+                            <td>
+                                <input type="number" class="form-control" ng-model="row.unpack_qty" placeholder="Extra Products" ng-change="calculateSum()" />
+                            </td>
+                            <td style="padding: 8px">Total Qty</td>
+                            <td style="padding: 8px; font-weight: bold; font-size: 1.5em">{{row.qty + row.unpack_qty}}</td>
+                        </tr>
+                    </table>
                 </td>
             </tr>
-
         </tbody>
         <tbody>
             <tr>
@@ -185,12 +197,14 @@ echo mainFooter();
         $scope.returnOrder = <?php echo json_encode($return) ?>;
         $scope.is_supplier = parseInt($scope.order?.order?.is_supplier || 1);
         $scope.return_type = parseInt($scope.order?.order?.return_type || 1);
+        $scope.show_bundle = $scope.order?.order?.show_bundle ? true : false;
 
         $scope.items = $scope.order?.order_items?.map(r => ({
             ...r,
             qty: parseFloat(r.quantity),
             pprice: parseFloat(r.price.toString()),
             price: parseFloat(r.price.toString()),
+            unpack_qty: parseFloat(r.unpack_qty.toString()),
             pack_qty: parseFloat(r.pack_qty.toString()),
             pack_size: parseFloat(r.pack_size.toString()),
             maxQty: r.quantity.toString() || "1",
@@ -208,11 +222,6 @@ echo mainFooter();
         $scope.discount = 0;
         $scope.payment_mode = '1';
         $scope.supplier = null;
-
-
-
-
-
 
         $scope.initCheckKeypress = (evt) => {
             var e = evt; // for trans-browser compatibility
@@ -450,6 +459,7 @@ echo mainFooter();
                 items: $scope.items.map(({
                     product_id,
                     qty,
+                    unpack_qty,
                     pack_qty,
                     pack_size,
                     price,
@@ -459,6 +469,7 @@ echo mainFooter();
                 }) => ({
                     product_id,
                     qty,
+                    unpack_qty,
                     pack_qty,
                     pack_size,
                     price,
@@ -492,22 +503,28 @@ echo mainFooter();
             let subtotal = 0;
             // $scope.discount = 0;
             $scope.items.map((product) => {
-                if (product.pack_qty) {
+                if (product.pack_qty && $scope.show_bundle) {
                     product.qty = (product.pack_size || 1) * product.pack_qty;
+                }
+                const qty = $scope.show_bundle ? (product.qty + (product.unpack_qty || 0)) : product.qty;
+                if (!$scope.show_bundle) {
+                    product.unpack_qty = 0;
+                    product.pack_qty = 0;
+                    product.pack_size = 0;
                 }
                 if (product.discount_type == 2) {
                     product.discount = product.discount_value
-                    subtotal += ((product.price - product.discount) * product.qty);
+                    subtotal += ((product.price - product.discount) * qty);
                 } else {
                     const price = parseFloat(product.price);
                     if (product.discount_value) {
                         product.discount = price * ((product.discount_value || 0) / 100);
-                        $scope.discountPercentValue += (product.discount * product.qty);
+                        $scope.discountPercentValue += (product.discount * qty);
                     } else {
                         product.discount_percent = '';
                         product.discount = 0;
                     }
-                    subtotal += ((product.price - product.discount) * product.qty);
+                    subtotal += ((product.price - product.discount) * qty);
                 }
                 // subtotal += (product.price * product.qty);
                 // $scope.discount += (product.discount * product.qty);

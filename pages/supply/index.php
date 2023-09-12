@@ -92,14 +92,16 @@ echo mainFooter();
         $scope.orderData = <?php echo json_encode($order); ?>;
         $scope.list = [];
         $scope.priceList = [];
+        $scope.show_bundle = $scope.orderData?.order?.show_bundle ? true : false;
         $scope.items = $scope.orderData?.order_items?.map(item => ({
             ...item,
             full_name: item.product_title || item.full_name,
             price: parseFloat(item.price),
+            unpack_qty: parseFloat(item.unpack_qty),
             pack_qty: parseFloat(item.pack_qty),
             pack_size: parseFloat(item.pack_size),
-            quantity: parseFloat(item.quantity),
-            qty: parseFloat(item.quantity),
+            quantity: parseFloat(item.quantity) - parseFloat(item.unpack_qty),
+            qty: parseFloat(item.quantity) - parseFloat(item.unpack_qty),
             discount: parseFloat(item.discount)
         })) || [];
         $scope.customerData = {};
@@ -110,7 +112,6 @@ echo mainFooter();
         $scope.payment_amount = parseFloat($scope.orderData?.order?.payment_amount || 0);
         $scope.payment_with_credit = parseFloat($scope.orderData?.order?.payment_with_credit || 0);
         $scope.payment_mode = '1';
-
         $scope.toggleForm = {
             searchMode: $scope.orderData?.customer ? true : false
         }
@@ -320,17 +321,28 @@ echo mainFooter();
                 if (price) {
                     product.pprice = parseFloat((product.price * ((100 - (parseFloat(product.discount || 0))) / 100)).toFixed(2));
                 }
-                if (product.pack_size) {
-                    product.qty = product.pack_size * product.pack_qty;
+                if (product.pack_size && $scope.show_bundle) {
+                    product.qty = (product.pack_size || 1) * product.pack_qty;
                 }
-                subtotal += parseFloat((product.pprice * product.qty).toFixed(2));
-                product.total = parseFloat((product.pprice * product.qty).toFixed(2))
+
+                const qty = $scope.show_bundle ? (product.qty + (product.unpack_qty || 0)) : product.qty;
+
+                if (!$scope.show_bundle) {
+                    product.unpack_qty = 0;
+                    product.pack_qty = 0;
+                    product.pack_size = 0;
+                }
+
+                subtotal += parseFloat((product.pprice * qty).toFixed(2));
+                product.total = parseFloat((product.pprice * qty).toFixed(2))
 
                 return Object.assign({}, product);
             })
             $scope.subTotal = subtotal;
             $scope.grandTotal = $scope.payment_amount = $scope.subTotal - $scope.discount;
         }
+
+        $scope.calculateSum(true);
 
         $scope.calculatePercent = product => {
             product.discount = parseFloat(((1 - (product.pprice / product.price)) * 100).toFixed(2))
