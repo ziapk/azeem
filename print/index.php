@@ -20,11 +20,11 @@ $service_charges = 0;
 $price = 0;
 $aprice = 0;
 
-if (!empty($order['order']['price'])) {
-    $gst = round($order['order']['price'] * ($order['order']['gst'] / 100));
-    $service_charges = round($order['order']['price'] * ($order['order']['service_charges'] / 100));
-    $price = $order['order']['price'] + $gst + $service_charges;
-}
+// if (!empty($order['order']['price'])) {
+// $gst = round($order['order']['price'] * ($order['order']['gst'] / 100));
+// $service_charges = round($order['order']['price'] * ($order['order']['service_charges'] / 100));
+// $price = $order['order']['price'] + $gst + $service_charges;
+// }
 
 $currentBalance = $blc['balance'];
 $balance = ($price - $order['order']['discount']) - $order['order']['paid_amount'];
