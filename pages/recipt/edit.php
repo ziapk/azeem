@@ -347,7 +347,7 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                     if (!$scope.show_bundle) {
                         product.unpack_qty = 0;
                         product.pack_qty = 0;
-                        product.pack_size = 0;
+                        // product.pack_size = 0;
                     }
 
                     if (product.product_type == 1 || product.product_type != 1 && !product.services?.length && !product.raw_items?.length) {
@@ -458,7 +458,7 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                     qty: parseFloat(row.quantity) - parseFloat(row.unpack_qty || 0),
                     unpack_qty: parseFloat(row.unpack_qty || 0),
                     pack_qty: parseFloat(row.pack_qty || 0),
-                    pack_size: parseFloat(row.pack_size || 0),
+                    pack_size: parseFloat(row.pack_size || obj.pack_size || 0),
                     discount_value: row.discount_type == 2 ? parseFloat(row.discount) : (parseFloat(row.discount || 0) / row.price) * 100,
                 })
             });
@@ -594,6 +594,7 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                     $scope.items.push({
                         ...p,
                         qty: 1,
+                        pack_size: parseFloat(p.pack_size),
                         show: true
                     });
                 } else {
@@ -612,6 +613,7 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
 
                         $scope.items.push({
                             ...p,
+                            pack_size: parseFloat(p.pack_size),
                             qty: 1
                         });
 
@@ -838,9 +840,9 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
 
 
     <script type="text/ng-template" id="row.html">
-        <a style="display: flex; justify-content: space-between; align-items: center">
+        <a style="display: flex; align-items: center">
         <span class="{{match.model.code ? 'text-danger' : ''}}" ng-bind-html="match.model.full_name | uibTypeaheadHighlight:query"></span>
-        <span class="label label-success" style="margin-left: auto; font-size: 14px">{{match.model.qty}}</span> | <span class="label label-danger" style="font-size: 14px">{{match.model.price}}</span>
+        <span ng-if="match.model.pack_size" class="label label-primary" style="font-size: 14px">{{match.model.pack_size}}B</span><span ng-if="match.model.pack_size">|</span><span class="label label-success" style="font-size: 14px">{{match.model.qty}}</span> | <span class="label label-danger" style="font-size: 14px">{{match.model.price}}</span>
     </a>
 </script>
     <script type="text/ng-template" id="customer.html">

@@ -283,7 +283,7 @@ class Products extends Connection
 			}
 
 			$mobileCols = "p.id,p.full_name";
-			$allCols = "group_concat(DISTINCT r.title ORDER BY r.title ASC) as rackNumbers, p.priority, group_concat(DISTINCT pc.code ORDER BY pc.code ASC) as other_codes, p.author, p.barcode, p.code, p.cat_id, p.board, p.group, p.id, p.pprice, p.publisher_id, concat(p.id, ' | ', p.full_name) as full_name, pub.full_name as publisherName, pub.discount_type, pub.discount_amount, CONVERT(case when (pub.discount_amount > 0) then (p.price * (1 - (pub.discount_amount / 100)) ) else p.price end, DECIMAL) as price, is_active, product_type $column";
+			$allCols = "group_concat(DISTINCT r.title ORDER BY r.title ASC) as rackNumbers, p.priority, group_concat(DISTINCT pc.code ORDER BY pc.code ASC) as other_codes, p.author, p.barcode, p.code, p.cat_id, p.board, p.group, p.id, p.pprice, p.publisher_id, concat(p.id, ' | ', p.full_name) as full_name, sp.pack_qty, sp.pack_size, pub.full_name as publisherName, pub.discount_type, pub.discount_amount, CONVERT(case when (pub.discount_amount > 0) then (p.price * (1 - (pub.discount_amount / 100)) ) else p.price end, DECIMAL) as price, is_active, product_type $column";
 
 			$mainCols = "";
 			if (!empty($mobileCol)) {

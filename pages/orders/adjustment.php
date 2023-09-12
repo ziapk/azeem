@@ -548,8 +548,8 @@ echo mainFooter();
 </script>
 
 <script type="text/ng-template" id="row2.html">
-    <a style="display: block">
-      <span ng-bind-html="match.model.full_name | uibTypeaheadHighlight:query"></span>
-      <span class="pull-right" style="margin-left: 20px">{{match.model.price}}</span>
-  </a>
+    <a style="display: flex">
+        <span style="margin-right: auto" class="{{match.model.code ? 'text-danger' : ''}}" ng-bind-html="match.model.full_name | uibTypeaheadHighlight:query"></span>
+        <span ng-if="match.model.pack_size" class="label label-primary" style="font-size: 14px">{{match.model.pack_size}}B</span><span ng-if="match.model.pack_size">|</span><span class="label label-success" style="font-size: 14px">{{match.model.qty}}</span> | <span class="label label-danger" style="font-size: 14px">{{match.model.price}}</span>
+    </a>
 </script>

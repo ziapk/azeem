@@ -204,6 +204,7 @@ echo mainFooter();
             if (!exists) {
                 $scope.items.unshift({
                     ...p,
+                    pack_size: parseFloat(p.pack_size),
                     price: parseInt(p.price || 0),
                     pprice: parseInt(p.pprice || 0),
                     qty: 1
@@ -330,7 +331,7 @@ echo mainFooter();
                 if (!$scope.show_bundle) {
                     product.unpack_qty = 0;
                     product.pack_qty = 0;
-                    product.pack_size = 0;
+                    // product.pack_size = 0;
                 }
 
                 subtotal += parseFloat((product.pprice * qty).toFixed(2));
@@ -362,8 +363,8 @@ echo mainFooter();
 </script>
 
 <script type="text/ng-template" id="row2.html">
-    <a style="display: flex; justify-content: space-between; align-items: center">
-        <span class="{{match.model.code ? 'text-danger' : ''}}" ng-bind-html="match.model.full_name | uibTypeaheadHighlight:query"></span>
-        <span class="label label-danger" style="font-size: 14px">{{match.model.price}}</span>
+    <a style="display: flex; align-items: center">
+        <span style="margin-right: auto" class="{{match.model.code ? 'text-danger' : ''}}" ng-bind-html="match.model.full_name | uibTypeaheadHighlight:query"></span>
+        <span ng-if="match.model.pack_size" class="label label-primary" style="font-size: 14px">{{match.model.pack_size}}B</span><span ng-if="match.model.pack_size">|</span><span class="label label-success" style="font-size: 14px">{{match.model.qty}}</span> | <span class="label label-danger" style="font-size: 14px">{{match.model.price}}</span>
     </a>
 </script>

@@ -465,6 +465,7 @@ echo mainFooter();
             if (sep) {
                 $scope.items.push({
                     ...p,
+                    pack_size: parseFloat(p.pack_size),
                     qty: 1,
                     show: true
                 });
@@ -484,6 +485,7 @@ echo mainFooter();
                 if (!exists) { // if already not exits in bucket
                     $scope.items.push({
                         ...p,
+                        pack_size: parseFloat(p.pack_size),
                         qty: 1
                     });
                     currentIndex = $scope.items.length;
@@ -714,7 +716,7 @@ echo mainFooter();
                 if (!$scope.show_bundle) {
                     product.unpack_qty = 0;
                     product.pack_qty = 0;
-                    product.pack_size = 0;
+                    // product.pack_size = 0;
                 }
 
                 if (product.product_type == 1 || product.product_type != 1 && !product.services?.length && !product.raw_items?.length) {
@@ -801,9 +803,9 @@ echo mainFooter();
 </script>
 
 <script type="text/ng-template" id="row.html">
-    <a style="display: flex; justify-content: space-between; align-items: center">
-        <span class="{{match.model.code ? 'text-danger' : ''}}" ng-bind-html="match.model.full_name | uibTypeaheadHighlight:query"></span>
-        <span class="label label-success" style="margin-left: auto; font-size: 14px">{{match.model.qty}}</span> | <span class="label label-danger" style="font-size: 14px">{{match.model.price}}</span>
+    <a style="display: flex; align-items: center">
+        <span style="margin-right: auto" class="{{match.model.code ? 'text-danger' : ''}}" ng-bind-html="match.model.full_name | uibTypeaheadHighlight:query"></span>
+        <span ng-if="match.model.pack_size" class="label label-primary" style="font-size: 14px">{{match.model.pack_size}}B</span><span ng-if="match.model.pack_size">|</span><span class="label label-success" style="margin-left: auto; font-size: 14px">{{match.model.qty}}</span> | <span class="label label-danger" style="font-size: 14px">{{match.model.price}}</span>
     </a>
 </script>
 <script type="text/ng-template" id="customer.html">

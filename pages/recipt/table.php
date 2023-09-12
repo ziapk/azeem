@@ -36,7 +36,7 @@ foreach ($statuses as  $value) {
             <label><input ng-change="setList(selectedList)" type="checkbox" ng-model="selectedList[$index]">{{$index + 1}}</label>
         </td>
         <td width="380">
-            {{cart.full_name}} | <strong class="text-danger">{{cart.rackNumbers}}</strong>
+            {{cart.full_name}} | <strong class="text-danger">{{cart.rackNumbers}}</strong> | <strong class="text-success">{{cart.pack_size}}B</strong>
             <?php if ($userData['role'] === 'owner' || $userData['role'] === 'manager') { ?>
                 <span class="dropdown">
                     <button class="dropdown-toggle btn btn-default" data-toggle="dropdown" style="padding-inline: 8px"><span class="fa fa-caret-down"></span></button>
