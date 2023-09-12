@@ -67,7 +67,7 @@ echo mainFooter();
         $scope.product = "";
         $scope.shopId = '4';
         $scope.createDemand = false;
-        $scope.qf = true;
+        $scope.qf = false;
 
         $scope.selectSupplier = function(p) {
             $http.get("<?php echo SITE_URL ?>api/getOpeningBalance.php", {
