@@ -194,7 +194,6 @@ if ($largeView) {
             <thead>
                 <tr>
                     <th style="padding: 0">
-                        <?php $net = abs(($price - $order['order']['discount'])); ?>
                         <table class="table head text-left" style="width: 100%; margin: 0" cellspading="0" cellspacing="0">
                             <tr>
                                 <td class="text-left" width="250">
@@ -262,6 +261,7 @@ if ($largeView) {
                                                                 $qty += $item['quantity'];
                                                                 echo number_format(abs(($item['quantity'] * ($item['price'] - $item['discount'])))); ?></td>
                                     </tr>
+                                    <?php $net = abs(($aprice - $distTotal - $order['order']['discount'])); ?>
                                     <?php if (!empty($item['description'])) { ?>
                                         <tr>
                                             <th colspan="2">--</th>
