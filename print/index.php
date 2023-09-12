@@ -194,7 +194,19 @@ if ($largeView) {
             <thead>
                 <tr>
                     <th style="padding: 0">
-                        <?php $net = abs(($price - $order['order']['discount'])); ?>
+                        <?php $net = abs(($price - $order['order']['discount']));
+                        echo '<pre>';
+                        print_r($gst);
+                        echo '<br />';
+                        print_r($service_charges);
+                        echo '<br />';
+                        print_r($price);
+                        echo '<br />';
+                        print_r($order);
+                        echo '<br />';
+                        echo '</pre>';
+                        ?>
+
                         <table class="table head text-left" style="width: 100%; margin: 0" cellspading="0" cellspacing="0">
                             <tr>
                                 <td class="text-left" width="250">
