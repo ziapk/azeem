@@ -465,7 +465,7 @@ echo mainFooter();
             if (sep) {
                 $scope.items.push({
                     ...p,
-                    pack_size: parseFloat(p.pack_size),
+                    pack_size: parseFloat(p.pack_size || 0),
                     qty: 1,
                     show: true
                 });
@@ -485,7 +485,7 @@ echo mainFooter();
                 if (!exists) { // if already not exits in bucket
                     $scope.items.push({
                         ...p,
-                        pack_size: parseFloat(p.pack_size),
+                        pack_size: parseFloat(p.pack_size || 0),
                         qty: 1
                     });
                     currentIndex = $scope.items.length;

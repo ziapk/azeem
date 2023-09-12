@@ -594,7 +594,7 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                     $scope.items.push({
                         ...p,
                         qty: 1,
-                        pack_size: parseFloat(p.pack_size),
+                        pack_size: parseFloat(p.pack_size || 0),
                         show: true
                     });
                 } else {
@@ -613,7 +613,7 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
 
                         $scope.items.push({
                             ...p,
-                            pack_size: parseFloat(p.pack_size),
+                            pack_size: parseFloat(p.pack_size || 0),
                             qty: 1
                         });
 
