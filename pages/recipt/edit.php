@@ -167,7 +167,7 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
             $scope.shopId = '<?php echo $userData['shopId']; ?>';
             $scope.list = [];
             $scope.focus = false;
-            $scope.qf = true;
+            $scope.qf = false;
             $scope.productCode = "";
 
             $scope.selectedList = {};
@@ -235,8 +235,8 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
             $scope.customerData = {};
             $scope.summery = $scope.data.order.summery;
             $scope.ref_no = $scope.data.order.ref_no;
-            $scope.show_discount = true;
-            $scope.show_bundle = $scope.data.order.show_bundle ? true : false;
+            $scope.show_discount = parseInt($scope.data.order.show_discount) ? true : false;
+            $scope.show_bundle = parseInt($scope.data.order.show_bundle) ? true : false;
             $scope.gst = $scope.data.order.gst;
             $scope.service_charges = $scope.data.order.service_charges;
             $scope.subTotal = $scope.data.order.price;

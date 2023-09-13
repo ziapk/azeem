@@ -197,7 +197,7 @@ echo mainFooter();
         $scope.returnOrder = <?php echo json_encode($return) ?>;
         $scope.is_supplier = parseInt($scope.order?.order?.is_supplier || 1);
         $scope.return_type = parseInt($scope.order?.order?.return_type || 1);
-        $scope.show_bundle = $scope.order?.order?.show_bundle ? true : false;
+        $scope.show_bundle = parseInt($scope.order?.order?.show_bundle) ? true : false;
 
         $scope.items = $scope.order?.order_items?.map(r => ({
             ...r,

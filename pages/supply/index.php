@@ -92,7 +92,7 @@ echo mainFooter();
         $scope.orderData = <?php echo json_encode($order); ?>;
         $scope.list = [];
         $scope.priceList = [];
-        $scope.show_bundle = $scope.orderData?.order?.show_bundle ? true : false;
+        $scope.show_bundle = parseInt($scope.orderData?.order?.show_bundle) ? true : false;
         $scope.items = $scope.orderData?.order_items?.map(item => ({
             ...item,
             full_name: item.product_title || item.full_name,
