@@ -565,11 +565,11 @@ echo mainFooter();
                         const exits = txt?.split(',')?.filter(tt => tt?.toLowerCase()?.startsWith($scope.productCode?.toLowerCase()));
                         return exits.length;
                     });
-                    const secondfilteredArray = term ? filteredArray.filter(obj => obj.searchString.toLowerCase().includes(term?.toLowerCase() || term) || $scope.partialSearch(obj.searchString, term)) : filteredArray;
+                    const secondfilteredArray = term ? filteredArray.filter(obj => obj.searchString.toLowerCase().includes(term?.toLowerCase() || term)) : filteredArray;
                     return secondfilteredArray;
                 } else {
                     const filteredArray = window.mainList.records.filter(r => r.id == term || r.code?.toLowerCase() == term?.toLowerCase() || r.barcode?.toLowerCase() == term?.toLowerCase() || r.searchString.split('|').pop()?.toLowerCase().includes(term?.toLowerCase()))
-                    const secondfilteredArray = !filteredArray.length ? window.mainList.records.filter(obj => obj.searchString.toLowerCase().includes(term?.toLowerCase() || term) || $scope.partialSearch(obj.searchString, term)) : filteredArray;
+                    const secondfilteredArray = !filteredArray.length ? window.mainList.records.filter(obj => obj.searchString.toLowerCase().includes(term?.toLowerCase() || term)) : filteredArray;
                     return secondfilteredArray.slice(0, 30);
 
                 }
@@ -739,7 +739,6 @@ echo mainFooter();
                         product.discount_value = parseFloat(product.discount_value);
                         product.discount_percent = product.discount_value;
                         subtotal += ((product.price - product.discount) * qty);
-                        console.log('product', product.full_name, subtotal);
                     } else if (!product.discount_value && customerData.discount_array?.length && customerData.discount_array?.filter(r => r.publisher_id == product.publisher_id).length) {
                         const row = customerData.discount_array.find(r => r.publisher_id == product.publisher_id);
                         const price = parseFloat(product.price);
@@ -747,7 +746,6 @@ echo mainFooter();
                         product.discount_value = row.discount_value;
                         product.discount_percent = row.discount_value + "%";
                         subtotal += ((product.price - product.discount) * qty);
-                        console.log('product', product.full_name, subtotal);
                     } else {
                         const price = parseFloat(product.price);
                         if (product.discount_value) {
@@ -761,10 +759,8 @@ echo mainFooter();
                             product.discount = 0;
                         }
                         subtotal += ((product.price - product.discount) * qty);
-                        console.log('product', product.full_name, subtotal);
                     }
                 } else {
-                    console.log('service type item')
                     product.price = 0;
                     product.services?.forEach(row => {
                         product.price += (row.price || 0) * (row.qty || 1)
@@ -779,7 +775,6 @@ echo mainFooter();
             $scope.payment_amount = $scope.subTotal - $scope.discount;
             $scope.grandTotal = $scope.payment_amount = $scope.payment_amount + Math.round($scope.payment_amount * ($scope.gst / 100)) + Math.round($scope.payment_amount * ($scope.service_charges / 100));
             $window.sessionStorage.setItem('shopping', JSON.stringify($scope.items));
-            console.log('product', $scope.subTotal, $scope.discount, $scope.grandTotal, $scope.payment_amount);
             <?php
             if (empty($credit)) { ?>
                 const pay = Object.values($scope.payWith);
