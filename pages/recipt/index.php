@@ -565,11 +565,11 @@ echo mainFooter();
                         const exits = txt?.split(',')?.filter(tt => tt?.toLowerCase()?.startsWith($scope.productCode?.toLowerCase()));
                         return exits.length;
                     });
-                    const secondfilteredArray = term ? filteredArray.filter(obj => $scope.partialSearch(obj.searchString, term)) : filteredArray;
+                    const secondfilteredArray = term ? filteredArray.filter(obj => obj.searchString.toLowerCase().includes(term?.toLowerCase() || term) || $scope.partialSearch(obj.searchString, term)) : filteredArray;
                     return secondfilteredArray;
                 } else {
                     const filteredArray = window.mainList.records.filter(r => r.id == term || r.code?.toLowerCase() == term?.toLowerCase() || r.barcode?.toLowerCase() == term?.toLowerCase() || r.searchString.split('|').pop()?.toLowerCase().includes(term?.toLowerCase()))
-                    const secondfilteredArray = !filteredArray.length ? window.mainList.records.filter(obj => $scope.partialSearch(obj.searchString, term)) : filteredArray;
+                    const secondfilteredArray = !filteredArray.length ? window.mainList.records.filter(obj => obj.searchString.toLowerCase().includes(term?.toLowerCase() || term) || $scope.partialSearch(obj.searchString, term)) : filteredArray;
                     return secondfilteredArray.slice(0, 30);
 
                 }
