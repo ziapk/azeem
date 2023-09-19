@@ -147,6 +147,18 @@ echo mainHeader(['page' => 'reports']);
         $scope.refreshAccounts = search => {
             $scope.accountsList = $scope.oaccountsList.filter(r => r.title.toLowerCase().includes(search.toLowerCase()));
         }
+        $scope.partialSearch = (name, query) => {
+            const lowerQuery = query.toLowerCase();
+            const lowerName = name.toLowerCase();
+            let queryIndex = 0;
+            for (let i = 0; i < lowerName.length; i++) {
+                if (lowerName[i] === lowerQuery[queryIndex]) {
+                    queryIndex++;
+                    if (queryIndex === lowerQuery.length) return true;
+                }
+            }
+            return false;
+        }
         $scope.product = '';
         $scope.searchProduct = function(term) {
             const params = {};
@@ -155,8 +167,8 @@ echo mainHeader(['page' => 'reports']);
                 const item = window.mainList.records.find(r => r.id == params.term || r.code == params.term || r.barcode == params.term);
                 return [];
             } else {
-                const filteredArray = window.mainList.records.filter(r => r.id == term || r.code == term || r.barcode == term || r.searchString.split('|').pop()?.toLowerCase().includes(term?.toLowerCase()) || r.searchString.includes(term + '|') || r.searchString.includes('|' + term) || r.searchString.includes('|' + term + '|'));
-                const secondfilteredArray = !filteredArray.length ? window.mainList.records.filter(obj => obj.searchString.toLowerCase().includes(term?.toLowerCase() || term)) : filteredArray;
+                const filteredArray = window.mainList.records.filter(r => r.id == term || r.code == term || r.barcode == term || r.searchString.split('|').pop()?.toLowerCase().includes(term?.toLowerCase()));
+                const secondfilteredArray = !filteredArray.length ? window.mainList.records.filter(obj => $scope.partialSearch(obj.searchString, term)) : filteredArray;
                 return secondfilteredArray.slice(0, 30);
             }
         }

@@ -139,11 +139,24 @@ if (!empty($_GET['all']) && $_GET['all'] == '1') {
 
                 }
 
+                $scope.partialSearch = (name, query) => {
+                    const lowerQuery = query.toLowerCase();
+                    const lowerName = name.toLowerCase();
+                    let queryIndex = 0;
+                    for (let i = 0; i < lowerName.length; i++) {
+                        if (lowerName[i] === lowerQuery[queryIndex]) {
+                            queryIndex++;
+                            if (queryIndex === lowerQuery.length) return true;
+                        }
+                    }
+                    return false;
+                }
+
                 $scope.searchProduct = function(term) {
                     if ($scope.shopId == $scope.currentShopId) {
 
                         const filteredArray = window.mainList.records.filter(r => r.id == term || r.code == term || r.barcode == term || r.searchString.split('|').pop()?.toLowerCase().includes(term?.toLowerCase()))
-                        const secondfilteredArray = !filteredArray.length ? window.mainList.records.filter(obj => obj.searchString.toLowerCase().includes(term?.toLowerCase() || term)) : filteredArray;
+                        const secondfilteredArray = !filteredArray.length ? window.mainList.records.filter(obj => $scope.partialSearch(obj.searchString, term)) : filteredArray;
 
                         return secondfilteredArray.slice(0, 30);
                     } else {

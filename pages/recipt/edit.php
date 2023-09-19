@@ -656,6 +656,19 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                 }
             }
 
+            $scope.partialSearch = (name, query) => {
+                const lowerQuery = query.toLowerCase();
+                const lowerName = name.toLowerCase();
+                let queryIndex = 0;
+                for (let i = 0; i < lowerName.length; i++) {
+                    if (lowerName[i] === lowerQuery[queryIndex]) {
+                        queryIndex++;
+                        if (queryIndex === lowerQuery.length) return true;
+                    }
+                }
+                return false;
+            }
+
             $scope.searchProduct = function(term) {
                 const params = {};
                 if ($scope.focus === true) {
@@ -668,19 +681,21 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                     if ($scope.productCode) {
                         const filteredArray = window.mainList.records.filter(r => {
                             const txt = r.searchString.split('|').pop()?.toLowerCase();
-                            const exits = txt?.split(',')?.filter(tt => tt?.startsWith($scope.productCode?.toLowerCase()));
+                            const exits = txt?.split(',')?.filter(tt => tt?.toLowerCase()?.startsWith($scope.productCode?.toLowerCase()));
                             return exits.length;
                         });
-                        const secondfilteredArray = term ? filteredArray.filter(obj => obj.searchString.toLowerCase().includes(term?.toLowerCase() || term)) : filteredArray;
+                        const secondfilteredArray = term ? filteredArray.filter(obj => $scope.partialSearch(obj.searchString, term)) : filteredArray;
                         return secondfilteredArray;
                     } else {
-                        const filteredArray = window.mainList.records.filter(r => r.id == term || r.code == term || r.barcode == term || r.searchString.split('|').pop()?.toLowerCase().includes(term?.toLowerCase()) || r.searchString.includes(term + '|') || r.searchString.includes('|' + term) || r.searchString.includes('|' + term + '|'))
-                        const secondfilteredArray = !filteredArray.length ? window.mainList.records.filter(obj => obj.searchString.toLowerCase().includes(term?.toLowerCase() || term)) : filteredArray;
+                        const filteredArray = window.mainList.records.filter(r => r.id == term || r.code?.toLowerCase() == term?.toLowerCase() || r.barcode?.toLowerCase() == term?.toLowerCase() || r.searchString.split('|').pop()?.toLowerCase().includes(term?.toLowerCase()))
+                        const secondfilteredArray = !filteredArray.length ? window.mainList.records.filter(obj => $scope.partialSearch(obj.searchString, term)) : filteredArray;
                         return secondfilteredArray.slice(0, 30);
 
                     }
                 }
             }
+
+
 
             $scope.searchMode = function() {
                 return $http.get("<?php echo SITE_URL ?>api/getPaymentModes.php")
