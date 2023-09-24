@@ -94,6 +94,33 @@ switch ($reportType) {
 		// $sum = ['price', 'discount', 'paid_amount'];
 
 		break;
+	case '18':
+		$product_ids = [];
+		if (!empty($_POST['product_id'])) {
+			$product_ids[] = $_POST['product_id'];
+		}
+		$publisher_id = !empty($_POST['publisher_id']) ? $_POST['publisher_id'] : "";
+		$account_id = !empty($_POST['account_id']) ? $_POST['account_id'] : "";
+		if (!empty($product_ids) || !empty($publisher_id) || !empty($account_id)) {
+			$orders = $ordersObj->ordersReport($shopId, $from, $to, $product_ids, $publisher_id, $account_id, 'sample');
+			include_once dirname(__FILE__) . '/salesProductsReport.php';
+		} else {
+			$orders = $ordersObj->ordersReport($shopId, $from, $to, $product_ids, '', '', 'sample');
+			include_once dirname(__FILE__) . '/salesReport.php';
+		}
+		exit;
+
+		break;
+	case '19':
+		$publisher_id = !empty($_POST['publisher_id']) ? $_POST['publisher_id'] : "";
+		$product_ids = [];
+		if (!empty($_POST['product_id'])) {
+			$product_ids[] = $_POST['product_id'];
+		}
+		$orders = $ordersObj->ordersReportProductWise($shopId, $from, $to, $publisher_id, 'sample');
+		include_once dirname(__FILE__) . '/salesReportProductWise.php';
+		exit;
+		break;
 	case '2':
 		$publisher_id = !empty($_POST['publisher_id']) ? $_POST['publisher_id'] : "";
 		$orders = $ordersObj->ordersReportProductWise($shopId, $from, $to, $publisher_id);

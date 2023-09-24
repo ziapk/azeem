@@ -664,12 +664,15 @@ class Orders extends Connection
         }
     }
 
-    public function ordersReport($shopId, $date, $to, $ids = [], $publisher_id = null, $account_id = null)
+    public function ordersReport($shopId, $date, $to, $ids = [], $publisher_id = null, $account_id = null, $report = '')
     {
         try {
 
             $toCondition = " AND o.order_date>='" . $date . "' AND o.order_date<='" . $to . "' ";
 
+            if (!empty($report) && $report == 'sample') {
+                $toCondition .= " AND o.price = o.discount AND o.price > 0 ";
+            }
             if (!empty($account_id) || !empty($publisher_id) || !empty($ids)) {
                 if (!empty($ids)) {
                     $toCondition .= " AND sub.product_id IN (" . implode(',', $ids) . ") ";
@@ -856,11 +859,16 @@ class Orders extends Connection
     }
 
 
-    public function ordersReportSummery($shopId, $date, $to, $publisher_id = null)
+    public function ordersReportSummery($shopId, $date, $to, $publisher_id = null, $report = '')
     {
         try {
 
             $toCondition = " AND o.order_date>='" . $date . "' AND o.order_date<='" . $to . "'";
+
+            if (!empty($report) && $report == 'sample') {
+                $toCondition .= " AND o.price = o.discount AND o.price > 0 ";
+            }
+
             $join = "";
             if (!empty($publisher_id)) {
                 $join = " LEFT JOIN `{$this->table_sub}` AS oi ON oi.order_id=o.id LEFT JOIN `{$this->table_pro}` AS p on p.id=oi.product_id ";
@@ -877,13 +885,17 @@ class Orders extends Connection
         }
     }
 
-    public function ordersReportProductWise($shopId, $date, $to, $publisher_id = null)
+    public function ordersReportProductWise($shopId, $date, $to, $publisher_id = null, $report = '')
     {
         try {
 
             $summery = $this->ordersReportSummery($shopId, $date, $to, $publisher_id);
 
             $toCondition = " AND o.order_date>='" . $date . "' AND o.order_date<='" . $to . "'";
+
+            if (!empty($report) && $report == 'sample') {
+                $toCondition .= " AND o.price = o.discount AND o.price > 0 ";
+            }
 
             if (!empty($publisher_id)) {
                 $toCondition .= " and p.publisher_id = $publisher_id ";
