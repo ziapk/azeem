@@ -316,6 +316,7 @@ echo mainFooter();
         }
 
         $scope.selectSupplier = function(p) {
+            console.log('p', p);
             $http.get("<?php echo SITE_URL ?>api/getOpeningBalance.php", {
                 params: {
                     account_id: p.account_id,
