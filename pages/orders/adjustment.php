@@ -267,7 +267,7 @@ echo mainFooter();
         }
 
         $scope.searchSupplier = function(term, init) {
-            $scope.supplierId = ""
+            // $scope.supplierId = ""
             return $http.get("<?php echo SITE_URL ?>api/getSupplier.php", {
                     params: {
                         term,
@@ -286,7 +286,7 @@ echo mainFooter();
                 });
         }
         $scope.searchCustomer = function(term, init) {
-            $scope.supplierId = ""
+            // $scope.supplierId = ""
             return $http.get("<?php echo SITE_URL ?>api/getCustomer.php", {
                     params: {
                         term,
@@ -335,8 +335,6 @@ echo mainFooter();
                 $scope.calculateSum();
             })
         }
-        console.log('$scope.order', $scope.order);
-        $scope.order && $scope.order.customer && $scope.order.customer.id && $scope.selectSupplier($scope.order.customer);
 
         $scope.addDiscount = function(val, obj) {
             if (parseFloat(val) > 0) {
@@ -450,7 +448,7 @@ echo mainFooter();
 
         $scope.searchMode();
 
-        // $scope.searchCustomer('', true);
+        $scope.searchCustomer('', true);
 
         $scope.clearSearch = () => {
             $scope.product = "";
@@ -493,6 +491,7 @@ echo mainFooter();
                     discount_type,
                     discount_value
                 })),
+                show_bundle: $scope.show_bundle,
                 shopId: $scope.shopId,
                 grandTotal: $scope.grandTotal,
                 payment_amount: $scope.payment_amount,
