@@ -450,7 +450,7 @@ echo mainFooter();
 
         $scope.searchMode();
 
-        $scope.searchCustomer('', true);
+        // $scope.searchCustomer('', true);
 
         $scope.clearSearch = () => {
             $scope.product = "";
