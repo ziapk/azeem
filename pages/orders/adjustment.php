@@ -334,6 +334,7 @@ echo mainFooter();
                 $scope.calculateSum();
             })
         }
+        $scope.order && $scope.order.customer && $scope.order.customer.id && $scope.selectSupplier($scope.order.customer);
 
         $scope.addDiscount = function(val, obj) {
             if (parseFloat(val) > 0) {
