@@ -335,6 +335,7 @@ echo mainFooter();
                 $scope.calculateSum();
             })
         }
+        console.log('$scope.order', $scope.order);
         $scope.order && $scope.order.customer && $scope.order.customer.id && $scope.selectSupplier($scope.order.customer);
 
         $scope.addDiscount = function(val, obj) {
