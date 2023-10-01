@@ -19,18 +19,13 @@ if ($_GET['t'] == 'c') {
     $user = $expenses->expenseByAccount($_GET['id']);
 }
 
-$journel = $dentry->getLedgerByAccount(['account_id' => $_GET['id'], 'type' => $type]);
+$journel = $dentry->getLedgerByAccount(['account_id' => $_GET['id'], 'type' => $type, 'user' => $user['account']]);
 $summery = $journel['summery'];
 
-if ($_GET['t'] == 'c') {
-    $summery['debit'] += $user['account']['opening_balance'];
-} else {
-    $summery['credit'] += $user['account']['opening_balance'];
-}
-$paid = $_GET['t'] == 's' ? $summery['debit'] : $summery['credit'];
-$amount = $_GET['t'] == 's' ? $summery['credit'] : $summery['debit'];
-// $amount = ($user['account']['opening_balance'] + $amount);
-$balance = ($amount - $paid);
+$paid = $summery['paid'];
+$amount = $summery['due'];
+$balance = $summery['balance'];
+
 ob_start();
 ?>
 <link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/css/bootstrap.min.css">

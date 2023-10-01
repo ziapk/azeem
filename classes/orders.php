@@ -838,7 +838,7 @@ class Orders extends Connection
             $prepare->bindParam(':return_type', $array['return_type'], PDO::PARAM_STR);
             $prepare->bindParam(':is_supplier', $array['is_supplier'], PDO::PARAM_STR);
             $prepare->bindParam(':flag', $flag, PDO::PARAM_STR);
-            $prepare->bindParam(':show_bundle', $array['is_supplier'], PDO::PARAM_STR);
+            $prepare->bindParam(':show_bundle', $array['show_bundle'], PDO::PARAM_STR);
             if (!empty($array['id'])) {
                 $prepare->bindParam(':id', $array['id'], PDO::PARAM_STR);
             }

@@ -221,14 +221,6 @@ class DoubleEntry extends Connection
 				$str = "(acc_account_transactions.creditAmount - acc_account_transactions.debitAmount)";
 			}
 
-			// if (!empty($arr['from']) && !empty($arr['to'])) {
-
-			// 	$to = $arr['to'];
-			// 	$from = $arr['from'];
-			// 	$where .= " and t.transaction_date between '$from' AND '$to'";
-			// 	$countwhere .= " and t.transaction_date between '$from' AND '$to'";
-			// }
-
 			if (!empty($account_id)) {
 				$where .= " and a.id = $account_id";
 				$countwhere .= " and e.account_id = $account_id";
@@ -239,6 +231,21 @@ class DoubleEntry extends Connection
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->execute();
 			$summery = $prepare->fetch(PDO::FETCH_ASSOC);
+
+			if ($_GET['t'] == 'c') {
+				$summery['debit'] += $arr['user']['opening_balance'];
+			} else {
+				$summery['credit'] += $arr['user']['opening_balance'];
+			}
+
+			$paid = in_array($arr['type'], ['s', 'emp']) ? $summery['debit'] : $summery['credit'];
+			$amount = in_array($arr['type'], ['s', 'emp']) ? $summery['credit'] : $summery['debit'];
+			$balance = ($amount - $paid);
+
+			$summery['paid'] = $paid;
+			$summery['due'] = $amount;
+			$summery['balance'] = $balance;
+
 
 
 			$stmt = "SELECT transaction_id, title, transaction_date, order_ref, order_custom_id, supply_ref, return_ref, transsaction_type, v_description, debitAmount, creditAmount, balance, reference  FROM
@@ -258,8 +265,6 @@ class DoubleEntry extends Connection
 			$prepare->execute();
 			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
 			$final = [];
-			$other = 0;
-			$match = 0;
 			$beforeEntry = [];
 			if (!empty($arr['from']) && !empty($arr['to'])) {
 				$first = false;
@@ -278,7 +283,7 @@ class DoubleEntry extends Connection
 				$final = $result;
 			}
 
-			return ['count' => sizeof($result), 'rows' => $final, 'first' => $beforeEntry, 'summery' => $summery];
+			return ['count' => sizeof($result), 'rows' => $final, 'first' => $beforeEntry, 'summery' => $summery, 'last' => end($final)];
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
 		}

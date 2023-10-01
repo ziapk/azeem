@@ -17,16 +17,11 @@ if (empty($supplier)) {
 
 $dentry = new DoubleEntry();
 
-$journel = $dentry->getLedgerByAccount(['account_id' => $supplier['account_id'], 'type' => 's']);
-$summery = $journel['summery'];
+$journel = $dentry->getLedgerByAccount(['account_id' => $supplier['account_id'], 'type' => 's', 'user' => $user['account']]);
 
-
-$summery['credit'] += $user['account']['opening_balance'];
-
-$paid = $summery['debit'];
-$amount = $summery['credit'];
-// $amount = ($user['account']['opening_balance'] + $amount);
-$balance = ($amount - $paid);
+$paid = $summery['paid'];
+$amount = $summery['due'];
+$balance = $summery['balance'];
 
 $data = [
     'paid' => $paid,

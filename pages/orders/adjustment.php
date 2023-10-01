@@ -188,7 +188,6 @@ echo mainFooter();
     });
     app.controller('reportController', function($scope, $http, $window, $httpParamSerializerJQLike) {
         $scope.currentShopId = '<?php echo $shop['id']; ?>';
-        $scope.supplierName = "";
         $scope.ref_no = "";
         $scope.supplierId = "";
         $scope.product = "";
@@ -198,6 +197,8 @@ echo mainFooter();
         $scope.is_supplier = parseInt($scope.order?.order?.is_supplier || 1);
         $scope.return_type = parseInt($scope.order?.order?.return_type || 1);
         $scope.show_bundle = parseInt($scope.order?.order?.show_bundle) ? true : false;
+        $scope.supplierName = $scope.order?.order?.customer_name || '';
+        $scope.supplierId = $scope.order?.order?.customer_id || '';
 
         $scope.items = $scope.order?.order_items?.map(r => ({
             ...r,
@@ -267,7 +268,7 @@ echo mainFooter();
         }
 
         $scope.searchSupplier = function(term, init) {
-            // $scope.supplierId = ""
+            $scope.supplierName = term;
             return $http.get("<?php echo SITE_URL ?>api/getSupplier.php", {
                     params: {
                         term,
@@ -286,6 +287,7 @@ echo mainFooter();
                 });
         }
         $scope.searchCustomer = function(term, init) {
+            $scope.supplierName = term;
             // $scope.supplierId = ""
             return $http.get("<?php echo SITE_URL ?>api/getCustomer.php", {
                     params: {
@@ -324,7 +326,7 @@ echo mainFooter();
                 }
             }).then(res => {
                 $scope.supplierId = p.id
-                $scope.supplierName = p.full_name || p.name
+                $scope.supplierName = $scope.order?.order?.customer_name || p.full_name || p.name
                 $scope.supplier = {
                     ...p,
                     full_name: p.full_name || p.name,
@@ -491,7 +493,7 @@ echo mainFooter();
                     discount_type,
                     discount_value
                 })),
-                show_bundle: $scope.show_bundle,
+                show_bundle: $scope.show_bundle ? 1 : 0,
                 shopId: $scope.shopId,
                 grandTotal: $scope.grandTotal,
                 payment_amount: $scope.payment_amount,

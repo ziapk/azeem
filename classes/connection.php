@@ -13,6 +13,7 @@ class Connection
 	// private $dbname = 'reclydmy_azeem';
 	// private $user = 'root';
 	// private $pass = 'root';
+	private $sql_mode = 'STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION';
 
 	public $dbh;
 
@@ -23,7 +24,7 @@ class Connection
 	private function connection()
 	{
 		try {
-			$this->dbh = new PDO('mysql:host=' . $this->host . ';dbname=' . $this->dbname, $this->user, $this->pass, array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION));
+			$this->dbh = new PDO('mysql:host=' . $this->host . ';dbname=' . $this->dbname, $this->user, $this->pass, array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::MYSQL_ATTR_INIT_COMMAND => 'SET sql_mode="' . $this->sql_mode . '"'));
 		} catch (PDOException $e) {
 			print "Error!: " . $e->getMessage() . "<br/>";
 			die();
@@ -72,6 +73,19 @@ class Connection
 		include dirname(__FILE__) . '/../print/return.php';
 		$html = ob_get_clean();
 		ob_clean();
+		return $html;
+	}
+
+	public function drawLedger($id, $type = 'c', $from = null, $to = null)
+	{
+		ob_start();
+		$id = $id;
+		$type = $type;
+		$from = $from;
+		$to = $to;
+		include dirname(__FILE__) . '/../pages/chart-of-accounts/summeryContent.php';
+		$html = ob_get_clean();
+		ob_end_clean();
 		return $html;
 	}
 

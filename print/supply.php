@@ -236,7 +236,7 @@ $qty = 0; ?>
                                 <th width="40" class="text-left thead">Code</th>
                                 <th class="text-left thead">Item</th>
                                 <th width="40" class="thead">Qty</th>
-                                <th width="50" class="thead">U. Price</th>
+                                <!-- <th width="50" class="thead">U. Price</th> -->
                                 <th width="50" class="thead">D. %</th>
                                 <th width="50" class="thead">D. Price</th>
                                 <th class="text-right thead" width="50">Total</th>
@@ -255,8 +255,8 @@ $qty = 0; ?>
                                         <span style="float: right;"><?php echo !empty($item['pack_qty']) ? '<strong>Bundles: ' . $item['pack_qty'] . 'x' . $item['pack_size'] . (!empty($item['unpack_qty']) ? '+' . $item['unpack_qty'] : '') . '</strong>' : null; ?></span>
                                     </td>
                                     <td class="text-right"><?php echo abs(($item['quantity'])); ?></td>
-                                    <td class="text-right"><?php echo number_format(abs(($item['price']))); ?></td>
-                                    <td class="text-right"><?php echo $item['discount'] . '%'; ?></td>
+                                    <!-- <td class="text-right"><?php echo number_format(abs(($item['price']))); ?></td> -->
+                                    <td class="text-right"><?php echo number_format(abs($item['discount'])) . '%'; ?></td>
                                     <td class="text-right"><?php echo $cprice; ?></td>
                                     <td class="text-right"><?php
                                                             $aprice += $item['quantity'] * ($item['price']);
@@ -272,7 +272,7 @@ $qty = 0; ?>
                                 <?php } ?>
                             <?php } ?>
                             <tr class="no-border">
-                                <td valign="top" style="border: 0" class="text-right" colspan="3">Total Quantity</td>
+                                <td valign="top" style="border: 0" class="text-right" colspan="2">Total Quantity</td>
                                 <td valign="top" style="border: 0" class="text-right"><strong><?php echo abs(($qty)); ?></strong></td>
                                 <td class="text-right ref" style="border: 0" colspan="3">Invoice Total</td>
                                 <th class="text-right ref"><?php echo number_format(abs(($aprice))); ?></th>
@@ -281,11 +281,11 @@ $qty = 0; ?>
                                 <th rowspan="2" style="border: 0;" valign="middle" colspan="4">
                                     <!-- Important Note: Books once sold nerver be returned or exchanged. -->
                                 </th>
-                                <td class="text-right ref" style="border: 0" colspan="3">Additional Discount</td>
+                                <td class="text-right ref" style="border: 0" colspan="2">Additional Discount</td>
                                 <th class="text-right ref"><?php echo number_format(abs(($order['order']['discount']))); ?></th>
                             </tr>
                             <tr class="no-border">
-                                <td class="text-right ref" style="border: 0" colspan="3">Total Discount</td>
+                                <td class="text-right ref" style="border: 0" colspan="2">Total Discount</td>
                                 <th class="text-right ref"><?php echo number_format(abs(($order['order']['discount'] + $distTotal))); ?></th>
                             </tr>
                             <tr class="no-border">
@@ -299,24 +299,24 @@ $qty = 0; ?>
                                         </table>
                                     </center>
                                 </th>
-                                <td class="text-right ref" style="border: 0" colspan="3">Amount After Discount</td>
+                                <td class="text-right ref" style="border: 0" colspan="2">Amount After Discount</td>
                                 <th class="text-right ref"><?php echo number_format($net); ?></th>
                             </tr>
                             <tr class="no-border">
                                 <th rowspan="4" style="border: 0;" valign="middle" colspan="4" class="text-left">
                                     Net in words: <?php echo convertNumberToWord($net); ?>
                                 </th>
-                                <th class="text-right ref" style="border: 0" colspan="3">Amount Paid</th>
+                                <th class="text-right ref" style="border: 0" colspan="2">Amount Paid</th>
                                 <th class="text-right ref"><?php echo number_format(abs(($order['order']['payment_amount']))); ?></th>
                             </tr>
                             <?php if (!empty($order['order']['payment_amount'])) { ?>
 
                                 <tr class="no-border">
-                                    <th class="text-right ref" style="border: 0" colspan="3">Amount Exchanged</th>
+                                    <th class="text-right ref" style="border: 0" colspan="2">Amount Exchanged</th>
                                     <th class="text-right ref"><?php echo number_format(abs(($order['order']['payment_with_credit']))); ?></th>
                                 </tr>
                                 <tr class="no-border">
-                                    <td class="text-right ref" style="border: 0" colspan="3">Balance</td>
+                                    <td class="text-right ref" style="border: 0" colspan="2">Balance</td>
                                     <th class="text-right ref"><?php echo number_format(abs(($balance))); ?></th>
                                 </tr>
                             <?php } ?>

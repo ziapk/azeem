@@ -16,14 +16,14 @@ if (empty($user)) {
 }
 
 $dentry = new DoubleEntry();
-$journel = $dentry->getLedgerByAccount(['account_id' => $user['account_id'], 'type' => 'c']);
+$journel = $dentry->getLedgerByAccount(['account_id' => $user['account_id'], 'type' => 'c', 'user' => $user['account']]);
 $summery = $journel['summery'];
 
-$summery['debit'] += $user['account']['opening_balance'];
+$paid = $summery['paid'];
+$amount = $summery['due'];
+$balance = $summery['balance'];
 
-$paid = $summery['credit'];
-$amount = $summery['debit'];
-$balance = ($amount - $paid);
+
 
 $data = [
     'paid' => $paid,

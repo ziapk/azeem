@@ -19,17 +19,13 @@ if ($_GET['t'] == 'c') {
     $user = $expenses->expenseByAccount($_GET['id']);
 }
 
-$journel = $dentry->getLedgerByAccount(['account_id' => $_GET['id'], 'type' => $type]);
+$journel = $dentry->getLedgerByAccount(['account_id' => $_GET['id'], 'type' => $type, 'user' => $user['account']]);
 $summery = $journel['summery'];
 
-if ($_GET['t'] == 'c') {
-    $summery['debit'] += $user['account']['opening_balance'];
-} else {
-    $summery['credit'] += $user['account']['opening_balance'];
-}
-$paid = in_array($_GET['t'], ['s', 'emp']) ? $summery['debit'] : $summery['credit'];
-$amount = in_array($_GET['t'], ['s', 'emp']) ? $summery['credit'] : $summery['debit'];
-$balance = ($amount - $paid);
+
+$paid = $summery['paid'];
+$amount = $summery['due'];
+$balance = $summery['balance'];
 
 $url = '?';
 
@@ -43,7 +39,9 @@ mainHeader();
     <table width="100%">
         <tr>
             <td>
-                <h2>Account Summary <a class="btn btn-primary" href="<?php echo 'summeryDownload.php' . $url; ?>" target="_blank">Generate PDF</a></h2>
+                <h2>Account Summary <a class="btn btn-primary" href="<?php echo 'summeryDownload.php' . $url; ?>" target="_blank">Generate PDF</a>
+                    <a class="btn btn-primary" href="javascript:void(0)" ng-click="sendSummery()"><span class="fa fa-envelope"></span>&nbsp; {{sending ? 'Sending...' : 'Send Summery'}}</a>
+                </h2>
                 <p><?php echo $user['full_name']; ?></p>
                 <p><?php echo $user['address']; ?> (<?php echo $user['company']; ?>) </p>
                 <p>Contact No: <?php echo $user['phoneNumber']; ?></p>
@@ -141,16 +139,55 @@ mainHeader();
         $scope.rows = <?php echo safe_json_encode($journel['rows']); ?>;
         $scope.startDate = moment('<?php echo $_GET['from']; ?>' || moment());
         $scope.endDate = moment('<?php echo $_GET['to']; ?>' || moment());
+        $scope.account_id = <?php echo $_GET['id']; ?>;
         $scope.form = {
             betweenDate: {
                 startDate: moment($scope.startDate),
                 toDate: moment($scope.toDate),
             }
         };
+        $scope.sending = false;
         $scope.setRange = (range) => {
             console.log(range.startDate, )
             $scope.startDate = range.startDate?.format('YYYY-MM-DD');
             $scope.endDate = range.endDate?.format('YYYY-MM-DD');
+        }
+
+        $scope.sendSummery = () => {
+            $scope.sending = true;
+            $http.post('sendSummery.php', $httpParamSerializerJQLike({
+                account_id: $scope.account_id,
+                from: '',
+                to: '',
+                type: 'c',
+                customer_name: "<?php echo $user['full_name']; ?>",
+            }), {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            }).then(function(res) {
+                $scope.sending = false;
+                if (res.data.success) {
+                    $scope.alert = {
+                        type: 'success',
+                        message: res.data.message
+                    }
+                } else {
+                    $scope.alert = {
+                        type: 'danger',
+                        message: res.data.message
+                    }
+                }
+                // $uibModalInstance.close($scope.form);
+            }).catch(err => {
+
+                $scope.alert = {
+                    type: 'danger',
+                    message: err?.message || err
+                }
+
+                $scope.sending = false;
+            });
         }
 
         $scope.addCustomer = function(item) {
@@ -217,8 +254,6 @@ mainHeader();
             });
         };
 
-
-
         $scope.cancel = function() {
             $uibModalInstance.dismiss('cancel');
         };
@@ -226,22 +261,22 @@ mainHeader();
 </script>
 <script type="text/ng-template" id="addCustomer.html">
     <form ng-submit="ok()">
-                                    <div class="modal-header">
-                                        <h3 class="modal-title" id="modal-title">Add Customer</h3>
-                                    </div>
-                                    <div class="modal-body" id="modal-body">
-                                        <div uib-alert ng-if="alert" ng-class="'alert-'+(alert.type || 'warning')" close="closeAlert()">{{alert.message}}</div>
-                                        <div class="form-group">
-                                            <label for="samount">Transaction Amount [TID: {{form.transaction_id}}]</label>
-                                            <input id="samount" type="text" ng-model="form.amount" class="form-control" placeholder="Amount">
-                                        </div>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button class="btn btn-default" type="button" ng-click="cancel()">Close</button>
-                                        <button class="btn btn-primary" type="submit">Submit Form</button>
-                                    </div>
-                                </form>
-                                </script>
+        <div class="modal-header">
+            <h3 class="modal-title" id="modal-title">Add Customer</h3>
+        </div>
+        <div class="modal-body" id="modal-body">
+            <div uib-alert ng-if="alert" ng-class="'alert-'+(alert.type || 'warning')" close="closeAlert()">{{alert.message}}</div>
+            <div class="form-group">
+                <label for="samount">Transaction Amount [TID: {{form.transaction_id}}]</label>
+                <input id="samount" type="text" ng-model="form.amount" class="form-control" placeholder="Amount">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-default" type="button" ng-click="cancel()">Close</button>
+            <button class="btn btn-primary" type="submit">Submit Form</button>
+        </div>
+    </form>
+</script>
 
 <?php
 
