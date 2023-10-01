@@ -13,7 +13,7 @@ class Connection
 	// private $dbname = 'reclydmy_azeem';
 	// private $user = 'root';
 	// private $pass = 'root';
-	private $sql_mode = 'STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION';
+	// private $sql_mode = 'STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION';
 
 	public $dbh;
 
@@ -24,7 +24,8 @@ class Connection
 	private function connection()
 	{
 		try {
-			$this->dbh = new PDO('mysql:host=' . $this->host . ';dbname=' . $this->dbname, $this->user, $this->pass, array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::MYSQL_ATTR_INIT_COMMAND => 'SET sql_mode="' . $this->sql_mode . '"'));
+			// , PDO::MYSQL_ATTR_INIT_COMMAND => 'SET sql_mode="' . $this->sql_mode . '"'
+			$this->dbh = new PDO('mysql:host=' . $this->host . ';dbname=' . $this->dbname, $this->user, $this->pass, array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION));
 		} catch (PDOException $e) {
 			print "Error!: " . $e->getMessage() . "<br/>";
 			die();
