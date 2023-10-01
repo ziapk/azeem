@@ -66,7 +66,7 @@ $end = $journel['last'];
         </td>
     </tr>
 </table>
-<table width="100%" border="1" cellpadding="4" cellspacing="0">
+<table width="100%" border="1" cellpadding="4" cellspacing="0" style="border: 1px solid;">
     <thead>
         <tr>
             <th>T.ID</th>

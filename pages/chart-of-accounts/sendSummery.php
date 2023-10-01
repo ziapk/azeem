@@ -4,7 +4,7 @@ include_once dirname(__FILE__) . '/../../include/settings.php';
 global $shop;
 $newsletter = new Newsletter();
 
-$from = !empty($_POST['from']) ? $_POST['from'] : date('Y-m-d', strtotime(date('Y-m') . '-' . '01'));
+$from = !empty($_POST['from']) ? $_POST['from'] : date('Y-m-d', strtotime(date('Y-m', strtotime("-2 months")) . '-' . '01'));
 $to = !empty($_POST['to']) ? $_POST['to'] : date('Y-m-d');
 $type = !empty($_POST['type']) ? $_POST['type'] : 'c';
 $account_id = $_POST['account_id'];
