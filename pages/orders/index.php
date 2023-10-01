@@ -54,7 +54,7 @@ echo mainHeader(['page' => 'order']);
                 <th>Running</th>
                 <th>Status</th>
                 <th>Date/time</th>
-                <th width="120"></th>
+                <th width="140"></th>
             </tr>
         </thead>
         <tbody>
@@ -85,6 +85,9 @@ echo mainHeader(['page' => 'order']);
                     <?php } ?>
                     <a uib-tooltip="Print" class="btn btn-default btn-xs" ng-click="openRecipt(row.id)" href="javascript:void(0)"><span class="fa fa-print"></span></a>
                     <a uib-tooltip="Large View" class="btn btn-default btn-xs" ng-click="openRecipt(row.id, 'details', 'large')" href="javascript:void(0)"><span class="fa fa-file"></span></a>
+                    <?php if ($userData['role'] === 'owner' || $userData['role'] === 'manager') { ?>
+                        <a uib-tooltip="Ledger View" class="btn btn-default btn-xs" href="../chart-of-accounts/summery.php?t=c&id={{row.account_id}}" target="_blank"><span class="fa fa-eye"></span></a>
+                    <?php } ?>
                     <a uib-tooltip="More" class="btn btn-default btn-xs" href="javascript:void(0)" data-toggle="dropdown"><span class="fa fa-chevron-down"></span></a>
                     <ul class="dropdown-menu pull-right">
                         <li>
@@ -109,6 +112,11 @@ echo mainHeader(['page' => 'order']);
                         <li>
                             <a ng-click="openRecipt(row.id, 'details')" href="javascript:void(0)"><span class="fa fa-eye"></span> View</a>
                         </li>
+                        <?php if ($userData['role'] === 'owner' || $userData['role'] === 'manager') { ?>
+                            <li>
+                                <a href="../chart-of-accounts/summery.php?t=c&id={{row.account_id}}" target="_blank"><span class="fa fa-eye"></span> Ledger View</a>
+                            </li>
+                        <?php } ?>
                         <li>
                             <a ng-click="openRecipt(row.id, 'details', 'large')" href="javascript:void(0)"><span class="fa fa-file"></span> Large View</a>
                         </li>
