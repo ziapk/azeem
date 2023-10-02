@@ -40,7 +40,7 @@ mainHeader();
         <tr>
             <td>
                 <h2>Account Summary <a class="btn btn-primary" href="<?php echo 'summeryDownload.php' . $url; ?>" target="_blank">Generate PDF</a>
-                    <a class="btn btn-primary" href="javascript:void(0)" ng-click="sendSummery()"><span class="fa fa-envelope"></span>&nbsp; {{sending ? 'Sending...' : 'Send Summery'}}</a>
+                    <?php if (empty($user['is_default'])) { ?><a class="btn btn-primary" href="javascript:void(0)" ng-click="sendSummery()"><span class="fa fa-envelope"></span>&nbsp; {{sending ? 'Sending...' : 'Send Summery'}}</a><?php } ?>
                 </h2>
                 <p><?php echo $user['full_name']; ?></p>
                 <p><?php echo $user['address']; ?> (<?php echo $user['company']; ?>) </p>

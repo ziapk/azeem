@@ -78,6 +78,9 @@ echo mainHeader(['page' => 'order']);
                 <td><span class="label" ng-class="{'label-success': row.status == 2, 'label-primary': row.status == 1, 'label-danger': row.status == 9}">{{statusArr[row.status].full_name | uppercase}}</span></td>
                 <td>{{row.order_date | date: 'dd MMM'}}</td>
                 <td align="right" class="dropdown">
+                    <?php if ($userData['role'] === 'owner' || $userData['role'] === 'manager') { ?>
+                        <a ng-if="row.is_default == 0" uib-tooltip="Ledger View" class="btn btn-default btn-xs" href="../chart-of-accounts/summery.php?t=c&id={{row.account_id}}" target="_blank"><span class="fa fa-eye"></span></a>
+                    <?php } ?>
                     <?php if ($userData['role'] == 'owner') { ?>
                         <a uib-tooltip="EDIT" class="btn btn-default btn-xs" ng-if="row.status != 5" href="{{'<?php echo SITE_URL; ?>pages/recipt/edit.php?id=' + row.id }}" target="_blank"><span class="fa fa-edit"></span></a>
                     <?php } else { ?>
@@ -85,9 +88,6 @@ echo mainHeader(['page' => 'order']);
                     <?php } ?>
                     <a uib-tooltip="Print" class="btn btn-default btn-xs" ng-click="openRecipt(row.id)" href="javascript:void(0)"><span class="fa fa-print"></span></a>
                     <a uib-tooltip="Large View" class="btn btn-default btn-xs" ng-click="openRecipt(row.id, 'details', 'large')" href="javascript:void(0)"><span class="fa fa-file"></span></a>
-                    <?php if ($userData['role'] === 'owner' || $userData['role'] === 'manager') { ?>
-                        <a uib-tooltip="Ledger View" class="btn btn-default btn-xs" href="../chart-of-accounts/summery.php?t=c&id={{row.account_id}}" target="_blank"><span class="fa fa-eye"></span></a>
-                    <?php } ?>
                     <a uib-tooltip="More" class="btn btn-default btn-xs" href="javascript:void(0)" data-toggle="dropdown"><span class="fa fa-chevron-down"></span></a>
                     <ul class="dropdown-menu pull-right">
                         <li>
@@ -112,14 +112,14 @@ echo mainHeader(['page' => 'order']);
                         <li>
                             <a ng-click="openRecipt(row.id, 'details')" href="javascript:void(0)"><span class="fa fa-eye"></span> View</a>
                         </li>
-                        <?php if ($userData['role'] === 'owner' || $userData['role'] === 'manager') { ?>
-                            <li>
-                                <a href="../chart-of-accounts/summery.php?t=c&id={{row.account_id}}" target="_blank"><span class="fa fa-eye"></span> Ledger View</a>
-                            </li>
-                        <?php } ?>
                         <li>
                             <a ng-click="openRecipt(row.id, 'details', 'large')" href="javascript:void(0)"><span class="fa fa-file"></span> Large View</a>
                         </li>
+                        <?php if ($userData['role'] === 'owner' || $userData['role'] === 'manager') { ?>
+                            <li>
+                                <a ng-if="row.is_default == 0" href="../chart-of-accounts/summery.php?t=c&id={{row.account_id}}" target="_blank"><span class="fa fa-eye"></span> Ledger View</a>
+                            </li>
+                        <?php } ?>
                     </ul>
 
                 </td>
