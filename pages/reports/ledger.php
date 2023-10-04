@@ -94,7 +94,7 @@ ob_start();
     <thead>
         <tr>
             <th style="border: 1px solid">Opening Balance</th>
-            <th style="border: 1px solid"><?php echo number_format($entries['first']['balance']); ?></th>
+            <th style="border: 1px solid"><?php echo number_format($entries['first']['previousBalance']); ?></th>
         </tr>
     </thead>
 </table>

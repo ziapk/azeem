@@ -32,6 +32,7 @@ echo mainHeader(['page' => 'authors']);
                 <td>
                     <a class="btn btn-primary btn-xs" href="<?php echo SITE_URL . "pages/authors/update.php?id=" ?>{{li.id}}">Edit</a>
                     <?php if ($userData['role'] === 'owner' || $userData['role'] === 'manager') { ?><a class="btn btn-default btn-xs" href="../chart-of-accounts/summery.php?t=s&id={{li.account_id}}">Ledger</a><?php } ?>
+                    <?php if ($userData['role'] === 'owner' || $userData['role'] === 'manager') { ?><a class="btn btn-default btn-xs" ng-click="sendSummery(li.account_id)" href="javascript:void(0)"><span class="fa fa-envelope"></span>{{sending[li.account_id] ? 'Sending' : ''}}</a><?php } ?>
                 </td>
             </tr>
         </tbody>
@@ -115,7 +116,7 @@ echo mainHeader(['page' => 'authors']);
         $scope.data = {
             perPage: "10"
         }; //$scope.data.records;
-        console.log($scope.data)
+        $scope.sending = {};
         $scope.currentPage = 1;
         $scope.list = []; //$scope.data.records;
         $scope.search = ""; //$scope.data.records;
@@ -138,6 +139,42 @@ echo mainHeader(['page' => 'authors']);
                         $scope.list = response.data.records;
                     }
                 })
+        }
+
+        $scope.sendSummery = (account_id) => {
+            $scope.sending[account_id] = true;
+            $http.post($scope.siteUrl + 'pages/chart-of-accounts/sendSummery.php', $httpParamSerializerJQLike({
+                account_id,
+                from: '',
+                to: '',
+                type: 's',
+            }), {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            }).then(function(res) {
+                $scope.sending[account_id] = false;
+                if (res.data.success) {
+                    $scope.alert = {
+                        type: 'success',
+                        message: res.data.message
+                    }
+                } else {
+                    $scope.alert = {
+                        type: 'danger',
+                        message: res.data.message
+                    }
+                }
+                // $uibModalInstance.close($scope.form);
+            }).catch(err => {
+
+                $scope.alert = {
+                    type: 'danger',
+                    message: err?.message || err
+                }
+
+                $scope.sending[account_id] = false;
+            });
         }
 
         $scope.perPage = () => {

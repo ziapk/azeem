@@ -248,13 +248,14 @@ class DoubleEntry extends Connection
 
 
 
-			$stmt = "SELECT transaction_id, title, transaction_date, order_ref, order_custom_id, supply_ref, return_ref, transsaction_type, v_description, debitAmount, creditAmount, balance, reference  FROM
+			$stmt = "SELECT transaction_id, title, transaction_date, order_ref, order_custom_id, supply_ref, return_ref, transsaction_type, v_description, debitAmount, creditAmount, balance, previousBalance, reference  FROM
 			(SELECT
 			*
 			,COALESCE(debitAmount)  as debits
 			,COALESCE(creditAmount) as credits
 			,(@running_balance := IF(@curr_account_id < account_id,         opening_balance,@running_balance)) prev_runnng_bal
 			,(@curr_account_id := IF(@curr_account_id < account_id,account_id,@curr_account_id)) curr_account_id
+			,(@running_balance := @running_balance) as previousBalance
 			,(@running_balance := @running_balance + $str) as balance
 			FROM (SELECT t.transsaction_type, t.reference, e.transaction_id, e.payment_mode, a.parent_id, a.code, e.account_id, a.opening_balance, a.account_type, a.title, e.entry_type, t.transaction_date, amount, o.order_custom_id, t.order_ref, t.supply_ref, t.return_ref, t.description as v_description, (CASE WHEN e.entry_type = 'D' THEN e.amount ELSE 0 END) AS debitAmount, (CASE WHEN e.entry_type = 'C' THEN e.amount ELSE 0 END) AS creditAmount FROM `$this->table_transactions` t LEFT JOIN `$this->table_ledger_entries` e ON e.transaction_id = t.id LEFT JOIN `$this->table` a ON a.id = e.account_id and a.status = 1 left join `$this->table_orders` as o on o.id=t.order_ref $where) as acc_account_transactions,(SELECT @running_balance := 0,@curr_account_id := 0) r
 			ORDER BY transaction_id) A";
@@ -265,17 +266,9 @@ class DoubleEntry extends Connection
 			$prepare->execute();
 			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
 			$final = [];
-			$beforeEntry = [];
 			if (!empty($arr['from']) && !empty($arr['to'])) {
-				$first = false;
 				foreach ($result as $key => $value) {
 					if (date($arr['from']) <= date($value['transaction_date']) && date($value['transaction_date']) <= date($arr['to'])) {
-						if ($first == false) {
-							$first = true;
-							if (!empty($result[$key - 1])) {
-								$beforeEntry = $result[$key - 1];
-							}
-						}
 						$final[] = $value;
 					}
 				}
@@ -283,7 +276,8 @@ class DoubleEntry extends Connection
 				$final = $result;
 			}
 
-			return ['count' => sizeof($result), 'rows' => $final, 'first' => $beforeEntry, 'summery' => $summery, 'last' => end($final)];
+			$first = reset($final); // First element's value
+			return ['count' => sizeof($result), 'rows' => $final, 'first' => $first, 'summery' => $summery, 'last' => end($final)];
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
 		}

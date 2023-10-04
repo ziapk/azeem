@@ -55,7 +55,7 @@ $end = $journel['last'];
             <table width="100%">
                 <tr>
                     <td>Opening Balance:</td>
-                    <td style="text-align: right; font-weight: bold" width="140"><?php echo number_format($summery['balance'], 0); ?><br /></td>
+                    <td style="text-align: right; font-weight: bold" width="140"><?php echo number_format($summery['previousBalance'], 0); ?><br /></td>
                 </tr>
                 <tr>
                     <td>Closing Balance:</td>
