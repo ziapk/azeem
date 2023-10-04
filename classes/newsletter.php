@@ -20,6 +20,12 @@ class Newsletter extends Connection
             $mail->SMTPSecure = 'ssl'; // Enable TLS encryption, [ICODE]ssl[/ICODE] also accepted
             $mail->Port = 465; // TCP port to connect to
 
+            $mail->addCustomHeader('X-Label: ' . $array['client']);
+
+            foreach ($array['labels'] as $value) {
+                $mail->addCustomHeader('X-Label: ' . $value);
+            }
+
             //Recipients
             $mail->setFrom('customer@reclinesolutions.com', $array['client']);
 

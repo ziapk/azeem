@@ -308,6 +308,7 @@ if ($supply_id) {
                 'sentTo' => [['email' => !empty($supplier['email']) ? $supplier['email'] : 'zia.pccr@yahoo.com', 'name' => !empty($_POST['supplierName']) ? $_POST['supplierName'] : $supplier['name']]],
                 'ccEmails' => [['email' => $shop['company_email'], 'name' => $shop['full_name']]],
                 'client' => $shop['full_name'],
+                'labels' => [$makeTransaction['transaction_type']]
             ]);
         } catch (Exception $e) {
             print_r($e);

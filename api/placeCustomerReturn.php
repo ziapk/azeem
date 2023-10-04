@@ -233,6 +233,7 @@ $send = $newsletter->send([
     'sentTo' => [['email' => !empty($supplier['email']) ? $supplier['email'] : 'zia.pccr@yahoo.com', 'name' => $_POST['supplierName']]],
     'ccEmails' => [['email' => $storeDATA['company_email'], 'name' => $storeDATA['full_name']]],
     'client' => $storeDATA['full_name'],
+    'labels' => [$makeTransaction['transaction_type']]
 ]);
 
 echo json_encode(['status' => 200, 'message' => 'successfully done', 'order' => ['id' => $returnId]]);

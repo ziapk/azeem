@@ -16,6 +16,7 @@ if (!empty($account_id)) {
         'sentTo' => [['email' => !empty($customer['email']) ? $customer['email'] : 'zia.pccr@yahoo.com', 'name' => $_POST['customer_name']]],
         'ccEmails' => [['email' => $shop['company_email'], 'name' => $shop['full_name']]],
         'client' => $shop['full_name'],
+        'labels' => ['Ledger Summery']
     ]);
     try {
         echo json_encode(['success' => true, 'message' => "Email Sent Successfully!"]);
