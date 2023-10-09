@@ -34,7 +34,7 @@ foreach ($recevingEntry as $row) {
             // $configs['sign_label'] = 'Supplier\'s Sign';
             $userEntry = $row;
             $userEntry['creditAmount'] = $row['amount'];
-            $blc = $de->getOpeningBalance($row['account_id'], 's');
+            // $blc = $de->getOpeningBalance($row['account_id'], 'c');
         }
     }
 }
