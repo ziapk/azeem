@@ -25,7 +25,7 @@ $blc = [];
 $configs = ['title' => 'Receiving Invoice', 'label' => 'Customer\'s Name', 'sign_label' => 'Customer\'s Sign'];
 print_r($recevingEntry);
 foreach ($recevingEntry as $row) {
-    if ($row['entry_type'] == 'C' && $row['transsaction_type'] == 'DIRECT_RECEIVING') {
+    if ($row['entry_type'] == 'C') {
         $userEntry = $row;
         $blc = $de->getOpeningBalance($row['account_id'], 'c');
     } else {
