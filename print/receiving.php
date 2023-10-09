@@ -23,6 +23,7 @@ $recevingEntry = $de->getLedgerByTID($id);
 $userEntry = [];
 $blc = [];
 $configs = ['title' => 'Receiving Invoice', 'label' => 'Customer\'s Name', 'sign_label' => 'Customer\'s Sign'];
+print_r($recevingEntry);
 foreach ($recevingEntry as $row) {
     if ($row['entry_type'] == 'C' && $row['transsaction_type'] == 'DIRECT_RECEIVING') {
         $userEntry = $row;
