@@ -23,7 +23,6 @@ $recevingEntry = $de->getLedgerByTID($id);
 $userEntry = [];
 $blc = [];
 $configs = ['title' => 'Receiving Invoice', 'label' => 'Customer\'s Name', 'sign_label' => 'Customer\'s Sign'];
-print_r($recevingEntry);
 foreach ($recevingEntry as $row) {
     if ($row['entry_type'] == 'C') {
         $userEntry = $row;
@@ -45,7 +44,6 @@ $price = $userEntry['creditAmount'];
 $aprice = 0;
 $largeView = true;
 $currentBalance = $blc['balance'];
-print_r($blc);
 $balance = $price - $order['order']['payment_amount'] - $order['order']['payment_with_credit'];
 ?>
 <link href="https://fonts.googleapis.com/css?family=Courgette&display=swap" rel="stylesheet">
