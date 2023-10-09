@@ -28,10 +28,10 @@ foreach ($recevingEntry as $row) {
         $userEntry = $row;
         $blc = $de->getOpeningBalance($row['account_id'], 'c');
     } else {
-        if (in_array($row['parent_id'], [$storeAccounts['payable']])) {
+        if (in_array($row['parent_id'], [$storeAccounts['receivable']])) {
             $configs['title'] = 'Payment Invoice';
-            $configs['label'] = 'Supplier\'s Name';
-            $configs['sign_label'] = 'Supplier\'s Sign';
+            // $configs['label'] = 'Supplier\'s Name';
+            // $configs['sign_label'] = 'Supplier\'s Sign';
             $userEntry = $row;
             $userEntry['creditAmount'] = $row['amount'];
             $blc = $de->getOpeningBalance($row['account_id'], 's');
