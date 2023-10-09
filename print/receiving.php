@@ -28,7 +28,7 @@ foreach ($recevingEntry as $row) {
         $userEntry = $row;
         $blc = $de->getOpeningBalance($row['account_id'], 'c');
     } else {
-        if (in_array($row['parent_id'], [$storeAccounts['payable'], $storeAccounts['receivable']])) {
+        if (in_array($row['parent_id'], [$storeAccounts['payable']])) {
             $configs['title'] = 'Payment Invoice';
             $configs['label'] = 'Supplier\'s Name';
             $configs['sign_label'] = 'Supplier\'s Sign';
@@ -44,6 +44,7 @@ $price = $userEntry['creditAmount'];
 $aprice = 0;
 $largeView = true;
 $currentBalance = $blc['balance'];
+print_r($blc);
 $balance = $price - $order['order']['payment_amount'] - $order['order']['payment_with_credit'];
 ?>
 <link href="https://fonts.googleapis.com/css?family=Courgette&display=swap" rel="stylesheet">
