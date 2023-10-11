@@ -244,8 +244,8 @@ $qty = 0; ?>
                         </thead>
                         <tbody>
                             <?php foreach ($order['order_items'] as $key => $item) {
-                                $cprice = $item['price'] / (100 / (100 - $item['discount']));
-                                $discountTotal = (!empty($item['discount'])) ? $item['price'] / (100 / ($item['discount'])) : 0;
+                                $cprice = !empty($item['pprice']) ? $item['price'] : $item['price'] / (100 / (100 - $item['discount']));
+                                $discountTotal = !empty($item['pprice']) ? ($item['price'] - $item['pprice']) : (!empty($item['discount']) ? ($item['price'] / (100 / ($item['discount']))) : 0);
                             ?>
                                 <tr>
                                     <td class="text-left"><?php echo $key + 1; ?></td>
