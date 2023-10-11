@@ -26,15 +26,20 @@ $configs = ['title' => 'Receiving Invoice', 'label' => 'Customer\'s Name', 'sign
 foreach ($recevingEntry as $row) {
     if ($row['entry_type'] == 'C') {
         $userEntry = $row;
-        $blc = $de->getOpeningBalance($row['account_id'], 'c');
-    } else {
         if (in_array($row['parent_id'], [$storeAccounts['receivable']])) {
             $configs['title'] = 'Payment Invoice';
-            // $configs['label'] = 'Supplier\'s Name';
-            // $configs['sign_label'] = 'Supplier\'s Sign';
             $userEntry = $row;
             $userEntry['creditAmount'] = $row['amount'];
-            // $blc = $de->getOpeningBalance($row['account_id'], 'c');
+            $blc = $de->getOpeningBalance($row['account_id'], 'c');
+        }
+    } else {
+        if (in_array($row['parent_id'], [$storeAccounts['payable']])) {
+            $configs['title'] = 'Payment Invoice';
+            $configs['label'] = 'Supplier\'s Name';
+            $configs['sign_label'] = 'Supplier\'s Sign';
+            $userEntry = $row;
+            $userEntry['creditAmount'] = $row['amount'];
+            $blc = $de->getOpeningBalance($row['account_id'], 's');
         }
     }
 }

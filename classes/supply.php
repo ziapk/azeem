@@ -100,13 +100,14 @@ class Supply extends Connection
     public function createSupplyDetails($array)
     {
         try {
-            $stmt = "INSERT INTO `{$this->table_sub}` (`supply_id`, `product_id`, `product_title`, `quantity`, `price`, `discount`, `pack_size`, `pack_qty`, `unpack_qty`) VALUES (:supply_id, :product_id, :product_title, :quantity, :price, :discount, :pack_size, :pack_qty, :unpack_qty)";
+            $stmt = "INSERT INTO `{$this->table_sub}` (`supply_id`, `product_id`, `product_title`, `quantity`, `price`, `pprice`, `discount`, `pack_size`, `pack_qty`, `unpack_qty`) VALUES (:supply_id, :product_id, :product_title, :quantity, :price, :pprice, :discount, :pack_size, :pack_qty, :unpack_qty)";
             $prepare = $this->dbh->prepare($stmt);
             $prepare->bindParam(':supply_id', $array['supply_id'], PDO::PARAM_STR);
             $prepare->bindParam(':product_id', $array['product_id'], PDO::PARAM_STR);
             $prepare->bindParam(':product_title', $array['product_title'], PDO::PARAM_STR);
             $prepare->bindParam(':quantity', $array['quantity'], PDO::PARAM_STR);
             $prepare->bindParam(':price', $array['price'], PDO::PARAM_STR);
+            $prepare->bindParam(':pprice', $array['pprice'], PDO::PARAM_STR);
             $prepare->bindParam(':discount', $array['discount'], PDO::PARAM_STR);
             $prepare->bindParam(':pack_size', $array['pack_size'], PDO::PARAM_STR);
             $prepare->bindParam(':pack_qty', $array['pack_qty'], PDO::PARAM_STR);

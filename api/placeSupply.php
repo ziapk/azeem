@@ -182,6 +182,7 @@ if ($supply_id) {
                 'quantity' => $item['qty']  + (!empty($item['unpack_qty']) ? $item['unpack_qty'] : 0),
                 'discount' => !empty($item['discount']) ? $item['discount'] : 0,
                 'price' => $item['price'],
+                'pprice' => $item['pprice'],
                 'pack_size' => !empty($item['pack_size']) ? $item['pack_size'] : 0,
                 'pack_qty' => !empty($item['pack_qty']) ? $item['pack_qty'] : 0,
                 'unpack_qty' => !empty($item['unpack_qty']) ? $item['unpack_qty'] : 0,
