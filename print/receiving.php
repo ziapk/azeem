@@ -25,9 +25,11 @@ $blc = [];
 
 $configs = ['title' => 'Receiving Invoice', 'label' => 'Customer\'s Name', 'sign_label' => 'Customer\'s Sign'];
 foreach ($recevingEntry as $row) {
-    if ($row['entry_type'] == 'C' && $row['transsaction_type'] == 'DIRECT_RECEIVING') {
-        $userEntry = $row;
-        $blc = $de->getOpeningBalance($row['account_id'], 'c');
+    if ($row['entry_type'] == 'C') {
+        if (in_array($row['parent_id'], [$storeAccounts['payable'], $storeAccounts['receivable']])) {
+            $userEntry = $row;
+            $blc = $de->getOpeningBalance($row['account_id'], 'c');
+        }
     } else {
         if (in_array($row['parent_id'], [$storeAccounts['payable'], $storeAccounts['receivable']])) {
             $configs['title'] = 'Payment Invoice';
