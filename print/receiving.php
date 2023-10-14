@@ -22,18 +22,14 @@ foreach ($accountsData as $a) {
 $recevingEntry = $de->getLedgerByTID($id);
 $userEntry = [];
 $blc = [];
+
 $configs = ['title' => 'Receiving Invoice', 'label' => 'Customer\'s Name', 'sign_label' => 'Customer\'s Sign'];
 foreach ($recevingEntry as $row) {
-    if ($row['entry_type'] == 'C') {
+    if ($row['entry_type'] == 'C' && $row['transsaction_type'] == 'DIRECT_RECEIVING') {
         $userEntry = $row;
-        if (in_array($row['parent_id'], [$storeAccounts['receivable']])) {
-            $configs['title'] = 'Payment Invoice';
-            $userEntry = $row;
-            $userEntry['creditAmount'] = $row['amount'];
-            $blc = $de->getOpeningBalance($row['account_id'], 'c');
-        }
+        $blc = $de->getOpeningBalance($row['account_id'], 'c');
     } else {
-        if (in_array($row['parent_id'], [$storeAccounts['payable']])) {
+        if (in_array($row['parent_id'], [$storeAccounts['payable'], $storeAccounts['receivable']])) {
             $configs['title'] = 'Payment Invoice';
             $configs['label'] = 'Supplier\'s Name';
             $configs['sign_label'] = 'Supplier\'s Sign';
@@ -43,6 +39,23 @@ foreach ($recevingEntry as $row) {
         }
     }
 }
+
+// $configs = ['title' => 'Receiving Invoice', 'label' => 'Customer\'s Name', 'sign_label' => 'Customer\'s Sign'];
+// foreach ($recevingEntry as $row) {
+//     if ($row['entry_type'] == 'C') {
+//         $userEntry = $row;
+//         $blc = $de->getOpeningBalance($row['account_id'], 'c');
+//     } else {
+//         if (in_array($row['parent_id'], [$storeAccounts['receivable']])) {
+//             $configs['title'] = 'Payment Invoice';
+//             // $configs['label'] = 'Supplier\'s Name';
+//             // $configs['sign_label'] = 'Supplier\'s Sign';
+//             $userEntry = $row;
+//             $userEntry['creditAmount'] = $row['amount'];
+//             // $blc = $de->getOpeningBalance($row['account_id'], 'c');
+//         }
+//     }
+// }
 $gst = 0;
 $service_charges = 0;
 $price = $userEntry['creditAmount'];

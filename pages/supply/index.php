@@ -97,11 +97,11 @@ echo mainFooter();
             ...item,
             full_name: item.product_title || item.full_name,
             price: parseFloat(item.price),
-            unpack_qty: parseFloat(item.unpack_qty),
-            pack_qty: parseFloat(item.pack_qty),
+            unpack_qty: parseFloat(item.unpack_qty || 0),
+            pack_qty: parseFloat(item.pack_qty || 0),
             pack_size: parseFloat(item.pack_size),
-            quantity: parseFloat(item.quantity) - parseFloat(item.unpack_qty),
-            qty: parseFloat(item.quantity) - parseFloat(item.unpack_qty),
+            quantity: parseFloat(item.quantity || 0) - parseFloat(item.unpack_qty || 0),
+            qty: parseFloat(item.quantity || 0) - parseFloat(item.unpack_qty || 0),
             discount: parseFloat(item.discount)
         })) || [];
         $scope.customerData = {};
