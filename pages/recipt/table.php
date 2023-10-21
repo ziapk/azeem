@@ -18,13 +18,13 @@ foreach ($statuses as  $value) {
 ?>
 <tr>
     <th width="70">Sr.#</th>
-    <th width="380">Description</th>
+    <th width="450">Description</th>
     <th width="120" ng-if="show_discount">Discount</th>
     <th width="100">Unit Price</th>
-    <th width="120">Add Qty</th>
+    <!-- <th width="120">Add Qty</th> -->
     <th width="180" style="text-align: center;">Qty</th>
-    <th width="100">Total</th>
-    <th>
+    <!-- <th width="100">Total</th> -->
+    <th width="180" style="text-align: right;">
         <a href="#" class="btn btn-xs btn-danger" ng-click="deleteAll(indexes, items)">Del</a> |
         <a href="#" class="btn btn-xs btn-primary" ng-click="inActiveAll(indexes, items)">InAct</a>
     </th>
@@ -35,7 +35,7 @@ foreach ($statuses as  $value) {
         <td width="70">
             <label><input ng-change="setList(selectedList)" type="checkbox" ng-model="selectedList[$index]">{{$index + 1}}</label>
         </td>
-        <td width="380">
+        <td width="400">
             {{cart.full_name}} | <strong class="text-danger">{{cart.rackNumbers}}</strong> | <strong class="text-success">{{cart.pack_size}}B</strong>
             <?php if ($userData['role'] === 'owner' || $userData['role'] === 'manager') { ?>
                 <span class="dropdown">
@@ -58,7 +58,7 @@ foreach ($statuses as  $value) {
             <?php } ?>
             <input type="text" ng-change="calculateSum()" ng-model="cart.description" placeholder="Description" ng-if="cart.show" class="form-control">
         </td>
-        <td width="120" width="120" ng-if="show_discount">
+        <td width="120" ng-if="show_discount">
             <div class="input-group">
                 <input type="number" class="form-control input-add-dist" ng-model="cart.discount_value" ng-change="calculateSum()" style="padding-right: 6px">
                 <span class="input-group-btn"><!-- class="dropdown input-group-btn" -->
@@ -76,18 +76,18 @@ foreach ($statuses as  $value) {
                 <del class="text-danger">{{cart.price | number: 2}}</del> / </span>
             <span class="text-success">{{(cart.price - cart.discount) | number: 2}}</span>
         </td>
-        <td width="120"><input type="search" ng-model="newqty" class="form-control input-qty" on-enter-press="addMoreQty(cart, newqty, $event)"></td>
+        <!-- <td width="120"><input type="search" ng-model="newqty" class="form-control input-qty" on-enter-press="addMoreQty(cart, newqty, $event)"></td> -->
         <td width="180">
             <div class="quantity">
                 <a href="#" class="quantity__minus" ng-click="subQty(cart)"><span>-</span></a>
-                <input class="quantity__input" type="text" ng-model="qty" ng-value=" cart.qty | number " ng-change="directlyAdd(qty, cart)">
+                <input class="quantity__input" type="number" ng-model="qty" ng-value=" cart.qty | number " ng-change="directlyAdd(qty, cart)" ng-keydown="initCheckKeypress($event)">
                 <a href="#" class="quantity__plus" ng-click="addQty(cart)"><span>+</span></a>
             </div>
         </td>
-        <td width="100">
+        <!-- <td width="100">
             <input class="form-control text-center" type="number" ng-model="addprice" ng-change="directlyPrice(addprice, cart)" ng-keydown="initCheckKeypress($event)">
-        </td>
-        <td style="text-align: right;">
+        </td> -->
+        <td width="180" style="text-align: right;">
             <strong>{{(cart.price - cart.discount) * cart.qty | number: 2}}</strong>
             <a style="margin-left: 8px;" href="#" class="btn btn-xs btn-danger pull-right" ng-click="remove(cart)">Delete</a>
         </td>
@@ -199,7 +199,7 @@ foreach ($statuses as  $value) {
         <td></td>
     </tr>
     <tr>
-        <td colspan="{{show_discount ?  (6) : (5)}}" rowspan="{{8 + modes.length}}">
+        <td colspan="{{show_discount ?  (4) : (3)}}" rowspan="{{6 + modes.length}}">
             <div class="row">
                 <div class="col-md-4">
                     <p>

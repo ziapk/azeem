@@ -61,7 +61,7 @@ echo mainHeader(['page' => 'category']);
             </div>
             <div class="form-group">
                 <label for="sname">Name</label>
-                <input id="sname" type="text" ng-model="form.full_name" name="full_name" class="form-control" placeholder="Supplier's Name">
+                <input id="sname" type="text" ng-model="form.full_name" name="full_name" class="form-control" placeholder="Category's Name">
             </div>
             <div class="form-group">
                 <label for="groupName">Group</label>

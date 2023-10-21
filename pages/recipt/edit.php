@@ -352,9 +352,11 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
 
                     if (product.product_type == 1 || product.product_type != 1 && !product.services?.length && !product.raw_items?.length) {
                         if (product.discount_type == 2) {
-                            product.discount = parseFloat(product.discount_value)
-                            product.discount_percent = product.discount_value + "%";
-                            subtotal += ((product.price - product.discount) * qty);
+                            product.discount = (product.discount_value || 0)
+                            product.discount_value = parseFloat(product.discount_value || 0);
+                            product.discount_percent = product.discount_value || 0;
+                            subtotal += ((product.price - (product.discount || 0)) * qty);
+
                         } else if (!product.discount_value && customerData.discount_array?.length && customerData.discount_array?.filter(r => r.publisher_id == product.publisher_id).length) {
                             const row = customerData.discount_array.find(r => r.publisher_id == product.publisher_id);
                             const price = parseFloat(product.price);
@@ -536,7 +538,7 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                             if ($('#product-' + currentIndex).find('.input-add-dist').length) {
                                 $('#product-' + currentIndex).find('.input-add-dist').focus();
                             } else {
-                                $('#product-' + currentIndex).find('.input-qty').focus();
+                                $('#product-' + currentIndex).find('.quantity__input').focus();
                             }
                         }
                     }, 200);
@@ -587,6 +589,9 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                 event && event.stopPropagation();
                 let currentIndex = 1
                 let tempSep = sep;
+                if (!p.discount_type) {
+                    p.discount_type = 1
+                }
                 if (p.product_type == 2) {
                     tempSep = true;
                 }
@@ -635,7 +640,7 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                             if ($('#product-' + currentIndex).find('.input-add-dist').length) {
                                 $('#product-' + currentIndex).find('.input-add-dist').focus();
                             } else {
-                                $('#product-' + currentIndex).find('.input-qty').focus();
+                                $('#product-' + currentIndex).find('.quantity__input').focus();
                             }
                         }
 

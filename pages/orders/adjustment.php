@@ -58,11 +58,12 @@ echo mainHeader();
                 <th></th>
             </tr>
             <tr>
-                <td colspan="9"><input type="text" class="form-control" id="searchProduct" ng-model="product" placeholder="Search Product to add" typeahead-on-select="selectProduct($item, row)" uib-typeahead="address as address.full_name for address in searchProduct($viewValue)" typeahead-template-url="row2.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="1" ng-model-options="{debounce: 500}" class="form-control" ng-model="row.product_name" /></td>
+                <td colspan="8"><input type="text" class="form-control" id="searchProduct" ng-model="product" placeholder="Search Product to add" typeahead-on-select="selectProduct($item, row)" uib-typeahead="address as address.full_name for address in searchProduct($viewValue)" typeahead-template-url="row2.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="1" ng-model-options="{debounce: 500}" class="form-control" ng-model="row.product_name" /></td>
+                <td><input type="checkbox" ng-model="qf"> Qty</td>
             </tr>
         </thead>
         <tbody>
-            <tr ng-repeat-start="row in items track by $index">
+            <tr ng-repeat-start="row in items track by $index" id="product-{{$index + 1}}">
                 <td>{{$index + 1}}</td>
                 <td><input type="text" class="form-control" ng-model="row.product_id" /></td>
                 <td>
@@ -186,7 +187,7 @@ echo mainFooter();
             });
         };
     });
-    app.controller('reportController', function($scope, $http, $window, $httpParamSerializerJQLike) {
+    app.controller('reportController', function($scope, $http, $window, $httpParamSerializerJQLike, $timeout, $anchorScroll, $location) {
         $scope.currentShopId = '<?php echo $shop['id']; ?>';
         $scope.ref_no = "";
         $scope.supplierId = "";
@@ -372,12 +373,17 @@ echo mainFooter();
             }
         }
         $scope.selectProduct = function(p, r) {
+            if (!p.discount_type) {
+                p.discount_type = 1
+            }
+            let currentIndex = 1
             let exists = false;
-            $scope.items.map((pro) => {
+            $scope.items.map((pro, index) => {
                 if (pro.product_id == p.id) {
                     exists = true;
                     pro.product_id = p.id;
-                    pro.qty = p.maxQty || 1;
+                    pro.qty++;
+                    currentIndex = index + 1;
                 }
             })
             $scope.product = "";
@@ -389,7 +395,18 @@ echo mainFooter();
                     pprice: parseInt(p.pprice || 0),
                     qty: parseFloat(p.maxQty) || 1
                 });
+                currentIndex = $scope.items.length;
             }
+
+            $timeout(() => {
+                if ($scope.qf) {
+                    $anchorScroll.yOffset = 160;
+                    $location.hash('product-' + currentIndex);
+                    $anchorScroll();
+                    $('#product-' + currentIndex).find('.input-add-dist').focus();
+                }
+            }, 200);
+
             $scope.calculateSum();
 
         }
@@ -552,7 +569,24 @@ echo mainFooter();
             $scope.payment_amount = $scope.grandTotal;
         }
 
-
+        $('body').on('keydown', 'input', function(e) {
+            if (e.key === "Enter") {
+                var self = $(this),
+                    form = self.parents('tr'),
+                    focusable, next;
+                focusable = form.find('input[type=text], input[type=number]').filter(':visible');
+                next = focusable.eq(focusable.index(this) + 1);
+                if (next.length) {
+                    next.focus();
+                } else {
+                    $('#searchProduct').focus()
+                    $anchorScroll.yOffset = 0;
+                    $location.hash('');
+                    $anchorScroll();
+                }
+                return false;
+            }
+        });
 
     });
 </script>

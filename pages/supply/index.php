@@ -364,6 +364,23 @@ echo mainFooter();
         }
 
 
+        $('body').on('keydown', 'input', function(e) {
+            if (e.key === "Enter") {
+                var self = $(this),
+                    form = self.parents('tr'),
+                    focusable, next;
+                focusable = form.find('input[type=text], input[type=number]').filter(':visible');
+                next = focusable.eq(focusable.index(this) + 1);
+                if (next.length) {
+                    next.focus();
+                } else {
+                    $('#searchProduct').focus()
+                }
+                return false;
+            }
+        });
+
+
 
     });
 </script>

@@ -445,7 +445,7 @@ echo mainFooter();
                         if ($('#product-' + currentIndex).find('.input-add-dist').length) {
                             $('#product-' + currentIndex).find('.input-add-dist').focus();
                         } else {
-                            $('#product-' + currentIndex).find('.input-qty').focus();
+                            $('#product-' + currentIndex).find('.quantity__input').focus();
                         }
                     }
                 }, 200);
@@ -458,6 +458,9 @@ echo mainFooter();
 
         $scope.selectProduct = function(p, sep, disableCalc, event) {
             event && event.stopPropagation();
+            if (!p.discount_type) {
+                p.discount_type = 1
+            }
             let currentIndex = 1
             if (p.product_type == 2) {
                 sep = true;
@@ -505,7 +508,7 @@ echo mainFooter();
                         if ($('#product-' + currentIndex).find('.input-add-dist').length) {
                             $('#product-' + currentIndex).find('.input-add-dist').focus();
                         } else {
-                            $('#product-' + currentIndex).find('.input-qty').focus();
+                            $('#product-' + currentIndex).find('.quantity__input').focus();
                         }
                     }
 
@@ -710,7 +713,7 @@ echo mainFooter();
         $scope.initCheckKeypress = (evt) => {
             var e = evt; // for trans-browser compatibility
             var charCode = e.which || e.keyCode;
-            if (charCode === 9) {
+            if (charCode === 9 || charCode === 13) {
                 $('#searchProduct').focus();
                 e.preventDefault();
             }
@@ -735,10 +738,10 @@ echo mainFooter();
                 if (product.product_type == 1 || product.product_type != 1 && !product.services?.length && !product.raw_items?.length) {
                     if (product.discount_type == 2) {
 
-                        product.discount = product.discount_value
-                        product.discount_value = parseFloat(product.discount_value);
-                        product.discount_percent = product.discount_value;
-                        subtotal += ((product.price - product.discount) * qty);
+                        product.discount = (product.discount_value || 0)
+                        product.discount_value = parseFloat(product.discount_value || 0);
+                        product.discount_percent = product.discount_value || 0;
+                        subtotal += ((product.price - (product.discount || 0)) * qty);
                     } else if (!product.discount_value && customerData.discount_array?.length && customerData.discount_array?.filter(r => r.publisher_id == product.publisher_id).length) {
                         const row = customerData.discount_array.find(r => r.publisher_id == product.publisher_id);
                         const price = parseFloat(product.price);
