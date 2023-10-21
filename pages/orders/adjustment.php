@@ -27,7 +27,7 @@ echo mainHeader();
             <input type="hidden" class="form-control" ng-model="supplierId">
             <input ng-if="is_supplier == 1" type="text" class="form-control" ng-model="supplierName" placeholder="Customer's Name" typeahead-on-select="selectSupplier($item)" uib-typeahead="address as address.full_name for address in searchCustomer($viewValue)" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="0">
             <input ng-if="is_supplier == 2" type="text" class="form-control" ng-model="supplierName" placeholder="Supplier's Name" typeahead-on-select="selectSupplier($item)" uib-typeahead="address as address.full_name for address in searchSupplier($viewValue)" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="0">
-            <label><input type="checkbox" ng-model="return_type" ng-true-value="2" ng-false-value="1" ng-change="resetUsers(return_type)"> Supply </label>
+            <label><input type="checkbox" ng-model="return_type" ng-true-value="2" ng-false-value="1" ng-change="resetUsers(return_type)"> Purchase Return </label>
             <label><input type="checkbox" ng-model="is_supplier" ng-true-value="2" ng-false-value="1" ng-change="resetUsers(return_type)"> Is Supplier </label>
             <label><span style="vertical-align: middle; margin-left: 10px"><input type="checkbox" ng-model="show_bundle"></span> <span style="vertical-align: middle">Bundles</span></label>
         </div>
