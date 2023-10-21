@@ -352,6 +352,9 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
 
                     if (product.product_type == 1 || product.product_type != 1 && !product.services?.length && !product.raw_items?.length) {
                         if (product.discount_type == 2) {
+                            if (parseFloat(customerData.default_discount)) {
+                                product.discount_value = product.price;
+                            }
                             product.discount = (product.discount_value || 0)
                             product.discount_value = parseFloat(product.discount_value || 0);
                             product.discount_percent = product.discount_value || 0;
@@ -365,6 +368,9 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                             subtotal += ((product.price - product.discount) * qty);
                         } else {
                             const price = parseFloat(product.price);
+                            if (parseFloat(customerData.default_discount)) {
+                                product.discount_value = customerData.default_discount;
+                            }
                             if (product.discount_value) {
                                 product.discount = price * ((product.discount_value || 0) / 100);
                                 $scope.discountPercentValue += (product.discount * qty);

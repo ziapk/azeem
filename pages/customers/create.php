@@ -30,6 +30,7 @@ if (empty($_POST['full_name'])) {
         'type' => !empty($_POST['type']) ? 2 : 1,
         'address' => !empty($_POST['address']) ? $_POST['address'] : "",
         'phoneNumber' => !empty($_POST['phoneNumber']) ? $_POST['phoneNumber'] : "",
+        'default_discount' => !empty($_POST['default_discount']) ? $_POST['default_discount'] : 0,
     ];
 
     $de = new DoubleEntry();

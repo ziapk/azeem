@@ -29,6 +29,7 @@ if (!empty($_POST) && isset($_POST['update'])) {
             'email' => $_POST['email'],
             'type' => $_POST['type'],
             'phoneNumber' => $_POST['phoneNumber'],
+            'default_discount' => !empty($_POST['default_discount']) ? $_POST['default_discount'] : 0,
             'type' => $_POST['type'],
             'address' => $_POST['address']
         ];
@@ -74,42 +75,49 @@ echo mainHeader();
         <?php if (!empty($message)) { ?><div class="alert alert-success"><?php echo $message; ?></div><?php } ?>
         <?php if (!empty($error)) { ?><div class="alert alert-danger"><?php echo $error; ?></div><?php } ?>
         <div class="row">
-            <div class="col-sm-4 form-group">
+            <div class="col-sm-3 form-group">
                 <input type="text" name="full_name" class="form-control" value="<?php echo $store['full_name']; ?>">
             </div>
-            <div class="col-sm-4 form-group">
+            <div class="col-sm-3 form-group">
                 <input name="code" type="text" class="form-control" placeholder="code" value="<?php echo $store['code']; ?>">
             </div>
-            <div class="col-sm-4 form-group">
+            <div class="col-sm-3 form-group">
                 <input name="title" type="text" class="form-control" placeholder="title" value="<?php echo $store['title']; ?>">
             </div>
-            <div class="col-sm-4 form-group">
+            <div class="col-sm-3 form-group">
                 <input name="company" type="text" class="form-control" placeholder="company" value="<?php echo $store['company']; ?>">
             </div>
-            <div class="col-sm-4 form-group">
+            <div class="col-sm-3 form-group">
                 <input name="email" type="email" class="form-control" placeholder="email" value="<?php echo $store['email']; ?>">
             </div>
-            <div class="col-sm-4 form-group">
+            <div class="col-sm-3 form-group">
                 <input name="address" type="text" class="form-control" placeholder="address" value="<?php echo $store['address']; ?>">
             </div>
-            <div class="col-sm-4 form-group">
+            <div class="col-sm-3 form-group">
                 <input name="phoneNumber" type="text" class="form-control" placeholder="phoneNumber" value="<?php echo $store['phoneNumber']; ?>">
             </div>
+            <div class="col-sm-3 form-group">
+                <input name="default_discount" type="number" class="form-control" placeholder="Discount Default" value="<?php echo $store['default_discount']; ?>">
+            </div>
             <div class="clearfix"></div>
-            <div class="col-sm-4 form-group">
+            <div class="col-sm-3 form-group">
                 <label for="type">Show on Closing Report</label>
                 <select name="type" id="type" class="form-control">
                     <option <?php echo $store['type'] == 2 ? 'selected' : ''; ?> value="2">No</option>
                     <option <?php echo $store['type'] == 1 ? 'selected' : ''; ?> value="1">Yes</option>
                 </select>
             </div>
+            <div class="col-sm-3 form-group">
+                <label for="default_discount">Discount %</label>
+                <input id="default_discount" name="default_discount" type="number" class="form-control" placeholder="Discount Default" value="<?php echo $store['default_discount']; ?>">
+            </div>
             <?php if (!empty($store['account'])) { ?>
-                <div class="col-sm-4 form-group">
+                <div class="col-sm-3 form-group">
                     <label for="opening_balance">Opening Balance</label>
                     <input id="opening_balance" name="opening_balance" type="text" class="form-control" placeholder="Customer's Opening Balance" value="<?php echo $store['account']['opening_balance']; ?>">
                 </div>
             <?php } ?>
-            <div class="col-sm-4 form-group">
+            <div class="col-sm-3 form-group">
                 <?php if (!empty($store['account'])) { ?>
                     <label for="opening_balance">Linked Account</label>
                     <strong class="form-control"><?php echo $store['account']['title'] . ' (' . $store['account']['code'] . ')'; ?></strong>

@@ -196,6 +196,7 @@ echo mainFooter();
             full_name: "",
             phoneNumber: "",
             address: "",
+            default_discount: 0,
             type: false
         }
 
@@ -322,37 +323,44 @@ echo mainFooter();
         </div>
         <div class="modal-body" id="modal-body">
             <div uib-alert ng-if="alert" ng-class="'alert-'+(alert.type || 'warning')" close="closeAlert()">{{alert.message}}</div>
-            <div class="form-group">
+            <div class="row">
+            <div class="form-group col-sm-6">
                 <label for="sname">Name</label>
                 <input id="sname" type="text" ng-model="form.full_name" class="form-control" placeholder="Customer's Name">
             </div>
-            <div class="form-group">
+            <div class="form-group col-sm-6">
                 <label for="semail">Email</label>
                 <input id="semail" type="text" ng-model="form.email" class="form-control" placeholder="Customer's Email">
             </div>
-            <div class="form-group">
+            <div class="form-group col-sm-6">
                 <label for="scontact">Contact</label>
                 <input id="scontact" type="text" ng-model="form.contact" class="form-control" placeholder="Customer's Contact">
             </div>
-            <div class="form-group">
+            <div class="form-group col-sm-6">
                 <label for="stitle">Title</label>
                 <input id="stitle" type="text" ng-model="form.title" class="form-control" placeholder="Customer's title">
             </div>
-            <div class="form-group">
+            <div class="form-group col-sm-6">
                 <label for="scompany">Company</label>
                 <input id="scompany" type="text" ng-model="form.company" class="form-control" placeholder="Customer's company">
             </div>
-            <div class="form-group">
+            <div class="form-group col-sm-6">
                 <label for="saddress">Address</label>
                 <input id="saddress" type="text" ng-model="form.address" class="form-control" placeholder="Customer's Address">
             </div>
-            <div class="form-group">
+            <div class="form-group col-sm-6">
                 <label for="sopening_balance">Opening Balance</label>
                 <input id="sopening_balance" type="text" ng-model="form.opening_balance" class="form-control" placeholder="Customer's Opening Balance">
             </div>
-            <div class="form-group">
-            <label><small><input name="type" ng-model="form.type" type="checkbox"> Select this if you want your customer's balance on closing report</small></label>
+            <div class="form-group col-sm-6">
+                <label for="sdefault_discount">Discount %</label>
+                <input id="sdefault_discount" type="text" ng-model="form.default_discount" class="form-control" placeholder="Customer's Discount">
             </div>
+
+        </div>
+        <div class="form-group">
+            <label><small><input name="type" ng-model="form.type" type="checkbox"> Select this if you want your customer's balance on closing report</small></label>
+        </div>
         </div>
         <div class="modal-footer">
             <button class="btn btn-default" type="button" ng-click="cancel()">Close</button>
