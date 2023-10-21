@@ -145,7 +145,7 @@ $qty = 0; ?>
     }
 
     .head h3 {
-        font-family: 'Courgette', cursive;
+        font-size: 1.75em;
     }
 
     .ref,
@@ -194,13 +194,14 @@ $qty = 0; ?>
                     <table class="table head text-left" style="width: 100%; margin: 0" cellspading="0" cellspacing="0">
                         <tr>
                             <td class="text-left" width="250">
-                                <h3>
-                                    <div style="padding-top: 10px"><?php echo strtoupper($shop['full_name']); ?>
-                                        <p class="mt-0 mb-0"><?php echo $shop['location']; ?>, <?php echo $shop['city']; ?> <br>
-                                            <strong><small><?php echo implode(", ", $result); ?></small></strong>
-                                        </p>
-                                        <div>
-                                </h3>
+                                <div style="padding-top: 10px">
+
+                                    <h3><?php echo strtoupper($shop['full_name']); ?></h3>
+                                    <p class="mt-0 mb-0"><?php echo $shop['location']; ?>, <?php echo $shop['city']; ?> <br>
+                                        <strong><small><?php echo implode(", ", $result); ?></small></strong>
+                                    </p>
+                                    <div>
+
                             </td>
                             <td>
                                 <h2 style="margin: 0 0 10px">Purchase Invoice <?php echo $order['order']['status'] == 1 ? '(Parked)' : null; ?></h2>

@@ -157,7 +157,7 @@ echo mainHeader();
         </tbody>
         <tbody>
             <tr>
-                <th colspan="8" class="text-right">
+                <th colspan="9" class="text-right">
                     <div class="btn-group">
                         <label class="btn btn-default" ng-repeat="li in modes">
                             <input type="radio" name="mode" ng-model="payment_mode" ng-value="li.id" ng-change="printValue(li)">

@@ -153,7 +153,7 @@ if ($largeView) {
         }
 
         .head h3 {
-            font-family: 'Courgette', cursive;
+            font-size: 1.75em;
         }
 
         .ref,
@@ -202,13 +202,14 @@ if ($largeView) {
                         <table class="table head text-left" style="width: 100%; margin: 0" cellspading="0" cellspacing="0">
                             <tr>
                                 <td class="text-left" width="250">
-                                    <h3>
-                                        <div style="padding-top: 10px"><?php echo strtoupper($shop['full_name']); ?>
+                                    <div>
+                                        <div style="padding-top: 10px">
+                                            <h3><?php echo strtoupper($shop['full_name']); ?></h3>
                                             <p class="mt-0 mb-0"><?php echo $shop['location']; ?>, <?php echo $shop['city']; ?> <br>
                                                 <strong><small><?php echo implode(", ", $result); ?></small></strong>
                                             </p>
                                             <div>
-                                    </h3>
+                                            </div>
                                 </td>
                                 <td>
                                     <h2 style="margin: 0 0 10px"><?php echo $configs['title']; ?></h2>
@@ -242,6 +243,7 @@ if ($largeView) {
                                     <th width="40" class="thead">Qty</th>
                                     <th width="50" class="thead">U. Price</th>
                                     <th width="50" class="thead">D. Price</th>
+                                    <th width="40" class="thead">D. %</th>
                                     <th class="text-right thead" width="50">Total</th>
                                 </tr>
                             </thead>
@@ -264,6 +266,10 @@ if ($largeView) {
                                                                 $aprice += $item['quantity'] * ($item['price']);
                                                                 $distTotal += $item['quantity'] * $discountTotal;
                                                                 $qty += $item['quantity'];
+                                                                echo number_format($distTotal / $aprice * 100);
+                                                                ?></td>
+                                        <td class="text-right"><?php
+
                                                                 echo number_format(abs($item['quantity'] * $cprice)); ?></td>
                                     </tr>
                                     <?php if (!empty($item['description'])) { ?>
@@ -276,7 +282,7 @@ if ($largeView) {
                                 <tr class="no-border">
                                     <td valign="top" style="border: 0" class="text-right" colspan="3">Total Quantity</td>
                                     <td valign="top" style="border: 0" class="text-right"><strong><?php echo abs(($qty)); ?></strong></td>
-                                    <td class="text-right ref" style="border: 0" colspan="2">Invoice Total</td>
+                                    <td class="text-right ref" style="border: 0" colspan="3">Invoice Total</td>
                                     <th class="text-right ref"><?php echo number_format(abs(($aprice))); ?></th>
                                 </tr>
                                 <tr class="no-border">
@@ -290,16 +296,16 @@ if ($largeView) {
                                             </tr>
                                         </table>
                                     </th>
-                                    <td class="text-right ref" style="border: 0" colspan="2">Additional Discount</td>
+                                    <td class="text-right ref" style="border: 0" colspan="3">Additional Discount</td>
                                     <th class="text-right ref"><?php echo number_format(abs(($order['order']['discount']))); ?></th>
                                 </tr>
                                 <tr class="no-border">
-                                    <td class="text-right ref" style="border: 0" colspan="2">Total Discount</td>
+                                    <td class="text-right ref" style="border: 0" colspan="3">Total Discount</td>
                                     <th class="text-right ref"><?php echo number_format(abs(($order['order']['discount'] + $distTotal))); ?></th>
                                 </tr>
                                 <tr class="no-border">
                                     <td colspan="4" style="border: 0; font-weight: 600; text-align: right">Net in words: <?php echo convertNumberToWord($net); ?></td>
-                                    <td class="text-right ref" style="border: 0" colspan="2">Net Invoice</td>
+                                    <td class="text-right ref" style="border: 0" colspan="3">Net Invoice</td>
                                     <th class="text-right ref"><?php echo number_format(abs($net)); ?></th>
                                 </tr>
                                 <tr class="no-border">
@@ -403,7 +409,7 @@ if ($largeView) {
         }
 
         .head h3 {
-            font-family: 'Courgette', cursive;
+            font-size: 1.75em;
         }
 
         .ref,
@@ -426,87 +432,88 @@ if ($largeView) {
     </style>
     <div class="recipt">
         <div class="head">
-            <h3 style="display: flex; text-align: left;">
+            <div style="display: flex; text-align: left;">
                 <img width="60" height="60" style="vertical-align: middle; margin-right: 5px; filter: grayscale(100%);" src="<?php echo SITE_URL; ?>assets/clients/<?php echo $shop['image']; ?>" />
-                <div style="padding-top: 10px"><?php echo strtoupper($shop['full_name']); ?>
+                <div style="padding-top: 10px">
+                    <h3><?php echo strtoupper($shop['full_name']); ?></h3>
                     <p class="mt-0"><?php echo $shop['location']; ?>, <?php echo $shop['city']; ?> <br>
                         <strong><small><?php echo implode(", ", $result); ?></small></strong>
                     </p>
                     <div>
-            </h3>
+                    </div>
 
-        </div>
-        <span class="pull-left ref"><span style="font-size: 10px">Customer Name:</span> <strong><?php echo !empty($order['order']['customer_name']) ? $order['order']['customer_name'] : $foodpanda['full_name']; ?></strong></span>
-        <div style="clear: both;"></div>
-        <span class="pull-left ref">Ref. RSV0<?php echo $_GET['id']; ?></span>
-        <span class="pull-right date"><?php echo date('d/m/Y H:i', strtotime($order['order']['created_at'])); ?></span>
-        <table width="100%" cellpadding="0" cellspacing="0">
-            <thead>
-                <tr>
-                    <th class="text-left thead"></th>
-                    <th width="45" class="thead">Price</th>
-                    <th width="45" class="thead">D.Price</th>
-                    <th width="20" class="thead">Qty</th>
-                    <th class="text-right thead" width="45">Total</th>
-                    <th class="text-right thead" width="45">D.Total</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php
-                $totalDist = $order['order']['discount'];
-                foreach ($order['order_items'] as $item) {
-                    if (!empty($order['order']['show_discount'])) {
-                        $totalDist += $item['discount'] * $item['quantity'];
-                        $aprice += $item['quantity'] * ($item['price']);
-                    }
-                ?>
-                    <tr style="border: 0">
-                        <td class="text-left" colspan="6" style="font-size: 10px"><strong style="font-weight: 700"><?php echo $item['product_id']; ?></strong> | <?php echo !empty($item['description']) ? $item['description'] : $item['product_title']; ?></td>
-                    </tr>
-                    <tr style="font-weight: bold">
-                        <td class="text-left"></td>
-                        <td style="padding: 0 3px"><?php echo abs($item['price']); ?></td>
-                        <td style="padding: 0 3px"><?php echo abs($item['price'] - $item['discount']); ?></td>
-                        <td style="padding: 0 3px"><?php echo abs($item['quantity']); ?></td>
-                        <td style="padding: 0 3px" class="text-right"><?php echo abs(($item['quantity'] * ($item['price']))); ?></td>
-                        <td style="padding: 0 3px" class="text-right"><?php echo abs(($item['quantity'] * ($item['price'] - $item['discount']))); ?></td>
-                    </tr>
-                <?php } ?>
-                <tr class="no-border">
-                    <td class="text-right ref" colspan="5">Gross Total</td>
-                    <td class="text-right ref"><?php echo abs(($aprice)); ?></td>
-                </tr>
-                <tr class="no-border">
-                    <th class="text-right ref" colspan="5">Disc</th>
-                    <th class="text-right ref"><?php echo abs(($totalDist)); ?></th>
-                </tr>
-                <tr class="no-border">
-                    <td class="text-right ref" colspan="5">Net Total</td>
-                    <th class="text-right ref"><?php echo abs(($price - $order['order']['discount'])); ?></th>
-                </tr>
-                <?php if (!empty($order['order']['payment_amount'])) { ?>
+                </div>
+                <span class="pull-left ref"><span style="font-size: 10px">Customer Name:</span> <strong><?php echo !empty($order['order']['customer_name']) ? $order['order']['customer_name'] : $foodpanda['full_name']; ?></strong></span>
+                <div style="clear: both;"></div>
+                <span class="pull-left ref">Ref. RSV0<?php echo $_GET['id']; ?></span>
+                <span class="pull-right date"><?php echo date('d/m/Y H:i', strtotime($order['order']['created_at'])); ?></span>
+                <table width="100%" cellpadding="0" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th class="text-left thead"></th>
+                            <th width="45" class="thead">Price</th>
+                            <th width="45" class="thead">D.Price</th>
+                            <th width="20" class="thead">Qty</th>
+                            <th class="text-right thead" width="45">Total</th>
+                            <th class="text-right thead" width="45">D.Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        $totalDist = $order['order']['discount'];
+                        foreach ($order['order_items'] as $item) {
+                            if (!empty($order['order']['show_discount'])) {
+                                $totalDist += $item['discount'] * $item['quantity'];
+                                $aprice += $item['quantity'] * ($item['price']);
+                            }
+                        ?>
+                            <tr style="border: 0">
+                                <td class="text-left" colspan="6" style="font-size: 10px"><strong style="font-weight: 700"><?php echo $item['product_id']; ?></strong> | <?php echo !empty($item['description']) ? $item['description'] : $item['product_title']; ?></td>
+                            </tr>
+                            <tr style="font-weight: bold">
+                                <td class="text-left"></td>
+                                <td style="padding: 0 3px"><?php echo abs($item['price']); ?></td>
+                                <td style="padding: 0 3px"><?php echo abs($item['price'] - $item['discount']); ?></td>
+                                <td style="padding: 0 3px"><?php echo abs($item['quantity']); ?></td>
+                                <td style="padding: 0 3px" class="text-right"><?php echo abs(($item['quantity'] * ($item['price']))); ?></td>
+                                <td style="padding: 0 3px" class="text-right"><?php echo abs(($item['quantity'] * ($item['price'] - $item['discount']))); ?></td>
+                            </tr>
+                        <?php } ?>
+                        <tr class="no-border">
+                            <td class="text-right ref" colspan="5">Gross Total</td>
+                            <td class="text-right ref"><?php echo abs(($aprice)); ?></td>
+                        </tr>
+                        <tr class="no-border">
+                            <th class="text-right ref" colspan="5">Disc</th>
+                            <th class="text-right ref"><?php echo abs(($totalDist)); ?></th>
+                        </tr>
+                        <tr class="no-border">
+                            <td class="text-right ref" colspan="5">Net Total</td>
+                            <th class="text-right ref"><?php echo abs(($price - $order['order']['discount'])); ?></th>
+                        </tr>
+                        <?php if (!empty($order['order']['payment_amount'])) { ?>
 
-                    <tr class="no-border">
-                        <td class="text-right ref" colspan="5">Deposit</td>
-                        <th class="text-right ref"><?php echo abs(($order['order']['payment_amount'])); ?></th>
-                    </tr>
-                    <tr class="no-border">
-                        <td class="text-right ref" colspan="5">Balance</td>
-                        <th class="text-right ref"><?php echo abs(($balance)); ?></th>
-                    </tr>
-                <?php } ?>
-                </tfoot>
-        </table>
-        <footer>
-            Powered by: Zia ur Rehman Ph.# <strong>03245120412</strong>
-        </footer>
-    </div>
-<?php } ?>
-<?php if (!$details) { ?>
-    <script>
-        window.print();
-        window.onafterprint = function() {
-            window.close();
-        }
-    </script>
-<?php } ?>
+                            <tr class="no-border">
+                                <td class="text-right ref" colspan="5">Deposit</td>
+                                <th class="text-right ref"><?php echo abs(($order['order']['payment_amount'])); ?></th>
+                            </tr>
+                            <tr class="no-border">
+                                <td class="text-right ref" colspan="5">Balance</td>
+                                <th class="text-right ref"><?php echo abs(($balance)); ?></th>
+                            </tr>
+                        <?php } ?>
+                        </tfoot>
+                </table>
+                <footer>
+                    Powered by: Zia ur Rehman Ph.# <strong>03245120412</strong>
+                </footer>
+            </div>
+        <?php } ?>
+        <?php if (!$details) { ?>
+            <script>
+                window.print();
+                window.onafterprint = function() {
+                    window.close();
+                }
+            </script>
+        <?php } ?>

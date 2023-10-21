@@ -177,7 +177,7 @@ $qty = 0; ?>
     }
 
     .head h3 {
-        font-family: 'Courgette', cursive;
+        font-size: 1.75em;
     }
 
     .ref,

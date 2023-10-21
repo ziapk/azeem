@@ -149,7 +149,8 @@ if ($largeView) {
         }
 
         .head h3 {
-            font-family: 'Courgette', cursive;
+            font-size: 1.75em;
+            /* font-family: 'Courgette', cursive; */
         }
 
         .ref,
@@ -202,11 +203,11 @@ if ($largeView) {
                                 <td class="text-left" width="250">
                                     <h3>
                                         <div style="padding-top: 10px"><?php echo strtoupper($shop['full_name']); ?>
-                                            <p class="mt-0 mb-0"><?php echo $shop['location']; ?>, <?php echo $shop['city']; ?> <br>
-                                                <strong><small><?php echo implode(", ", $result); ?></small></strong>
-                                            </p>
-                                            <div>
                                     </h3>
+                                    <p class="mt-0 mb-0"><?php echo $shop['location']; ?>, <?php echo $shop['city']; ?> <br>
+                                        <strong><small><?php echo implode(", ", $result); ?></small></strong>
+                                    </p>
+                                    <div>
                                 </td>
                                 <td>
                                     <h2 style="margin: 0 0 10px"><?php echo $cashInvoice; ?></h2>
@@ -403,7 +404,8 @@ if ($largeView) {
         }
 
         .head h3 {
-            font-family: 'Courgette', cursive;
+            font-size: 1.75em;
+            /* font-family: 'Courgette', cursive; */
         }
 
         .ref,
@@ -426,88 +428,89 @@ if ($largeView) {
     </style>
     <div class="recipt">
         <div class="head">
-            <h3 style="display: flex; text-align: left;">
+            <div style="display: flex; text-align: left;">
                 <img width="60" height="60" style="vertical-align: middle; margin-right: 5px; filter: grayscale(100%);" src="<?php echo $siteUrl . "assets/clients/" . $shop['image']; ?>" />
-                <div style="padding-top: 10px"><?php echo strtoupper($shop['full_name']); ?>
+                <div>
+                    <h3><?php echo strtoupper($shop['full_name']); ?></h3>
                     <p class="mt-0"><?php echo $shop['location']; ?>, <?php echo $shop['city']; ?> <br>
                         <strong><small><?php echo implode(", ", $result); ?></small></strong>
                     </p>
-                    <div>
-            </h3>
+                </div>
 
+
+            </div>
+            <span class="pull-left ref"><span style="font-size: 10px">Customer Name:</span> <strong><?php echo !empty($order['order']['customer_name']) ? $order['order']['customer_name'] : $foodpanda['full_name']; ?></strong></span>
+            <div style="clear: both;"></div>
+            <span class="pull-left ref">Ref. <strong>RSV0<?php echo $order['order']['order_custom_id']; ?></strong></span>
+            <span class="pull-right date"><?php echo date('d/m/Y H:i', strtotime($order['order']['created_at'])); ?></span>
+            <table width="100%" cellpadding="0" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th class="text-left thead"></th>
+                        <th width="45" class="thead">Price</th>
+                        <th width="45" class="thead">D.Price</th>
+                        <th width="20" class="thead">Qty</th>
+                        <th class="text-right thead" width="45">Total</th>
+                        <th class="text-right thead" width="45">D.Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    $totalDist = $order['order']['discount'];
+                    foreach ($order['order_items'] as $item) {
+                        if (!empty($order['order']['show_discount'])) {
+                            $totalDist += $item['discount'] * $item['quantity'];
+                            $aprice += $item['quantity'] * ($item['price']);
+                        }
+                    ?>
+                        <tr style="border: 0">
+                            <td class="text-left" colspan="6" style="font-size: 10px"><strong style="font-weight: 700"><?php echo $item['product_id']; ?></strong> | <?php echo !empty($item['description']) ? $item['description'] : $item['product_title']; ?></td>
+                        </tr>
+                        <tr style="font-weight: bold">
+                            <td class="text-left"></td>
+                            <td style="padding: 0 3px"><?php echo abs($item['price']); ?></td>
+                            <td style="padding: 0 3px"><?php echo abs($item['price'] - $item['discount']); ?></td>
+                            <td style="padding: 0 3px"><?php echo abs($item['quantity']); ?></td>
+                            <td style="padding: 0 3px" class="text-right"><?php echo abs(($item['quantity'] * ($item['price']))); ?></td>
+                            <td style="padding: 0 3px" class="text-right"><?php echo abs(($item['quantity'] * ($item['price'] - $item['discount']))); ?></td>
+                        </tr>
+                    <?php } ?>
+                    <tr class="no-border">
+                        <td class="text-left" rowspan="5" colspan="3" valign="bottom" style="font-size: 10px; font-weight: bold; padding: 10px"><?php echo !empty($shop['sale_terms']) ? 'Note: ' . $shop['sale_terms'] : null; ?></td>
+                        <td class="text-right ref" colspan="2">Gross Total</td>
+                        <td class="text-right ref"><?php echo abs(($aprice)); ?></td>
+                    </tr>
+                    <tr class="no-border">
+                        <th class="text-right ref" colspan="2">Disc</th>
+                        <th class="text-right ref"><?php echo abs(($totalDist)); ?></th>
+                    </tr>
+                    <tr class="no-border">
+                        <td class="text-right ref" colspan="2">Net Total</td>
+                        <th class="text-right ref"><?php echo abs(($price - $order['order']['discount'])); ?></th>
+                    </tr>
+                    <?php if (!empty($order['order']['paid_amount'])) { ?>
+
+                        <tr class="no-border">
+                            <td class="text-right ref" colspan="2">Deposit</td>
+                            <th class="text-right ref"><?php echo abs(($order['order']['paid_amount'])); ?></th>
+                        </tr>
+                        <tr class="no-border">
+                            <td class="text-right ref" colspan="2">Balance</td>
+                            <th class="text-right ref"><?php echo abs(($balance)); ?></th>
+                        </tr>
+                    <?php } ?>
+                    </tfoot>
+            </table>
+            <footer style="font-size: 10px; padding-top: 10px">
+                Software Developed by: <strong>Zia ur Rehman</strong> <br /> Ph.# <strong>0324 5120412</strong>
+            </footer>
         </div>
-        <span class="pull-left ref"><span style="font-size: 10px">Customer Name:</span> <strong><?php echo !empty($order['order']['customer_name']) ? $order['order']['customer_name'] : $foodpanda['full_name']; ?></strong></span>
-        <div style="clear: both;"></div>
-        <span class="pull-left ref">Ref. <strong>RSV0<?php echo $order['order']['order_custom_id']; ?></strong></span>
-        <span class="pull-right date"><?php echo date('d/m/Y H:i', strtotime($order['order']['created_at'])); ?></span>
-        <table width="100%" cellpadding="0" cellspacing="0">
-            <thead>
-                <tr>
-                    <th class="text-left thead"></th>
-                    <th width="45" class="thead">Price</th>
-                    <th width="45" class="thead">D.Price</th>
-                    <th width="20" class="thead">Qty</th>
-                    <th class="text-right thead" width="45">Total</th>
-                    <th class="text-right thead" width="45">D.Total</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php
-                $totalDist = $order['order']['discount'];
-                foreach ($order['order_items'] as $item) {
-                    if (!empty($order['order']['show_discount'])) {
-                        $totalDist += $item['discount'] * $item['quantity'];
-                        $aprice += $item['quantity'] * ($item['price']);
-                    }
-                ?>
-                    <tr style="border: 0">
-                        <td class="text-left" colspan="6" style="font-size: 10px"><strong style="font-weight: 700"><?php echo $item['product_id']; ?></strong> | <?php echo !empty($item['description']) ? $item['description'] : $item['product_title']; ?></td>
-                    </tr>
-                    <tr style="font-weight: bold">
-                        <td class="text-left"></td>
-                        <td style="padding: 0 3px"><?php echo abs($item['price']); ?></td>
-                        <td style="padding: 0 3px"><?php echo abs($item['price'] - $item['discount']); ?></td>
-                        <td style="padding: 0 3px"><?php echo abs($item['quantity']); ?></td>
-                        <td style="padding: 0 3px" class="text-right"><?php echo abs(($item['quantity'] * ($item['price']))); ?></td>
-                        <td style="padding: 0 3px" class="text-right"><?php echo abs(($item['quantity'] * ($item['price'] - $item['discount']))); ?></td>
-                    </tr>
-                <?php } ?>
-                <tr class="no-border">
-                    <td class="text-left" rowspan="5" colspan="3" valign="bottom" style="font-size: 10px; font-weight: bold; padding: 10px"><?php echo !empty($shop['sale_terms']) ? 'Note: ' . $shop['sale_terms'] : null; ?></td>
-                    <td class="text-right ref" colspan="2">Gross Total</td>
-                    <td class="text-right ref"><?php echo abs(($aprice)); ?></td>
-                </tr>
-                <tr class="no-border">
-                    <th class="text-right ref" colspan="2">Disc</th>
-                    <th class="text-right ref"><?php echo abs(($totalDist)); ?></th>
-                </tr>
-                <tr class="no-border">
-                    <td class="text-right ref" colspan="2">Net Total</td>
-                    <th class="text-right ref"><?php echo abs(($price - $order['order']['discount'])); ?></th>
-                </tr>
-                <?php if (!empty($order['order']['paid_amount'])) { ?>
-
-                    <tr class="no-border">
-                        <td class="text-right ref" colspan="2">Deposit</td>
-                        <th class="text-right ref"><?php echo abs(($order['order']['paid_amount'])); ?></th>
-                    </tr>
-                    <tr class="no-border">
-                        <td class="text-right ref" colspan="2">Balance</td>
-                        <th class="text-right ref"><?php echo abs(($balance)); ?></th>
-                    </tr>
-                <?php } ?>
-                </tfoot>
-        </table>
-        <footer style="font-size: 10px; padding-top: 10px">
-            Software Developed by: <strong>Zia ur Rehman</strong> <br /> Ph.# <strong>0324 5120412</strong>
-        </footer>
-    </div>
-<?php } ?>
-<?php if (!$details) { ?>
-    <script>
-        window.print();
-        window.onafterprint = function() {
-            window.close();
-        }
-    </script>
-<?php } ?>
+    <?php } ?>
+    <?php if (!$details) { ?>
+        <script>
+            window.print();
+            window.onafterprint = function() {
+                window.close();
+            }
+        </script>
+    <?php } ?>
