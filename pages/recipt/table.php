@@ -71,10 +71,13 @@ foreach ($statuses as  $value) {
             </div>
         </td>
         <td width="100">
-            <span ng-if="cart.discount">
-                {{cart.discount_percent ? cart.discount_percent : ''}}
-                <del class="text-danger">{{cart.price | number: 2}}</del> / </span>
-            <span class="text-success">{{(cart.price - cart.discount) | number: 2}}</span>
+            <div style="display: flex;">
+                <input ng-model="cart.price" class="form-control" ng-if="cart.product_type == 2" ng-change="calculateSum()" />
+                <span ng-if="cart.discount" ng-if="cart.product_type != 2">
+                    {{cart.discount_percent ? cart.discount_percent : ''}}
+                    <del class="text-danger">{{cart.price | number: 2}}</del> / </span>
+                <span ng-if="cart.product_type != 2" class="text-success">{{(cart.price - cart.discount) | number: 2}}</span>
+            </div>
         </td>
         <!-- <td width="120"><input type="search" ng-model="newqty" class="form-control input-qty" on-enter-press="addMoreQty(cart, newqty, $event)"></td> -->
         <td width="180">
@@ -92,7 +95,7 @@ foreach ($statuses as  $value) {
             <a style="margin-left: 8px;" href="#" class="btn btn-xs btn-danger pull-right" ng-click="remove(cart)">Delete</a>
         </td>
     </tr>
-    <tr ng-if="show_bundle">
+    <tr ng-if="show_bundle" ng-repeat-end="cart in items track by $index" id="product-{{$index + 1}}" class="row-expected">
         <td colspan="8">
             <table style="margin-left: auto;" cellpadding="0" cellspacing="0">
                 <tr>
@@ -114,7 +117,7 @@ foreach ($statuses as  $value) {
             </table>
         </td>
     </tr>
-    <tr ng-if="cart.product_type == 2">
+    <!-- <tr ng-if="cart.product_type == 2">
         <td colspan="2"><strong>Services Items</strong></td>
         <td>
             <input type="text" class="form-control" ng-model="cart.service" placeholder="Add Service" uib-typeahead="address as address.full_name for address in searchServices($viewValue)" typeahead-on-select="selectService($item, cart)" ng-model-options="{debounce: 500}" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="1">
@@ -123,8 +126,8 @@ foreach ($statuses as  $value) {
             <input type="text" class="form-control" ng-model="cart.raw" placeholder="Add Raw material" uib-typeahead="address as address.full_name for address in searchProduct($viewValue, 3)" typeahead-on-select="selectRaw($item, cart)" ng-model-options="{debounce: 500}" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="1">
         </td>
         <td colspan="6"></td>
-    </tr>
-    <tr ng-repeat="service in cart.services track by $index" class="row-service">
+    </tr> -->
+    <!-- <tr ng-repeat="service in cart.services track by $index" class="row-service">
         <td style="padding-left: 40px; text-align: right">S.#{{$index + 1}}</td>
         <td>
             <input type="text" class="form-control" ng-model="service.service" placeholder="Search Service" uib-typeahead="address as address.full_name for address in searchServices($viewValue)" typeahead-on-select="selectService($item)" ng-model-options="{debounce: 500}" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="1">
@@ -165,8 +168,8 @@ foreach ($statuses as  $value) {
             {{service.price * service.qty | number: 2 }}
         </td>
         <td colspan="6"></td>
-    </tr>
-    <tr ng-if="cart.product_type == 2" ng-repeat-end="cart in items track by $index" id="product-{{$index + 1}}" class="row-expected">
+    </tr> -->
+    <!-- <tr ng-if="cart.product_type == 2" ng-repeat-end="cart in items track by $index" id="product-{{$index + 1}}" class="row-expected">
         <td>
             Delivery
         </td>
@@ -197,7 +200,7 @@ foreach ($statuses as  $value) {
             </select>
         </td>
         <td></td>
-    </tr>
+    </tr> -->
     <tr>
         <td colspan="{{show_discount ?  (4) : (3)}}" rowspan="{{6 + modes.length}}">
             <div class="row">
