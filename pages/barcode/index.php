@@ -155,7 +155,7 @@ if (!empty($_GET['all']) && $_GET['all'] == '1') {
                 $scope.searchProduct = function(term) {
                     if ($scope.shopId == $scope.currentShopId) {
 
-                        const filteredArray = window.mainList.records.filter(r => r.id == term || r.code == term || r.barcode == term || r.searchString.split('|').pop()?.toLowerCase().includes(term?.toLowerCase()))
+                        const filteredArray = window.mainList.records.filter(r => r.id == term || r.code == term || r.searchString.split('|').pop()?.toLowerCase().includes(term?.toLowerCase()))
                         const secondfilteredArray = !filteredArray.length ? window.mainList.records.filter(obj => obj.searchString.toLowerCase().includes(term?.toLowerCase() || term)) : filteredArray;
 
                         return secondfilteredArray.slice(0, 30);
