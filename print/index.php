@@ -106,12 +106,15 @@ if ($largeView) {
             border: 0;
         }
 
-        th {
+        .recipt-table th {
             padding: 3px 4px;
         }
 
-        td {
+        .recipt-table td {
             padding: 2px 4px;
+        }
+
+        td {
             text-align: center;
         }
 
@@ -202,10 +205,10 @@ if ($largeView) {
                             <tr>
                                 <td class="text-left" width="250">
                                     <h3>
-                                        <div style="padding-top: 10px"><?php echo strtoupper($shop['full_name']); ?>
+                                        <div><?php echo strtoupper($shop['full_name']); ?>
                                     </h3>
                                     <p class="mt-0 mb-0"><?php echo $shop['location']; ?>, <?php echo $shop['city']; ?> <br>
-                                        <strong><small><?php echo implode(", ", $result); ?></small></strong>
+                                        <strong><?php echo implode(", ", $result); ?></strong>
                                     </p>
                                     <div>
                                 </td>
@@ -214,13 +217,13 @@ if ($largeView) {
                                     <span style="font-weight: bold; font-size: 14px;">Bill Ref. <?php echo $order['order']['order_custom_id']; ?></span>
                                 </td>
                                 <td class="text-right" width="250">
-                                    <img width="120" height="60" style="vertical-align: middle; margin-right: 5px; filter: grayscale(100%);" src="<?php echo $siteUrl; ?>assets/clients/<?php echo $shop['image']; ?>" />
+                                    <img width="120" height="60" style="vertical-align: middle; filter: grayscale(100%);" src="<?php echo $siteUrl; ?>assets/clients/<?php echo $shop['image']; ?>" />
                                 </td>
                             </tr>
                         </table>
                         <table class="table" style="width: 100%; margin: 0;" cellspading="0" cellspacing="0">
                             <tr>
-                                <td width="60" class="text-right">Customer:</td>
+                                <td width="60" class="text-left">Name:</td>
                                 <th><?php echo !empty($order['order']['customer_name']) ? $order['order']['customer_name'] : $foodpanda['full_name']; ?></th>
                                 <td width="120" class="text-right">Date Time</td>
                                 <td width="160" class="text-right"><?php echo dbDateToClient($order['order']['created_at']); ?></td>

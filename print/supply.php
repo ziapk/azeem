@@ -102,12 +102,15 @@ $qty = 0; ?>
         border: 0;
     }
 
-    th {
+    .recipt-table th {
+        padding: 4px 5px;
+    }
+
+    .recipt-table td {
         padding: 4px 5px;
     }
 
     td {
-        padding: 4px 5px;
         text-align: center;
     }
 
@@ -194,25 +197,25 @@ $qty = 0; ?>
                     <table class="table head text-left" style="width: 100%; margin: 0" cellspading="0" cellspacing="0">
                         <tr>
                             <td class="text-left" width="250">
-                                <div style="padding-top: 10px">
+                                <div>
 
                                     <h3><?php echo strtoupper($shop['full_name']); ?></h3>
                                     <p class="mt-0 mb-0"><?php echo $shop['location']; ?>, <?php echo $shop['city']; ?> <br>
-                                        <strong><small><?php echo implode(", ", $result); ?></small></strong>
+                                        <strong><?php echo implode(", ", $result); ?></strong>
                                     </p>
                                     <div>
 
                             </td>
                             <td>
                                 <h2 style="margin: 0 0 10px">Purchase Invoice <?php echo $order['order']['status'] == 1 ? '(Parked)' : null; ?></h2>
-                                <span style="font-weight: bold; font-size: 14px;">Bill.# <?php echo $_GET['id'];
+                                <span style="font-weight: bold; font-size: 14px;">Bill Ref. <?php echo $_GET['id'];
                                                                                             if ($order['order']['ref_no']) {
                                                                                             ?> | R:
                                     <?php echo $order['order']['ref_no'];
                                                                                             } ?></span>
                             </td>
                             <td class="text-right" width="250">
-                                <img width="120" height="60" style="vertical-align: middle; margin-right: 5px; filter: grayscale(100%);" src="<?php echo $siteUrl; ?>assets/clients/<?php echo $shop['image']; ?>" />
+                                <img width="120" height="60" style="vertical-align: middle; filter: grayscale(100%);" src="<?php echo $siteUrl; ?>assets/clients/<?php echo $shop['image']; ?>" />
                             </td>
                         </tr>
                     </table>
@@ -273,9 +276,9 @@ $qty = 0; ?>
                                 <?php } ?>
                             <?php } ?>
                             <tr class="no-border">
-                                <td valign="top" style="border: 0" class="text-right" colspan="2">Total Quantity</td>
+                                <td valign="top" style="border: 0" class="text-right" colspan="3">Total Quantity</td>
                                 <td valign="top" style="border: 0" class="text-right"><strong><?php echo abs(($qty)); ?></strong></td>
-                                <td class="text-right ref" style="border: 0" colspan="3">Invoice Total</td>
+                                <td class="text-right ref" style="border: 0" colspan="2">Invoice Total</td>
                                 <th class="text-right ref"><?php echo number_format(abs(($aprice))); ?></th>
                             </tr>
                             <tr class="no-border">

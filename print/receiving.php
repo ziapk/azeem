@@ -134,12 +134,15 @@ $qty = 0; ?>
         border: 0;
     }
 
-    th {
+    .recipt-table th {
+        padding: 4px 5px;
+    }
+
+    .recipt-table td {
         padding: 4px 5px;
     }
 
     td {
-        padding: 4px 5px;
         text-align: center;
     }
 
@@ -220,26 +223,27 @@ $qty = 0; ?>
                     <table class="table head text-left" style="width: 100%; margin: 0" cellspading="0" cellspacing="0">
                         <tr>
                             <td class="text-left" width="250">
-                                <h3>
-                                    <div style="padding-top: 10px"><?php echo strtoupper($shop['full_name']); ?>
-                                        <p class="mt-0 mb-0"><?php echo $shop['location']; ?>, <?php echo $shop['city']; ?> <br>
-                                            <strong><small><?php echo implode(", ", $result); ?></small></strong>
-                                        </p>
-                                        <div>
-                                </h3>
+
+                                <div>
+                                    <h3><?php echo strtoupper($shop['full_name']); ?></h3>
+                                    <p class="mt-0 mb-0"><?php echo $shop['location']; ?>, <?php echo $shop['city']; ?> <br>
+                                        <strong><?php echo implode(", ", $result); ?></strong>
+                                    </p>
+                                    <div>
+
                             </td>
                             <td>
                                 <h2 style="margin: 0 0 10px"><?php echo $configs['title']; ?></h2>
                                 <span style="font-weight: bold; font-size: 14px;">Bill Ref. <?php echo $_GET['id']; ?></span>
                             </td>
                             <td class="text-right" width="250">
-                                <img width="120" height="60" style="vertical-align: middle; margin-right: 5px; filter: grayscale(100%);" src="<?php echo $siteUrl; ?>assets/clients/<?php echo $shop['image']; ?>" />
+                                <img width="120" height="60" style="vertical-align: middle; filter: grayscale(100%);" src="<?php echo $siteUrl; ?>assets/clients/<?php echo $shop['image']; ?>" />
                             </td>
                         </tr>
                     </table>
                     <table class="table" style="width: 100%; margin: 0" cellspading="0" cellspacing="0">
                         <tr>
-                            <td width="140" class="text-right"><?php echo $configs['label']; ?>:</td>
+                            <td width="140" class="text-left"><?php echo $configs['label']; ?>:</td>
                             <th><?php echo $userEntry['title']; ?></th>
                             <td width="120" class="text-right">Date Time</td>
                             <td width="160" class="text-right"><?php echo dbDateToClient($userEntry['datetime']); ?></td>
