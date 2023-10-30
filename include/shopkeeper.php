@@ -125,9 +125,12 @@ $categoryProducts = $productCls->getCategoryProducts($shop['owner_id'], $ids, $s
         <li class="<?php if ($params['page'] == 'running') {
                       echo 'active';
                     } ?>"><a uib-tooltip="Running Items" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/product/running.php"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/lightning-bolt.svg" alt="" /> <span class="nav-menu-text">Running Items</span></a></li>
-        <li class="<?php if ($params['page'] == 'order') {
-                      echo 'active';
-                    } ?>"><a uib-tooltip="Sales" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/orders"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/sales.svg" alt="" /> <span class="nav-menu-text">Sales</span></a></li>
+        <?php
+        if ($userData['role'] == 'owner' || $userData['role'] == 'manager') { ?>
+          <li class="<?php if ($params['page'] == 'order') {
+                        echo 'active';
+                      } ?>"><a uib-tooltip="Sales" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/orders"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/sales.svg" alt="" /> <span class="nav-menu-text">Sales</span></a></li>
+        <?php } ?>
         <!-- <li class="<?php if ($params['page'] == 'reports') {
                           echo 'active';
                         } ?>"><a uib-tooltip="Reports" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/reports"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/reports.svg" alt="" /> <span class="nav-menu-text">Reports</span></a></li> -->
