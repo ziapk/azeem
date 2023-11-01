@@ -209,7 +209,7 @@ class Demands extends Connection
 			$prepare->bindParam(':id', $id, PDO::PARAM_INT);
 			$prepare->execute();
 			$result = $prepare->rowCount();
-			$this->assignStoreQty($array, $shop_id, $owner_id);
+			// $this->assignStoreQty($array, $shop_id, $owner_id);
 			return $result;
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
@@ -271,7 +271,7 @@ class Demands extends Connection
 			if (!empty($isOwner)) {
 				$array['assign_date'] = $array['demand_date'];
 				$array['flag'] = 1;
-				$updated = $this->assignDemand($array);
+				$this->assignDemand($array);
 			}
 			return $array;
 		} catch (PDOException $e) {
