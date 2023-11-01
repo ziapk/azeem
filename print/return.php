@@ -266,7 +266,7 @@ if ($largeView) {
                                                                 $aprice += $item['quantity'] * ($item['price']);
                                                                 $distTotal += $item['quantity'] * $discountTotal;
                                                                 $qty += $item['quantity'];
-                                                                echo $item['discount_value'] . ' ' . ($item['discount_type'] === 1 ? '%' : 'FIX');
+                                                                echo $item['discount_value'] . ' ' . ($item['discount_type'] == 1 ? '%' : 'FIX');
                                                                 ?>
                                         </td>
                                         <td class="text-right"><?php echo number_format(abs($item['quantity'] * $cprice)); ?></td>
