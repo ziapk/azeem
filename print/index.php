@@ -259,14 +259,14 @@ if ($largeView) {
                                             <span style="float: right;"><?php echo !empty($item['pack_qty']) ? '<strong>Bundles: ' . $item['pack_qty'] . 'x' . $item['pack_size'] . (!empty($item['unpack_qty']) ? '+' . $item['unpack_qty'] : '') . '</strong>' : null; ?></span>
                                         </td>
                                         <td class="text-right"><?php echo abs(($item['quantity'])); ?></td>
-                                        <td class="text-right"><?php echo number_format(abs(($item['price']))); ?></td>
-                                        <td class="text-right"><?php echo abs(($item['discount'] / $item['price']) * 100) . '%'; ?></td>
-                                        <td class="text-right"><?php echo number_format(abs(($item['price'] - $item['discount']))); ?></td>
+                                        <td class="text-right"><?php echo number_format(round(($item['price']), 2)); ?></td>
+                                        <td class="text-right"><?php echo round(($item['discount'] / $item['price']) * 100, 2) . '%'; ?></td>
+                                        <td class="text-right"><?php echo number_format(round(($item['price'] - $item['discount']), 2)); ?></td>
                                         <td class="text-right"><?php
                                                                 $aprice += $item['quantity'] * ($item['price']);
                                                                 $distTotal += $item['quantity'] * ($item['discount']);
                                                                 $qty += $item['quantity'];
-                                                                echo number_format(abs(($item['quantity'] * ($item['price'] - $item['discount'])))); ?></td>
+                                                                echo number_format(round(($item['quantity'] * ($item['price'] - $item['discount'])), 2)); ?></td>
                                     </tr>
                                     <?php if (!empty($item['description'])) { ?>
                                         <tr>
