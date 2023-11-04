@@ -11,6 +11,8 @@ if (empty($_POST['title'])) {
         'id' => $_POST['id'],
         'title' => $_POST['title'],
         'code' => $_POST['code'],
+        'shopId' => $_POST['shopId'],
+        'owner_id' => $_POST['owner_id'],
         'is_default' => $_POST['is_default'],
         'status' => !empty($_POST['status']) ? $_POST['status'] : 1
     ];

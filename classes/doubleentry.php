@@ -979,11 +979,13 @@ class DoubleEntry extends Connection
 		}
 	}
 
-	public function updateAll()
+	public function updateAll($owner_id, $shopId)
 	{
 		try {
-			$stmt = "UPDATE `{$this->table_modes}` SET `is_default`=0";
+			$stmt = "UPDATE `{$this->table_modes}` SET `is_default`=0 where shopId=:shopId and owner_id=:owner_id";
 			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':shopId', $shopId, PDO::PARAM_STR);
+			$prepare->bindParam(':owner_id', $owner_id, PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $prepare->rowCount();
 			return $result;
@@ -999,7 +1001,9 @@ class DoubleEntry extends Connection
 		$code = $array['code'];
 		$is_default = $array['is_default'];
 		$status = $array['status'];
-		$this->updateAll();
+		$shopId = $array['shopId'];
+		$owner_id = $array['owner_id'];
+		$this->updateAll($owner_id, $shopId);
 		try {
 			$stmt = "UPDATE `{$this->table_modes}` SET `title`=:title, `code`=:code, `is_default`=:is_default, `status`=:status WHERE `id` = :id";
 			$prepare = $this->dbh->prepare($stmt);
