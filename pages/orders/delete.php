@@ -11,6 +11,15 @@ include_once dirname(__FILE__) . '/../../include/settings.php';
 
 if (!empty($id) && !empty($reason)) {
     $orders = new Orders();
+    $orderDetail = $orders->getOrder($id);
+    $currentStatus = $orderDetail['order']['status'];
+    if (in_array($orderDetail['order']['status'], [2, 8, 9])) {
+        // rollback products first
+        $products = new Products();
+        foreach ($orderDetail['order_items'] as $prod) {
+            $products->subProductQty(['product_id' => $prod['product_id'], 'quantity' => -1 * $prod['quantity'], 'pack_qty' => $prod['pack_qty'], 'owner_id' => $userData['role'] == 'owner' ? $userData['id'] : $userData['created_by'], 'shopId' => $orderDetail['order']['shopId']]);
+        }
+    }
     $orders->changeOrderFlag(['id' => $id, 'reason' => $reason, 'flag' => 99]);
     echo json_encode(['success' => true, 'message' => "Successfully deleted!"]);
 }
