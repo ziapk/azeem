@@ -125,6 +125,7 @@ $productTypes = array(
     '2' => 'Service',
     '3' => 'Raw Material',
     '4' => 'Asset',
+    '5' => 'F.O.R',
 );
 
 $statusArr = [

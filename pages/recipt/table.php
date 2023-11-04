@@ -31,7 +31,7 @@ foreach ($statuses as  $value) {
 </tr>
 </thead>
 <tbody>
-    <tr ng-repeat-start="cart in items track by $index" id="product-{{$index + 1}}">
+    <tr ng-repeat-start="cart in items track by $index" id="product-{{$index + 1}}" ng-if="cart.product_type != 5">
         <td width="70">
             <label><input ng-change="setList(selectedList)" type="checkbox" ng-model="selectedList[$index]">{{$index + 1}}</label>
         </td>
@@ -95,7 +95,7 @@ foreach ($statuses as  $value) {
             <a style="margin-left: 8px;" href="#" class="btn btn-xs btn-danger pull-right" ng-click="remove(cart)">Delete</a>
         </td>
     </tr>
-    <tr ng-if="show_bundle" ng-repeat-end="cart in items track by $index" id="product-{{$index + 1}}" class="row-expected">
+    <tr ng-if="show_bundle && cart.product_type != 5" ng-repeat-end="cart in items track by $index" id="product-{{$index + 1}}" class="row-expected">
         <td colspan="8">
             <table style="margin-left: auto;" cellpadding="0" cellspacing="0">
                 <tr>
@@ -229,6 +229,10 @@ foreach ($statuses as  $value) {
         </td>
         <td class="text-right">Sub Total</td>
         <td class="text-right" style="font-weight: bold; font-size: 1.5em">{{(subTotal + discountPercentValue) | number: 2}}</td>
+    </tr>
+    <tr ng-repeat="cart in items track by $index" ng-if="cart.product_type == 5">
+        <td width="150" class="text-right">{{cart.full_name}}</td>
+        <td width="150"><input type="text" ng-model="cart.price" class="form-control" on-enter-press="calculateSum()"></td>
     </tr>
     <tr>
         <td width="150" class="text-right">Add Discount</td>
