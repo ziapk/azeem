@@ -202,7 +202,9 @@ foreach ($statuses as  $value) {
         <td></td>
     </tr> -->
     <tr ng-repeat="cart in items track by $index" ng-if="cart.product_type == 5">
-        <td colspan="{{show_discount ?  (4) : (3)}}"></td>
+        <td colspan="{{show_discount ?  (4) : (3)}}">
+            <a href="#" class="btn btn-xs btn-danger pull-right" ng-click="remove(cart)">Delete</a>
+        </td>
         <td width="150" class="text-right">{{cart.full_name}}</td>
         <td width="150"><input type="text" ng-model="cart.price" class="form-control" ng-change="calculateSum()"></td>
     </tr>
