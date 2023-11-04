@@ -198,6 +198,7 @@ if (!empty($_POST) && isset($_POST['update'])) {
             'cat_id' => !empty($_POST['cat_id']) ? $_POST['cat_id'] : null,
             'pack_size' => !empty($_POST['pack_size']) ? $_POST['pack_size'] : 0,
             'pack_qty' => !empty($_POST['pack_qty']) ? $_POST['pack_qty'] : 0,
+            'product_type' => !empty($_POST['product_type']) ? $_POST['product_type'] : "1",
             'description' => $_POST['description'],
             'group' => $_POST['group'],
             'author' => $_POST['author'],
@@ -279,6 +280,14 @@ echo mainHeader(['page' => 'product']);
             <div class="col-sm-3 form-group">
                 <label>Description</label>
                 <input type="text" name="description" ng-model="form.description" placeholder="i.e Any thing about product" class="form-control">
+            </div>
+            <div class="col-sm-3 form-group">
+                <label>Product Type</label>
+                <select ng-model="form.product_type" name="product_type" class="form-control">
+                    <?php foreach ($productTypes as $key => $value) { ?>
+                        <option value="<?php echo $key; ?>"><?php echo $value; ?></option>
+                    <?php } ?>
+                </select>
             </div>
         </div>
         <!-- <h4 class="text-danger"><strong>Tax Information</strong></h4>

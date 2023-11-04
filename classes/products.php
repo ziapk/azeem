@@ -863,7 +863,7 @@ class Products extends Connection
 	public function updateProduct($array)
 	{
 		try {
-			$stmt = "UPDATE `{$this->table}` SET `full_name`=:full_name, `price`=:price, `pprice`=:pprice, `code`=:code, `description`=:description, `group`=:group, `board`=:board, `author`=:author, `image`=:image, `publisher_id`=:publisher_id, `cat_id`=:cat_id, pack_size=:pack_size, pack_qty=:pack_qty WHERE id=:id AND owner_id=:owner_id";
+			$stmt = "UPDATE `{$this->table}` SET `full_name`=:full_name, `price`=:price, `pprice`=:pprice, `code`=:code, `description`=:description, `group`=:group, `board`=:board, `author`=:author, `image`=:image, `publisher_id`=:publisher_id, `cat_id`=:cat_id, pack_size=:pack_size, pack_qty=:pack_qty, product_type=:product_type WHERE id=:id AND owner_id=:owner_id";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':full_name', $array['full_name'], PDO::PARAM_STR);
 			$prepare->bindParam(':price', $array['price'], PDO::PARAM_STR);
@@ -880,6 +880,7 @@ class Products extends Connection
 			$prepare->bindParam(':cat_id', $array['cat_id'], PDO::PARAM_STR);
 			$prepare->bindParam(':id', $array['id'], PDO::PARAM_INT);
 			$prepare->bindParam(':owner_id', $array['owner_id'], PDO::PARAM_INT);
+			$prepare->bindParam(':product_type', $array['product_type'], PDO::PARAM_INT);
 			$prepare->execute();
 			$result = $prepare->rowCount();
 			return $result;
