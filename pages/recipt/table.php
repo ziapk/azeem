@@ -232,7 +232,7 @@ foreach ($statuses as  $value) {
     </tr>
     <tr ng-repeat="cart in items track by $index" ng-if="cart.product_type == 5">
         <td width="150" class="text-right">{{cart.full_name}}</td>
-        <td width="150"><input type="text" ng-model="cart.price" class="form-control" on-enter-press="calculateSum()"></td>
+        <td width="150"><input type="text" ng-model="cart.price" class="form-control" ng-change="calculateSum()"></td>
     </tr>
     <tr>
         <td width="150" class="text-right">Add Discount</td>
