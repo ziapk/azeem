@@ -726,7 +726,7 @@ echo mainFooter();
             let counter = 1;
             for (const product of $scope.items) {
                 product.price = product.price || 0;
-                if (product.product_type != 1) {
+                if (product.product_type != 5) {
                     product.srno = counter;
                     counter++;
                 }

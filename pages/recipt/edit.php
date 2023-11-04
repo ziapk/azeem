@@ -341,7 +341,7 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                 let counter = 1;
                 for (const product of $scope.items) {
                     product.price = product.price || 0;
-                    if (product.product_type != 1) {
+                    if (product.product_type != 5) {
                         product.srno = counter;
                         counter++;
                     }
