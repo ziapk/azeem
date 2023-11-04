@@ -632,7 +632,7 @@ echo mainFooter();
                     customerId: $scope.customerData && $scope.customerData.id ? $scope.customerData.id : 1,
                     subTotal: $scope.subTotal,
                     discount: $scope.discount,
-                    items: $scope.items.map(({
+                    items: $scope.items.filter(row => row.price).map(({
                         id,
                         description,
                         pack_size,

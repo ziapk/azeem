@@ -194,7 +194,7 @@ echo mainFooter();
             let currentIndex = 1
             let exists = false;
             $scope.items.map((pro, index) => {
-                if (pro.id == p.id) {
+                if (pro.id == p.id && p.product_type != 5) {
                     exists = true;
                     currentIndex = index + 1;
                     pro.qty++;
@@ -212,7 +212,7 @@ echo mainFooter();
             }
 
             $timeout(() => {
-                if ($scope.qf) {
+                if ($scope.qf && p.product_type != 5) {
                     $anchorScroll.yOffset = 160;
                     $location.hash('product-' + currentIndex);
                     $anchorScroll();
@@ -304,7 +304,7 @@ echo mainFooter();
                 subTotal: $scope.subTotal,
                 payable: $scope.grandTotal,
                 discount: $scope.discount,
-                items: $scope.items,
+                items: $scope.items.filter(product => product.pprice),
                 shopId: $scope.shopId,
                 id: '<?php echo $_GET['id']; ?>' || 0,
                 status: status || 2,
@@ -331,7 +331,19 @@ echo mainFooter();
 
         $scope.calculateSum = (price) => {
             let subtotal = 0;
-            $scope.items.map((product) => {
+            let counter = 1;
+            let forCounter = 1;
+            for (const product of $scope.items) {
+                product.price = product.price || 0;
+                if (product.product_type != 5) {
+                    product.srno = counter;
+                    counter++;
+                } else {
+                    product.srno = forCounter;
+                    forCounter++;
+                    product.price = product.pprice;
+                }
+
                 if (price) {
                     product.pprice = parseFloat((product.price * ((100 - (parseFloat(product.discount || 0))) / 100)).toFixed(2));
                 }
@@ -349,9 +361,7 @@ echo mainFooter();
 
                 subtotal += parseFloat((product.pprice * qty).toFixed(2));
                 product.total = parseFloat((product.pprice * qty).toFixed(2))
-
-                return Object.assign({}, product);
-            })
+            }
             $scope.subTotal = subtotal;
             $scope.grandTotal = $scope.payment_amount = $scope.subTotal - $scope.discount;
         }

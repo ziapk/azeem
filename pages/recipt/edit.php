@@ -772,7 +772,7 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                         customer_name: $scope.customerName,
                         subTotal: $scope.subTotal,
                         discount: $scope.discount,
-                        items: $scope.items.map(({
+                        items: $scope.items.filter(row => row.price).map(({
                             id,
                             description,
                             qty,

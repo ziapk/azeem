@@ -19,8 +19,8 @@
         </tr>
     </thead>
     <tbody>
-        <tr ng-repeat-start="row in items track by $index" id="product-{{$index + 1}}">
-            <td style="text-align: center"><input type="checkbox" ng-model="row.pin" /> {{$index + 1}}</td>
+        <tr ng-repeat-start="row in items track by $index" id="product-{{row.srno}}" ng-if="row.product_type != 5">
+            <td style="text-align: center"><input type="checkbox" ng-model="row.pin" /> {{row.srno}}</td>
             <td><input type="text" class="form-control" ng-model="row.minQty" /></td>
             <td><input type="text" class="form-control" ng-model="row.id" />
             </td>
@@ -36,7 +36,7 @@
             <td style="text-align: right">{{row.total | number: 2}}</td>
             <td><a href="#" class="btn btn-xs btn-danger pull-right" ng-click="remove($index)">Delete</a></td>
         </tr>
-        <tr ng-repeat-end="row in items track by $index" ng-if="show_bundle">
+        <tr ng-repeat-end="row in items track by $index" ng-if="show_bundle && row.product_type != 5">
             <td colspan="10">
                 <table style="margin-left: auto;" cellpadding="0" cellspacing="0">
                     <tr>
@@ -60,6 +60,13 @@
         </tr>
     </tbody>
     <tbody>
+        <tr ng-repeat="row in items track by $index" ng-if="row.product_type == 5">
+            <td colspan="6">
+                <a href="#" class="btn btn-xs btn-danger pull-right" ng-click="remove($index)">Delete</a>
+            </td>
+            <td width="150" colspan="2" class="text-right">{{row.full_name}}</td>
+            <td width="150" colspan="2"><input type="text" ng-model="row.pprice" class="form-control" ng-change="calculateSum()"></td>
+        </tr>
         <tr>
             <th rowspan="6" colspan="6"></th>
             <th class="text-right" colspan="2">Sub Total</th>
