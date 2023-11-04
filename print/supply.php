@@ -248,33 +248,35 @@ $qty = 0; ?>
                         </thead>
                         <tbody>
                             <?php foreach ($order['order_items'] as $key => $item) {
-                                $cprice = !empty($item['pprice']) ? $item['pprice'] : $item['price'] / (100 / (100 - $item['discount']));
-                                $discountTotal = !empty($item['pprice']) ? ($item['price'] - $item['pprice']) : (!empty($item['discount']) ? ($item['price'] / (100 / ($item['discount']))) : 0);
+                                if ($item['product_type'] != 5) {
+                                    $cprice = !empty($item['pprice']) ? $item['pprice'] : $item['price'] / (100 / (100 - $item['discount']));
+                                    $discountTotal = !empty($item['pprice']) ? ($item['price'] - $item['pprice']) : (!empty($item['discount']) ? ($item['price'] / (100 / ($item['discount']))) : 0);
                             ?>
-                                <tr>
-                                    <td class="text-left"><?php echo $key + 1; ?></td>
-                                    <td class="text-left" style="padding: 0 6px"><?php echo $item['product_id']; ?></td>
-                                    <td class="text-left">
-                                        <?php echo !empty($item['product_title']) ? $item['product_title'] : $item['full_name']; ?>
-                                        <span style="float: right;"><?php echo !empty($item['pack_qty']) ? '<strong>Bundles: ' . $item['pack_qty'] . 'x' . $item['pack_size'] . (!empty($item['unpack_qty']) ? '+' . $item['unpack_qty'] : '') . '</strong>' : null; ?></span>
-                                    </td>
-                                    <td class="text-right"><?php echo abs(($item['quantity'])); ?></td>
-                                    <!-- <td class="text-right"><?php echo number_format(abs(($item['price']))); ?></td> -->
-                                    <td class="text-right"><?php echo number_format(abs($item['discount'])) . '%'; ?></td>
-                                    <td class="text-right"><?php echo $cprice; ?></td>
-                                    <td class="text-right"><?php
-                                                            $aprice += $item['quantity'] * ($item['price']);
-                                                            $distTotal += $item['quantity'] * $discountTotal;
-                                                            $qty += $item['quantity'];
-                                                            echo number_format(abs($item['quantity'] * $cprice)); ?></td>
-                                </tr>
-                                <?php if (!empty($item['description'])) { ?>
                                     <tr>
-                                        <th colspan="2">--</th>
-                                        <td colspan="6" style="text-align: left"><?php echo $item['description']; ?></td>
+                                        <td class="text-left"><?php echo $key + 1; ?></td>
+                                        <td class="text-left" style="padding: 0 6px"><?php echo $item['product_id']; ?></td>
+                                        <td class="text-left">
+                                            <?php echo !empty($item['product_title']) ? $item['product_title'] : $item['full_name']; ?>
+                                            <span style="float: right;"><?php echo !empty($item['pack_qty']) ? '<strong>Bundles: ' . $item['pack_qty'] . 'x' . $item['pack_size'] . (!empty($item['unpack_qty']) ? '+' . $item['unpack_qty'] : '') . '</strong>' : null; ?></span>
+                                        </td>
+                                        <td class="text-right"><?php echo abs(($item['quantity'])); ?></td>
+                                        <!-- <td class="text-right"><?php echo number_format(abs(($item['price']))); ?></td> -->
+                                        <td class="text-right"><?php echo number_format(abs($item['discount'])) . '%'; ?></td>
+                                        <td class="text-right"><?php echo $cprice; ?></td>
+                                        <td class="text-right"><?php
+                                                                $aprice += $item['quantity'] * ($item['price']);
+                                                                $distTotal += $item['quantity'] * $discountTotal;
+                                                                $qty += $item['quantity'];
+                                                                echo number_format(abs($item['quantity'] * $cprice)); ?></td>
                                     </tr>
-                                <?php } ?>
-                            <?php } ?>
+                                    <?php if (!empty($item['description'])) { ?>
+                                        <tr>
+                                            <th colspan="2">--</th>
+                                            <td colspan="6" style="text-align: left"><?php echo $item['description']; ?></td>
+                                        </tr>
+                                    <?php } ?>
+                            <?php }
+                            } ?>
                             <tr class="no-border">
                                 <td valign="top" style="border: 0" class="text-right" colspan="3">Total Quantity</td>
                                 <td valign="top" style="border: 0" class="text-right"><strong><?php echo abs(($qty)); ?></strong></td>
@@ -292,6 +294,18 @@ $qty = 0; ?>
                                 <td class="text-right ref" style="border: 0" colspan="2">Total Discount</td>
                                 <th class="text-right ref"><?php echo number_format(abs(($order['order']['discount'] + $distTotal))); ?></th>
                             </tr>
+                            <?php
+                            foreach ($order['order_items'] as $item) {
+                                if ($item['product_type'] == 5) { ?>
+                                    <tr class="no-border">
+                                        <th style="border: 0;" valign="middle" colspan="4">
+                                            <!-- Important Note: Books once sold nerver be returned or exchanged. -->
+                                        </th>
+                                        <td class="text-right ref" style="border: 0" colspan="2"><?php echo $item['full_name']; ?></td>
+                                        <th class="text-right ref"><?php echo number_format(abs(($item['price']))); ?></th>
+                                    </tr>
+                            <?php }
+                            } ?>
                             <tr class="no-border">
                                 <th style="border: 0;" valign="middle" colspan="4">
                                     <center>

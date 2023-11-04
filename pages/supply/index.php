@@ -356,7 +356,7 @@ echo mainFooter();
                 if (!$scope.show_bundle) {
                     product.unpack_qty = 0;
                     product.pack_qty = 0;
-                    // product.pack_size = 0;
+                    product.pack_size = 0;
                 }
 
                 subtotal += parseFloat((product.pprice * qty).toFixed(2));

@@ -169,7 +169,7 @@ class Supply extends Connection
                 $result['supplier'] = $c->getSupplier($result['order']['supplier_id']);
             }
             if (!empty($result['order'])) {
-                $stmt = "SELECT item.*, p.full_name, p.code, p.barcode, p.id FROM `{$this->table_sub}` as item LEFT JOIN products as p ON item.product_id = p.id WHERE item.supply_id=:id";
+                $stmt = "SELECT item.*, p.full_name, p.code, p.barcode, p.id, p.product_type FROM `{$this->table_sub}` as item LEFT JOIN products as p ON item.product_id = p.id WHERE item.supply_id=:id";
                 $prepare = $this->dbh->prepare($stmt);
                 $prepare->bindParam(':id', $id, PDO::PARAM_STR);
                 $prepare->execute();
