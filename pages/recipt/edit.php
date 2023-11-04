@@ -339,6 +339,7 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                 let subtotal = 0;
                 $scope.discountPercentValue = 0;
                 $scope.items.map((product) => {
+                    product.price = product.price || 0;
                     if (product.pack_qty && $scope.show_bundle) {
                         product.qty = (product.pack_size || 1) * product.pack_qty;
                     }

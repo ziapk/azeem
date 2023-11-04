@@ -724,6 +724,7 @@ echo mainFooter();
             let subtotal = 0;
             $scope.discountPercentValue = 0;
             $scope.items.map((product) => {
+                product.price = product.price || 0;
                 if (product.pack_qty && $scope.show_bundle) {
                     product.qty = (product.pack_size || 1) * product.pack_qty;
                 }
