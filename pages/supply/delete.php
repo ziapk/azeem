@@ -11,7 +11,7 @@ include_once dirname(__FILE__) . '/../../include/settings.php';
 
 if (!empty($id) && !empty($reason)) {
     $orders = new Supply();
-    $orderDetail = $supply->getOrder($id);
+    $orderDetail = $orders->getOrder($id);
     // rollback products first
     foreach ($orderDetail['order_items'] as $prod) {
         $products->addProductQty($prod['product_id'], ['qty' => -1 * $prod['quantity'], 'pack_size' => $prod['pack_size'], 'pack_qty' => -1 * $prod['pack_qty']], $orderDetail['order']['shopId']);
