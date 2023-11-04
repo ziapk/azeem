@@ -724,11 +724,15 @@ echo mainFooter();
             let subtotal = 0;
             $scope.discountPercentValue = 0;
             let counter = 1;
+            let forCounter = 1;
             for (const product of $scope.items) {
                 product.price = product.price || 0;
                 if (product.product_type != 5) {
                     product.srno = counter;
                     counter++;
+                } else {
+                    product.srno = forCounter;
+                    forCounter++;
                 }
                 if (product.pack_qty && $scope.show_bundle) {
                     product.qty = (product.pack_size || 1) * product.pack_qty;

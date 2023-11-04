@@ -339,11 +339,15 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                 let subtotal = 0;
                 $scope.discountPercentValue = 0;
                 let counter = 1;
+                let forCounter = 1;
                 for (const product of $scope.items) {
                     product.price = product.price || 0;
                     if (product.product_type != 5) {
                         product.srno = counter;
                         counter++;
+                    } else {
+                        product.srno = forCounter;
+                        forCounter++;
                     }
                     if (product.pack_qty && $scope.show_bundle) {
                         product.qty = (product.pack_size || 1) * product.pack_qty;
@@ -604,7 +608,7 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                 if (!p.discount_type) {
                     p.discount_type = 1
                 }
-                if (p.product_type == 2) {
+                if (p.product_type == 2 || p.product_type == 5) {
                     tempSep = true;
                 }
                 if (tempSep) {

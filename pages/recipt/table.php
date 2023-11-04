@@ -201,6 +201,11 @@ foreach ($statuses as  $value) {
         </td>
         <td></td>
     </tr> -->
+    <tr ng-repeat="cart in items track by $index" ng-if="cart.product_type == 5">
+        <td colspan="{{show_discount ?  (4) : (3)}}"></td>
+        <td width="150" class="text-right">{{cart.full_name}}</td>
+        <td width="150"><input type="text" ng-model="cart.price" class="form-control" ng-change="calculateSum()"></td>
+    </tr>
     <tr>
         <td colspan="{{show_discount ?  (4) : (3)}}" rowspan="{{6 + modes.length}}">
             <div class="row">
@@ -229,10 +234,6 @@ foreach ($statuses as  $value) {
         </td>
         <td class="text-right">Sub Total</td>
         <td class="text-right" style="font-weight: bold; font-size: 1.5em">{{(subTotal + discountPercentValue) | number: 2}}</td>
-    </tr>
-    <tr ng-repeat="cart in items track by $index" ng-if="cart.product_type == 5">
-        <td width="150" class="text-right">{{cart.full_name}}</td>
-        <td width="150"><input type="text" ng-model="cart.price" class="form-control" ng-change="calculateSum()"></td>
     </tr>
     <tr>
         <td width="150" class="text-right">Add Discount</td>
