@@ -13,6 +13,7 @@ if (!empty($id) && !empty($reason)) {
     $orders = new Supply();
     $orderDetail = $orders->getOrder($id);
     // rollback products first
+    $products = new Products();
     foreach ($orderDetail['order_items'] as $prod) {
         $products->addProductQty($prod['product_id'], ['qty' => -1 * $prod['quantity'], 'pack_size' => $prod['pack_size'], 'pack_qty' => -1 * $prod['pack_qty']], $orderDetail['order']['shopId']);
     }
