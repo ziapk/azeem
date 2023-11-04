@@ -462,7 +462,7 @@ echo mainFooter();
                 p.discount_type = 1
             }
             let currentIndex = 1
-            if (p.product_type == 2) {
+            if (p.product_type == 2 || p.product_type == 5) {
                 sep = true;
             }
             if (sep) {
