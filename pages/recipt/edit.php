@@ -338,8 +338,13 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                 const customerData = c || $scope.customerData;
                 let subtotal = 0;
                 $scope.discountPercentValue = 0;
-                $scope.items.map((product) => {
+                let counter = 1;
+                for (const product of $scope.items) {
                     product.price = product.price || 0;
+                    if (product.product_type != 1) {
+                        product.srno = counter;
+                        counter++;
+                    }
                     if (product.pack_qty && $scope.show_bundle) {
                         product.qty = (product.pack_size || 1) * product.pack_qty;
                     }
@@ -391,7 +396,7 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                         })
                         subtotal += product.price * qty;
                     }
-                })
+                };
                 $scope.subTotal = subtotal;
                 $scope.payment_amount = $scope.subTotal - $scope.discount;
                 $scope.grandTotal = $scope.payment_amount = $scope.payment_amount + Math.round($scope.payment_amount * ($scope.gst / 100)) + Math.round($scope.payment_amount * ($scope.service_charges / 100));

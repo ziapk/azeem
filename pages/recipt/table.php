@@ -31,9 +31,9 @@ foreach ($statuses as  $value) {
 </tr>
 </thead>
 <tbody>
-    <tr ng-repeat-start="cart in items track by $index" id="product-{{$index + 1}}" ng-if="cart.product_type != 5">
+    <tr ng-repeat-start="cart in items track by $index" id="product-{{cart.srno}}" ng-if="cart.product_type != 5">
         <td width="70">
-            <label><input ng-change="setList(selectedList)" type="checkbox" ng-model="selectedList[$index]">{{$index + 1}}</label>
+            <label><input ng-change="setList(selectedList)" type="checkbox" ng-model="selectedList[cart.srno]">{{cart.srno}}</label>
         </td>
         <td width="400">
             {{cart.full_name}} | <strong class="text-danger">{{cart.rackNumbers}}</strong> | <strong class="text-success">{{cart.pack_size}}B</strong>
@@ -95,7 +95,7 @@ foreach ($statuses as  $value) {
             <a style="margin-left: 8px;" href="#" class="btn btn-xs btn-danger pull-right" ng-click="remove(cart)">Delete</a>
         </td>
     </tr>
-    <tr ng-if="show_bundle && cart.product_type != 5" ng-repeat-end="cart in items track by $index" id="product-{{$index + 1}}" class="row-expected">
+    <tr ng-if="show_bundle && cart.product_type != 5" ng-repeat-end="cart in items track by $index" class="row-expected">
         <td colspan="8">
             <table style="margin-left: auto;" cellpadding="0" cellspacing="0">
                 <tr>
