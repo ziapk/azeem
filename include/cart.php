@@ -349,6 +349,9 @@
               records
             }))
             $window.mainList = response.data;
+            toaster.success({
+              body: 'Items Updated!'
+            });
           });
       } else {
         $window.mainList = JSON.parse(p);
