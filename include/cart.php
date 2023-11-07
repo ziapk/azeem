@@ -338,7 +338,6 @@
                 is_active,
                 min_qty,
                 other_codes,
-                pprice,
                 discount_amount,
                 discount_type,
                 board,
