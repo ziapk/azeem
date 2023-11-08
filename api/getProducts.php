@@ -46,7 +46,7 @@ function convert_array_to_utf8(&$array)
         if (is_array($value)) {
             convert_array_to_utf8($value);
         } elseif (is_string($value)) {
-            $value = mb_convert_encoding($value, 'UTF-8', 'ISO-8859-1');
+            $value = $value;
         }
     }
 }
