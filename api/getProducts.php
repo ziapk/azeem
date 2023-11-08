@@ -40,19 +40,19 @@ if (!empty($_SESSION['shopInfo'])) {
 };
 $search['status'] = $status;
 
-function convert_array_to_utf8(&$array)
-{
-    foreach ($array as $key => &$value) {
-        if (is_array($value)) {
-            convert_array_to_utf8($value);
-        } elseif (is_string($value)) {
-            $value = $value;
-        }
-    }
-}
-convert_array_to_utf8($search);
-echo json_encode($search);
-if (json_last_error()) {
-    var_dump(json_last_error());
-}
-// echo safe_json_encode($search);
+// function convert_array_to_utf8(&$array)
+// {
+//     foreach ($array as $key => &$value) {
+//         if (is_array($value)) {
+//             convert_array_to_utf8($value);
+//         } elseif (is_string($value)) {
+//             $value = $value;
+//         }
+//     }
+// }
+// convert_array_to_utf8($search);
+// echo json_encode($search);
+// if (json_last_error()) {
+//     var_dump(json_last_error());
+// }
+echo safe_json_encode($search);
