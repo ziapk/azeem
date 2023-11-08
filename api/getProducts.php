@@ -40,4 +40,7 @@ if (!empty($_SESSION['shopInfo'])) {
 };
 $search['status'] = $status;
 echo json_encode($search);
+if (json_last_error()) {
+    var_dump(json_last_error());
+}
 // echo safe_json_encode($search);
