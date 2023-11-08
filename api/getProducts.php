@@ -55,4 +55,4 @@ $search['status'] = $status;
 // if (json_last_error()) {
 //     var_dump(json_last_error());
 // }
-echo json_encode($search);
+echo safe_json_encode($search);
