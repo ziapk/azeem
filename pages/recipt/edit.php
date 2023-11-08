@@ -185,7 +185,7 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                 if (confirm('Are you sure you want delete?')) {
                     if (indexes?.length) {
                         $scope.items = list.reduce((acc, value, index) => {
-                            if (!indexes.includes(index)) {
+                            if (!indexes.includes(value.srno)) {
                                 acc.push(value);
                             }
                             return acc;
@@ -205,7 +205,7 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                     if (indexes?.length) {
                         const removableItems = [];
                         $scope.items = list.reduce((acc, value, index) => {
-                            if (!indexes.includes(index)) {
+                            if (!indexes.includes(value.srno)) {
                                 acc.push(value);
                             } else {
                                 $scope.setInactive(value);
@@ -346,7 +346,7 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                         product.srno = counter;
                         counter++;
                     } else {
-                        product.srno = forCounter;
+                        product.frsrno = forCounter;
                         forCounter++;
                     }
                     if (product.pack_qty && $scope.show_bundle) {

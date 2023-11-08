@@ -200,7 +200,7 @@ echo mainFooter();
             if (confirm('Are you sure you want delete?')) {
                 if (indexes?.length) {
                     $scope.items = list.reduce((acc, value, index) => {
-                        if (!indexes.includes(index)) {
+                        if (!indexes.includes(value.srno)) {
                             acc.push(value);
                         }
                         return acc;
@@ -220,7 +220,7 @@ echo mainFooter();
                 if (indexes?.length) {
                     const removableItems = [];
                     $scope.items = list.reduce((acc, value, index) => {
-                        if (!indexes.includes(index)) {
+                        if (!indexes.includes(value.srno)) {
                             acc.push(value);
                         } else {
                             $scope.setInactive(value);
@@ -731,7 +731,7 @@ echo mainFooter();
                     product.srno = counter;
                     counter++;
                 } else {
-                    product.srno = forCounter;
+                    product.frsrno = forCounter;
                     forCounter++;
                 }
                 if (product.pack_qty && $scope.show_bundle) {
