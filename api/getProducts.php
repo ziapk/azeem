@@ -50,8 +50,8 @@ function convert_array_to_utf8(&$array)
         }
     }
 }
-$newArray = convert_array_to_utf8($search);
-echo json_encode($newArray);
+convert_array_to_utf8($search);
+echo json_encode($search);
 if (json_last_error()) {
     var_dump(json_last_error());
 }
