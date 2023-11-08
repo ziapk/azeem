@@ -2,7 +2,7 @@
 $totals = ['price' => 0, 'samples_qty' => 0, 'samples' => 0, 'discount' => 0, 'paid' => 0, 'balance' => 0];
 ?>
 <center>
-    <h2>Sales Orders</h2>
+    <h2><?php echo !empty($reportTitle) ? $reportTitle : "Sales Orders"; ?></h2>
     <h4>Between <?php echo $from; ?> and <?php echo $to; ?></h4>
 </center>
 <table class="table">

@@ -83,9 +83,11 @@ switch ($reportType) {
 		}
 		if (!empty($product_ids)) {
 			$orders = $ordersObj->ordersReport($shopId, $from, $to, $product_ids);
+			$reportTitle = "Purchase Orders (Product Wise)";
 			include_once dirname(__FILE__) . '/salesProductsReport.php';
 		} else {
 			$orders = $ordersObj->ordersReport($shopId, $from, $to, $product_ids);
+			$reportTitle = "Purchase Orders";
 			include_once dirname(__FILE__) . '/salesReport.php';
 		}
 		exit;
