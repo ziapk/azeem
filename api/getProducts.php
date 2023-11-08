@@ -39,7 +39,19 @@ if (!empty($_SESSION['shopInfo'])) {
     }
 };
 $search['status'] = $status;
-echo json_encode($search);
+
+function convert_array_to_utf8(&$array)
+{
+    foreach ($array as $key => &$value) {
+        if (is_array($value)) {
+            convert_array_to_utf8($value);
+        } elseif (is_string($value)) {
+            $value = mb_convert_encoding($value, 'UTF-8', 'ISO-8859-1');
+        }
+    }
+}
+$newArray = convert_array_to_utf8($search);
+echo json_encode($newArray);
 if (json_last_error()) {
     var_dump(json_last_error());
 }
