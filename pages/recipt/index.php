@@ -813,6 +813,8 @@ echo mainFooter();
 
         $scope.submitCode = (form) => {
             $http.post("<?php echo SITE_URL ?>pages/product/update.php?id=" + form.id, $httpParamSerializerJQLike({
+                    author: form.author,
+                    full_name: form.newTitle,
                     code: form.newBarCode,
                     price: form.newPrice,
                     rackNo: form.rackNo,

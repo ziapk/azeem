@@ -69,6 +69,15 @@ if (!empty($_POST) && isset($_POST['createCode'])) {
             $data['price'] = $_POST['price'];
             $create = $productObj->updateProductPrice($data);
         }
+        if (!empty($_POST['author'])) {
+            $data['author'] = $_POST['author'];
+            $create = $productObj->updateProductAuthor($data);
+        }
+
+        if (!empty($_POST['full_name'])) {
+            $data['full_name'] = $_POST['full_name'];
+            $create = $productObj->updateProductName($data);
+        }
 
         if ($create) {
             $message = "Successfully Added!";
