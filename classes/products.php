@@ -876,9 +876,23 @@ class Products extends Connection
 	public function updateProductName($array)
 	{
 		try {
-			$stmt = "UPDATE `{$this->table}` SET  `full_name`=:full_name WHERE id=:id";
+			$stmt = "UPDATE `{$this->table}` SET `full_name`=:full_name WHERE id=:id";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':full_name', $array['full_name'], PDO::PARAM_STR);
+			$prepare->bindParam(':id', $array['product_id'], PDO::PARAM_STR);
+			$prepare->execute();
+			$prepare->rowCount();
+			return $array['product_id'];
+		} catch (PDOException $e) {
+			die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
+	public function updateProductPublisherId($array)
+	{
+		try {
+			$stmt = "UPDATE `{$this->table}` SET `publisher_id`=:publisher_id WHERE id=:id";
+			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':publisher_id', $array['publisher_id'], PDO::PARAM_STR);
 			$prepare->bindParam(':id', $array['product_id'], PDO::PARAM_STR);
 			$prepare->execute();
 			$prepare->rowCount();

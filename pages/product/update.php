@@ -53,41 +53,41 @@ $error = "";
 $message = "";
 if (!empty($_POST) && isset($_POST['createCode'])) {
     $error = "";
-    if (empty($_POST['code']) && empty($_POST['price'])) {
-        $error = "Please fill all fields";
+    $data = [
+        'product_id' => $_GET['id']
+    ];
+
+    if (!empty($_POST['code'])) {
+        $data['code'] = $_POST['code'];
+        $create = $productObj->createProductCode($data);
+    }
+    if (!empty($_POST['price'])) {
+        $data['price'] = $_POST['price'];
+        $create = $productObj->updateProductPrice($data);
+    }
+    if (!empty($_POST['author'])) {
+        $data['author'] = $_POST['author'];
+        $create = $productObj->updateProductAuthor($data);
+    }
+
+    if (!empty($_POST['full_name'])) {
+        $data['full_name'] = $_POST['full_name'];
+        $create = $productObj->updateProductName($data);
+    }
+
+    if (!empty($_POST['publisher_id'])) {
+        $data['publisher_id'] = $_POST['publisher_id'];
+        $create = $productObj->updateProductPublisherId($data);
+    }
+
+    if ($create) {
+        $message = "Successfully Added!";
     } else {
-
-        $data = [
-            'product_id' => $_GET['id']
-        ];
-
-        if (!empty($_POST['code'])) {
-            $data['code'] = $_POST['code'];
-            $create = $productObj->createProductCode($data);
-        }
-        if (!empty($_POST['price'])) {
-            $data['price'] = $_POST['price'];
-            $create = $productObj->updateProductPrice($data);
-        }
-        if (!empty($_POST['author'])) {
-            $data['author'] = $_POST['author'];
-            $create = $productObj->updateProductAuthor($data);
-        }
-
-        if (!empty($_POST['full_name'])) {
-            $data['full_name'] = $_POST['full_name'];
-            $create = $productObj->updateProductName($data);
-        }
-
-        if ($create) {
-            $message = "Successfully Added!";
-        } else {
-            $message = "Nothing Added";
-        }
-        if (!empty($_POST['json_response'])) {
-            echo json_encode(["status" => 200, "message" => $message]);
-            die();
-        }
+        $message = "Nothing Added";
+    }
+    if (!empty($_POST['json_response'])) {
+        echo json_encode(["status" => 200, "message" => $message]);
+        die();
     }
 }
 if (!empty($_POST) && isset($_POST['updateCode'])) {

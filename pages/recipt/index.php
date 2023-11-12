@@ -8,6 +8,12 @@ $orders = $ordersObj->userOrders($shop['id'], $data, 1, false);
 $stores = new Store();
 $userId = $userData['role'] == 'owner' ? $userData['id'] : $userData['created_by'];
 $ownerStores = $stores->getOwnerStores($userId);
+
+
+$publisherObj = new Publishers();
+
+$publishers = $publisherObj->getPublishers($userId);
+
 ?>
 <style>
     .uib-typeahead-match.active span.text-danger {
@@ -370,6 +376,10 @@ echo mainFooter();
                     unpack_qty: parseFloat(row.unpack_qty || 0),
                     discount: row.discount?.toString(),
                     discount_value: row.discount_value?.toString(),
+                    publisher: row.publisherName ? ({
+                        full_name: row.publisherName,
+                        id: row.publisher_id,
+                    }) : null
                 })
             });
             $scope.items = items;
@@ -470,7 +480,11 @@ echo mainFooter();
                     ...p,
                     pack_size: parseFloat(p.pack_size || 0),
                     qty: 1,
-                    show: true
+                    show: true,
+                    publisher: p.publisherName ? ({
+                        full_name: p.publisherName,
+                        id: p.publisher_id,
+                    }) : null
                 });
                 currentIndex = $scope.items.length;
             } else {
@@ -489,7 +503,11 @@ echo mainFooter();
                     $scope.items.push({
                         ...p,
                         pack_size: parseFloat(p.pack_size || 0),
-                        qty: 1
+                        qty: 1,
+                        publisher: p.publisherName ? ({
+                            full_name: p.publisherName,
+                            id: p.publisher_id,
+                        }) : null
                     });
                     currentIndex = $scope.items.length;
                 }
@@ -810,12 +828,20 @@ echo mainFooter();
             <?php } ?>
 
         }
+        $scope.opublishers = <?php echo !empty($publishers) ? json_encode($publishers) : json_encode([]); ?>;
+        $scope.publishers = <?php echo !empty($publishers) ? json_encode($publishers) : json_encode([]); ?>;
+
+        $scope.refreshPublishers = search => {
+            $scope.publishers = $scope.opublishers.filter(r => r.full_name.toLowerCase().includes(search.toLowerCase()));
+        }
 
         $scope.submitCode = (form) => {
             $http.post("<?php echo SITE_URL ?>pages/product/update.php?id=" + form.id, $httpParamSerializerJQLike({
                     author: form.author,
                     full_name: form.newTitle,
                     code: form.newBarCode,
+                    product_id: form.product_id,
+                    publisher_id: form?.publisher?.id || '',
                     price: form.newPrice,
                     rackNo: form.rackNo,
                     createCode: true,

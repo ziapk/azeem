@@ -6,6 +6,13 @@ $order = $orders->getOrder($id);
 if (!empty($_GET['dup'])) { // remove id from order
     unset($order['order']['id']);
 }
+
+
+
+$publisherObj = new Publishers();
+$userId = $userData['role'] == 'owner' ? $userData['id'] : $userData['created_by'];
+$publishers = $publisherObj->getPublishers($userId);
+
 echo mainHeader(['page' => 'recipt', 'title' => (!empty($_GET['dup']) ? "Duplicate => " : "") . $order['order']['customer_name'], 'hideSidebar' => $userData['role'] == 'shopkeeper' ? false : true]);
 if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
 
@@ -478,6 +485,10 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                     pack_qty: parseFloat(row.pack_qty || 0),
                     pack_size: parseFloat(row.pack_size || obj.pack_size || 0),
                     discount_value: row.discount_type == 2 ? parseFloat(row.discount) : (parseFloat(row.discount || 0) / row.price) * 100,
+                    publisher: row.publisherName ? ({
+                        full_name: row.publisherName,
+                        id: row.publisher_id,
+                    }) : null
                 })
             });
             if ($window.sessionStorage.getItem('shopping')) {
@@ -494,6 +505,10 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                         discount: parseFloat(row.discount),
                         qty: row.quantity,
                         discount_value: row.discount_type == 2 ? parseFloat(row.discount) : (parseFloat(row.discount || 0) / row.price) * 100,
+                        publisher: row.publisherName ? ({
+                            full_name: row.publisherName,
+                            id: row.publisher_id,
+                        }) : null
                     })
                 });
                 $scope.items = items;
@@ -616,7 +631,11 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                         ...p,
                         qty: 1,
                         pack_size: parseFloat(p.pack_size || 0),
-                        show: true
+                        show: true,
+                        publisher: p.publisherName ? ({
+                            full_name: p.publisherName,
+                            id: p.publisher_id,
+                        }) : null
                     });
                 } else {
                     $scope.product = '';
@@ -635,7 +654,11 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                         $scope.items.push({
                             ...p,
                             pack_size: parseFloat(p.pack_size || 0),
-                            qty: 1
+                            qty: 1,
+                            publisher: p.publisherName ? ({
+                                full_name: p.publisherName,
+                                id: p.publisher_id,
+                            }) : null
                         });
 
                         currentIndex = $scope.items.length;
@@ -844,10 +867,18 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                         });
                 }
             }
+            $scope.opublishers = <?php echo !empty($publishers) ? json_encode($publishers) : json_encode([]); ?>;
+            $scope.publishers = <?php echo !empty($publishers) ? json_encode($publishers) : json_encode([]); ?>;
+
+            $scope.refreshPublishers = search => {
+                $scope.publishers = $scope.opublishers.filter(r => r.full_name.toLowerCase().includes(search.toLowerCase()));
+            }
             $scope.submitCode = (form) => {
                 $http.post("<?php echo SITE_URL ?>pages/product/update.php?id=" + form.id, $httpParamSerializerJQLike({
                         author: form.author,
                         full_name: form.newTitle,
+                        product_id: form.product_id,
+                        publisher_id: form?.publisher?.id || '',
                         code: form.newBarCode,
                         price: form.newPrice,
                         rackNo: form.rackNo,

@@ -41,7 +41,17 @@ foreach ($statuses as  $value) {
                 <span class="dropdown">
                     <button class="dropdown-toggle btn btn-default" data-toggle="dropdown" style="padding-inline: 8px"><span class="fa fa-caret-down"></span></button>
                     <form ng-submit="submitCode(cart)" class="dropdown-menu" style="padding: 10px; width: 450px">
-                        <input type="text" placeholder="Title" ng-model="cart.newTitle" type="text" class="form-control">
+                        <div class="input-group" style="width: 100%">
+                            <input type="text" placeholder="Title" ng-model="cart.newTitle" type="text" class="form-control">
+                            <span class="input-group-btn" style="width: 50%">
+                                <ui-select custom-dropdown ng-model="cart.publisher" theme="bootstrap" ng-disabled="disabled" reset-search-input="false" title="Choose a publisher">
+                                    <ui-select-match placeholder="Enter a publisher...">{{$select.selected.full_name}}</ui-select-match>
+                                    <ui-select-choices repeat="address in publishers track by $index" refresh="refreshPublishers($select.search)" refresh-delay="0">
+                                        <div style="white-space: wrap;" ng-bind-html="address.full_name | highlight: $select.search"></div>
+                                    </ui-select-choices>
+                                </ui-select>
+                            </span>
+                        </div>
                         <div class="input-group">
                             <span class="input-group-btn" style="width: 100px">
                                 <input type="text" placeholder="Author" ng-model="cart.author" type="text" class="form-control">
