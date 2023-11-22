@@ -571,6 +571,17 @@ class DoubleEntry extends Connection
 							$consider = false;
 						}
 					}
+					if (in_array($value['transsaction_type'], ['PURCHASE_RETURN'])) {
+						if ($value['entry_type'] == 'D' && $store['purchase_returns'] == $value['account_id']) {
+							if ($cashModeId == $value['payment_mode']) {
+								$payments += $value['amount'];
+							} else {
+								$consider = false;
+							}
+						} else {
+							$consider = false;
+						}
+					}
 
 					if (in_array($value['transsaction_type'], ['PURCHASE'])) {
 						if ($value['entry_type'] == 'D') {
