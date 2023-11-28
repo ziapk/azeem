@@ -93,6 +93,7 @@ echo mainFooter();
         $scope.list = [];
         $scope.priceList = [];
         $scope.show_bundle = parseInt($scope.orderData?.order?.show_bundle) ? true : false;
+        $scope.sep = false;
         $scope.items = $scope.orderData?.order_items?.map(item => ({
             ...item,
             full_name: item.product_title || item.full_name,
@@ -193,13 +194,17 @@ echo mainFooter();
         $scope.selectProduct = function(p, r) {
             let currentIndex = 1
             let exists = false;
-            $scope.items.map((pro, index) => {
-                if (pro.id == p.id && p.product_type != 5) {
-                    exists = true;
-                    currentIndex = index + 1;
-                    pro.qty++;
-                }
-            })
+
+            if (!$scope.sep) {
+                $scope.items.map((pro, index) => {
+                    if (pro.id == p.id && p.product_type != 5) {
+                        exists = true;
+                        currentIndex = index + 1;
+                        pro.qty++;
+                    }
+                })
+            }
+
             $scope.product = "";
             if (!exists) {
                 $scope.items.unshift({

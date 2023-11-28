@@ -58,7 +58,7 @@ class Supply extends Connection
         try {
             if (!empty($array['id'])) {
                 // $this->addColumn();
-                $stmt = "UPDATE `{$this->table}` SET `supplier_id`=:supplier_id, supplier_type=:supplier_type, `status`=:status, `price`=:price, `payment_amount`=:payment_amount, `payment_with_credit`=:payment_with_credit, `discount`=:discount, `supply_date`=:supply_date, `ref_no`=:ref_no, `show_bundle`=:show_bundle WHERE id=:id";
+                $stmt = "UPDATE `{$this->table}` SET `supplier_id`=:supplier_id, supplier_type=:supplier_type, `status`=:status, `price`=:price, `payment_amount`=:payment_amount, `payment_with_credit`=:payment_with_credit, `discount`=:discount, `supply_date`=:supply_date, `ref_no`=:ref_no, `show_bundle`=:show_bundle, `description`=:description WHERE id=:id";
                 $prepare = $this->dbh->prepare($stmt);
                 $prepare->bindParam(':supplier_id', $array['supplier_id'], PDO::PARAM_STR);
                 $prepare->bindParam(':supplier_type', $array['supplier_type'], PDO::PARAM_STR);
@@ -70,12 +70,13 @@ class Supply extends Connection
                 $prepare->bindParam(':supply_date', $array['supply_date'], PDO::PARAM_STR);
                 $prepare->bindParam(':ref_no', $array['ref_no'], PDO::PARAM_STR);
                 $prepare->bindParam(':show_bundle', $array['show_bundle'], PDO::PARAM_STR);
+                $prepare->bindParam(':description', $array['description'], PDO::PARAM_STR);
                 $prepare->bindParam(':id', $array['id'], PDO::PARAM_STR);
                 $prepare->execute();
                 return $array['id'];
             } else {
                 // $this->addColumn();
-                $stmt = "INSERT INTO `{$this->table}` (`user_id`, `supplier_id`, `supplier_type`, `status`, `price`, `payment_amount`, `payment_with_credit`, `discount`, `shopId`, `supply_date`, `ref_no`) VALUES (:user_id, :supplier_id, :supplier_type, :status, :price, :payment_amount, :payment_with_credit, :discount, :shopId, :supply_date, :ref_no)";
+                $stmt = "INSERT INTO `{$this->table}` (`user_id`, `supplier_id`, `supplier_type`, `status`, `price`, `payment_amount`, `payment_with_credit`, `discount`, `shopId`, `supply_date`, `ref_no`, `show_bundle`, `description`) VALUES (:user_id, :supplier_id, :supplier_type, :status, :price, :payment_amount, :payment_with_credit, :discount, :shopId, :supply_date, :ref_no, :show_bundle, :description)";
                 $prepare = $this->dbh->prepare($stmt);
                 $prepare->bindParam(':user_id', $array['user_id'], PDO::PARAM_STR);
                 $prepare->bindParam(':supplier_id', $array['supplier_id'], PDO::PARAM_STR);
@@ -88,6 +89,8 @@ class Supply extends Connection
                 $prepare->bindParam(':shopId', $array['shopId'], PDO::PARAM_STR);
                 $prepare->bindParam(':supply_date', $array['supply_date'], PDO::PARAM_STR);
                 $prepare->bindParam(':ref_no', $array['ref_no'], PDO::PARAM_STR);
+                $prepare->bindParam(':show_bundle', $array['show_bundle'], PDO::PARAM_STR);
+                $prepare->bindParam(':description', $array['description'], PDO::PARAM_STR);
                 $prepare->execute();
                 $result = $this->dbh->lastInsertId();
                 return $result;
