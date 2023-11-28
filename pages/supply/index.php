@@ -62,7 +62,6 @@ echo mainFooter();
         $scope.shopId = '<?php echo $userData['shopId']; ?>';
         $scope.supplierName = "";
         $scope.ref_no = "";
-        $scope.description = "";
         $scope.supplierId = "";
         $scope.product = "";
         $scope.shopId = '4';
@@ -93,6 +92,7 @@ echo mainFooter();
         $scope.list = [];
         $scope.priceList = [];
         $scope.show_bundle = parseInt($scope.orderData?.order?.show_bundle) ? true : false;
+        $scope.description = $scope.orderData?.order?.description || "";
         $scope.sep = false;
         $scope.items = $scope.orderData?.order_items?.map(item => ({
             ...item,
