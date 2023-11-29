@@ -113,6 +113,7 @@ $publishers = $publisherObj->getPublishers($userId);
                                 <th style="vertical-align: middle">
                                     <label class="pull-left"><span style="vertical-align: middle"><input type="checkbox" ng-model="show_discount"></span> <span style="vertical-align: middle">Add Discount</span></label>
                                     <label class="pull-left"><span style="vertical-align: middle; margin-left: 10px"><input type="checkbox" ng-model="show_bundle"></span> <span style="vertical-align: middle">Bundles</span></label>
+                                    <label class="pull-left"><span style="vertical-align: middle; margin-left: 10px"><input type="checkbox" ng-model="sep"></span> <span style="vertical-align: middle">SEP</span></label>
                                     <div class="pull-right">
                                         <label><span style="vertical-align: middle">QF</span> <span style="vertical-align: middle; margin-left: 4px;"><input type="checkbox" name="qf" ng-model="qf"><span></label>
                                         <label><span style="vertical-align: middle">Search Product</span> <span style="vertical-align: middle; margin-left: 4px"><input type="checkbox" name="focus" ng-model="focus"><span></label>
@@ -189,6 +190,7 @@ echo mainFooter();
         $scope.list = [];
         $scope.focus = false;
         $scope.qf = false;
+        $scope.sep = false;
         $scope.productCode = "";
         $scope.selectedList = {};
         $scope.indexes = [];
@@ -474,6 +476,9 @@ echo mainFooter();
             let currentIndex = 1
             if (p.product_type == 2 || p.product_type == 5) {
                 sep = true;
+            }
+            if ($scope.sep) {
+                sep = true
             }
             if (sep) {
                 $scope.items.push({

@@ -58,7 +58,8 @@ echo mainHeader();
                 <th></th>
             </tr>
             <tr>
-                <td colspan="8"><input type="text" class="form-control" id="searchProduct" ng-model="product" placeholder="Search Product to add" typeahead-on-select="selectProduct($item, row)" uib-typeahead="address as address.full_name for address in searchProduct($viewValue)" typeahead-template-url="row2.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="1" ng-model-options="{debounce: 500}" class="form-control" ng-model="row.product_name" /></td>
+                <td colspan="7"><input type="text" class="form-control" id="searchProduct" ng-model="product" placeholder="Search Product to add" typeahead-on-select="selectProduct($item, row)" uib-typeahead="address as address.full_name for address in searchProduct($viewValue)" typeahead-template-url="row2.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="1" ng-model-options="{debounce: 500}" class="form-control" ng-model="row.product_name" /></td>
+                <td><input type="checkbox" ng-model="sep"> SEP</td>
                 <td><input type="checkbox" ng-model="qf"> Qty</td>
             </tr>
         </thead>
@@ -193,6 +194,7 @@ echo mainFooter();
         $scope.supplierId = "";
         $scope.product = "";
         $scope.shopId = '';
+        $scope.sep = false;
         $scope.order = <?php echo json_encode($order) ?>;
         $scope.returnOrder = <?php echo json_encode($return) ?>;
         $scope.is_supplier = parseInt($scope.order?.order?.is_supplier || 1);
@@ -378,14 +380,16 @@ echo mainFooter();
             }
             let currentIndex = 1
             let exists = false;
-            $scope.items.map((pro, index) => {
-                if (pro.product_id == p.id) {
-                    exists = true;
-                    pro.product_id = p.id;
-                    pro.qty++;
-                    currentIndex = index + 1;
-                }
-            })
+            if (!$scope.sep) {
+                $scope.items.map((pro, index) => {
+                    if (pro.product_id == p.id) {
+                        exists = true;
+                        pro.product_id = p.id;
+                        pro.qty++;
+                        currentIndex = index + 1;
+                    }
+                })
+            }
             $scope.product = "";
             if (!exists) {
                 $scope.items.push({
