@@ -52,7 +52,7 @@ if (!empty($account_ids)) {
                 'subject' => "Ledger Summery Between " . $from . " and " . $to,
                 'body' => $newsletter->drawLedger($account_id, $type, $from, $to),
                 'sentTo' => $emails,
-                'ccEmails' => [['email' => $shop['company_email'], 'name' => $shop['full_name']]],
+                'ccEmails' => [['email' => $shop['company_ledger_inbox'], 'name' => $shop['full_name']]],
                 'client' => $shop['full_name'],
                 'labels' => ['Ledger Summery']
             ]);
