@@ -65,6 +65,12 @@ $end = $journel['last'];
 
         </td>
     </tr>
+    <?php if (!empty($subtitle)) { ?><tr>
+            <td colspan="2">
+                <?php echo $subtitle; ?>
+            </td>
+        </tr>
+    <?php } ?>
 </table>
 <table width="100%" border="1" cellpadding="4" cellspacing="0" style="border: 1px solid;">
     <thead>

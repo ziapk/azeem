@@ -39,7 +39,7 @@ if (!empty($account_ids)) {
             if (!empty($addressArr)) {
                 foreach ($addressArr as $key => $email) {
                     if (!empty($email)) {
-                        $emails[] = ['email' => $email, 'name' => $_POST['customer_name']];
+                        $emails[] = ['email' => $email, 'name' => $customer['full_name']];
                     } else {
                         $emails[] = ['email' => 'zia.pccr@yahoo.com', 'name' => $customer['full_name']];
                     }
@@ -49,7 +49,7 @@ if (!empty($account_ids)) {
             }
 
             $newsletter->send([
-                'subject' => "Ledger Summery Between " . $from . " and " . $to,
+                'subject' => "Ledger Summery for " . $customer['full_name'],
                 'body' => $newsletter->drawLedger($account_id, $type, $from, $to),
                 'sentTo' => $emails,
                 'ccEmails' => [['email' => $shop['company_ledger_inbox'], 'name' => $shop['full_name']]],
