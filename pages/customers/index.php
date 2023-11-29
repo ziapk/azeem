@@ -92,7 +92,7 @@ echo mainFooter();
                             account_id: [account_id],
                             from: '',
                             to: '',
-                            type: 's',
+                            type: 'c',
                         }), {
                             headers: {
                                 'Content-Type': 'application/x-www-form-urlencoded'

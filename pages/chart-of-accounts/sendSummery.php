@@ -17,43 +17,47 @@ $expenses = new Categories();
 
 
 if (!empty($account_ids)) {
-    if ($type == 'c') {
-        $customer = $customers->getUserByAccount($id);
-    } elseif ($type == 's') {
-        $customer = $suppliers->getUserByAccount($id);
-    } elseif ($type == 'emp') {
-        $customer = $employees->getUserByAccount($id);
-    } elseif ($type == 'e') {
-        $customer = $expenses->expenseByAccount($id);
-    }
-    if (sizeof($account_ids)) {
+
+    try {
+
         foreach ($account_ids as $key => $account_id) {
+
+            if ($type == 'c') {
+                $customer = $customers->getUserByAccount($account_id);
+            } elseif ($type == 's') {
+                $customer = $suppliers->getUserByAccount($account_id);
+            } elseif ($type == 'emp') {
+                $customer = $employees->getUserByAccount($account_id);
+            } elseif ($type == 'e') {
+                $customer = $expenses->expenseByAccount($account_id);
+            }
 
             $emails = [];
 
             $addressArr = explode(',', $customer['email']);
 
-            if (sizeof($addressArr)) {
+            if (!empty($addressArr)) {
                 foreach ($addressArr as $key => $email) {
-                    $emails[] = ['email' => $email, 'name' => $_POST['customer_name']];
+                    if (!empty($email)) {
+                        $emails[] = ['email' => $email, 'name' => $_POST['customer_name']];
+                    } else {
+                        $emails[] = ['email' => 'zia.pccr@yahoo.com', 'name' => $customer['full_name']];
+                    }
                 }
             } else {
-                $emails[] = ['email' => 'zia.pccr@yahoo.com', 'name' => $_POST['customer_name']];
+                $emails[] = ['email' => 'zia.pccr@yahoo.com', 'name' => $customer['full_name']];
             }
-
-            print_r($addressArr);
 
             $newsletter->send([
                 'subject' => "Ledger Summery Between " . $from . " and " . $to,
                 'body' => $newsletter->drawLedger($account_id, $type, $from, $to),
-                'sentTo' => $addressArr,
+                'sentTo' => $emails,
                 'ccEmails' => [['email' => $shop['company_email'], 'name' => $shop['full_name']]],
                 'client' => $shop['full_name'],
                 'labels' => ['Ledger Summery']
             ]);
         }
-    }
-    try {
+
         echo json_encode(['success' => true, 'message' => "Email Sent Successfully!"]);
     } catch (Exception $e) {
         print_r($e);
