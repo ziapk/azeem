@@ -28,12 +28,23 @@ if (!empty($account_ids)) {
     }
     if (sizeof($account_ids)) {
         foreach ($account_ids as $key => $account_id) {
+
+            $emails = [];
+
+            $addressArr = explode(',', $customer['email']);
+
+            if (sizeof($addressArr)) {
+                foreach ($addressArr as $key => $email) {
+                    $emails[] = ['email' => $email, 'name' => $_POST['customer_name']];
+                }
+            } else {
+                $emails[] = ['email' => 'zia.pccr@yahoo.com', 'name' => $_POST['customer_name']];
+            }
+
             $newsletter->send([
                 'subject' => "Ledger Summery Between " . $from . " and " . $to,
                 'body' => $newsletter->drawLedger($account_id, $type, $from, $to),
-                'sentTo' => [
-                    ['email' => !empty($customer['email']) ? $customer['email'] : 'zia.pccr@yahoo.com', 'name' => $_POST['customer_name']]
-                ],
+                'sentTo' => $addressArr,
                 'ccEmails' => [['email' => $shop['company_email'], 'name' => $shop['full_name']]],
                 'client' => $shop['full_name'],
                 'labels' => ['Ledger Summery']
