@@ -9,42 +9,46 @@ echo mainHeader(['page' => 'authors']);
 
     <a href="javascript:void(0)" style="margin-right: 10px" ng-click="addSuppliers()" class="btn btn-primary btn-xs pull-right">Add Author</a>
     <h4 class="section-title">All Authors</h4>
-    <h5 class="section-title">Total Payable Amount: {{data.closing_total | number}}</h5>
-    <div class="form-group">
-        <input class="form-control" ng-change="searchSupplier()" ng-model="search" placeholder="Type here for search..." />
-    </div>
-    <table class="table">
-        <thead>
-            <tr>
-                <th></th>
-                <th>Contact</th>
-                <th>Company / Title / Address</th>
-                <th>Balance</th>
-                <th width="300"></th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr ng-repeat="li in list">
-                <td width="50">{{li.id}}</td>
-                <td><strong>{{li.name}}</strong> <br /> {{li.contact}}</td>
-                <td><strong>{{li.company}}</strong> - {{li.title}} <br />{{li.address}}</td>
-                <td ng-class="{'text-danger': li.closing_balance < 0}">{{li.closing_balance}}</td>
-                <td>
-                    <a class="btn btn-primary btn-xs" href="<?php echo SITE_URL . "pages/authors/update.php?id=" ?>{{li.id}}">Edit</a>
-                    <?php if ($userData['role'] === 'owner' || $userData['role'] === 'manager') { ?><a class="btn btn-default btn-xs" href="../chart-of-accounts/summery.php?t=s&id={{li.account_id}}">Ledger</a><?php } ?>
-                    <?php if ($userData['role'] === 'owner' || $userData['role'] === 'manager') { ?><a class="btn btn-default btn-xs" ng-click="sendSummery(li.account_id)" href="javascript:void(0)"><span class="fa fa-envelope"></span>{{sending[li.account_id] ? 'Sending' : ''}}</a><?php } ?>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-    <div style="display: flex; align-items: center; justify-content: space-between">
-        <ul uib-pagination ng-if="data.perPage < data.totalRecords" items-per-page="data.perPage" total-items="data.totalRecords" ng-model="currentPage" ng-change="pageChanged(currentPage)"></ul> <span>Per Page <select ng-change="perPage()" ng-model="data.perPage">
-                <option value="10">10</option>
-                <option value="25">25</option>
-                <option value="50">50</option>
-                <option value="100">100</option>
-            </select></span> <span>Total number of Records <strong>{{data.totalRecords}}</strong></span>
-    </div>
+    <h5 class="section-title">Total Payable Amount: {{data.closing_total | number}} <?php if ($userData['role'] === 'owner' || $userData['role'] === 'manager') { ?>
+            <button class="btn btn-sm btn-primary" ng-click="bulkSendSummery()">Send Ledgers</button>
+            <?php } ?>/h5>
+            <div class="form-group">
+                <input class="form-control" ng-change="searchSupplier()" ng-model="search" placeholder="Type here for search..." />
+            </div>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th></th>
+                        <th>Contact</th>
+                        <th>Company / Title / Address</th>
+                        <th>Balance</th>
+                        <th width="300"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="li in list">
+                        <td width="50"><input type="checkbox" ng-model="li.selected" /></td>
+                        <td width="50">{{li.id}}</td>
+                        <td><strong>{{li.name}}</strong> <br /> {{li.contact}}</td>
+                        <td><strong>{{li.company}}</strong> - {{li.title}} <br />{{li.address}}</td>
+                        <td ng-class="{'text-danger': li.closing_balance < 0}">{{li.closing_balance}}</td>
+                        <td>
+                            <a class="btn btn-primary btn-xs" href="<?php echo SITE_URL . "pages/authors/update.php?id=" ?>{{li.id}}">Edit</a>
+                            <?php if ($userData['role'] === 'owner' || $userData['role'] === 'manager') { ?><a class="btn btn-default btn-xs" href="../chart-of-accounts/summery.php?t=s&id={{li.account_id}}">Ledger</a><?php } ?>
+                            <?php if ($userData['role'] === 'owner' || $userData['role'] === 'manager') { ?><a class="btn btn-default btn-xs" ng-click="sendSummery(li.account_id)" href="javascript:void(0)"><span class="fa fa-envelope"></span>{{sending[li.account_id] ? 'Sending' : ''}}</a><?php } ?>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div style="display: flex; align-items: center; justify-content: space-between">
+                <ul uib-pagination ng-if="data.perPage < data.totalRecords" items-per-page="data.perPage" total-items="data.totalRecords" ng-model="currentPage" ng-change="pageChanged(currentPage)"></ul> <span>Per Page <select ng-change="perPage()" ng-model="data.perPage">
+                        <option value="10">10</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select></span> <span>Total number of Records <strong>{{data.totalRecords}}</strong></span>
+            </div>
 </div>
 
 <script type="text/ng-template" id="addSupplier.html">
@@ -112,7 +116,7 @@ echo mainHeader(['page' => 'authors']);
 
 
 <script>
-    app.controller('productController', function($scope, $http, $httpParamSerializerJQLike, $filter, $window, $document, $uibModal, $log) {
+    app.controller('productController', function($scope, $http, $httpParamSerializerJQLike, $filter, $window, $document, $uibModal, $log, toaster) {
         $scope.data = {
             perPage: "10"
         }; //$scope.data.records;
@@ -141,10 +145,52 @@ echo mainHeader(['page' => 'authors']);
                 })
         }
 
+        $scope.bulkSendSummery = async () => {
+            const getList = $scope.list.filter(row => row.selected).map(row => row.account_id);
+            if (getList?.length) {
+                for (const account_id of getList) {
+                    try {
+                        $scope.sending[account_id] = true;
+                        const res = await $http.post($scope.siteUrl + 'pages/chart-of-accounts/sendSummery.php', $httpParamSerializerJQLike({
+                            account_id: [account_id],
+                            from: '',
+                            to: '',
+                            type: 's',
+                        }), {
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded'
+                            }
+                        });
+
+                        if (res.data.success) {
+                            toaster.success({
+                                body: res.data.message
+                            })
+                        } else {
+                            console.log({
+                                type: 'danger',
+                                message: res.data.message
+                            })
+                        }
+                    } catch (err) {
+                        console.log({
+                            type: 'danger',
+                            message: err?.message || err
+                        })
+                    }
+
+                    $scope.sending[account_id] = false;
+
+                }
+
+
+            }
+
+        }
         $scope.sendSummery = (account_id) => {
             $scope.sending[account_id] = true;
             $http.post($scope.siteUrl + 'pages/chart-of-accounts/sendSummery.php', $httpParamSerializerJQLike({
-                account_id,
+                account_id: [account_id],
                 from: '',
                 to: '',
                 type: 's',

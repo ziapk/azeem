@@ -156,7 +156,7 @@ mainHeader();
         $scope.sendSummery = () => {
             $scope.sending = true;
             $http.post('sendSummery.php', $httpParamSerializerJQLike({
-                account_id: $scope.account_id,
+                account_id: [$scope.account_id],
                 from: '',
                 to: '',
                 type: 'c',

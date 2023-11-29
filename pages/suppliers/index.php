@@ -10,13 +10,17 @@ echo mainHeader(['page' => 'supplier']);
     <a href="<?php echo SITE_URL . 'pages/supply'; ?>" class="btn btn-primary btn-xs pull-right">Add Supply</a>
     <a href="javascript:void(0)" style="margin-right: 10px" ng-click="addSuppliers()" class="btn btn-primary btn-xs pull-right">Add Supplier</a>
     <h4 class="section-title">All Suppliers</h4>
-    <h5 class="section-title">Total Payable Amount: {{data.closing_total | number}}</h5>
+    <h5 class="section-title">Total Payable Amount: {{data.closing_total | number}} <?php if ($userData['role'] === 'owner' || $userData['role'] === 'manager') { ?>
+            <button class="btn btn-sm btn-primary" ng-click="bulkSendSummery()">Send Ledgers</button>
+        <?php } ?>
+    </h5>
     <div class="form-group">
         <input class="form-control" ng-change="searchSupplier()" ng-model="search" placeholder="Type here for search..." />
     </div>
     <table class="table">
         <thead>
             <tr>
+                <th></th>
                 <th></th>
                 <th>Contact</th>
                 <th>Company / Title / Address</th>
@@ -26,6 +30,7 @@ echo mainHeader(['page' => 'supplier']);
         </thead>
         <tbody>
             <tr ng-repeat="li in list">
+                <td width="50"><input type="checkbox" ng-model="li.selected" /></td>
                 <td width="50">{{li.id}}</td>
                 <td><strong>{{li.name}}</strong> <br /> {{li.contact}}</td>
                 <td><strong>{{li.company}}</strong> - {{li.title}} <br />{{li.address}}</td>
@@ -113,7 +118,7 @@ echo mainHeader(['page' => 'supplier']);
 
 
 <script>
-    app.controller('productController', function($scope, $http, $httpParamSerializerJQLike, $filter, $window, $document, $uibModal, $log) {
+    app.controller('productController', function($scope, $http, $httpParamSerializerJQLike, $filter, $window, $document, $uibModal, $log, toaster) {
         $scope.data = {
             perPage: "10"
         }; //$scope.data.records;
@@ -140,10 +145,53 @@ echo mainHeader(['page' => 'supplier']);
                 })
         }
 
+        $scope.bulkSendSummery = async () => {
+            const getList = $scope.list.filter(row => row.selected).map(row => row.account_id);
+            if (getList?.length) {
+                for (const account_id of getList) {
+                    try {
+                        $scope.sending[account_id] = true;
+                        const res = await $http.post($scope.siteUrl + 'pages/chart-of-accounts/sendSummery.php', $httpParamSerializerJQLike({
+                            account_id: [account_id],
+                            from: '',
+                            to: '',
+                            type: 's',
+                        }), {
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded'
+                            }
+                        });
+
+                        if (res.data.success) {
+                            toaster.success({
+                                body: res.data.message
+                            })
+                        } else {
+                            console.log({
+                                type: 'danger',
+                                message: res.data.message
+                            })
+                        }
+                    } catch (err) {
+                        console.log({
+                            type: 'danger',
+                            message: err?.message || err
+                        })
+                    }
+
+                    $scope.sending[account_id] = false;
+
+                }
+
+
+            }
+
+        }
+
         $scope.sendSummery = (account_id) => {
             $scope.sending[account_id] = true;
             $http.post($scope.siteUrl + 'pages/chart-of-accounts/sendSummery.php', $httpParamSerializerJQLike({
-                account_id,
+                account_id: [account_id],
                 from: '',
                 to: '',
                 type: 's',

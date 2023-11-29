@@ -6,13 +6,19 @@ echo mainHeader(['page' => 'customer']);
 <div class="container" ng-controller="customerController">
     <a href="javascript:void(0)" ng-click="addCustomer()" class="btn btn-primary btn-xs pull-right">Add New</a>
     <h4 class="section-title">Customers <a class="btn btn-primary" href="<?php echo 'summeryDownload.php' . $url; ?>" target="_blank">Generate PDF</a></h4>
-    <h5 class="section-title">Total Receivable Amount: {{data.closing_total | number}}</h5>
+    <h5 class="section-title">Total Receivable Amount: {{data.closing_total | number}}
+        <?php if ($userData['role'] === 'owner' || $userData['role'] === 'manager') { ?>
+            <button class="btn btn-sm btn-primary" ng-click="bulkSendSummery()">Send Ledgers</button>
+        <?php } ?>
+    </h5>
+
     <div class="form-group">
         <input class="form-control" ng-change="searchCustomer()" ng-model="search" placeholder="Type here for search..." />
     </div>
     <table class="table">
         <thead>
             <tr>
+                <th width="50"></th>
                 <th>Id</th>
                 <th>Contact</th>
                 <th>Title / Company / Address</th>
@@ -23,6 +29,7 @@ echo mainHeader(['page' => 'customer']);
         </thead>
         <tbody>
             <tr ng-repeat="li in list">
+                <td><input type="checkbox" ng-model="li.selected" /></td>
                 <td>{{li.id}}</td>
                 <td><strong>{{li.full_name}}</strong> <br /> {{li.phoneNumber}}</td>
                 <td><strong>{{li.company}}</strong> - {{li.title}} <br />{{li.address}}</td>
@@ -65,7 +72,7 @@ echo mainFooter();
     }
 
 
-    app.controller('customerController', function($scope, $http, $httpParamSerializerJQLike, $uibModal, $window, $log) {
+    app.controller('customerController', function($scope, $http, $httpParamSerializerJQLike, $uibModal, $window, $log, toaster) {
         $scope.currentPage = 1;
         $scope.data = {
             perPage: "10"
@@ -75,10 +82,53 @@ echo mainFooter();
         $scope.siteUrl = '<?php echo SITE_URL ?>';
         $scope.sending = {};
 
+        $scope.bulkSendSummery = async () => {
+            const getList = $scope.list.filter(row => row.selected).map(row => row.account_id);
+            if (getList?.length) {
+                for (const account_id of getList) {
+                    try {
+                        $scope.sending[account_id] = true;
+                        const res = await $http.post($scope.siteUrl + 'pages/chart-of-accounts/sendSummery.php', $httpParamSerializerJQLike({
+                            account_id: [account_id],
+                            from: '',
+                            to: '',
+                            type: 's',
+                        }), {
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded'
+                            }
+                        });
+
+                        if (res.data.success) {
+                            toaster.success({
+                                body: res.data.message
+                            })
+                        } else {
+                            console.log({
+                                type: 'danger',
+                                message: res.data.message
+                            })
+                        }
+                    } catch (err) {
+                        console.log({
+                            type: 'danger',
+                            message: err?.message || err
+                        })
+                    }
+
+                    $scope.sending[account_id] = false;
+
+                }
+
+
+            }
+
+        }
+
         $scope.sendSummery = (account_id) => {
             $scope.sending[account_id] = true;
             $http.post($scope.siteUrl + 'pages/chart-of-accounts/sendSummery.php', $httpParamSerializerJQLike({
-                account_id,
+                account_id: [account_id],
                 from: '',
                 to: '',
                 type: 'c',
