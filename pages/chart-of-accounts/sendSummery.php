@@ -41,6 +41,8 @@ if (!empty($account_ids)) {
                 $emails[] = ['email' => 'zia.pccr@yahoo.com', 'name' => $_POST['customer_name']];
             }
 
+            print_r($addressArr);
+
             $newsletter->send([
                 'subject' => "Ledger Summery Between " . $from . " and " . $to,
                 'body' => $newsletter->drawLedger($account_id, $type, $from, $to),
