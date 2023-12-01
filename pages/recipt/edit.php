@@ -649,13 +649,16 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                     $scope.product = null
                     let exists = false;
 
-                    $scope.items.map((pro, index) => {
-                        if (pro.id == p.id && !pro.show) {
-                            currentIndex = index + 1;
-                            exists = true;
-                            pro.qty++;
-                        }
-                    })
+                    if (!$scope.sep) {
+
+                        $scope.items.map((pro, index) => {
+                            if (pro.id == p.id && !pro.show) {
+                                currentIndex = index + 1;
+                                exists = true;
+                                pro.qty++;
+                            }
+                        })
+                    }
                     if (!exists) { // if already not exits in bucket
 
                         $scope.items.push({
