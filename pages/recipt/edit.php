@@ -99,7 +99,7 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                                     <th style="vertical-align: middle">
                                         <label class="pull-left"><span style="vertical-align: middle"><input type="checkbox" ng-model="show_discount"></span> <span style="vertical-align: middle">Add Discount</span></label>
                                         <label class="pull-left"><span style="vertical-align: middle; margin-left: 10px"><input type="checkbox" ng-model="show_bundle" ng-change="calculateSum()"></span> <span style="vertical-align: middle">Bundles</span></label>
-                                        <label class="pull-left"><span style="vertical-align: middle; margin-left: 10px"><input type="checkbox" ng-model="SEP" ng-change="calculateSum()"></span> <span style="vertical-align: middle">SEP</span></label>
+                                        <label class="pull-left"><span style="vertical-align: middle; margin-left: 10px"><input type="checkbox" ng-model="sep" ng-change="calculateSum()"></span> <span style="vertical-align: middle">SEP</span></label>
 
                                         <div class="pull-right">
                                             <label><span style="vertical-align: middle">QF</span> <span style="vertical-align: middle; margin-left: 4px;"><input type="checkbox" name="qf" ng-model="qf"><span></label>
@@ -629,9 +629,7 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                     tempSep = true;
                 }
 
-                if ($scope.sep) {
-                    tempSep = true
-                }
+
 
                 if (tempSep) {
                     $scope.items.push({
@@ -649,8 +647,8 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                     $scope.product = null
                     let exists = false;
 
-                    if (!$scope.sep) {
 
+                    if (!$scope.sep) {
                         $scope.items.map((pro, index) => {
                             if (pro.id == p.id && !pro.show) {
                                 currentIndex = index + 1;
