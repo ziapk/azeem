@@ -48,10 +48,10 @@ if (!empty($shop['phoneNumber3'])) {
 $result = array_filter($a, 'strlen');
 if ($largeView) {
 
-    $cashInvoice = "Cash Sales Invoice";
+    $cashInvoice = "Cash Invoice";
 
     if (!empty($order['order']['price']) && empty($order['order']['paid_amount'])) {
-        $cashInvoice = "Credit Sales Invoice";
+        $cashInvoice = "Credit Invoice";
     }
 
     $distTotal = 0;
