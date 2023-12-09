@@ -422,6 +422,14 @@ if ($largeView) {
             margin-top: 0;
         }
 
+        .mb-0 {
+            margin-bottom: 0;
+        }
+
+        .mb-5 {
+            margin-bottom: 5px;
+        }
+
         .head h3 {
             font-size: 1.75em;
             /* font-family: 'Courgette', cursive; */
@@ -451,14 +459,12 @@ if ($largeView) {
                 <img width="60" height="60" style="vertical-align: middle; margin-right: 5px; filter: grayscale(100%);" src="<?php echo $siteUrl . "assets/clients/" . $shop['image']; ?>" />
                 <div>
                     <h3><?php echo strtoupper($shop['full_name']); ?></h3>
-                    <p class="mt-0"><?php echo $shop['location']; ?>, <?php echo $shop['city']; ?> <br>
+                    <p class="mt-0 mb-0"><?php echo $shop['location']; ?>, <?php echo $shop['city']; ?> <br>
                         <strong><small><?php echo implode(", ", $result); ?></small></strong>
                     </p>
                 </div>
-
-
             </div>
-            <span class="pull-left ref"><span style="font-size: 10px">Customer Name:</span> <strong><?php echo !empty($order['order']['customer_name']) ? $order['order']['customer_name'] : $foodpanda['full_name']; ?></strong></span>
+            <span class="pull-left ref"><strong><?php echo !empty($order['order']['customer_name']) ? $order['order']['customer_name'] : $foodpanda['full_name']; ?></strong></span>
             <div style="clear: both;"></div>
             <span class="pull-left ref">Ref. <strong>RSV0<?php echo $order['order']['order_custom_id']; ?></strong></span>
             <span class="pull-right date"><?php echo dbDateToClient($order['order']['created_at']); ?></span>
