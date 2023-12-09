@@ -213,7 +213,7 @@ if ($largeView) {
                                     <div>
                                 </td>
                                 <td>
-                                    <h2 style="margin: 0 0 10px"><?php echo $cashInvoice; ?></h2>
+                                    <h2 style="margin: 0 0 5px"><?php echo $cashInvoice; ?></h2>
                                     <span style="font-weight: bold; font-size: 14px;">Bill Ref. <?php echo $order['order']['order_custom_id']; ?></span>
                                 </td>
                                 <td class="text-right" width="250">
