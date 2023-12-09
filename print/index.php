@@ -329,17 +329,15 @@ if ($largeView) {
                                     </th>
 
                                 </tr>
-                                <?php if (!empty($order['order']['paid_amount'])) { ?>
 
-                                    <tr class="no-border">
-                                        <th class="text-right ref" style="border: 0" colspan="3">Amount Paid</th>
-                                        <th class="text-right ref"><?php echo number_format(abs(($order['order']['paid_amount']))); ?></th>
-                                    </tr>
-                                    <tr class="no-border">
-                                        <td class="text-right ref" style="border: 0" colspan="3">Balance</td>
-                                        <th class="text-right ref"><?php echo number_format(abs(($balance))); ?></th>
-                                    </tr>
-                                <?php } ?>
+                                <tr class="no-border">
+                                    <th class="text-right ref" style="border: 0" colspan="3">Amount Paid</th>
+                                    <th class="text-right ref"><?php echo number_format(abs(($order['order']['paid_amount']))); ?></th>
+                                </tr>
+                                <tr class="no-border">
+                                    <td class="text-right ref" style="border: 0" colspan="3">Balance</td>
+                                    <th class="text-right ref"><?php echo number_format(abs(($balance))); ?></th>
+                                </tr>
                                 </tfoot>
                         </table>
                     </td>
@@ -516,17 +514,15 @@ if ($largeView) {
                             </tr>
                     <?php }
                     } ?>
-                    <?php if (!empty($order['order']['paid_amount'])) { ?>
 
-                        <tr class="no-border">
-                            <td class="text-right ref" colspan="2">Deposit</td>
-                            <th class="text-right ref"><?php echo abs(($order['order']['paid_amount'])); ?></th>
-                        </tr>
-                        <tr class="no-border">
-                            <td class="text-right ref" colspan="2">Balance</td>
-                            <th class="text-right ref"><?php echo abs(($balance)); ?></th>
-                        </tr>
-                    <?php } ?>
+                    <tr class="no-border">
+                        <td class="text-right ref" colspan="2">Deposit</td>
+                        <th class="text-right ref"><?php echo abs(($order['order']['paid_amount'])); ?></th>
+                    </tr>
+                    <tr class="no-border">
+                        <td class="text-right ref" colspan="2">Balance</td>
+                        <th class="text-right ref"><?php echo abs(($balance)); ?></th>
+                    </tr>
                     </tfoot>
             </table>
             <footer style="font-size: 10px; padding-top: 10px">
