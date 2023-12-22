@@ -97,7 +97,7 @@ try {
                     'price' => $item['price'],
                     'services' => $item['services'],
                     'raw_items' => $item['raw_items'],
-                    'status' => $staus,
+                    'status' => $_POST['status'],
                     'item_status' => !empty($item['item_status']) ? $item['item_status'] : 1,
                     'employee_id' => !empty($item['employee_id']) ? $item['employee_id'] : null,
                     'start_date' => !empty($item['start_date']) ? $item['start_date'] : null,

@@ -77,7 +77,27 @@ $publishers = $publisherObj->getPublishers($userId);
         <h5 class="text-danger"><strong>Today's Parked Bills</strong></h5>
         <span class="btn-group btn-group-sm form-group">
             <?php foreach ($orders as $key => $value) { ?>
-                <a class="btn btn-default" href="./edit.php?id=<?php echo $value['id']; ?>"><?php echo $value['full_name'] . ' - ' . $value['id']; ?></a>
+                <div class="dropdown">
+                    <div class="btn-group btn-group-sm">
+                        <a class="btn btn-default" href="./edit.php?id=<?php echo $value['id']; ?>"><?php echo $value['full_name'] . ' - ' . $value['id']; ?></a>
+                        <button type="button" class="btn btn-default" class="dropdown-toggle" data-toggle="dropdown" ng-click="loadOrder(<?php echo $value['id']; ?>)"><span class="fa fa-arrow-down"></span></button>
+                        <div class="dropdown-menu" style="width: 300px; padding: 16px">
+                            <form role="search" ng-submit="saveOrder(<?php echo $value['id']; ?>)">
+                                <input type="text" autocomplete="off" class="form-control" ng-model="pinProduct" placeholder="Search Products" uib-typeahead="address as address.full_name for address in searchProduct($viewValue)" typeahead-on-select="selectPinProduct($item)" ng-model-options="{debounce: 100}" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="productCode ? 0 : 1">
+                                <span ng-if="loading[<?php echo $value['id']; ?>]">Loading...</span>
+                                <div ng-if="!loading[<?php echo $value['id']; ?>]">
+                                    <ol style="padding-left: 18px;">
+                                        <li style="line-height: 2;" ng-repeat="li in pinOrder.order_items">{{li.product_title}}
+                                            <div class="pull-right"><span class="label label-danger">Q.{{li.quantity}}</span> <span class="label label-success">Rs.{{li.price}}</span></div>
+                                        </li>
+                                    </ol>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                </div>
+
             <?php } ?>
         </span>
         <div class="clearfix" id="dummyHeight"></div>
@@ -202,6 +222,48 @@ echo mainFooter();
                     $scope.indexes.push(parseInt(key));
                 }
             });
+        }
+
+        $scope.loading = {}
+        $scope.pinOrder = {}
+        $scope.loadOrder = id => {
+            if (!$scope.loading[id]) {
+                $scope.pinOrder = {};
+                $scope.loading[id] = true;
+                $http.get("<?php echo SITE_URL ?>api/getOrder.php", {
+                    params: {
+                        id,
+                        shop_id: $scope.shopId
+                    }
+                }).then(response => {
+                    $scope.pinOrder = response.data;
+                    $scope.loading[id] = false;
+                }).catch(() => {
+                    $scope.loading[id] = false;
+                })
+            }
+        }
+
+
+        $scope.selectPinProduct = (p) => {
+            $http.post("<?php echo SITE_URL ?>api/addProductToOrder.php", $httpParamSerializerJQLike({
+                product: p,
+                order_id: $scope.pinOrder.order.id
+            }), {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            }).then(response => {
+                $scope.pinOrder = null;
+                $scope.pinProduct = '';
+                $scope.pinProduct = null;
+                toaster.success({
+                    body: response.data.message
+                });
+                $scope.loading[id] = false;
+            }).catch(() => {
+                $scope.loading[id] = false;
+            })
         }
 
         $scope.deleteAll = (indexes, list) => {
