@@ -20,6 +20,12 @@ echo mainHeader(['page' => 'supplies']);
             </div>
         </div>
     </form>
+    <uib-tabset active="activePill">
+        <uib-tab select="getReport($event)" index="0" data-tab="all" heading="All Orders"></uib-tab>
+        <uib-tab select="getReport($event)" index="1" data-tab="cash" heading="Paid"></uib-tab>
+        <uib-tab select="getReport($event)" index="2" data-tab="credit" heading="Un-Paid"></uib-tab>
+        <uib-tab select="getReport($event)" index="3" data-tab="park" heading="Parked"></uib-tab>
+    </uib-tabset>
     <table class="table">
         <thead>
             <tr>
@@ -103,12 +109,15 @@ echo mainFooter();
 
         $scope.statusArr = <?php echo json_encode($orderStatusArr); ?>
 
-        $scope.getReport = form => {
+        $scope.getReport = (form, activeValue) => {
+            const orderType = form?.currentTarget?.parentNode?.getAttribute('data-tab') || 'all';
+            $scope.activeValue = orderType || activeValue || 'all';
             $http.get("<?php echo SITE_URL ?>api/getSupplyReport.php", {
                     params: {
                         from: moment($scope.datePicker.date.startDate).format('YYYY-MM-DD'),
                         to: moment($scope.datePicker.date.endDate).format('YYYY-MM-DD'),
-                        orderId: $scope.orderId
+                        orderId: $scope.orderId,
+                        orderType
                     }
                 })
                 .then(function(response) {
@@ -118,6 +127,7 @@ echo mainFooter();
                     }
                 })
         }
+
 
         $scope.getReport();
 
