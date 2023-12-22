@@ -72,7 +72,17 @@ if (empty($_POST['supplierId']) && !empty($_POST['supplierName'])) {
 $products = new Products();
 
 $items = [];
-$status = $_POST['status'] ? $_POST['status'] : 2;
+
+$status = 9;
+if ($_POST['status'] == 1) {
+    $status = 1; // parked
+} else if (!empty($_POST['payment_amount'])) {
+    $status = 8;
+    if ((($_POST['payable']) - $_POST['discount'] - $_POST['payment_amount']) == 0) {
+        $status = 2;
+    }
+}
+
 $purchaseValue = 0;
 $productsValue = 0;
 $fixAssetsValue = 0;

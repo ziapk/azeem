@@ -235,7 +235,18 @@ class Supply extends Connection
                 $toCondition = " AND o.id='" . $params['orderId'] . "' ";
             }
 
-            $stmt = "SELECT o.*, c.full_name as c_full_name, s.name as s_full_name FROM `{$this->table}` AS o LEFT JOIN customers AS c ON o.supplier_type = 2 and c.id = o.supplier_id LEFT JOIN suppliers AS s ON o.supplier_type = 1 and s.id = o.supplier_id WHERE o.shopId=:shopId " . $toCondition . ' and o.flag = 1 ORDER BY id desc';
+            if ($params['orderType'] == 'cash') {
+                $toCondition .= " AND o.payment_amount > 0 and o.status = 2 ";
+            }
+            if ($params['orderType'] == 'credit') {
+                $toCondition .= " AND ((o.price > 0 and o.price != o.discount and o.payment_amount = 0 AND o.status != 1) OR o.status = 9) ";
+            }
+            if ($params['orderType'] == 'park') { // all parked
+                $toCondition = " ";
+                $flagCondition = " AND o.status = 1 ";
+            }
+
+            $stmt = "SELECT o.*, c.full_name as c_full_name, s.name as s_full_name FROM `{$this->table}` AS o LEFT JOIN customers AS c ON o.supplier_type = 2 and c.id = o.supplier_id LEFT JOIN suppliers AS s ON o.supplier_type = 1 and s.id = o.supplier_id WHERE o.shopId=:shopId " . $toCondition . ' ' . $flagCondition . ' and o.flag = 1 ORDER BY id desc';
             $prepare = $this->dbh->prepare($stmt);
             $prepare->bindParam(':shopId', $shopId, PDO::PARAM_STR);
             $prepare->execute();
