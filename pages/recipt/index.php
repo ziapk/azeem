@@ -81,7 +81,7 @@ $publishers = $publisherObj->getPublishers($userId);
                     <div class="btn-group btn-group-sm">
                         <a class="btn btn-default" href="./edit.php?id=<?php echo $value['id']; ?>"><?php echo $value['full_name'] . ' - ' . $value['id']; ?></a>
                         <button type="button" class="btn btn-default" class="dropdown-toggle" data-toggle="dropdown" ng-click="loadOrder(<?php echo $value['id']; ?>)"><span class="fa fa-arrow-down"></span></button>
-                        <div class="dropdown-menu" style="width: 450px; padding: 16px">
+                        <div class="dropdown-menu" style="width: 600px; padding: 16px">
                             <form role="search" ng-submit="saveOrder(<?php echo $value['id']; ?>)">
                                 <input type="text" autocomplete="off" class="form-control" ng-model="pinProduct" placeholder="Search Products" uib-typeahead="address as address.full_name for address in searchProduct($viewValue)" typeahead-on-select="selectPinProduct($item)" ng-model-options="{debounce: 100}" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="productCode ? 0 : 1">
                                 <span ng-if="loading[<?php echo $value['id']; ?>]">Loading...</span>
