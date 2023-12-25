@@ -24,7 +24,7 @@ echo mainHeader(['page' => 'customer']);
                 <th>Title / Company / Address</th>
                 <th>On Closing Report</th>
                 <th>Balance</th>
-                <th width="165"></th>
+                <th width="300"></th>
             </tr>
         </thead>
         <tbody>
