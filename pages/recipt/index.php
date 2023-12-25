@@ -81,14 +81,19 @@ $publishers = $publisherObj->getPublishers($userId);
                     <div class="btn-group btn-group-sm">
                         <a class="btn btn-default" href="./edit.php?id=<?php echo $value['id']; ?>"><?php echo $value['full_name'] . ' - ' . $value['id']; ?></a>
                         <button type="button" class="btn btn-default" class="dropdown-toggle" data-toggle="dropdown" ng-click="loadOrder(<?php echo $value['id']; ?>)"><span class="fa fa-arrow-down"></span></button>
-                        <div class="dropdown-menu" style="width: 300px; padding: 16px">
+                        <div class="dropdown-menu" style="width: 450px; padding: 16px">
                             <form role="search" ng-submit="saveOrder(<?php echo $value['id']; ?>)">
                                 <input type="text" autocomplete="off" class="form-control" ng-model="pinProduct" placeholder="Search Products" uib-typeahead="address as address.full_name for address in searchProduct($viewValue)" typeahead-on-select="selectPinProduct($item)" ng-model-options="{debounce: 100}" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="productCode ? 0 : 1">
                                 <span ng-if="loading[<?php echo $value['id']; ?>]">Loading...</span>
                                 <div ng-if="!loading[<?php echo $value['id']; ?>]">
                                     <ol style="padding-left: 18px;">
                                         <li style="line-height: 2;" ng-repeat="li in pinOrder.order_items">{{li.product_title}}
-                                            <div class="pull-right"><span class="label label-danger">Q.{{li.quantity}}</span> <span class="label label-success">Rs.{{li.price}}</span></div>
+                                            <div class="pull-right"><span class="label label-danger">Q.{{li.quantity}}</span> <span class="label label-success">Rs.{{li.price}}</span>
+                                                <?php if ($userData['role'] == 'owner') { ?>
+                                                    <button type="button" class="btn btn-xs btn-default" ng-click="deleteItemPinOrder(li.id)">Delete</button>
+                                                <?php } ?>
+                                            </div>
+
                                         </li>
                                     </ol>
                                 </div>
@@ -245,16 +250,67 @@ echo mainFooter();
         }
 
 
+        $scope.deleteItemPinOrder = (id) => {
+            if ($window.confirm('Are you sure?')) {
+                const currentItems = $scope.pinOrder.order_items?.filter(r => {
+                    return r.id != id
+                })
+
+                console.log(currentItems, id)
+
+                $http.post("<?php echo SITE_URL ?>api/addProductToOrder.php", $httpParamSerializerJQLike({
+                    items: currentItems,
+                    order_id: $scope.pinOrder.order.id
+                }), {
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    }
+                }).then(response => {
+                    // $scope.pinOrder = null;
+                    $scope.loadOrder($scope.pinOrder.order.id);
+                    $scope.pinProduct = '';
+                    $scope.pinProduct = null;
+                    toaster.success({
+                        body: 'Product removed from order successfully!'
+                    });
+                    $scope.loading[id] = false;
+                }).catch(() => {
+                    $scope.loading[id] = false;
+                })
+            }
+        }
+
         $scope.selectPinProduct = (p) => {
+            console.log($scope.pinOrder, 'p', p)
+            const items = [];
+            let exists = false;
+            const currentItems = $scope.pinOrder.order_items.map(r => {
+                if (r.product_id === p.id) {
+                    r.quantity = (parseFloat(r.quantity) + 1);
+                    exists = true;
+                }
+            })
+            if (!exists) {
+
+                $scope.pinOrder.order_items.push({
+                    ...p,
+                    product_id: p.id,
+                    new: true,
+                    qty: 1,
+                    quantity: 1
+                });
+            }
+
             $http.post("<?php echo SITE_URL ?>api/addProductToOrder.php", $httpParamSerializerJQLike({
-                product: p,
+                items: $scope.pinOrder.order_items,
                 order_id: $scope.pinOrder.order.id
             }), {
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded'
                 }
             }).then(response => {
-                $scope.pinOrder = null;
+                // $scope.pinOrder = null;
+                $scope.loadOrder($scope.pinOrder.order.id);
                 $scope.pinProduct = '';
                 $scope.pinProduct = null;
                 toaster.success({
