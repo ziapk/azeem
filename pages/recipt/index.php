@@ -87,22 +87,19 @@ $publishers = $publisherObj->getPublishers($userId);
                                 <span ng-if="loading[<?php echo $value['id']; ?>]">Loading...</span>
                                 <div ng-if="!loading[<?php echo $value['id']; ?>]">
                                     <ol style="padding-left: 18px;">
-                                        <li style="line-height: 2;" ng-repeat="li in pinOrder.order_items">{{li.product_title}}
+                                        <li ng-repeat="li in pinOrder.order_items" class="clearfix">{{li.product_title}}
                                             <div class="pull-right"><span class="label label-danger">Q.{{li.quantity}}</span> <span class="label label-success">Rs.{{li.price}}</span>
                                                 <?php if ($userData['role'] == 'owner') { ?>
                                                     <button type="button" class="btn btn-xs btn-default" ng-click="deleteItemPinOrder(li.id)">Delete</button>
                                                 <?php } ?>
                                             </div>
-
                                         </li>
                                     </ol>
                                 </div>
                             </form>
                         </div>
                     </div>
-
                 </div>
-
             <?php } ?>
         </span>
         <div class="clearfix" id="dummyHeight"></div>
