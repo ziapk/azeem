@@ -178,7 +178,7 @@ if (sizeof($demandProducts)) {
         'created_by' => $userData['id'],
         'items' => $demandProducts,
     ];
-    $dd = $demands->createDemand($final, false);
+    $dd = $demands->createDemand($final, false, $shop['id']);
 }
 
 if ($supply_id) {

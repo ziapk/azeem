@@ -1,24 +1,23 @@
-<?php 
-require_once(dirname(__FILE__).'/autoload.php');
+<?php
+require_once(dirname(__FILE__) . '/autoload.php');
 $_POST = json_decode(file_get_contents('php://input'), true);
 
-if(empty($_POST['items']) || empty($_POST['demand_title']) || empty($_POST['demand_date']) || empty($_POST['shop_id'])) {
+if (empty($_POST['items']) || empty($_POST['demand_title']) || empty($_POST['demand_date']) || empty($_POST['shop_id'])) {
     http_response_code(400);
     echo json_encode(['message' => "Please fill all fields"]);
-}
-else {
+} else {
 
     $data = $_POST;
 
     $demandObj = new Demands();
     $isOwner = false; // if true is will assign to relativent store
-    $create = $demandObj->createDemand($data, $isOwner);
+    $create = $demandObj->createDemand($data, $isOwner, $_POST['shop_id']);
 
-    if($create) {
+    if ($create) {
         http_response_code(200);
-        echo json_encode(['status' => 200, 'message' =>"Created Successfully!"]);
+        echo json_encode(['status' => 200, 'message' => "Created Successfully!"]);
     } else {
         http_response_code(400);
-        echo json_encode(['status' => 400, 'message' =>"Check form carefully!"]);
+        echo json_encode(['status' => 400, 'message' => "Check form carefully!"]);
     }
 }
