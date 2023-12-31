@@ -41,7 +41,9 @@ if ($userData['role'] == 'owner' || $userData['role'] == 'manager') {
             <uib-tab select="getReport($event)" index="2" data-tab="credit" heading="Un-Paid"></uib-tab>
             <uib-tab select="getReport($event)" index="3" data-tab="park" heading="Parked"></uib-tab>
             <uib-tab select="getReport($event)" index="4" data-tab="sample" heading="Samples"></uib-tab>
-            <uib-tab select="getReport($event)" index="5" data-tab="linked" heading="Linked Order"></uib-tab>
+            <?php if ($userData['role'] === 'manager') { ?>
+                <uib-tab select="getReport($event)" index="5" data-tab="linked" heading="Linked Order"></uib-tab>
+            <?php } ?>
         </uib-tabset>
         <table class="table">
             <thead style="font-size: .7em;">

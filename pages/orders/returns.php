@@ -32,7 +32,9 @@ echo mainHeader(['page' => 'sale_returns']);
             </div>
             <div class="input-group-btn">
                 <a href="<?php echo SITE_URL; ?>pages/orders/adjustment.php" class="btn btn-danger">New Retrun</a>
-                <a href="<?php echo SITE_URL; ?>pages/orders/adjustment.php?LinkForMainShop=1" class="btn btn-danger">Retrun to Main Shop</a>
+                <?php if ($userData['role'] === 'manager') { ?>
+                    <a href="<?php echo SITE_URL; ?>pages/orders/adjustment.php?LinkForMainShop=1" class="btn btn-danger">Retrun to Main Shop</a>
+                <?php } ?>
             </div>
         </div>
     </form>
