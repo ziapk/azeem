@@ -158,6 +158,11 @@ $orderStatusArr = [
     8 => ['id' => 8, 'full_name' => 'Partial Paid'],
     9 => ['id' => 9, 'full_name' => 'Un-Paid']
 ];
+
+$returnOrderStatusArr = [
+    1 => ['id' => 1, 'full_name' => 'Need Approval'],
+    2 => ['id' => 2, 'full_name' => 'Approved']
+];
 $orderPriority = [
     1 => 'No Priority',
     2 => 'Low',
@@ -223,6 +228,18 @@ function dateToSimple($date)
             return '';
         }
     }
+}
+
+function UserInfo()
+{
+    global $userData;
+    global $shopData;
+    global $shop;
+    return [
+        'user' => $userData,
+        'client' => $shopData,
+        'shop' => $shop
+    ];
 }
 
 function nestedDrawList($list, $menuClass = null, $subMenuClass = null)
