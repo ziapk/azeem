@@ -130,12 +130,15 @@ $supply = new Supply();
 
 if (!empty($_POST['id'])) {
     $orderDetail = $supply->getOrder($_POST['id']);
-    // rollback products first
-    foreach ($orderDetail['order_items'] as $prod) {
-        $products->addProductQty($prod['product_id'], ['qty' => -1 * $prod['quantity'], 'pack_size' => $prod['pack_size'], 'pack_qty' => -1 * $prod['pack_qty']], $orderDetail['order']['shopId']);
+    $currentStatus = $orderDetail['order']['status'];
+    if (in_array($orderDetail['order']['status'], [2, 8, 9])) {
+        // rollback products first
+        foreach ($orderDetail['order_items'] as $prod) {
+            $products->addProductQty($prod['product_id'], ['qty' => -1 * $prod['quantity'], 'pack_size' => $prod['pack_size'], 'pack_qty' => -1 * $prod['pack_qty']], $orderDetail['order']['shopId']);
+        }
+        // delete transactions
+        $de->deleteTransactionBySupplyId($orderDetail['order']['id']);
     }
-    // delete transactions
-    $de->deleteTransactionBySupplyId($orderDetail['order']['id']);
 }
 
 if (sizeof($items)) {

@@ -24,7 +24,8 @@ $pin = !empty($_GET['bookmark']) ? $_GET['bookmark'] : "";
 $dup = !empty($_GET['dup']) ? $_GET['dup'] : "";
 $session = !empty($_GET['session']) ? $_GET['session'] : "";
 
-$shopId = $userData['role'] == 'owner' ? null : $userData['shopId'];
+// $shopId = $userData['role'] == 'owner' ? null : $userData['shopId'];
+$shopId = $userData['shopId'];
 
 if (!empty($session)) {
     $users = new Users();

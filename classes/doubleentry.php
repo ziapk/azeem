@@ -1271,6 +1271,14 @@ class DoubleEntry extends Connection
 
 
 		try {
+			return $this->insertAccountDirect($array);
+		} catch (PDOException $e) {
+			die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
+	public function insertAccountDirect($array)
+	{
+		try {
 			$stmt = "INSERT INTO `{$this->table}` (`title`, `code`, `account_type`, `group_id`, `status`, `parent_id`, `created_by`, `shopId`, `opening_balance`) VALUES (:title, :code, :account_type, :group_id, :status, :parent_id, :created_by, :shopId, :opening_balance)";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':title', $array['title'], PDO::PARAM_STR);

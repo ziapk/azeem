@@ -39,7 +39,7 @@ echo mainHeader();
             <label>Shop Select</label>
             <select class="form-control c-select" ng-model="shopId" ng-change="resetFields()">
                 <?php foreach ($ownerStores as $value) { ?>
-                    <option value="<?php echo $value['id']; ?>"><?php echo $value['full_name']; ?></option>
+                    <option ng-value="<?php echo $value['id']; ?>"><?php echo $value['full_name']; ?></option>
                 <?php } ?>
             </select>
         </div>
@@ -158,14 +158,25 @@ echo mainHeader();
         </tbody>
         <tbody>
             <tr>
-                <th colspan="9" class="text-right">
+                <th colspan="2">
+                    <?php if (!empty($order['order']['main_shop_rid']) && $order['order']['main_shop_rid'] == $userData['shopId'] && $userData['role'] === 'owner') { ?>
+                        <a href="#" class="btn btn-danger" ng-click="checkout(2)"> Approve Return </a>
+                    <?php } ?>
+                </th>
+                <th colspan="7" class="text-right">
                     <div class="btn-group">
                         <label class="btn btn-default" ng-repeat="li in modes">
                             <input type="radio" name="mode" ng-model="payment_mode" ng-value="li.id" ng-change="printValue(li)">
                             {{li.title}}
                         </label>
                     </div>
-                    <a href="#" class="btn btn-primary" ng-click="checkout()"> Return Submit</a>
+                    <?php if (!empty($order['order']['main_shop_rid']) && $order['order']['main_shop_rid'] == $userData['shopId'] && $userData['role'] === 'owner') { ?>
+                        <a href="#" class="btn btn-success" ng-click="checkout()"> Save</a>
+                    <?php } elseif ($userData['role'] === 'owner') { ?>
+                        <a href="#" class="btn btn-primary" ng-click="checkout(2)"> Return Submit</a>
+                    <?php } else { ?>
+                        <a href="#" class="btn btn-success" ng-click="checkout()"> Save</a>
+                    <?php } ?>
                 </th>
             </tr>
         </tbody>
@@ -193,7 +204,6 @@ echo mainFooter();
         $scope.ref_no = "";
         $scope.supplierId = "";
         $scope.product = "";
-        $scope.shopId = '';
         $scope.sep = false;
         $scope.order = <?php echo json_encode($order) ?>;
         $scope.returnOrder = <?php echo json_encode($return) ?>;
@@ -202,6 +212,8 @@ echo mainFooter();
         $scope.show_bundle = parseInt($scope.order?.order?.show_bundle) ? true : false;
         $scope.supplierName = $scope.order?.order?.customer_name || '';
         $scope.supplierId = $scope.order?.order?.customer_id || '';
+        $scope.shopId = $scope.order?.order?.shopId ? parseInt($scope.order.order.shopId) : 0;
+        $scope.LinkForMainShop = '<?php echo $_GET['LinkForMainShop']; ?>';
 
         $scope.items = $scope.order?.order_items?.map(r => ({
             ...r,
@@ -223,6 +235,7 @@ echo mainFooter();
         $scope.subTotal = 0;
         $scope.grandTotal = 0;
         $scope.givenDiscount = parseFloat($scope?.order?.order?.discount || 0);
+        $scope.payment_amount = parseFloat($scope?.order?.order?.paid || 0);
         $scope.discount = 0;
         $scope.payment_mode = '1';
         $scope.supplier = null;
@@ -335,7 +348,7 @@ echo mainFooter();
                     full_name: p.full_name || p.name,
                     opening_balance: ((parseFloat(res.data.opening_balance || 0) + parseFloat(res.data.debitAmount || 0)) - parseFloat(res.data.creditAmount || 0))
                 };
-                $scope.shopId = p.shopId;
+                $scope.shopId = parseFloat($scope.shopId || p.shopId);
                 // $scope.items = [];
                 $scope.calculateSum();
             })
@@ -482,7 +495,7 @@ echo mainFooter();
             $scope.payment_amount = a;
         }
 
-        $scope.checkout = function() {
+        $scope.checkout = function(flag) {
             $scope.form = {
                 supplierId: $scope.supplierId,
                 supplierName: $scope.supplierName,
@@ -519,8 +532,11 @@ echo mainFooter();
                 grandTotal: $scope.grandTotal,
                 payment_amount: $scope.payment_amount,
                 opening_balance: $scope.supplier.opening_balance,
-                returnOrder: $scope.returnOrder
+                returnOrder: $scope.returnOrder,
+                flag: flag || 1,
+                LinkForMainShop: $scope.LinkForMainShop
             }
+
 
 
             $http.post("<?php echo SITE_URL ?>api/placeCustomerReturn.php", $httpParamSerializerJQLike($scope.form), {
@@ -568,7 +584,7 @@ echo mainFooter();
                 // $scope.discount += (product.discount * product.qty);
             })
             $scope.subTotal = subtotal;
-            $scope.grandTotal = $scope.subTotal - $scope.discount;
+            $scope.grandTotal = $scope.subTotal - $scope.discount - $scope.givenDiscount;
             console.log($scope.grandTotal)
             $scope.payment_amount = $scope.grandTotal;
         }

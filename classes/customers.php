@@ -28,7 +28,8 @@ class Customers extends Connection
 	public function createCustomer($array)
 	{
 		try {
-			$stmt = "INSERT INTO `{$this->table}` (`full_name`, `address`,`type`, `company`, `email`, `title`, `phoneNumber`, `shopId`, `account_id`, `code`, `default_discount`) VALUES (:full_name, :address, :type, :company, :email, :title, :phoneNumber, :shopId, :account_id, :code, :default_discount)";
+			$linkedShop = !empty($array['linked_shop']) ? $array['linked_shop'] : null;
+			$stmt = "INSERT INTO `{$this->table}` (`full_name`, `address`,`type`, `company`, `email`, `title`, `phoneNumber`, `shopId`, `account_id`, `code`, `default_discount`, `linked_shop`) VALUES (:full_name, :address, :type, :company, :email, :title, :phoneNumber, :shopId, :account_id, :code, :default_discount, :linked_shop)";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':full_name', $array['full_name'], PDO::PARAM_STR);
 			$prepare->bindParam(':phoneNumber', $array['phoneNumber'], PDO::PARAM_STR);
@@ -41,6 +42,7 @@ class Customers extends Connection
 			$prepare->bindParam(':account_id', $array['account_id'], PDO::PARAM_INT);
 			$prepare->bindParam(':code', $array['code'], PDO::PARAM_STR);
 			$prepare->bindParam(':default_discount', $array['default_discount'], PDO::PARAM_STR);
+			$prepare->bindParam(':linked_shop', $linkedShop, PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $this->dbh->lastInsertId();
 			return $result;
@@ -67,7 +69,8 @@ class Customers extends Connection
 	public function updateCustomer($array)
 	{
 		try {
-			$stmt = "UPDATE `{$this->table}` SET full_name=:full_name, address=:address, phoneNumber=:phoneNumber, company=:company, email=:email, title=:title, code=:code, type=:type, default_discount=:default_discount WHERE id=:id";
+			$linkedShop = !empty($array['linked_shop']) ? $array['linked_shop'] : null;
+			$stmt = "UPDATE `{$this->table}` SET full_name=:full_name, address=:address, phoneNumber=:phoneNumber, company=:company, email=:email, title=:title, code=:code, type=:type, default_discount=:default_discount, linked_shop=:linked_shop WHERE id=:id";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':full_name', $array['full_name'], PDO::PARAM_STR);
 			$prepare->bindParam(':id', $array['id'], PDO::PARAM_STR);
@@ -79,6 +82,7 @@ class Customers extends Connection
 			$prepare->bindParam(':type', $array['type'], PDO::PARAM_STR);
 			$prepare->bindParam(':address', $array['address'], PDO::PARAM_STR);
 			$prepare->bindParam(':default_discount', $array['default_discount'], PDO::PARAM_STR);
+			$prepare->bindParam(':linked_shop', $linkedShop, PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $prepare->rowCount();
 			return $result;
@@ -209,6 +213,24 @@ class Customers extends Connection
 	{
 		try {
 			$stmt = "SELECT *  FROM `{$this->table}` WHERE `id`=:id and flag=1";
+			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':id', $id, PDO::PARAM_STR);
+			$prepare->execute();
+			$result = $prepare->fetch(PDO::FETCH_ASSOC);
+			$de = new DoubleEntry();
+			if (!empty($result['account_id'])) {
+				$result['account'] = $de->getAccount($result['account_id']);
+			}
+			$result['discount_array'] = $this->getCustomerDiscounts(['customer_id' => $id, 'shopId' => $result['shopId']]);
+			return $result;
+		} catch (PDOException $e) {
+			die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
+	public function getCustomerByLinkedShop($id)
+	{
+		try {
+			$stmt = "SELECT *  FROM `{$this->table}` WHERE `linked_shop`=:id and flag=1";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':id', $id, PDO::PARAM_STR);
 			$prepare->execute();

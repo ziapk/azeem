@@ -32,6 +32,249 @@ class Supply extends Connection
         }
     }
 
+    public function prepareSupplyAgainstOrder($orderData, $array)
+    {
+        $customer = $orderData['customer'];
+        $order = $orderData['order'];
+        $orderItems = $orderData['order_items'];
+
+        $products = new Products();
+        $de = new DoubleEntry();
+        $storeObj = new Store();
+        $shopAccounts = new ShopAccounts();
+        $supplierObj = new Suppliers();
+
+        $storeDATA = $storeObj->getStore($customer['linked_shop']);
+        $accountsData = $shopAccounts->getSAs($customer['linked_shop']);
+
+        $storeAccounts = [];
+        foreach ($accountsData as $a) {
+            $storeAccounts[$a['key_value']] = $a['account_id'];
+        }
+
+        $supplyId = 0;
+
+        $userInfo = UserInfo();
+        $user = $userInfo['user'];
+
+        $totals = ['discount' => 0, 'assetsValue' => 0, 'price' => 0];
+
+        $supplyDetail = $this->getSupplyByRefId($order['id'], $customer['linked_shop']);
+        if (!empty($supplyDetail['order'])) {
+
+            $supplyId = $supplyDetail['order']['id'];
+            $supplyCurrentStatus = $supplyDetail['order']['status'];
+
+            if (in_array($supplyCurrentStatus, [2, 8, 9])) {
+
+                foreach ($supplyDetail['order_items'] as $prod) {
+                    $products->addProductQty($prod['product_id'], ['qty' => -1 * $prod['quantity'], 'pack_qty' => -1 * $prod['pack_qty'], 'owner_id' => $supplyDetail['order']['owner_id']], $supplyDetail['order']['shopId']);
+                }
+                // delete transactions
+                $de->deleteTransactionBySupplyId($supplyDetail['order']['id']);
+            }
+        }
+
+        $supplier = $supplierObj->getSupplierByLinkShop($order['shopId'], $customer['linked_shop']);
+
+        $data = [
+            'id' => $supplyId,
+            'user_id' => $user['id'],
+            'supplier_id' => $supplier['id'],
+            'status' => $order['status'],
+            'ref_no' => $order['id'],
+            'show_bundle' => $order['show_bundle'],
+            'description' => !empty($order['description']) ? $order['description'] : (!empty($order['summery']) ? $order['summery'] : ''),
+            'price' => $order['price'],
+            'payment_amount' => $order['paid_amount'],
+            'payment_with_credit' => 0,
+            'discount' => $order['discount'],
+            'supplier_type' => 1,
+            'shopId' => $customer['linked_shop'],
+            'supply_date' => $storeDATA['sale_date']
+        ];
+
+        $totals['price'] = $order['price'];
+
+        // {
+
+
+        //     "id": "4928",
+        //     "order_custom_id": "4924",
+        //     "user_id": "2",
+        //     "customer_id": "84",
+        //     "customer_name": "PCC Quaid Campus ( Shahzad Azam )",
+        //     "status": "2",
+        //     "price": "2030",
+        //     "paid_amount": "2030",
+        //     "discount": "0",
+        //     "gst": "0",
+        //     "service_charges": "0",
+        //     "shopId": "4",
+        //     "order_date": "2023-10-01",
+        //     "flag": "1",
+        //     "recon": "0",
+        //     "reason": null,
+        //     "summery": "",
+        //     "ref_no": "",
+        //     "show_bundle": "0",
+        //     "show_discount": "1",
+        //     "created_at": "2023-12-27 13:08:55",
+        //     "delivery_date": null,
+        //     "expected_delivery_date": "2023-12-27",
+        //     "complete_date": null,
+        //     "status_id": null
+        //   }
+        $supply_id = $this->createSupply($data);
+
+        $this->deleteSupplyDetails($supply_id);
+
+        foreach ($orderItems as $item) {
+            $d = [
+                'supply_id' => $supply_id,
+                'product_id' => $item['product_id'],
+                'product_title' => $item['product_title'],
+                'quantity' => $item['quantity'],
+                'discount' => !empty($item['discount']) ? round(($item['discount'] / $item['price']) * 100, 2) : 0,
+                'price' => $item['price'],
+                'pprice' => $item['price'] - $item['discount'],
+                'pack_size' => !empty($item['pack_size']) ? $item['pack_size'] : 0,
+                'pack_qty' => !empty($item['pack_qty']) ? $item['pack_qty'] : 0,
+                'unpack_qty' => !empty($item['unpack_qty']) ? $item['unpack_qty'] : 0,
+            ];
+            $totals['discount'] += $item['discount'];
+            $this->createSupplyDetails($d);
+            $products->assignProduct([
+                "qty" => $item['quantity'],
+                "stock_out" => 0,
+                "product_id" => $item['product_id'],
+                "shopId" => $customer['linked_shop'],
+                "owner_id" => $storeDATA['owner_id'],
+                "location" => "",
+                "pack_size" => $d['pack_size'],
+                "pack_qty" => $d['pack_qty'],
+                "min_qty" => $d['unpack_qty'],
+            ]);
+        }
+
+        $totals['discount'] += $order['discount'];
+        $totals['assetsValue'] += $totals['price'];
+
+
+        $cash = !empty($order['paid_amount']) ? $order['paid_amount'] : 0;
+        if ($order['status'] != 1) {
+            $account_id = $supplier['account_id'];
+            $credit_amount = 0;
+
+            $makeTransaction = [
+                'description' => !empty($data['description']) ? $data['description'] : "Supply Invoice: " . $supply_id . " PLACED",
+                'transaction_date' => $storeDATA['sale_date'],
+                'reference' => $data['ref_no'],
+                'transaction_type' => !empty($credit_amount) ? 'EXCHANGE' : 'PURCHASE',
+                'shopId' => $storeDATA['id'],
+                'created_by' => $_SESSION['user_credentials']['id'],
+                'order_ref' => null,
+                'supply_ref' => $supply_id,
+            ];
+
+            $makeTransactionId = $de->makeTransaction($makeTransaction);
+
+            $assetPrice = $totals['assetsValue'];
+            $purchaseDiscount = $totals['discount'];
+            $payableAmount = $totals['price'] - $order['discount'];
+
+            $defaultId = 0;
+
+            foreach ($array['payment_with'] as $value) {
+                if (!empty($value['is_default'])) {
+                    $defaultId = $value['id'];
+                }
+            }
+
+            // assets debit entry - debit
+            // liability payable entry - credit
+            // purchase discount entry - credit
+            if (!empty($assetPrice)) {
+                $entry = [
+                    'transaction_id' => $makeTransactionId,
+                    'account_id' => $storeAccounts['assets'],
+                    'entry_type' => 'D',
+                    'description' => !empty($data['description']) ? $data['description'] : '',
+                    'amount' => $assetPrice, // 2000
+                    'payment_mode' => $defaultId,
+                    'user_id' => $user['id'],
+                ];
+                $a[] = $de->makeEntry($entry);
+            }
+
+            // payable credit entry
+            $entry = [
+                'transaction_id' => $makeTransactionId,
+                'account_id' => $account_id,
+                'entry_type' => 'C',
+                'description' => !empty($data['description']) ? $data['description'] : '',
+                'amount' => $payableAmount,
+                'payment_mode' => $defaultId,
+                'user_id' => $user['id'],
+            ];
+            $a[] = $de->makeEntry($entry);
+
+            if (!empty($purchaseDiscount)) {
+                // saleDiscount credit entry
+                $entry = [
+                    'transaction_id' => $makeTransactionId,
+                    'account_id' => $storeAccounts['purchase_discount'],
+                    'entry_type' => 'C',
+                    'description' => !empty($data['description']) ? $data['description'] : '',
+                    'amount' => $purchaseDiscount, // 200 @ 10%
+                    'payment_mode' => $defaultId,
+                    'user_id' => $user['id'],
+                ];
+                $a[] = $de->makeEntry($entry);
+            }
+
+
+            if (!empty($cash)) {
+                $makeTransactionId = $de->makeTransaction($makeTransaction);
+                // payable credit entry
+                $entry = [
+                    'transaction_id' => $makeTransactionId,
+                    'account_id' => $account_id,
+                    'entry_type' => 'D',
+                    'description' => '',
+                    'amount' => $cash,
+                    'payment_mode' => $defaultId,
+                    'user_id' => $user['id'],
+                ];
+                $a[] = $de->makeEntry($entry);
+                // cash credit entry
+                $entry = [
+                    'transaction_id' => $makeTransactionId,
+                    'account_id' => $storeAccounts['cash'],
+                    'entry_type' => 'C',
+                    'description' => '',
+                    'amount' => $cash, // 200 @ 10%
+                    'payment_mode' => $defaultId,
+                    'user_id' => $user['id'],
+                ];
+                $a[] = $de->makeEntry($entry);
+            }
+            // $newsletter = new Newsletter();
+            // try {
+            //     $send = $newsletter->send([
+            //         'subject' => $makeTransaction['description'],
+            //         'body' => $newsletter->drawSupply($supply_id),
+            //         'sentTo' => [['email' => !empty($supplier['email']) ? $supplier['email'] : 'zia.pccr@yahoo.com', 'name' => !empty($_POST['supplierName']) ? $_POST['supplierName'] : $supplier['name']]],
+            //         'ccEmails' => [['email' => $storeDATA['company_email'], 'name' => $storeDATA['full_name']]],
+            //         'client' => $storeDATA['full_name'],
+            //         'labels' => [$makeTransaction['transaction_type']]
+            //     ]);
+            // } catch (Exception $e) {
+            //     print_r($e);
+            // }
+        }
+    }
+
     public function ordersReport($shopId, $date, $to, $ids = [])
     {
         try {
@@ -175,6 +418,34 @@ class Supply extends Connection
                 $stmt = "SELECT item.*, p.full_name, p.code, p.barcode, p.id, p.product_type FROM `{$this->table_sub}` as item LEFT JOIN products as p ON item.product_id = p.id WHERE item.supply_id=:id";
                 $prepare = $this->dbh->prepare($stmt);
                 $prepare->bindParam(':id', $id, PDO::PARAM_STR);
+                $prepare->execute();
+                $result['order_items'] = $prepare->fetchAll(PDO::FETCH_ASSOC);
+            }
+            return $result;
+        } catch (PDOException $e) {
+            die("Error!: " . $e->getMessage() . "<br/>");
+        }
+    }
+    public function getSupplyByRefId($id, $shopId)
+    {
+        try {
+            $stmt = "SELECT * FROM `{$this->table}` WHERE ref_no=:id and shopId=:shopId";
+            $prepare = $this->dbh->prepare($stmt);
+            $prepare->bindParam(':id', $id, PDO::PARAM_STR);
+            $prepare->bindParam(':shopId', $shopId, PDO::PARAM_STR);
+            $prepare->execute();
+            $result['order'] = $prepare->fetch(PDO::FETCH_ASSOC);
+            if ($result['order']['supplier_type'] == 2) {
+                $c = new Customers();
+                $result['customer'] = $c->getCustomer($result['order']['supplier_id']);
+            } else {
+                $c = new Suppliers();
+                $result['supplier'] = $c->getSupplier($result['order']['supplier_id']);
+            }
+            if (!empty($result['order'])) {
+                $stmt = "SELECT item.*, p.full_name, p.code, p.barcode, p.id, p.product_type FROM `{$this->table_sub}` as item LEFT JOIN products as p ON item.product_id = p.id WHERE item.supply_id=:id";
+                $prepare = $this->dbh->prepare($stmt);
+                $prepare->bindParam(':id', $result['order']['id'], PDO::PARAM_STR);
                 $prepare->execute();
                 $result['order_items'] = $prepare->fetchAll(PDO::FETCH_ASSOC);
             }

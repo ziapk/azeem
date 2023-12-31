@@ -227,47 +227,7 @@ foreach ($publishersArr as $key => $value) {
             }
         }
 
-        $scope.applyClosing = (id, store) => {
-            $http.post('<?php echo SITE_URL; ?>api/getSaleClosingReport.php', $httpParamSerializerJQLike({
-                shopId: id
-            }), {
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                }
-            }).then((response) => {
-                $scope.shopClosing(store, response.data);
-            })
-            // $scope.showPicker = {};
-            // $scope.showPicker[id] = true;
-            // $timeout(() => {
-            //     const d = $('.datepicker-single').daterangepicker({
-            //         autoApply: true,
-            //         minDate: moment().subtract(1, 'week').format('YYYY-MM-DD'),
-            //         maxDate: moment().add(1, 'week').format('YYYY-MM-DD'),
-            //         singleDatePicker: true,
-            //         locale: {
-            //             format: 'YYYY-MM-DD'
-            //         },
-            //     }, function(date) {
-            //         if ($window.confirm('Are you sure you want to close to sale for Today')) {
-            //             $http.post('<?php echo SITE_URL; ?>api/closing.php', $httpParamSerializerJQLike({
-            //                 id,
-            //                 sale_date: moment(date).format('YYYY-MM-DD')
-            //             }), {
-            //                 headers: {
-            //                     'Content-Type': 'application/x-www-form-urlencoded'
-            //                 }
-            //             }).then((response) => {
-            //                 store.sale_date = moment(date).format('YYYY-MM-DD');
-            //                 alert('Date Updated!');
-            //                 $scope.showPicker = {};
-            //             })
-            //         }
-            //         $scope.$apply();
-            //     }).val(store.sale_date);
-            // }, 100)
 
-        }
         $scope.showClosing = (id, enable, sale_date) => {
             if ($window.confirm('Are you sure you want to close to sale for Today')) {
                 $http.post('<?php echo SITE_URL; ?>api/enable.php', $httpParamSerializerJQLike({
@@ -282,12 +242,23 @@ foreach ($publishersArr as $key => $value) {
                 })
             }
         }
+        $scope.applyClosing = (id, store) => {
+            $http.post('<?php echo SITE_URL; ?>api/getSaleClosingReport.php', $httpParamSerializerJQLike({
+                shopId: id
+            }), {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            }).then((response) => {
+                $scope.shopClosing(store, response.data);
+            })
+        }
         $scope.shopClosing = function(item, closingReport) {
             $uibModal.open({
                 ariaLabelledBy: 'modal-title',
                 ariaDescribedBy: 'modal-body',
                 templateUrl: 'shopClosing.html',
-                controller: 'ModalInstanceCtrl',
+                controller: 'SaleClosingModalInstanceCtrl',
                 resolve: {
                     parentData: function() {
                         return {
@@ -310,49 +281,4 @@ foreach ($publishersArr as $key => $value) {
             });
         };
     });
-    app.controller('ModalInstanceCtrl', function($scope, $http, $window, $uibModalInstance, $httpParamSerializerJQLike, parentData) {
-
-        const {
-            item,
-            closingReport
-        } = parentData;
-        $scope.form = {
-            full_name: item.full_name,
-            sale_date: item.sale_date,
-            closing_balance: closingReport?.other?.totalNetSale || 0,
-        }
-        $scope.ok = function() {
-            $uibModalInstance.close({
-                ...$scope.form,
-                sale_date: moment($scope.form.sale_date).format('YYYY-MM-DD'),
-                id: item.id,
-            });
-        };
-
-        $scope.cancel = function() {
-            $uibModalInstance.dismiss('cancel');
-        };
-    });
-</script>
-<script type="text/ng-template" id="shopClosing.html">
-    <form ng-submit="ok()">
-        <div class="modal-header">
-            <h3 class="modal-title" id="modal-title">Open Next Opening Balance for {{form.full_name}}</h3>
-        </div>
-        <div class="modal-body" id="modal-body">
-            <div uib-alert ng-if="alert" ng-class="'alert-'+(alert.type || 'warning')" close="closeAlert()">{{alert.message}}</div>
-            <div class="form-group">
-                <label for="sname">Opening Balance</label>
-                <input id="sname" type="text" ng-model="form.closing_balance" class="form-control" placeholder="Opening Balance">
-            </div>
-            <div class="form-group">
-                <label>Set Next Opening Date</label>
-                <input date-range-picker class="form-control date-picker" type="text" ng-model="form.sale_date" options="{ autoApply: true, singleDatePicker: true }">
-            </div>
-        </div>
-        <div class="modal-footer">
-            <button class="btn btn-default" type="button" ng-click="cancel()">Close</button>
-            <button class="btn btn-primary" type="submit">Submit Form</button>
-        </div>
-    </form>
 </script>

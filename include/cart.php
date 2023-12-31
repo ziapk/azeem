@@ -48,7 +48,7 @@
   // Create the event
   var event = new CustomEvent("ProdcutAdded");
 
-  app.controller('headerController', function($scope, $http, $httpParamSerializerJQLike, $filter, $window, toaster) {
+  app.controller('headerController', function($scope, $http, $httpParamSerializerJQLike, $filter, $window, toaster, $uibModal) {
     $scope.fontsize = parseInt(localStorage.getItem('font-size') || 13);
 
     $('html').css('font-size', $scope.fontsize + 'px');
@@ -57,6 +57,7 @@
       localStorage.setItem('font-size', size)
       $('html').css('font-size', size + 'px');
     }
+    $scope.currentShop = <?php echo json_encode($shop); ?>;
 
     // $scope.list = <?php echo safe_json_encode($list); ?>;
     // sessionStorage.setItem('list', JSON.stringify($scope.list));
@@ -358,10 +359,97 @@
       }
     }
     $scope.loadProduct();
+
+    $scope.makeClosing = (id, store) => {
+      $http.post('<?php echo SITE_URL; ?>api/getSaleClosingReport.php', $httpParamSerializerJQLike({
+        shopId: id
+      }), {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }).then((response) => {
+        $scope.shopClosing(store, response.data);
+      })
+    }
+    $scope.shopClosing = function(item, closingReport) {
+      $uibModal.open({
+        ariaLabelledBy: 'modal-title',
+        ariaDescribedBy: 'modal-body',
+        templateUrl: 'shopClosing.html',
+        controller: 'SaleClosingModalInstanceCtrl',
+        resolve: {
+          parentData: function() {
+            return {
+              item,
+              closingReport
+            }
+          }
+        }
+      }).result.then(function(response) {
+        console.log(response);
+        $http.post('<?php echo SITE_URL; ?>api/closing.php', $httpParamSerializerJQLike(response), {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }).then(function() {
+          $window.location.reload();
+        });
+      }, function() {
+        $log.info('Modal dismissed at: ' + new Date());
+      });
+    };
   });
   app.filter('roundup', function() {
     return function(value) {
       return Math.ceil(value);
     };
-  })
+  });
+
+  app.controller('SaleClosingModalInstanceCtrl', function($scope, $http, $window, $uibModalInstance, $httpParamSerializerJQLike, parentData) {
+
+    const {
+      item,
+      closingReport
+    } = parentData;
+    console.log('item', item, 'closingReport', closingReport);
+    $scope.form = {
+      full_name: item.full_name,
+      sale_date: item.sale_date,
+      closing_balance: closingReport?.other?.totalNetSale || 0,
+    }
+    $scope.ok = function() {
+      $uibModalInstance.close({
+        ...$scope.form,
+        sale_date: moment($scope.form.sale_date).format('YYYY-MM-DD'),
+        id: item.id,
+      });
+    };
+
+    $scope.cancel = function() {
+      $uibModalInstance.dismiss('cancel');
+    };
+  });
+</script>
+
+<script type="text/ng-template" id="shopClosing.html">
+  <form ng-submit="ok()">
+        <div class="modal-header">
+            <h3 class="modal-title" id="modal-title">Open Next Opening Balance for {{form.full_name}}</h3>
+        </div>
+        <div class="modal-body" id="modal-body">
+            <div uib-alert ng-if="alert" ng-class="'alert-'+(alert.type || 'warning')" close="closeAlert()">{{alert.message}}</div>
+            <div class="form-group">
+                <label for="sname">Opening Balance</label>
+                <input id="sname" type="text" ng-model="form.closing_balance" class="form-control" placeholder="Opening Balance">
+            </div>
+            <div class="form-group">
+                <label>Set Next Opening Date</label>
+                <input date-range-picker class="form-control date-picker" type="text" ng-model="form.sale_date" options="{ autoApply: true, singleDatePicker: true }">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-default" type="button" ng-click="cancel()">Close</button>
+            <button class="btn btn-primary" type="submit">Submit Form</button>
+        </div>
+    </form>
 </script>

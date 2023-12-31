@@ -103,6 +103,31 @@ class Users extends Connection
 			die("Error!: " . $e->getMessage() . "<br/>");
 		}
 	}
+	public function createProfile($array)
+	{
+		try {
+			$password = $this->normalToPassword($array['password']);
+			$stmt = "INSERT INTO `{$this->table}` (`password`,`full_name`,`city`,`cnic`,`phoneNumber1`,`phoneNumber2`,`phoneNumber3`,`photo`,`shopId`,`role`, `created_by`, `email`) values (:password, :full_name, :city, :cnic, :phoneNumber1, :phoneNumber2, :phoneNumber3, :photo, :shopId, :role, :created_by, :email)";
+			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':full_name', $array['full_name'], PDO::PARAM_STR);
+			$prepare->bindParam(':city', $array['city'], PDO::PARAM_STR);
+			$prepare->bindParam(':cnic', $array['cnic'], PDO::PARAM_STR);
+			$prepare->bindParam(':phoneNumber1', $array['phoneNumber1'], PDO::PARAM_STR);
+			$prepare->bindParam(':phoneNumber2', $array['phoneNumber2'], PDO::PARAM_STR);
+			$prepare->bindParam(':phoneNumber3', $array['phoneNumber3'], PDO::PARAM_STR);
+			$prepare->bindParam(':photo', $array['photo'], PDO::PARAM_STR);
+			$prepare->bindParam(':shopId', $array['shopId'], PDO::PARAM_STR);
+			$prepare->bindParam(':role', $array['role'], PDO::PARAM_STR);
+			$prepare->bindParam(':created_by', $array['created_by'], PDO::PARAM_STR);
+			$prepare->bindParam(':password', $password, PDO::PARAM_STR);
+			$prepare->bindParam(':email', $array['email'], PDO::PARAM_STR);
+			$prepare->execute();
+			$result = $prepare->rowCount();
+			return $result;
+		} catch (PDOException $e) {
+			die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
 	public function runQuery($stmt)
 	{
 		try {

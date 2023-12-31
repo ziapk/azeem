@@ -22,7 +22,8 @@ class Suppliers extends Connection
 	public function createSupplier($array)
 	{
 		try {
-			$stmt = "INSERT INTO `{$this->table}` (`name`, `contact`, `email`, `address`,`wallet`, `company`, `title`, `user_id`, `shopId`, `type`, `account_id`) VALUES (:name, :contact, :email, :address, :wallet, :company, :title, :user_id, :shopId, :type, :account_id)";
+			$linkedShop = !empty($array['linked_shop']) ? $array['linked_shop'] : null;
+			$stmt = "INSERT INTO `{$this->table}` (`name`, `contact`, `email`, `address`,`wallet`, `company`, `title`, `user_id`, `shopId`, `type`, `account_id`, `linked_shop`) VALUES (:name, :contact, :email, :address, :wallet, :company, :title, :user_id, :shopId, :type, :account_id, :linked_shop)";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':name', $array['name'], PDO::PARAM_STR);
 			$prepare->bindParam(':contact', $array['contact'], PDO::PARAM_STR);
@@ -35,6 +36,7 @@ class Suppliers extends Connection
 			$prepare->bindParam(':shopId', $array['shopId'], PDO::PARAM_INT);
 			$prepare->bindParam(':type', $array['type'], PDO::PARAM_INT);
 			$prepare->bindParam(':account_id', $array['account_id'], PDO::PARAM_INT);
+			$prepare->bindParam(':linked_shop', $linkedShop, PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $this->dbh->lastInsertId();
 			return $result;
@@ -61,7 +63,8 @@ class Suppliers extends Connection
 	public function updateSupplier($array)
 	{
 		try {
-			$stmt = "UPDATE `{$this->table}` SET name=:name, contact=:contact, email=:email, address=:address, company=:company, title=:title WHERE id=:id";
+			$linkedShop = !empty($array['linked_shop']) ? $array['linked_shop'] : null;
+			$stmt = "UPDATE `{$this->table}` SET name=:name, contact=:contact, email=:email, address=:address, company=:company, title=:title, linked_shop=:linked_shop WHERE id=:id";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':name', $array['name'], PDO::PARAM_STR);
 			$prepare->bindParam(':contact', $array['contact'], PDO::PARAM_STR);
@@ -70,6 +73,7 @@ class Suppliers extends Connection
 			$prepare->bindParam(':company', $array['company'], PDO::PARAM_STR);
 			$prepare->bindParam(':title', $array['title'], PDO::PARAM_STR);
 			$prepare->bindParam(':id', $array['id'], PDO::PARAM_STR);
+			$prepare->bindParam(':linked_shop', $linkedShop, PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $prepare->rowCount();
 			return $result;
@@ -142,6 +146,24 @@ class Suppliers extends Connection
 			$stmt = "SELECT *  FROM `{$this->table}` WHERE flag=1 and `id`=:id";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':id', $id, PDO::PARAM_STR);
+			$prepare->execute();
+			$result = $prepare->fetch(PDO::FETCH_ASSOC);
+			$de = new DoubleEntry();
+			if (!empty($result['account_id'])) {
+				$result['account'] = $de->getAccount($result['account_id']);
+			}
+			return $result;
+		} catch (PDOException $e) {
+			die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
+	public function getSupplierByLinkShop($id, $shopId)
+	{
+		try {
+			$stmt = "SELECT *  FROM `{$this->table}` WHERE flag=1 and `linked_shop`=:id and `shopId`=:shopId";
+			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':id', $id, PDO::PARAM_STR);
+			$prepare->bindParam(':shopId', $shopId, PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $prepare->fetch(PDO::FETCH_ASSOC);
 			$de = new DoubleEntry();

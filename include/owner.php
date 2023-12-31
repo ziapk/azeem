@@ -206,6 +206,8 @@ $customersList = $customerObj->getCustomers($shop['id']);
             <ul class="dropdown-menu">
               <li><a title="" href="<?php echo SITE_URL; ?>pages/profile">Profile</a></li>
               <li class="divider"></li>
+              <li><a title="" ng-click="makeClosing(currentShop.id, currentShop)" href="javascript:void(0)">Closing</a></li>
+              <li class="divider"></li>
               <li><a title="" href="<?php echo SITE_URL; ?>logout.php">Logout</a></li>
               <li class="divider"></li>
               <li style="padding: 0 10px">

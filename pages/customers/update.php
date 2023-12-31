@@ -7,6 +7,9 @@ $productObj = new Customers();
 $ownerId = $userData['role'] == 'owner' ? $userData['id'] : $userData['created_by'];
 $userId = $userData['id'];
 
+$stores = new Store();
+$ownerStores = $stores->getOwnerStores($ownerId);
+
 $store = $productObj->getCustomer($_GET['id']);
 
 $error = "";
@@ -33,6 +36,11 @@ if (!empty($_POST) && isset($_POST['update'])) {
             'type' => $_POST['type'],
             'address' => $_POST['address']
         ];
+        if ($ownerId === $userId) {
+            if (!empty($_POST['linked_shop'])) {
+                $data['linked_shop'] = $_POST['linked_shop'];
+            }
+        }
         $update = $productObj->updateCustomer($data);
         if (!empty($store['account_id'])) {
             $de = new DoubleEntry();
@@ -124,6 +132,22 @@ echo mainHeader();
                 <?php } else { ?>
                     <p>No Linked Account: <a href="javascript:void(0)" ng-click="linkAccount()">Link and Account</a></p>
                 <?php } ?>
+            </div>
+            <div class="col-sm-3 form-group">
+                <label>Linked Shop (Optional)</label>
+                <?php if ($ownerId === $userId) { ?>
+                    <select name="linked_shop" type="text" class="form-control" placeholder="linked_shop" value="<?php echo $store['linked_shop']; ?>">
+                        <option value="">Link a Shop</option>
+                        <?php foreach ($ownerStores as $storeItem) { ?>
+                            <option value="<?php echo $storeItem['id']; ?>" <?php if ($store['linked_shop'] == $storeItem['id']) {
+                                                                                echo 'selected';
+                                                                            } ?>><?php echo $storeItem['full_name']; ?></option>
+                        <?php } ?>
+                    </select>
+                <?php } else { ?>
+                    <strong class="form-control"><?php echo $store['link_shop_account']['title'] . ' (' . $store['link_shop__account']['code'] . ')'; ?></strong>
+                <?php } ?>
+
             </div>
         </div>
         <p class="text-right">

@@ -32,9 +32,14 @@ echo mainHeader(['page' => 'sale_returns']);
             </div>
             <div class="input-group-btn">
                 <a href="<?php echo SITE_URL; ?>pages/orders/adjustment.php" class="btn btn-danger">New Retrun</a>
+                <a href="<?php echo SITE_URL; ?>pages/orders/adjustment.php?LinkForMainShop=1" class="btn btn-danger">Retrun to Main Shop</a>
             </div>
         </div>
     </form>
+    <uib-tabset active="activePill">
+        <uib-tab select="getReport($event)" index="0" data-tab="mine" heading="My Returns"></uib-tab>
+        <uib-tab select="getReport($event)" index="1" data-tab="linked" heading="Link Returns"></uib-tab>
+    </uib-tabset>
     <table class="table">
         <thead>
             <tr>
@@ -59,7 +64,8 @@ echo mainHeader(['page' => 'sale_returns']);
                 <td>{{row.order_date}}</td>
                 <td align="right">
                     <?php if ($userData['role'] === 'owner') { ?><a class="btn btn-xs btn-default" href="<?php echo SITE_URL; ?>pages/orders/adjustment.php?return={{row.id}}">Edit</a><?php } ?>
-                    <a class="btn btn-xs btn-danger" ng-click="deleteRecipt(row.id)" href="javascript:void(0)">Delete</a>
+                    <?php if ($userData['role'] === 'manager') { ?><a class="btn btn-xs btn-default" ng-if="row.flag == 1" href="<?php echo SITE_URL; ?>pages/orders/adjustment.php?return={{row.id}}">Edit</a><?php } ?>
+                    <?php if ($userData['role'] === 'owner') { ?><a class="btn btn-xs btn-danger" ng-click="deleteRecipt(row.id)" href="javascript:void(0)">Delete</a><?php } ?>
                     <a class="btn btn-xs btn-default" ng-click="openRecipt(row.id, 'details', 'large')" href="javascript:void(0)">Large View</a>
                 </td>
             </tr>
@@ -101,12 +107,16 @@ echo mainFooter();
 
         $scope.statusArr = <?php echo json_encode($orderStatusArr); ?>
 
-        $scope.getReport = form => {
+        $scope.getReport = (form) => {
+            const orderType = form?.currentTarget?.parentNode?.getAttribute('data-tab') || $scope.activeValue || 'mine';
+            $scope.activeValue = orderType || 'mine';
+            console.log(orderType)
             $http.get("<?php echo SITE_URL ?>api/getSaleReturnReport.php", {
                     params: {
                         from: moment($scope.datePicker.date.startDate).format('YYYY-MM-DD'),
                         to: moment($scope.datePicker.date.endDate).format('YYYY-MM-DD'),
-                        orderId: $scope.orderId
+                        orderId: $scope.orderId,
+                        orderType
                     }
                 })
                 .then(function(response) {

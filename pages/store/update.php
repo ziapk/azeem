@@ -35,6 +35,7 @@ if (!empty($_POST) && isset($_POST['update'])) {
             'sale_terms' => !empty($_POST['sale_terms']) ? $_POST['sale_terms'] : "",
             'sale_terms_lg' => !empty($_POST['sale_terms_lg']) ? $_POST['sale_terms_lg'] : "",
             'status' => !empty($_POST['status']) ? $_POST['status'] : 1,
+            'invoice_prefix' => !empty($_POST['invoice_prefix']) ? $_POST['invoice_prefix'] : null,
         ];
 
         $photo = $_FILES['image'];
@@ -109,6 +110,9 @@ $storeTypesArr = $storeObj->getStoreTypes();
                 <input name="image" type="file">
             </div>
             <div class="clearfix"></div>
+            <div class="col-sm-4 form-group">
+                <input name="invoice_prefix" type="text" class="form-control" placeholder="Invoice Prefix" value="<?php echo $storeData['invoice_prefix']; ?>">
+            </div>
             <div class="col-sm-4 form-group">
                 <input name="location" type="text" class="form-control" placeholder="Location" value="<?php echo $storeData['location']; ?>">
             </div>

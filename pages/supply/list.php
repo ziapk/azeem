@@ -32,7 +32,7 @@ echo mainHeader(['page' => 'supplies']);
                 <th>Sr.#</th>
                 <th>Order Number</th>
                 <th>Ref.#</th>
-                <th>Customer</th>
+                <th>Supplier</th>
                 <th>Price</th>
                 <th>Status</th>
                 <th>Date/time</th>

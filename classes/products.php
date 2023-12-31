@@ -169,7 +169,6 @@ class Products extends Connection
 	public function getOwnerProductsPagination($owner_id, $params, $shopId = null, $mobileCol = false)
 	{
 		try {
-
 			$searchQry = "";
 			$sortByQry = "";
 
@@ -187,7 +186,7 @@ class Products extends Connection
 
 			$pin = "";
 			if (!empty($params['pin'])) {
-				$pin .= " AND p.pin > 0";
+				$pin .= " AND sp.pin > 0";
 			}
 			$dup = "";
 			if (!empty($params['dup'])) {
@@ -283,7 +282,7 @@ class Products extends Connection
 			}
 
 			$mobileCols = "p.id,p.full_name";
-			$allCols = "group_concat(DISTINCT r.title ORDER BY r.title ASC) as rackNumbers, p.priority, group_concat(DISTINCT pc.code ORDER BY pc.code ASC) as other_codes, p.author, p.barcode, p.code, p.cat_id, p.board, p.group, p.id, p.pprice, p.publisher_id, concat(p.id, ' | ', p.full_name) as full_name, sp.pack_qty, sp.pack_size, pub.full_name as publisherName, pub.discount_type, pub.discount_amount, CONVERT(case when (pub.discount_amount > 0) then (p.price * (1 - (pub.discount_amount / 100)) ) else p.price end, DECIMAL) as price, is_active, product_type $column";
+			$allCols = "group_concat(DISTINCT r.title ORDER BY r.title ASC) as rackNumbers, p.priority, group_concat(DISTINCT pc.code ORDER BY pc.code ASC) as other_codes, p.author, p.barcode, p.code, p.cat_id, p.board, p.group, p.id, p.pprice, sp.pin, p.publisher_id, concat(p.id, ' | ', p.full_name) as full_name, sp.pack_qty, sp.pack_size, pub.full_name as publisherName, pub.discount_type, pub.discount_amount, CONVERT(case when (pub.discount_amount > 0) then (p.price * (1 - (pub.discount_amount / 100)) ) else p.price end, DECIMAL) as price, is_active, product_type $column";
 
 			$mainCols = "";
 			if (!empty($mobileCol)) {
@@ -503,7 +502,7 @@ class Products extends Connection
 
 			$pin = "";
 			if (!empty($params['pin'])) {
-				$pin .= " AND p.pin > 0";
+				$pin .= " AND sp.pin > 0";
 			}
 			$publisher_query = "";
 			if (!empty($params['publisher_id'])) {
@@ -697,7 +696,7 @@ class Products extends Connection
 
 		try {
 
-			$stmt1 = "SELECT count(st.id) as count FROM `{$this->table_st}` as st LEFT JOIN `{$this->table}` AS p ON p.id = st.product_id LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id WHERE p.is_active = 1 and st.`owner_id`=:owner_id and st.status = 1 $shopCondition $searchQry $publisher_query order by p.id";
+			$stmt1 = "SELECT count(*) as count FROM (SELECT st.id FROM `{$this->table_st}` as st LEFT JOIN `{$this->table}` AS p ON p.id = st.product_id LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id WHERE p.is_active = 1 and st.`owner_id`=:owner_id and st.status = 1 $shopCondition $searchQry $publisher_query group by pc.product_id, st.product_id order by p.id) AS a";
 			$prepare = $this->dbh->prepare($stmt1);
 			$prepare->bindParam(':owner_id', $owner_id, PDO::PARAM_STR);
 			$prepare->execute();
@@ -708,8 +707,7 @@ class Products extends Connection
 			$currentPage = $total_pages >= $params['page'] ? $params['page'] : $total_pages;
 			$offset =  ((!empty($currentPage) ? $currentPage : 1) - 1) * $no_of_records_per_page;
 
-
-			$stmt = "SELECT st.*, p.code, p.id as product_id, p.full_name, p.group, p.publisher_id, p.author FROM `{$this->table_st}` as st LEFT JOIN `{$this->table}` AS p ON p.id = st.product_id LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id WHERE p.is_active = 1 and st.`owner_id`=:owner_id and st.status = 1 $shopCondition $searchQry $publisher_query order by p.id desc LIMIT :offset, :perPage";
+			$stmt = "SELECT st.*, p.code, p.id as product_id, p.full_name, p.group, p.publisher_id, p.author FROM `{$this->table_st}` as st LEFT JOIN `{$this->table}` AS p ON p.id = st.product_id LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id WHERE p.is_active = 1 and st.`owner_id`=:owner_id and st.status = 1 $shopCondition $searchQry $publisher_query group by st.product_id, pc.product_id order by p.id desc LIMIT :offset, :perPage";
 			$prepare2 = $this->dbh->prepare($stmt);
 			$prepare2->bindParam(':owner_id', $owner_id, PDO::PARAM_STR);
 			$prepare2->bindParam(':offset', $offset, PDO::PARAM_INT);
@@ -944,11 +942,12 @@ class Products extends Connection
 			die("Error!: " . $e->getMessage() . "<br/>");
 		}
 	}
-	public function setBookmark($id, $pin)
+	public function setBookmark($id, $pin, $shopId)
 	{
 		try {
-			$stmt = "UPDATE `{$this->table}` SET `pin`=:pin WHERE id=:id";
+			$stmt = "UPDATE `{$this->table_st}` SET `pin`=:pin WHERE product_id=:id and shopId=:shopId";
 			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':shopId', $shopId, PDO::PARAM_INT);
 			$prepare->bindParam(':pin', $pin, PDO::PARAM_INT);
 			$prepare->bindParam(':id', $id, PDO::PARAM_INT);
 			$prepare->execute();

@@ -5,6 +5,7 @@ $data = [
     'from' => $_GET['from'],
     'to' => $_GET['to'],
     'orderId' => $_GET['orderId'],
+    'orderType' => !empty($_GET['orderType']) && $_GET['orderType'] == 'linked' ? 1 : 0
 ];
 $orders = $ordersObj->userReturnOrders($userData['shopId'], $data);
 $data = [];

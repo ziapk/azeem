@@ -58,11 +58,257 @@ class Orders extends Connection
         }
     }
 
+
+
+    public function prepareOrder($array)
+    {
+        $customersObj = new Customers();
+        $customer = $customersObj->getCustomer($array['customerId']);
+
+        if (!empty($customer)) {
+
+            $storeObj = new Store();
+            $shopAccounts = new ShopAccounts();
+            $doubleEntry = new DoubleEntry();
+            $userObj = UserInfo();
+            $user = $userObj['user'];
+            $shop = $userObj['shop'];
+
+            $status = 9;
+            $totalDiscount = 0;
+            $additionalDiscount = 0;
+            $parked = false;
+
+            $storeDATA = $storeObj->getStore($shop['id']);
+
+            if ($array['status'] == 1) {
+                $status = 1; // parked
+                $parked = true;
+            } else if (!empty($array['payment_amount'])) {
+                $gst = round($array['subTotal'] * ($array['gst'] / 100));
+                $service_charges = round($array['subTotal'] * ($array['service_charges'] / 100));
+                $status = 8;
+                if ((($array['subTotal'] + $gst + $service_charges) - $array['discount'] - $array['payment_amount']) == 0) {
+                    $status = 2;
+                }
+            }
+
+            $data = [
+                'user_id' => $user['id'],
+                'customer_name' => $array['customer_name'],
+                'customer_id' => !empty($customer['id']) ? $customer['id'] : 0,
+                'status' => $status,
+                'price' => $array['subTotal'],
+                'paid_amount' => $array['payment_amount'],
+                'show_discount' => !empty($array['show_discount']) ? 1 : 0,
+                'discount' => $array['discount'],
+                'show_bundle' => !empty($array['show_bundle']) ? 1 : 0,
+                'gst' => $array['gst'],
+                'service_charges' => !empty($array['service_charges']) ? $array['service_charges'] : 0,
+                'shopId' => !empty($array['shopId']) ? $array['shopId'] : $shop['id'],
+                'order_date' => $storeDATA['sale_date'],
+                'summery' => $array['summery'],
+                'ref_no' => $array['ref_no'],
+                'id' => $array['id'],
+                'linked_shop' => $customer['linked_shop'],
+                'status_id' => !empty($array['status_id']) ? $array['status_id'] : null,
+                'expected_delivery_date' => !empty($array['expected_delivery_date']) ? $array['expected_delivery_date'] : null,
+            ];
+
+            $additionalDiscount += $array['discount'];
+            $accountsData = $shopAccounts->getSAs($shop['id']);
+            $storeAccounts = [];
+            foreach ($accountsData as $a) {
+                $storeAccounts[$a['key_value']] = $a['account_id'];
+            }
+
+            if (!empty($array['id'])) {
+
+                $orderDetail = $this->getOrder($array['id']);
+                $currentStatus = $orderDetail['order']['status'];
+
+                if (in_array($currentStatus, [2, 8, 9])) {
+
+                    // rollback products first
+                    $products = new Products();
+                    foreach ($orderDetail['order_items'] as $prod) {
+                        $products->subProductQty(['product_id' => $prod['product_id'], 'quantity' => -1 * $prod['quantity'], 'pack_qty' => $prod['pack_qty'], 'owner_id' => $user['role'] == 'owner' ? $user['id'] : $user['created_by'], 'shopId' => $orderDetail['order']['shopId']]);
+                        if (!empty($customer['linked_shop'])) {
+                            $products->addProductQty($prod['product_id'], ['qty' => -1 * $prod['quantity'], 'pack_qty' => $prod['pack_qty']], $customer['linked_shop']);
+                        }
+                    }
+
+                    // delete transactions
+                    $doubleEntry->deleteTransactionByOrderId($orderDetail['order']['id']);
+                }
+            }
+            $order_id = $this->createOrder($data);
+
+            if ($status == 1 && !empty($array['id'])) { // when edit a parked entry
+                $order_id = $array['id'];
+            }
+
+            if ($order_id) {
+                $items = [];
+                if (sizeof($array['items'])) {
+                    $this->deleteOrderItems($order_id);
+                    $this->deleteOrderServices($order_id);
+
+                    $c = [];
+                    foreach ($array['items'] as $item) {
+                        $discount = !empty($item['discount']) ? $item['discount'] : 0;
+
+                        $d = [
+                            'shopId' => $shop['id'],
+                            'owner_id' => $user['role'] == 'owner' ? $user['id'] : $user['created_by'],
+                            'product_id' => $item['id'],
+                            'order_id' => $order_id,
+                            'description' => $item['description'],
+                            'quantity' => $item['qty'] + (!empty($item['unpack_qty']) ? $item['unpack_qty'] : 0),
+                            'pack_size' => !empty($item['pack_size']) ? $item['pack_size'] : 0,
+                            'pack_qty' => !empty($item['pack_qty']) ? $item['pack_qty'] : 0,
+                            'unpack_qty' => !empty($item['unpack_qty']) ? $item['unpack_qty'] : 0,
+                            'discount' => $discount,
+                            'discount_type' => !empty($item['discount_type']) ? $item['discount_type'] : 1,
+                            'price' => $item['price'],
+                            'services' => $item['services'],
+                            'raw_items' => $item['raw_items'],
+                            'status' => $array['status'],
+                            'item_status' => !empty($item['item_status']) ? $item['item_status'] : 1,
+                            'employee_id' => !empty($item['employee_id']) ? $item['employee_id'] : null,
+                            'start_date' => !empty($item['start_date']) ? $item['start_date'] : null,
+                            'end_date' => !empty($item['end_date']) ? $item['end_date'] : null,
+                            'priority' => !empty($item['priority']) ? $item['priority'] : 1,
+                        ];
+
+                        $totalDiscount += $item['discount'];
+                        $c[] = $this->createOrderDetails($d, $customer);
+                    }
+                }
+
+                if ($status != 1) { // if not in park state
+
+
+                    $orderDetail = $this->getOrder($order_id);
+                    $assetPrice = $data['price'] + $totalDiscount;
+                    $cash = $data['paid_amount'];
+                    $saleDiscount = $totalDiscount + $additionalDiscount;
+                    $receivable = ($assetPrice - $saleDiscount);
+                    $defaultId = 0;
+
+                    foreach ($array['payment_with'] as $value) {
+                        if (!empty($value['is_default'])) {
+                            $defaultId = $value['id'];
+                        }
+                    }
+
+                    $makeTransaction = [
+                        'description' => !empty($array['summery']) ? $array['summery'] : "ORDER ID: " . $orderDetail['order']['order_custom_id'] . " PLACED",
+                        'transaction_date' => $storeDATA['sale_date'],
+                        'reference' => !empty($array['ref_no']) ? $array['ref_no'] : '',
+                        'transaction_type' => 'SALE',
+                        'shopId' => $shop['id'],
+                        'created_by' => $_SESSION['user_credentials']['id'],
+                        'order_ref' => $order_id,
+                        'supply_ref' => null,
+                    ];
+
+                    $makeTransactionId = $doubleEntry->makeTransaction($makeTransaction);
+
+                    // assets debit entry - credit
+                    // assets receivable entry - debit
+                    // expense discount entry - debit
+
+                    // receivable credit entry
+                    $entry = [
+                        'transaction_id' => $makeTransactionId,
+                        'account_id' => $customer['account_id'],
+                        'entry_type' => 'D',
+                        'description' => '',
+                        'amount' => $receivable,
+                        'payment_mode' => $defaultId,
+                        'user_id' => $_SESSION['user_credentials']['id'],
+                    ];
+                    $a[] = $doubleEntry->makeEntry($entry);
+
+                    if (!empty($saleDiscount)) {
+                        // saleDiscount credit entry
+                        $entry = [
+                            'transaction_id' => $makeTransactionId,
+                            'account_id' => $storeAccounts['sale_discount'],
+                            'entry_type' => 'D',
+                            'description' => '',
+                            'amount' => $saleDiscount, // 200 @ 10%
+                            'payment_mode' => $defaultId,
+                            'user_id' => $_SESSION['user_credentials']['id'],
+                        ];
+                        $a[] = $doubleEntry->makeEntry($entry);
+                    }
+
+                    $entry = [
+                        'transaction_id' => $makeTransactionId,
+                        'account_id' => $storeAccounts['assets'],
+                        'entry_type' => 'C',
+                        'description' => '',
+                        'amount' => $assetPrice, // 2000
+                        'payment_mode' => $defaultId,
+                        'user_id' => $_SESSION['user_credentials']['id'],
+                    ];
+
+                    $a[] = $doubleEntry->makeEntry($entry);
+
+                    if (!empty($cash)) {
+                        $makeTransactionId = $doubleEntry->makeTransaction($makeTransaction);
+                        foreach ($array['payment_with'] as $value) {
+                            if (!empty($value['amount'])) {
+                                // cash credit entry
+                                $entry = [
+                                    'transaction_id' => $makeTransactionId,
+                                    'account_id' => $storeAccounts['cash'],
+                                    'entry_type' => 'D',
+                                    'description' => '',
+                                    'amount' => $value['amount'], // 200 @ 10%
+                                    'payment_mode' => $value['id'],
+                                    'user_id' => $_SESSION['user_credentials']['id'],
+                                ];
+                                $a[] = $doubleEntry->makeEntry($entry);
+
+                                // receivable credit entry
+                                $entry = [
+                                    'transaction_id' => $makeTransactionId,
+                                    'account_id' => $customer['account_id'],
+                                    'entry_type' => 'C',
+                                    'description' => '',
+                                    'amount' => $value['amount'],
+                                    'payment_mode' => $value['id'],
+                                    'user_id' => $_SESSION['user_credentials']['id'],
+                                ];
+                                $a[] = $doubleEntry->makeEntry($entry);
+                            }
+                        }
+                    }
+                    $newsletter = new Newsletter();
+                    $send = $newsletter->send([
+                        'subject' => "Order.#" . $orderDetail['order']['order_custom_id'] . " has been generated",
+                        'body' => $newsletter->drawInvoice($order_id),
+                        'sentTo' => [['email' => !empty($customer['email']) ? $customer['email'] : 'zia.pccr@yahoo.com', 'name' => $array['customer_name']]],
+                        'ccEmails' => [['email' => $shop['company_email'], 'name' => $shop['full_name']]],
+                        'client' => $shop['full_name'],
+                        'labels' => [$makeTransaction['transaction_type']]
+                    ]);
+                }
+
+                return ['status' => 200, 'send' => $send, 'message' => 'successfully done', 'order' => ['id' => $order_id]];
+            }
+        } else {
+            return ['status' => 400, 'message' => 'Please select a customer'];
+        }
+    }
     public function createOrder($array)
     {
         try {
             if (!empty($array['id'])) {
-                $stmt = "UPDATE `{$this->table}` SET `user_id`=:user_id, `customer_id`=:customer_id, `customer_name`=:customer_name, `status`=:status, `price`=:price, `paid_amount`=:paid_amount, `discount`=:discount, `shopId`=:shopId, `order_date`=:order_date, `gst`=:gst, `service_charges`=:service_charges, `summery`=:summery, `ref_no`=:ref_no, `show_discount`=:show_discount, `show_bundle`=:show_bundle, status_id=:status_id, expected_delivery_date=:expected_delivery_date WHERE id=:id";
+                $stmt = "UPDATE `{$this->table}` SET `user_id`=:user_id, `customer_id`=:customer_id, `customer_name`=:customer_name, `status`=:status, `price`=:price, `paid_amount`=:paid_amount, `discount`=:discount, `shopId`=:shopId, `linked_shop`=:linked_shop, `order_date`=:order_date, `gst`=:gst, `service_charges`=:service_charges, `summery`=:summery, `ref_no`=:ref_no, `show_discount`=:show_discount, `show_bundle`=:show_bundle, status_id=:status_id, expected_delivery_date=:expected_delivery_date WHERE id=:id";
                 $prepare = $this->dbh->prepare($stmt);
                 $prepare->bindParam(':user_id', $array['user_id'], PDO::PARAM_STR);
                 $prepare->bindParam(':customer_id', $array['customer_id'], PDO::PARAM_STR);
@@ -72,6 +318,7 @@ class Orders extends Connection
                 $prepare->bindParam(':paid_amount', $array['paid_amount'], PDO::PARAM_STR);
                 $prepare->bindParam(':discount', $array['discount'], PDO::PARAM_STR);
                 $prepare->bindParam(':shopId', $array['shopId'], PDO::PARAM_STR);
+                $prepare->bindParam(':linked_shop', $array['linked_shop'], PDO::PARAM_STR);
                 $prepare->bindParam(':order_date', $array['order_date'], PDO::PARAM_STR);
                 $prepare->bindParam(':gst', $array['gst'], PDO::PARAM_STR);
                 $prepare->bindParam(':service_charges', $array['service_charges'], PDO::PARAM_STR);
@@ -87,7 +334,7 @@ class Orders extends Connection
                 return $array['id'];
             } else {
                 $id = $this->getNextId($array['shopId']);
-                $stmt = "INSERT INTO `{$this->table}` (`order_custom_id`,`user_id`, `customer_id`, `customer_name`, `status`, `price`, `paid_amount`, `discount`, `shopId`, `order_date`, `gst`, `service_charges`, `summery`, `ref_no`, `show_discount`, `show_bundle`, `status_id`, `expected_delivery_date`) VALUES (:order_custom_id, :user_id, :customer_id, :customer_name, :status, :price, :paid_amount, :discount, :shopId, :order_date, :gst, :service_charges, :summery, :ref_no, :show_discount, :show_bundle, :status_id, :expected_delivery_date)";
+                $stmt = "INSERT INTO `{$this->table}` (`order_custom_id`,`user_id`, `customer_id`, `customer_name`, `status`, `price`, `paid_amount`, `discount`, `shopId`, `linked_shop`, `order_date`, `gst`, `service_charges`, `summery`, `ref_no`, `show_discount`, `show_bundle`, `status_id`, `expected_delivery_date`) VALUES (:order_custom_id, :user_id, :customer_id, :customer_name, :status, :price, :paid_amount, :discount, :shopId, :linked_shop, :order_date, :gst, :service_charges, :summery, :ref_no, :show_discount, :show_bundle, :status_id, :expected_delivery_date)";
                 $prepare = $this->dbh->prepare($stmt);
                 $prepare->bindParam(':order_custom_id', $id, PDO::PARAM_STR);
                 $prepare->bindParam(':user_id', $array['user_id'], PDO::PARAM_STR);
@@ -98,6 +345,7 @@ class Orders extends Connection
                 $prepare->bindParam(':paid_amount', $array['paid_amount'], PDO::PARAM_STR);
                 $prepare->bindParam(':discount', $array['discount'], PDO::PARAM_STR);
                 $prepare->bindParam(':shopId', $array['shopId'], PDO::PARAM_STR);
+                $prepare->bindParam(':linked_shop', $array['linked_shop'], PDO::PARAM_STR);
                 $prepare->bindParam(':order_date', $array['order_date'], PDO::PARAM_STR);
                 $prepare->bindParam(':gst', $array['gst'], PDO::PARAM_STR);
                 $prepare->bindParam(':service_charges', $array['service_charges'], PDO::PARAM_STR);
@@ -119,7 +367,7 @@ class Orders extends Connection
         }
     }
 
-    public function orderReturnAll($array, $reverse = false)
+    public function orderReturnAll($array, $reverse = false, $ownerShopId, $flag = 1)
     {
         try {
             $stmt = "INSERT INTO `{$this->table_rp}` (`user_id`, `shopId`, `order_id`, `product_id`, `quantity`, `price`, `discount`, `discount_type`, `discount_value`, `type`, `pack_size`, `pack_qty`, `unpack_qty` ) VALUES (:user_id, :shopId, :order_id, :product_id, :quantity, :price, :discount, :discount_type, :discount_value, :type, :pack_size, :pack_qty, :unpack_qty)";
@@ -139,13 +387,20 @@ class Orders extends Connection
             $prepare->bindParam(':unpack_qty', $array['unpack_qty'], PDO::PARAM_STR);
             $prepare->execute();
             $result = $this->dbh->lastInsertId();
-            $products = new Products();
-            $qty = -1 * $array['quantity'];
-            $pack_qty = -1 * $array['pack_qty'];
-            if ($reverse) {
-                $products->addProductQty($array['product_id'], ['qty' => $qty, 'pack_qty' => $pack_qty, 'pack_size' => $array['pack_size']], $array['shopId']);
-            } else {
-                $products->subProductQty(['product_id' => $array['product_id'], 'quantity' => $qty, 'pack_qty' => $pack_qty, 'owner_id' => $array['owner_id'], 'shopId' => $array['shopId']]);
+            if ($flag == 2) {
+                $products = new Products();
+                $qty = -1 * $array['quantity'];
+                $pack_qty = -1 * $array['pack_qty'];
+                if ($reverse) {
+                    $products->addProductQty($array['product_id'], ['qty' => $qty, 'pack_qty' => $pack_qty, 'pack_size' => $array['pack_size']], $array['shopId']);
+                } else {
+                    if (!empty($ownerShopId)) {
+                        $products->addProductQty($array['product_id'], ['qty' => $array['quantity'], 'pack_qty' => $array['pack_qty']], $ownerShopId);
+                        $products->subProductQty(['product_id' => $array['product_id'], 'quantity' => $array['quantity'], 'pack_qty' => $array['pack_qty'], 'owner_id' => $array['owner_id'], 'shopId' => $array['shopId']]);
+                    } else {
+                        $products->subProductQty(['product_id' => $array['product_id'], 'quantity' => $qty, 'pack_qty' => $pack_qty, 'owner_id' => $array['owner_id'], 'shopId' => $array['shopId']]);
+                    }
+                }
             }
 
             // $this->orderReturn($array['order_id'], ($action + 4));
@@ -283,7 +538,7 @@ class Orders extends Connection
         }
     }
 
-    public function createOrderDetails($array)
+    public function createOrderDetails($array, $customer = null)
     {
         try {
 
@@ -342,6 +597,29 @@ class Orders extends Connection
             if ($array['status'] != 1) {
                 $prod = new Products();
                 $prod->subProductQty($array);
+
+
+                if (!empty($customer['linked_shop'])) {
+
+                    $dd = [
+                        'pprice' => $array['price'] - $array['discount'],
+                        'price' => $array['price'],
+                        'discount' => !empty($array['discount']) ? $array['discount'] : 0,
+                        'qty' => $array['quantity'],
+                        'pack_size' => !empty($array['pack_size']) ? $array['pack_size'] : 0,
+                        'pack_qty' => !empty($array['pack_qty']) ? $array['pack_qty'] : 0,
+                        'unpack_qty' => !empty($array['unpack_qty']) ? $array['unpack_qty'] : 0,
+                        'stock_out' => 0,
+                        'location' => null,
+                        'pin' => 0,
+                        'minQty' => 2,
+                        'product_id' => $array['product_id'],
+                        'shopId' => $customer['linked_shop'],
+                        'owner_id' => $array['owner_id'],
+                    ];
+
+                    $prod->assignProduct($dd);
+                }
             }
             return $result;
         } catch (PDOException $e) {
@@ -582,7 +860,13 @@ class Orders extends Connection
                 $toCondition .= " AND o.price = o.discount ";
             }
 
-            $stmt = "SELECT o.*, full_name, account_id, is_default FROM `{$this->table}` AS o LEFT JOIN customers AS c ON c.id = o.customer_id WHERE o.shopId=:shopId " . $toCondition . ' ' . $flagCondition . ' and ((o.flag = 1) or (o.flag = 2 and o.status IN (5,6,7))) ORDER BY id desc';
+            if ($params['orderType'] == 'linked') {
+                $toCondition .= " AND o.linked_shop = :shopId ";
+            } else {
+                $toCondition .= " AND o.shopId=:shopId ";
+            }
+
+            $stmt = "SELECT o.*, full_name, account_id, is_default FROM `{$this->table}` AS o LEFT JOIN customers AS c ON c.id = o.customer_id WHERE ((o.flag = 1) or (o.flag = 2 and o.status IN (5,6,7))) " . $toCondition . ' ' . $flagCondition . ' ORDER BY id desc';
             $prepare = $this->dbh->prepare($stmt);
             $prepare->bindParam(':shopId', $shopId, PDO::PARAM_STR);
             $prepare->execute();
@@ -631,7 +915,14 @@ class Orders extends Connection
                 $toCondition = " AND o.id='" . $params['orderId'] . "' ";
             }
 
-            $stmt = "SELECT o.*, o.amount as price, full_name, account_id FROM `{$this->table_ro}` AS o LEFT JOIN customers AS c ON c.id = o.customer_id WHERE o.shopId=:shopId " . $toCondition . '  ' . ' and (o.flag = 1) ORDER BY id desc';
+            if (!empty($params['orderType'])) {
+                $toCondition .= " AND o.main_shop_rid=:shopId ";
+            } else {
+                $toCondition .= " AND o.shopId=:shopId ";
+            }
+
+
+            $stmt = "SELECT o.*, o.amount as price, full_name, account_id FROM `{$this->table_ro}` AS o LEFT JOIN customers AS c ON c.id = o.customer_id WHERE (o.flag IN (1, 2)) " . $toCondition . '  ' . '  ORDER BY id desc';
             $prepare = $this->dbh->prepare($stmt);
             $prepare->bindParam(':shopId', $shopId, PDO::PARAM_STR);
             $prepare->execute();
@@ -818,11 +1109,11 @@ class Orders extends Connection
         try {
 
             $ref_no = !empty($array['ref_no']) ? $array['ref_no'] : null;
-            $flag = 1;
+            $flag = $array['flag'];
             if (!empty($array['id'])) {
-                $stmt = "UPDATE `{$this->table_ro}` SET `amount`=:amount, `paid`=:paid, `discount`=:discount, `ref_no`=:ref_no, `shopId`=:shopId, `owner_id`=:owner_id, `order_id`=:order_id, `customer_id`=:customer_id, `customer_name`=:customer_name, `return_date`=:return_date, `return_type`=:return_type, `is_supplier`=:is_supplier, `flag`=:flag, `show_bundle`=:show_bundle where id=:id";
+                $stmt = "UPDATE `{$this->table_ro}` SET `amount`=:amount, `paid`=:paid, `discount`=:discount, `ref_no`=:ref_no, `shopId`=:shopId, `main_shop_rid`=:main_shop_rid, `owner_id`=:owner_id, `order_id`=:order_id, `customer_id`=:customer_id, `customer_name`=:customer_name, `return_date`=:return_date, `return_type`=:return_type, `is_supplier`=:is_supplier, `flag`=:flag, `show_bundle`=:show_bundle where id=:id";
             } else {
-                $stmt = "INSERT INTO `{$this->table_ro}` (`amount`, `paid`, `discount`, `ref_no`, `shopId`, `owner_id`, `order_id`, `customer_id`, `customer_name`, `return_date`, `return_type`, `is_supplier`, `flag`, `show_bundle`) VALUES (:amount, :paid, :discount, :ref_no, :shopId, :owner_id, :order_id, :customer_id, :customer_name, :return_date, :return_type, :is_supplier, :flag, :show_bundle)";
+                $stmt = "INSERT INTO `{$this->table_ro}` (`amount`, `paid`, `discount`, `ref_no`, `shopId`, `main_shop_rid`, `owner_id`, `order_id`, `customer_id`, `customer_name`, `return_date`, `return_type`, `is_supplier`, `flag`, `show_bundle`) VALUES (:amount, :paid, :discount, :ref_no, :shopId, :main_shop_rid, :owner_id, :order_id, :customer_id, :customer_name, :return_date, :return_type, :is_supplier, :flag, :show_bundle)";
             }
             $prepare = $this->dbh->prepare($stmt);
             $prepare->bindParam(':amount', $array['amount'], PDO::PARAM_STR);
@@ -830,6 +1121,7 @@ class Orders extends Connection
             $prepare->bindParam(':discount', $array['discount'], PDO::PARAM_STR);
             $prepare->bindParam(':ref_no', $ref_no, PDO::PARAM_STR);
             $prepare->bindParam(':shopId', $array['shopId'], PDO::PARAM_STR);
+            $prepare->bindParam(':main_shop_rid', $array['main_shop_rid'], PDO::PARAM_STR);
             $prepare->bindParam(':return_date', $array['return_date'], PDO::PARAM_STR);
             $prepare->bindParam(':owner_id', $array['owner_id'], PDO::PARAM_STR);
             $prepare->bindParam(':order_id', $array['order_id'], PDO::PARAM_STR);
@@ -849,8 +1141,6 @@ class Orders extends Connection
             } else {
                 $result = $this->dbh->lastInsertId();
             }
-
-            var_dump($result);
 
             return $result;
         } catch (PDOException $e) {
@@ -1061,5 +1351,257 @@ class Orders extends Connection
         } catch (PDOException $e) {
             die("Error!: " . $e->getMessage() . "<br/>");
         }
+    }
+
+    public function prepareReturn($array)
+    {
+
+        $customersObj = new Customers();
+        $storeObj = new Store();
+
+        $array['flag'] = !empty($array['flag']) ? $array['flag'] : 1;
+
+        $userData = UserInfo();
+        $user = $userData['user'];
+        $LinkedCustomer = null;
+        if (!empty($array['LinkForMainShop'])) {
+            $LinkedCustomer = $customersObj->getCustomerByLinkedShop($user['shopId']); // main shop customer's account
+        }
+        if (!empty($array['returnOrder'])) {
+            $order = $this->getReturnOrder($array['returnOrder']);
+            if (!empty($order['order']['main_shop_rid'])) {
+                $LinkedCustomer = $customersObj->getCustomerByLinkedShop($order['order']['shopId']); // main shop customer's account
+            }
+        }
+
+        $shopId = (!empty($array['shopId']) ? $array['shopId'] : $user['shopId']);
+        $ownerShopId = !empty($LinkedCustomer) ? $LinkedCustomer['shopId'] : (!empty($array['shopId']) ? $array['shopId'] : $user['shopId']);
+
+        $array['supplierId'] = !empty($LinkedCustomer) ? $LinkedCustomer['id'] : $array['supplierId'];
+        $array['supplierName'] = !empty($LinkedCustomer) ? $LinkedCustomer['full_name'] : $array['supplierName'];
+
+        $selectedStoreDATA = $storeObj->getStore($shopId);
+        $storeDATA = $storeObj->getStore($ownerShopId);
+
+
+        $shopAccounts = new ShopAccounts();
+        $products = new Products();
+        $doubleEntry = new DoubleEntry();
+        $supplierId = $array['supplierId'];
+
+        $purchaseValue = $array['subTotal'];
+        $discount = !empty($array['discount']) ? $array['discount'] : 0;
+        $givenDiscount = !empty($array['givenDiscount']) ? $array['givenDiscount'] : 0;
+        $discount += $givenDiscount;
+        $productsValue = $purchaseValue;
+        $payment_amount = !empty($array['payment_amount']) ? $array['payment_amount'] : 0;
+
+        $returnType = !empty($LinkedCustomer) ? 1 : (!empty($array['return_type']) ? $array['return_type'] : 1); // 1 = sale return, 2 = purchase return
+        $isSupplier = !empty($LinkedCustomer) ? 1 : (!empty($array['is_supplier']) ? $array['is_supplier'] : 1); // 1 = customer, 2 = supplier
+        $supplierObj = $isSupplier === 1 ? new Customers() : new Suppliers();
+        $accountsData = $shopAccounts->getSAs($storeDATA['id']);
+        $storeAccounts = [];
+        foreach ($accountsData as $a) {
+            $storeAccounts[$a['key_value']] = $a['account_id'];
+        }
+
+        if (!empty($array['returnOrder'])) {
+
+            $order = $this->getReturnOrder($array['returnOrder']);
+
+            if (!empty($order['order']['id'])) {
+                $currentStatus = $order['order']['flag'];
+
+                $this->deleteReturnOrderItem($order['order']['id']);
+                // delete transactions
+                $doubleEntry->deleteTransactionByReturnId($array['returnOrder']);
+
+                if (in_array($currentStatus, [2])) { // approve 
+
+                    // rollback products first
+                    foreach ($order['order_items'] as $prod) {
+                        if ($returnType == 1) { // sales return
+                            if (!empty($LinkedCustomer)) {
+                                $products->addProductQty($prod['product_id'], ['qty' => $prod['quantity'], 'pack_qty' => $prod['pack_qty']], $shopId);
+                                $products->subProductQty(['product_id' => $prod['product_id'], 'quantity' => $prod['quantity'], 'pack_qty' => $prod['pack_qty'], 'owner_id' => $storeDATA['owner_id'], 'shopId' => $ownerShopId]);
+                            } else {
+                                $products->subProductQty(['product_id' => $prod['product_id'], 'quantity' => $prod['quantity'], 'pack_qty' => $prod['pack_qty'], 'owner_id' => $storeDATA['owner_id'], 'shopId' => $shopId]);
+                            }
+                        } else { // supply return
+                            $products->addProductQty($prod['product_id'], ['qty' => $prod['quantity'], 'pack_qty' => $prod['pack_qty']], $shopId);
+                        }
+                    }
+                }
+            }
+        }
+
+        $returnId = $this->makeReturn([
+            "id" => $array['returnOrder'],
+            "amount" => $purchaseValue,
+            "paid" => $payment_amount,
+            "discount" => $discount,
+            "flag" => $array['flag'],
+            "shopId" => $shopId,
+            "main_shop_rid" => !empty($LinkedCustomer['shopId']) ? $LinkedCustomer['shopId'] : null,
+            "return_date" => $selectedStoreDATA['sale_date'],
+            "owner_id" => $storeDATA['owner_id'],
+            'show_bundle' => !empty($array['show_bundle']) ? 1 : 0,
+            "order_id" => !empty($array['order_id']) ? $array['order_id'] : null,
+            "customer_id" => $supplierId,
+            "customer_name" => $array['supplierName'],
+            "return_type" => $returnType,
+            "is_supplier" => $isSupplier
+        ]);
+
+        $products = [];
+        foreach ($array['items'] as $value) {
+            $products[] = [
+                'user_id' => $user['id'],
+                'shopId' => $shopId,
+                'order_id' => $returnId,
+                'product_id' => $value['product_id'],
+                'quantity' => $value['qty'] + (!empty($value['unpack_qty']) ? $value['unpack_qty'] : 0),
+                "owner_id" => $storeDATA['owner_id'],
+                'pack_size' => !empty($value['pack_size']) ? $value['pack_size'] : 0,
+                'pack_qty' => !empty($value['pack_qty']) ? $value['pack_qty'] : 0,
+                'unpack_qty' => !empty($value['unpack_qty']) ? $value['unpack_qty'] : 0,
+                'price' => $value['price'],
+                'discount_type' => !empty($value['discount_type']) ? $value['discount_type'] : 1,
+                'discount_value' => !empty($value['discount_value']) ? $value['discount_value'] : 0,
+                'discount' => !empty($value['discount']) ? $value['discount'] : 0,
+                'type' => 1,
+            ];
+        }
+
+        $returnOrder = $this->getReturnOrder($returnId);
+
+        $res = [];
+        foreach ($products as $row) {
+            $res[$row['product_id']][] = $this->orderReturnAll($row, $returnType == 1 ? false : true, !empty($LinkedCustomer['shopId']) ? $LinkedCustomer['shopId'] : null, $array['flag']);
+        }
+
+        if ($returnOrder['order']['flag'] == 2) {
+            if ($isSupplier == 1) {
+                $supplier = $supplierObj->getCustomer($supplierId);
+            } else {
+                $supplierObj = new Suppliers();
+                $supplier = $supplierObj->getSupplier($supplierId);
+            }
+
+            $config = [
+                'description' => !empty($array['summery']) ? $array['summery'] : ($returnType == 1 ? "Sale Return PLACED" : "Purchase Return PLACED"),
+                'transaction_type' => ($returnType == 1 ? 'SALE_RETURN' : 'PURCHASE_RETURN'),
+                'shop_entry' => 'D',
+                'customer_entry' => 'C',
+                'customer_cash_entry' => 'D',
+                'shop_cash_entry' => 'C',
+            ];
+
+            if ($returnType == 2) {
+                $config['shop_entry'] = 'C';
+                $config['customer_entry'] = 'D';
+                $config['customer_cash_entry'] = 'C';
+                $config['shop_cash_entry'] = 'D';
+            }
+
+            $makeTransaction = [
+                'description' => $config['description'],
+                'transaction_date' => $storeDATA['sale_date'],
+                'reference' => $array['ref_no'],
+                'transaction_type' => $config['transaction_type'],
+                'shopId' => $ownerShopId,
+                'created_by' => $_SESSION['user_credentials']['id'],
+                'return_ref' => $returnId
+            ];
+
+            $makeTransactionId = $doubleEntry->makeTransaction($makeTransaction);
+
+
+            $assetPrice = $productsValue; // D 1000
+            $saleDiscount = $discount; // C 200
+            $returnAmount = $purchaseValue - $discount; // C 800
+
+            $entry = [
+                'transaction_id' => $makeTransactionId,
+                'account_id' => $storeAccounts['assets'],
+                'entry_type' => $config['shop_entry'],
+                'description' => '',
+                'amount' => $assetPrice, // 2000
+                'payment_mode' => $array['payment_mode'],
+                'user_id' => $_SESSION['user_credentials']['id'],
+            ];
+
+            $a[] = $doubleEntry->makeEntry($entry);
+
+            $entry = [
+                'transaction_id' => $makeTransactionId,
+                'account_id' => $supplier['account_id'],
+                'entry_type' => $config['customer_entry'],
+                'description' => '',
+                'amount' => $returnAmount,
+                'payment_mode' => $array['payment_mode'],
+                'user_id' => $_SESSION['user_credentials']['id'],
+            ];
+
+            $a[] = $doubleEntry->makeEntry($entry);
+
+            if (!empty($saleDiscount)) {
+                // saleDiscount credit entry
+                $entry = [
+                    'transaction_id' => $makeTransactionId,
+                    'account_id' => $returnType == 1 ? $storeAccounts['sale_discount'] : $storeAccounts['purchase_discount'],
+                    'entry_type' => $config['customer_entry'], // as per customer
+                    'description' => '',
+                    'amount' => $saleDiscount, // 200 @ 10%
+                    'payment_mode' => $array['payment_mode'],
+                    'user_id' => $_SESSION['user_credentials']['id'],
+                ];
+                $a[] = $doubleEntry->makeEntry($entry);
+            }
+
+
+            // assets debit entry - debit
+            // liability payable entry - credit
+            // purchase discount entry - credit
+
+
+            if (!empty($payment_amount)) {
+                // $makeTransactionId = $doubleEntry->makeTransaction($makeTransaction);
+                // payable credit entry
+                $entry = [
+                    'transaction_id' => $makeTransactionId,
+                    'account_id' => $supplier['account_id'],
+                    'entry_type' => $config['customer_cash_entry'],
+                    'description' => '',
+                    'amount' => $payment_amount,
+                    'payment_mode' => $array['payment_mode'],
+                    'user_id' => $_SESSION['user_credentials']['id'],
+                ];
+                $a[] = $doubleEntry->makeEntry($entry);
+                // cash credit entry
+                $entry = [
+                    'transaction_id' => $makeTransactionId,
+                    'account_id' => $returnType == 1 ? $storeAccounts['sale_returns'] : $storeAccounts['purchase_returns'],
+                    'entry_type' => $config['shop_cash_entry'],
+                    'description' => '',
+                    'amount' => $payment_amount, // 200 @ 10%
+                    'payment_mode' => $array['payment_mode'],
+                    'user_id' => $_SESSION['user_credentials']['id'],
+                ];
+                $a[] = $doubleEntry->makeEntry($entry);
+            }
+
+            $newsletter = new Newsletter();
+            $newsletter->send([
+                'subject' => $config['description'],
+                'body' => $newsletter->drawReturn($returnId),
+                'sentTo' => [['email' => !empty($supplier['email']) ? $supplier['email'] : 'zia.pccr@yahoo.com', 'name' => $array['supplierName']]],
+                'ccEmails' => [['email' => $storeDATA['company_email'], 'name' => $storeDATA['full_name']]],
+                'client' => $storeDATA['full_name'],
+                'labels' => [$makeTransaction['transaction_type']]
+            ]);
+        }
+
+        return ['status' => 200, 'message' => 'successfully done', 'order' => ['id' => $returnId, 'linked_shop' => $supplier['linked_shop'], 'shopId' => $LinkedCustomer]];
     }
 }
