@@ -214,7 +214,7 @@ if ($largeView) {
                                 </td>
                                 <td>
                                     <h2 style="margin: 0 0 5px"><?php echo $cashInvoice; ?></h2>
-                                    <span style="font-weight: bold; font-size: 14px;">Bill Ref. <?php echo $order['order']['order_custom_id']; ?></span>
+                                    <span style="font-weight: bold; font-size: 14px;">Bill Ref. <?php echo $shop['invoice_prefix'] . $order['order']['order_custom_id']; ?></span>
                                 </td>
                                 <td class="text-right" width="250">
                                     <img width="120" height="60" style="vertical-align: middle; filter: grayscale(100%);" src="<?php echo $siteUrl; ?>assets/clients/<?php echo $shop['image']; ?>" />
@@ -466,7 +466,7 @@ if ($largeView) {
             </div>
             <span class="pull-left ref"><strong><?php echo !empty($order['order']['customer_name']) ? $order['order']['customer_name'] : $foodpanda['full_name']; ?></strong></span>
             <div style="clear: both;"></div>
-            <span class="pull-left ref">Ref. <strong>RSV0<?php echo $order['order']['order_custom_id']; ?></strong></span>
+            <span class="pull-left ref">Ref. <strong><?php echo $shop['invoice_prefix'] . $order['order']['order_custom_id']; ?></strong></span>
             <span class="pull-right date"><?php echo dbDateToClient($order['order']['created_at']); ?></span>
             <table width="100%" cellpadding="0" cellspacing="0">
                 <thead>
