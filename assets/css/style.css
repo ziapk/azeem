@@ -888,7 +888,7 @@ body.no-horizontal-padding {
   left: 100%;
   right: auto;
 }
-.dropdown-menu > li:hover > .dropdown-submenu {
+.dropdown-menu li:hover > .dropdown-submenu {
   display: block;
 }
 
