@@ -50,11 +50,11 @@ $customersList = $customerObj->getCustomers($shop['id']);
             <a href="#" class="nav-menu-item btn btn-primary" data-toggle="dropdown">
               <img src="<?php echo SITE_URL . 'assets/img/stationary.png'; ?>" alt="" width="40" height="40" style="margin: -10px 0" />
             </a>
-            <ul class="dropdown-menu" style="width: 450px">
+            <ul class="dropdown-menu" style="width: 500px">
               <div style="display: flex; flex-wrap: wrap">
                 <?php foreach ($productCategories as $key => $value) { ?>
                   <li class="dropdown" style="min-width: 150px">
-                    <a style="padding: 3px 6px" class="dropdown-item" href="#" data-toggle="dropdown"><span class="nav-menu-icon" style="margin-right: 6px"><img width="30" height="30" src="<?php echo SITE_URL . 'uploads/products/' . $value['image']; ?>" alt="" /></span><span class="nav-menu-text"><?php echo $value['full_name']; ?></span>
+                    <a style="padding: 3px 6px; display: block" class="dropdown-item" href="#" data-toggle="dropdown"><span class="nav-menu-icon" style="margin-right: 6px"><img width="30" height="30" src="<?php echo SITE_URL . 'uploads/products/' . $value['image']; ?>" alt="" /></span><span class="nav-menu-text"><?php echo $value['full_name']; ?></span>
                       <div class="fa fa-caret-right"></div>
                     </a>
                     <?php if (!empty($categoryProducts[$value['id']])) { ?>
