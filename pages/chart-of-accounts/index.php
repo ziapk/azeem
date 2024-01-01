@@ -1,17 +1,72 @@
 <?php
+session_start();
 include_once dirname(__FILE__) . '/../../include/settings.php';
+global $shop;
 $doubleEntryObj = new DoubleEntry();
 $accountTypes = $doubleEntryObj->getAccountTypes();
 $ids = [];
-if ($userData['role'] === 'owner') {
-  $storeObj = new Store();
-  $ownerStores = $storeObj->getOwnerStores($shop['owner_id']);
-  foreach ($ownerStores as $v) {
-    $ids[] = $v['id'];
-  }
-} else {
-  $ids[] = $shop['id'];
-}
+$storeObj = new Store();
+// if ($userData['role'] === 'owner') {
+//   $storeObj = new Store();
+//   $ownerStores = $storeObj->getOwnerStores($shop['owner_id']);
+//   foreach ($ownerStores as $v) {
+//     $ids[] = $v['id'];
+//   }
+// } else {
+$ids[] = $shop['id'];
+// }
+
+// SELECT * FROM `accounts` WHERE id IN(21,22,24,25,26,27,28,48,75,76,81,211,236,238,263,274) order by account_type asc, id asc
+
+// SELECT * FROM `store_schema`
+// INSERT INTO store_schema (id, title, code, account_type) VALUES (NULL, 'ASSETS', '01', '1'), (NULL, 'LIABILITIES', '02', '2'), (NULL, 'EQUITY', '03', '3'), (NULL, 'INCOME', '04', '4'), (NULL, 'EXPENSES', '05', '5')
+// TRUNCATE TABLE store_schema
+
+// INSERT INTO store_schema (id, shop_account_key, shop_account_label,	title,	code,	account_type) VALUES (NULL,	'cash',	'Cash - Sale', 'Cash In Hand', '01-01', 1), (NULL,	'receivable',	'Receivable - for customer', 'Receiables', '01-02', 1), (NULL,	'purchase_discount',	'Purchase - Discount', 'Purchase Discount', '01-03', 1), (NULL,	'purchase_returns',	'Purchase - Returns', 'Purchase - Returns', '01-04', 1), (NULL,	'adjustment',	'Adjustment Account', 'All Adjustments', '01-05', 1), (NULL,	'royalty_pay',	'Royalty Payments', 'Royalty Payments', '01-06', 1), (NULL,	'fix_assets',	'Shop Assets (Fix Assets)', 'Shop Assets (Fix Assets)', '01-07', 1), (NULL,	'payable',	'Payable - for supplier', 'Payables',	'02-01', 2), (NULL,	'royalty',	'Royalty', 'Payable - Royalty',	'02-02', 2), (NULL,	'salary',	'Salary', 'Employees - Salaries',	'02-03', 2), (NULL,	'assets',	'Assets', 'Products & Sales',	'04-01', 4), (NULL,	'sale_discount',	'Sales - Discount', 'Sale Discount',	'04-02', 4), (NULL,	'sale_returns',	'Sale - Returns', 'Sale - Returns',	'04-03', 4), (NULL,	'receiving',	'Receivings - Account', 'Receivings',	'04-04', 4), (NULL,	'expense',	'Expense', 'Expenses',	'05-01', 5)
+// INSERT INTO store_schema (id, shop_account_key, shop_account_label, title, code, account_type) VALUES (NULL, 'payable_salary', 'Payble Salaries', 'Expense - Salary/Advance Receive - General', '05-01-01', 5);
+
+
+// INSERT INTO `category` (`id`, `full_name`, `groupName`, `cat_type`, `owner_id`, `account_id`) VALUES (NULL, 'Salary/Advance Receive', 'General', '1', :owner_id, :account_id)
+
+// NULL,	"payable_salary",	"Payble Salaries", "Expense - Salary/Advance Receive - General",	05-01-01, 5
+
+
+
+
+
+
+// "INSERT INTO `accounts` (`id`, `title`, `code`, `account_type`, `group_id`, `parent_id`, `shopId`, `status`, `opening_balance`, `created_by`) VALUES
+
+// (NULL, 'EQUITY', '03', '3', '0', NULL, :shop_id, '1', '0', '1'),
+
+
+// (NULL, 'ASSETS', '01', '1', '0', NULL, :shop_id, '1', '0', '1'),
+
+// (NULL, 'Cash In Hand', '01-10', '1', NULL, :parent_id, :shop_id, '1', '0', '1'),
+// (NULL, 'Purchase Discount', '01-03', '1', NULL, :parent_id, :shop_id, '1', '0', '1'),
+// (NULL, 'Receiables', '01-02', '1', NULL, :parent_id, :shop_id, '1', '0', '1'),
+// (NULL, 'Purchase - Returns', '01-04', '1', NULL, :parent_id, :shop_id, '1', '0', '1'),
+// (NULL, 'All Adjustments', '01--05', '1', NULL, :parent_id, :shop_id, '1', '0', '1'),
+// (NULL, 'Royalty Payments', '01-06', '1', NULL, :parent_id, :shop_id, '1', '0', '1'),
+// (NULL, 'Shop Assets (Fix Assets)', '01--07', '1', NULL, :parent_id, :shop_id, '1', '0', '1'),
+
+
+// (NULL, 'LIABILITIES', '02', '2', '0', NULL, :shop_id, '1', '0', '1'),
+// (NULL, 'Payables', '02-02', '2', NULL, :parent_id, :shop_id, '1', '0', '1'),
+// (NULL, 'Payable - Royalty', '02-03', '2', NULL, :parent_id, :shop_id, '1', '0', '1'),
+// (NULL, 'Employees - Salaries', '02-04', '2', NULL, :parent_id, :shop_id, '1', '0', '1')
+
+
+// (NULL, 'INCOME', '04', '4', '0', NULL, :shop_id, '1', '0', '1'),
+// (NULL, 'Books & Stationaries (Sales)', '04-1000', '4', NULL, :parent_id, :shop_id, '1', '0', '2'),
+// (NULL, 'Sale Discount', '04-05', '4', NULL, :parent_id, :shop_id, '1', '0', '5'),
+// (NULL, 'Sale - Returns', '04--07', '4', NULL, :parent_id, :shop_id, '1', '0', '2'),
+// (NULL, 'AGP - Receivings', '04--08', '4', NULL, :parent_id, :shop_id, '1', '0', '2'),
+
+
+// (NULL, 'EXPENSES', '05', '5', '0', NULL, :shop_id, '1', '0', '1'),
+// (NULL, 'Expenses', '05-01', '5', NULL, :parent_id, :shop_id, '1', '0', '2')";
+
 $accounts = $doubleEntryObj->getAccounts($ids);
 echo mainHeader(['page' => 'coa']);
 ?>
