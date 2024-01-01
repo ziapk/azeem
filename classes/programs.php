@@ -11,8 +11,12 @@ class Programs extends Connection
 	{
 		try {
 
-			$stmt = "SELECT COUNT(id) as total FROM `{$this->table}`";
+			$userInfo = UserInfo();
+			$user = $userInfo['user'];
+
+			$stmt = "SELECT COUNT(id) as total FROM `{$this->table}` where shopId=:shopId";
 			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':shopId', $user['shopId'], PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $prepare->fetch(PDO::FETCH_ASSOC);
 
@@ -21,9 +25,10 @@ class Programs extends Connection
 			$total_pages = ceil($total_rows / $no_of_records_per_page);
 			$currentPage = $total_pages >= $params['page'] ? $params['page'] : $total_pages;
 			$offset = (($currentPage - 1) < 0 ? 0 : ($currentPage - 1)) * $no_of_records_per_page;
-			$search = "(degree LIKE '%" . $params["search"] . "%' OR program LIKE '%" . $params["search"] . "%' OR class LIKE '%" . $params["search"] . "%') ";
+			$search = "shopId=:shopId and (degree LIKE '%" . $params["search"] . "%' OR program LIKE '%" . $params["search"] . "%' OR class LIKE '%" . $params["search"] . "%') ";
 			$stmt = "SELECT * FROM `{$this->table}` WHERE $search LIMIT :offset, :perPage";
 			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':shopId', $user['shopId'], PDO::PARAM_STR);
 			$prepare->bindParam(':offset', $offset, PDO::PARAM_INT);
 			$prepare->bindParam(':perPage', $no_of_records_per_page, PDO::PARAM_INT);
 			$prepare->execute();
@@ -37,8 +42,11 @@ class Programs extends Connection
 	public function getPrograms()
 	{
 		try {
-			$stmt = "SELECT * FROM `{$this->table}`";
+			$userInfo = UserInfo();
+			$user = $userInfo['user'];
+			$stmt = "SELECT * FROM `{$this->table}` where shopId=:shopId";
 			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':shopId', $user['shopId'], PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
 			return $result;
@@ -50,9 +58,12 @@ class Programs extends Connection
 	public function getProgram($id)
 	{
 		try {
-			$stmt = "SELECT * FROM `{$this->table}` where id=:id";
+			$userInfo = UserInfo();
+			$user = $userInfo['user'];
+			$stmt = "SELECT * FROM `{$this->table}` where id=:id and shopId=:shopId";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':id', $id, PDO::PARAM_STR);
+			$prepare->bindParam(':shopId', $user['shopId'], PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $prepare->fetch(PDO::FETCH_ASSOC);
 			return $result;
@@ -64,9 +75,12 @@ class Programs extends Connection
 	public function updateProgram($array)
 	{
 		try {
-			$stmt = "UPDATE `{$this->table}` SET degree=:degree, program=:program, class=:class, pin=:pin WHERE id=:id";
+			$userInfo = UserInfo();
+			$user = $userInfo['user'];
+			$stmt = "UPDATE `{$this->table}` SET degree=:degree, program=:program, class=:class, pin=:pin WHERE id=:id and shopId=:shopId";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':id', $array['id'], PDO::PARAM_STR);
+			$prepare->bindParam(':shopId', $user['shopId'], PDO::PARAM_STR);
 			$prepare->bindParam(':degree', $array['degree'], PDO::PARAM_STR);
 			$prepare->bindParam(':program', $array['program'], PDO::PARAM_STR);
 			$prepare->bindParam(':class', $array['class'], PDO::PARAM_STR);
@@ -82,12 +96,15 @@ class Programs extends Connection
 	public function createProgram($array)
 	{
 		try {
-			$stmt = "INSERT INTO `{$this->table}` (`degree`, `program`, `class`, `pin`) VALUES (:degree, :program, :class, :pin)";
+			$userInfo = UserInfo();
+			$user = $userInfo['user'];
+			$stmt = "INSERT INTO `{$this->table}` (`degree`, `program`, `class`, `pin`, `shopId`) VALUES (:degree, :program, :class, :pin, :shopId)";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':degree', $array['degree'], PDO::PARAM_STR);
 			$prepare->bindParam(':program', $array['program'], PDO::PARAM_STR);
 			$prepare->bindParam(':class', $array['class'], PDO::PARAM_STR);
 			$prepare->bindParam(':pin', $array['pin'], PDO::PARAM_STR);
+			$prepare->bindParam(':shopId', $user['shopId'], PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $this->dbh->lastInsertId();
 			return $result;
@@ -99,8 +116,11 @@ class Programs extends Connection
 	public function getPinPrograms()
 	{
 		try {
-			$stmt = "SELECT * FROM `{$this->table}` where pin=1";
+			$userInfo = UserInfo();
+			$user = $userInfo['user'];
+			$stmt = "SELECT * FROM `{$this->table}` where pin=1 and shopId=:shopId";
 			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':shopId', $user['shopId'], PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
 			foreach ($result as $key => $row) {
