@@ -12,6 +12,11 @@ if (!empty($id)) {
     $order = $supplyObj->getOrder($id);
 }
 
+$isOwner = false;
+if ($userData['role'] == 'owner') {
+    $isOwner = true;
+}
+
 echo mainHeader();
 ?>
 <style>
@@ -33,14 +38,16 @@ echo mainHeader();
             <label>Ref. No</label>
             <input type="text" class="form-control" ng-model="ref_no" placeholder="Ref. No">
         </div>
-        <div class="col-sm-3 form-group">
-            <label>Shop Select</label>
-            <select class="form-control c-select" ng-model="shopId">
-                <?php foreach ($ownerStores as $value) { ?>
-                    <option value="<?php echo $value['id']; ?>"><?php echo $value['full_name']; ?></option>
-                <?php } ?>
-            </select>
-        </div>
+        <?php if ($isOwner) { ?>
+            <div class="col-sm-3 form-group">
+                <label>Shop Select</label>
+                <select class="form-control c-select" ng-model="shopId">
+                    <?php foreach ($ownerStores as $value) { ?>
+                        <option value="<?php echo $value['id']; ?>"><?php echo $value['full_name']; ?></option>
+                    <?php } ?>
+                </select>
+            </div>
+        <?php } ?>
         <div class="col-sm-3">
             <label>&nbsp;</label><br />
             <a href="javascript:void(0)" title="Add Product" ng-click="addFreshProduct()" class="btn btn-danger">Add Product</a>

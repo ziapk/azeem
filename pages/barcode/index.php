@@ -14,6 +14,11 @@ if (!empty($id)) {
     $demandDetail = $demandObj->getDemandDetail($id, $ownerId);
 }
 
+$isOwner = false;
+if ($userData['role'] == 'owner') {
+    $isOwner = true;
+}
+
 if (!empty($_GET['all']) && $_GET['all'] == '1') {
     $shopId = $_GET['shopId'];
     $products = $productsObj->getOwnerProductsPagination($ownerId, ['page' => 1, 'perPage' => 100000, 'status' => 1], $shopId);
@@ -23,14 +28,19 @@ if (!empty($_GET['all']) && $_GET['all'] == '1') {
 
 <div class="container" ng-controller="categoryController">
     <form class="row" action="" method="GET">
-        <div class="col-sm-3 form-group">
+        <?php if (!empty($isOwner)) { ?>
+            <div class="col-sm-3 form-group">
+                <input type="hidden" class="form-control" name="all" value="1">
+                <select class="form-control" name="shopId" ng-model="shopId">
+                    <?php foreach ($ownerStores as $value) { ?>
+                        <option value="<?php echo $value['id']; ?>"><?php echo $value['full_name']; ?></option>
+                    <?php } ?>
+                </select>
+            </div>
+        <?php } else { ?>
             <input type="hidden" class="form-control" name="all" value="1">
-            <select class="form-control" name="shopId" ng-model="shopId">
-                <?php foreach ($ownerStores as $value) { ?>
-                    <option value="<?php echo $value['id']; ?>"><?php echo $value['full_name']; ?></option>
-                <?php } ?>
-            </select>
-        </div>
+            <input type="hidden" name="shopId" ng-model="shopId" value="<?php echo $userData['shopId']; ?>" />
+        <?php } ?>
         <div class="col-sm-3 form-group">
             <input type="submit" class="btn btn-primary" value="Fetch All Items" />
         </div>
@@ -94,10 +104,10 @@ if (!empty($_GET['all']) && $_GET['all'] == '1') {
         <script>
             app.controller('categoryController', function($scope, $http, $httpParamSerializerJQLike, $filter, $window, $document, $uibModal, $log, $location, $anchorScroll, $timeout, $rootScope) {
                 $scope.list = []; //$scope.data.records;
-                console.log('mainList', $rootScope);
                 $scope.siteUrl = '<?php echo SITE_URL ?>';
                 $scope.demandDetail = <?php echo safe_json_encode($demandDetail); ?>;
                 $scope.shopId = '<?php echo !empty($_GET['shopId']) ? $_GET['shopId'] : $userData['shopId']; ?>';
+                console.log($scope.shopId);
                 $scope.currentShopId = '<?php echo $shop['id']; ?>';
 
                 $scope.books = <?php echo safe_json_encode($products); ?>;
