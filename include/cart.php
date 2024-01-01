@@ -358,7 +358,12 @@
         $window.mainList = JSON.parse(p);
       }
     }
-    $scope.loadProduct();
+    <?php if (!empty($_GET['refresh'])) { ?>
+      $scope.loadProduct('', true);
+    <?php } else { ?>
+      $scope.loadProduct();
+    <?php } ?>
+
 
     $scope.makeClosing = (id, store) => {
       $http.post('<?php echo SITE_URL; ?>api/getSaleClosingReport.php', $httpParamSerializerJQLike({

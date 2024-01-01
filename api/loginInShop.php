@@ -14,4 +14,4 @@ $_SESSION['user_credentials'] = $userData['user'];
 $_SESSION['shopInfo'] = $userData['client'];
 $_SESSION['shop'] = $userData['shop'];
 $_SESSION['user_logged_in'] = true;
-header('Location: ' . SITE_URL . 'index.php');
+header('Location: ' . SITE_URL . 'index.php?refresh=1');
