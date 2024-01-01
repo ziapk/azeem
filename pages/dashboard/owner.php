@@ -42,8 +42,7 @@ foreach ($publishersArr as $key => $value) {
                 <th>City</th>
                 <th>Location</th>
                 <th>Status</th>
-                <th colspan="3" style="text-align: center">Sale Related Actions</th>
-                <th></th>
+                <th colspan="5" style="text-align: center; background: #00000001">Sale Related Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -64,6 +63,7 @@ foreach ($publishersArr as $key => $value) {
                     <a class="btn btn-xs btn-danger" href="javascript:void(0)" ng-click="applyClosing(store.id, store)">Sale Close</a>
                 </td>
                 <td><a class="btn btn-xs btn-primary" href="<?php echo SITE_URL . "pages/store/update.php?id="; ?>{{store.id}}">Edit Shop</a></td>
+                <td><a class="btn btn-xs btn-success" href="<?php echo SITE_URL ?>api/loginInShop.php?id={{store.id}}">CheckIn <span class="fa fa-arrow-right"></span></a></td>
             </tr>
         </tbody>
     </table>
