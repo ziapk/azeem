@@ -214,7 +214,7 @@ class DoubleEntry extends Connection
 			$user = $userInfo['user'];
 
 			$countwhere = "where t.flag=1 and t.shopId=:shopId";
-			$where = "where t.flag=1 and o.shopId=:shopId";
+			$where = "where t.flag=1 and t.shopId=:shopId";
 			$account_id = $arr['account_id'];
 
 			$type = $arr['type'];
