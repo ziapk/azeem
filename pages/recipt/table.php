@@ -37,7 +37,7 @@ foreach ($statuses as  $value) {
         </td>
         <td width="400">
             {{cart.full_name}} | <strong class="text-danger">{{cart.rackNumbers}}</strong> | <strong class="text-success">{{cart.pack_size}}B</strong>
-            <?php if ($userData['role'] === 'owner' || $userData['role'] === 'manager') { ?>
+            <?php if ($userData['role'] === 'owner') { ?>
                 <span class="dropdown">
                     <button class="dropdown-toggle btn btn-default" data-toggle="dropdown" style="padding-inline: 8px"><span class="fa fa-caret-down"></span></button>
                     <form ng-submit="submitCode(cart)" class="dropdown-menu" style="padding: 10px; width: 450px">
