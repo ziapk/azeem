@@ -24,6 +24,19 @@ class Users extends Connection
 			die("Error!: " . $e->getMessage() . "<br/>");
 		}
 	}
+
+	public function refreshSession($id)
+	{
+		try {
+			$sess = UserInfo();
+			$sess['user']['shopId'] = $id;
+			$sess['shop'] = $this->getShop($sess['user']);
+			return $sess;
+		} catch (PDOException $e) {
+			die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
+
 	public function getUser($id)
 	{
 		try {
