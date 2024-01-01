@@ -41,7 +41,6 @@ foreach ($publishersArr as $key => $value) {
                 <th>Type</th>
                 <th>City</th>
                 <th>Location</th>
-                <th>Status</th>
                 <th colspan="5" style="text-align: center; background: #00000001">Sale Related Actions</th>
             </tr>
         </thead>
@@ -52,12 +51,8 @@ foreach ($publishersArr as $key => $value) {
                 <td>{{ store.storeType }}</td>
                 <td>{{ store.city }}</td>
                 <td>{{ store.location }}</td>
-                <td>{{ store.status }}</td>
                 <td>
                     <span>{{ store.sale_date }}</span>
-                </td>
-                <td>
-                    <label uib-tooltip="When you enable this option [SHOP'S MANAGER] can close Today's Sale" tooltip-placement="bottom"><input type="checkbox" ng-model="store.sale_date_show" ng-true-value="'1'" ng-false-value="'0'" ng-change="showClosing(store.id, store.sale_date_show)"> Enable</label>
                 </td>
                 <td>
                     <a class="btn btn-xs btn-danger" href="javascript:void(0)" ng-click="applyClosing(store.id, store)">Sale Close</a>
