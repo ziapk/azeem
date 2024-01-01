@@ -16,6 +16,10 @@ $storeObj = new Store();
 $ids[] = $shop['id'];
 // }
 
+
+print_r($shop);
+print_r($ids);
+exit;
 // SELECT * FROM `accounts` WHERE id IN(21,22,24,25,26,27,28,48,75,76,81,211,236,238,263,274) order by account_type asc, id asc
 
 // SELECT * FROM `store_schema`
