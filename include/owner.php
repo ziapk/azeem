@@ -40,7 +40,7 @@ $customersList = $customerObj->getCustomers($shop['id']);
           <a href="<?php echo SITE_URL; ?>" title="">
             <span class="hidden-xs">
               <?php if (!empty($shopData['image'])) { ?>
-                <img style="width: 120px; max-height: 45px" style="vertical-align: middle; filter: grayscale(100%);" src="<?php echo SITE_URL; ?>assets/clients/<?php echo $shopData['image']; ?>" />
+                <img style="width: 120px; max-height: 45px" style="vertical-align: middle; filter: grayscale(100%);" src="<?php echo SITE_URL; ?>assets/clients/<?php echo $shop['image']; ?>" />
               <?php } else { ?>
                 <img width="60" src="<?php echo SITE_URL; ?>assets/img/logo.png" alt="" />
               <?php } ?>
