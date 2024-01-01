@@ -208,9 +208,13 @@ class Employees extends Connection
 	public function getUserByAccount($id)
 	{
 		try {
-			$stmt = "SELECT *  FROM `{$this->table}` WHERE `account_id`=:id";
+			$userInfo = UserInfo();
+			$user = $userInfo['user'];
+
+			$stmt = "SELECT *  FROM `{$this->table}` WHERE `account_id`=:id and shop_id=:shop_id";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':id', $id, PDO::PARAM_STR);
+			$prepare->bindParam(':shop_id', $user['shopId'], PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $prepare->fetch(PDO::FETCH_ASSOC);
 			$de = new DoubleEntry();

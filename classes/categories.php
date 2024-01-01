@@ -9,9 +9,13 @@ class Categories extends Connection
 	public function getOwnerCategories($owner_id)
 	{
 		try {
-			$stmt = "SELECT * FROM `{$this->table}` WHERE flag=1 and `owner_id`=:owner_id";
+			$userInfo = UserInfo();
+			$user = $userInfo['user'];
+
+			$stmt = "SELECT * FROM `{$this->table}` WHERE flag=1 and `owner_id`=:owner_id and shopId=:shopId";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':owner_id', $owner_id, PDO::PARAM_STR);
+			$prepare->bindParam(':shopId', $user['shopId'], PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
 			return $result;
@@ -22,9 +26,13 @@ class Categories extends Connection
 	public function getGroupNames($owner_id)
 	{
 		try {
-			$stmt = "SELECT DISTINCT groupName FROM `{$this->table}` WHERE flag=1 and `owner_id`=:owner_id";
+			$userInfo = UserInfo();
+			$user = $userInfo['user'];
+
+			$stmt = "SELECT DISTINCT groupName FROM `{$this->table}` WHERE flag=1 and `owner_id`=:owner_id and shopId=:shopId";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':owner_id', $owner_id, PDO::PARAM_STR);
+			$prepare->bindParam(':shopId', $user['shopId'], PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
 			return $result;
@@ -88,10 +96,12 @@ class Categories extends Connection
 	public function getCategoriesPagination($params)
 	{
 		try {
-
-			$stmt = "SELECT COUNT(id) as total FROM `{$this->table}` where flag=1 and `owner_id`=:owner_id";
+			$userInfo = UserInfo();
+			$user = $userInfo['user'];
+			$stmt = "SELECT COUNT(id) as total FROM `{$this->table}` where flag=1 and `owner_id`=:owner_id and shopId=:shopId";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':owner_id', $params['owner_id'], PDO::PARAM_INT);
+			$prepare->bindParam(':shopId', $user['shopId'], PDO::PARAM_INT);
 			$prepare->execute();
 			$result = $prepare->fetch(PDO::FETCH_ASSOC);
 
@@ -101,10 +111,11 @@ class Categories extends Connection
 			$currentPage = $total_pages >= $params['page'] ? $params['page'] : $total_pages;
 			$offset = (($currentPage - 1) < 0 ? 0 : ($currentPage - 1)) * $no_of_records_per_page;
 			$search = "(c.full_name LIKE '%" . $params["search"] . "%' or c.groupName LIKE '%" . $params["search"] . "%') ";
-			$stmt = "SELECT c.*, a.title, a.code, a.opening_balance FROM `{$this->table}` as c left join `{$this->table_accounts}` as a on c.`account_id`=a.id WHERE flag=1 and $search and `owner_id`=:owner_id LIMIT :offset, :perPage";
+			$stmt = "SELECT c.*, a.title, a.code, a.opening_balance FROM `{$this->table}` as c left join `{$this->table_accounts}` as a on c.`account_id`=a.id WHERE flag=1 and $search and `owner_id`=:owner_id and c.shopId=:shopId LIMIT :offset, :perPage";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':offset', $offset, PDO::PARAM_INT);
 			$prepare->bindParam(':owner_id', $params['owner_id'], PDO::PARAM_INT);
+			$prepare->bindParam(':shopId', $user['shopId'], PDO::PARAM_INT);
 			$prepare->bindParam(':perPage', $no_of_records_per_page, PDO::PARAM_INT);
 			$prepare->execute();
 			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
@@ -117,6 +128,9 @@ class Categories extends Connection
 	public function getCategories($type, $owner_id)
 	{
 		try {
+			$userInfo = UserInfo();
+			$user = $userInfo['user'];
+
 			$where = "";
 			if ($type == 'pro') {
 				$where = 'and flag=1 and cat_type = 2';
@@ -124,9 +138,10 @@ class Categories extends Connection
 			if ($type == 'exp') {
 				$where = 'and flag=1 and cat_type = 1';
 			}
-			$stmt = "SELECT * FROM `{$this->table}` where owner_id=:owner_id " . $where;
+			$stmt = "SELECT * FROM `{$this->table}` where owner_id=:owner_id and shopId=:shopId " . $where;
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':owner_id', $owner_id, PDO::PARAM_INT);
+			$prepare->bindParam(':shopId', $user['shopId'], PDO::PARAM_INT);
 			$prepare->execute();
 			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
 			return $result;
@@ -152,9 +167,13 @@ class Categories extends Connection
 	public function expenseByAccount($id)
 	{
 		try {
-			$stmt = "SELECT * FROM `{$this->table}` where flag=1 and account_id=:id";
+			$userInfo = UserInfo();
+			$user = $userInfo['user'];
+
+			$stmt = "SELECT * FROM `{$this->table}` where flag=1 and account_id=:id and shopId=:shopId";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':id', $id, PDO::PARAM_INT);
+			$prepare->bindParam(':shopId', $user['shopId'], PDO::PARAM_INT);
 			$prepare->execute();
 			$result = $prepare->fetch(PDO::FETCH_ASSOC);
 			return $result;
@@ -165,12 +184,16 @@ class Categories extends Connection
 	public function createCategory($array)
 	{
 		try {
-			$stmt = "INSERT INTO `{$this->table}` (`full_name`, `cat_type`, `groupName`, `owner_id`, `account_id`, `image`) VALUES (:full_name, :cat_type, :groupName, :owner_id, :account_id, :image)";
+			$userInfo = UserInfo();
+			$user = $userInfo['user'];
+
+			$stmt = "INSERT INTO `{$this->table}` (`full_name`, `cat_type`, `groupName`, `owner_id`, `shopId`, `account_id`, `image`) VALUES (:full_name, :cat_type, :groupName, :owner_id, :shopId, :account_id, :image)";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':full_name', $array['full_name'], PDO::PARAM_STR);
 			$prepare->bindParam(':cat_type', $array['cat_type'], PDO::PARAM_STR);
 			$prepare->bindParam(':groupName', $array['groupName'], PDO::PARAM_STR);
 			$prepare->bindParam(':owner_id', $array['owner_id'], PDO::PARAM_STR);
+			$prepare->bindParam(':shopId', $user['shopId'], PDO::PARAM_STR);
 			$prepare->bindParam(':account_id', $array['account_id'], PDO::PARAM_STR);
 			$prepare->bindParam(':image', $array['image'], PDO::PARAM_STR);
 			$prepare->execute();

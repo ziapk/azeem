@@ -126,9 +126,13 @@ class Suppliers extends Connection
 	public function getUserByAccount($id)
 	{
 		try {
-			$stmt = "SELECT *, name as full_name  FROM `{$this->table}` WHERE flag=1 and `account_id`=:id";
+			$userInfo = UserInfo();
+			$user = $userInfo['user'];
+
+			$stmt = "SELECT *, name as full_name  FROM `{$this->table}` WHERE flag=1 and `account_id`=:id and shopId=:shopId";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':id', $id, PDO::PARAM_STR);
+			$prepare->bindParam(':shopId', $user['shopId'], PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $prepare->fetch(PDO::FETCH_ASSOC);
 			$de = new DoubleEntry();

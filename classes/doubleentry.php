@@ -210,8 +210,12 @@ class DoubleEntry extends Connection
 	public function getLedgerByAccount($arr = [])
 	{
 		try {
-			$countwhere = "where t.flag=1 ";
-			$where = "where t.flag=1 ";
+
+			$userInfo = UserInfo();
+			$user = $userInfo['user'];
+
+			$countwhere = "where t.flag=1 and t.shopId=:shopId";
+			$where = "where t.flag=1 and o.shopId=:shopId";
 			$account_id = $arr['account_id'];
 
 			$type = $arr['type'];
@@ -229,6 +233,7 @@ class DoubleEntry extends Connection
 
 			$stmt = "SELECT SUM(CASE WHEN e.entry_type = 'D' THEN e.amount ELSE 0 END) AS debit, SUM(CASE WHEN e.entry_type = 'C' THEN e.amount ELSE 0 END) AS credit, count(e.id) as total from `$this->table_ledger_entries` as e left join `$this->table_transactions` as t on t.id = e.transaction_id $countwhere";
 			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':shopId', $user['shopId'], PDO::PARAM_STR);
 			$prepare->execute();
 			$summery = $prepare->fetch(PDO::FETCH_ASSOC);
 
@@ -263,6 +268,7 @@ class DoubleEntry extends Connection
 
 			// $stmt = "SELECT a.*, t.transaction_date, t.reference, a.description, t.description as v_description, m.title as payment_mode from `$this->table_ledger_entries` as a left join `$this->table_transactions` as t on t.id = a.transaction_id left join `$this->table_modes` as m on m.id = a.payment_mode $where order by id";
 			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':shopId', $user['shopId'], PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
 			$final = [];

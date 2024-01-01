@@ -195,9 +195,13 @@ class Customers extends Connection
 	public function getUserByAccount($id)
 	{
 		try {
-			$stmt = "SELECT *  FROM `{$this->table}` WHERE `account_id`=:id and flag=1";
+			$userInfo = UserInfo();
+			$user = $userInfo['user'];
+
+			$stmt = "SELECT *  FROM `{$this->table}` WHERE `account_id`=:id and flag=1 and shopId=:shopId";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':id', $id, PDO::PARAM_STR);
+			$prepare->bindParam(':shopId', $user['shopId'], PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $prepare->fetch(PDO::FETCH_ASSOC);
 			$de = new DoubleEntry();
