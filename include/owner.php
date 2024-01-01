@@ -33,7 +33,7 @@ $customersList = $customerObj->getCustomers($shop['id']);
     <div class="container-fluid">
       <!-- Brand and toggle get grouped for better mobile display -->
       <div class="navbar-header">
-        <div style="position: absolute; left: 0; top: 0; padding: 6px 10px; text-align: center; line-height: 45px; width: 57px">
+        <div class="visible-xs" style="position: absolute; left: 0; top: 0; padding: 6px 10px; text-align: center; line-height: 45px; width: 57px">
           <a ng-click="showSidebar = !showSidebar" style="color: #fff" href="javascript:void(0)"><span class="fa fa-list"></span></a>
         </div>
         <div class="logo pull-left">
