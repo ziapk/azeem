@@ -1,6 +1,7 @@
 <?php
 include_once dirname(__FILE__) . '/../../include/settings.php';
-
+$clients = new Clients();
+$shopData = $clients->getClient($_GET['id']);
 
 if (isset($_POST['save'])) {
     $data = $_POST;
@@ -42,7 +43,6 @@ if (isset($_POST['save'])) {
 
 
 echo mainHeader();
-global $shopData;
 ?>
 <div class="container">
     <h4>Shop Details</h4>

@@ -1,6 +1,8 @@
 <?php
 
 $stores = new Store();
+$clientsObj = new Clients();
+$clients = $clientsObj->getClients();
 $ownerStores = $stores->getStores();
 $storeTypesArr = $stores->getStoreTypes();
 
@@ -42,6 +44,33 @@ foreach ($publishersArr as $key => $value) {
 
 <div class="container" ng-controller="productController">
     <a href="#" class="btn btn-primary btn sm" ng-click="shopClosing()">Create</a>
+    <h4>Clients </h4>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Sr.#</th>
+                <th>Client</th>
+                <th>Address</th>
+                <th>Contract Start</th>
+                <th>Expiry</th>
+                <th>Register_Date</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="store in clients track by $index">
+                <td>{{ $index + 1 }}</td>
+                <td>{{ store.product_title }}</td>
+                <td>{{ store.address }}</td>
+                <td>{{ store.start_date }}</td>
+                <td>{{ store.end_date }}</td>
+                <td>
+                    {{ store.datetime }}
+                </td>
+                <td><a class="btn btn-xs btn-primary" href="<?php echo SITE_URL . "pages/configration/?id="; ?>{{store.id}}">Edit Shop</a></td>
+            </tr>
+        </tbody>
+    </table>
     <h4>Locations </h4>
     <table class="table">
         <thead>
@@ -104,6 +133,7 @@ foreach ($publishersArr as $key => $value) {
 <script type="text/javascript">
     app.controller('productController', function($scope, $timeout, $http, $httpParamSerializerJQLike, $filter, $window, toaster, $uibModal) {
         $scope.currentPage = 1;
+        $scope.clients = <?php echo safe_json_encode($clients); ?>;
         $scope.shopData = <?php echo safe_json_encode($storeList); ?>;
         $scope.users = <?php echo safe_json_encode($users); ?>;
         $scope.data = {

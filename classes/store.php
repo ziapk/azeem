@@ -196,6 +196,7 @@ class Store extends Connection
 										$cat->createCategory([
 											"full_name" => $currentNestedChild['shop_account_label'],
 											"cat_type" => 1,
+											"shopId" => $shopId,
 											"groupName" => "General",
 											"owner_id" => $owner_id,
 											"account_id" => $nestedChildAccount,
