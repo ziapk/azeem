@@ -33,20 +33,30 @@ $customersList = $customerObj->getCustomers($shop['id']);
     <div class="container-fluid">
       <!-- Brand and toggle get grouped for better mobile display -->
       <div class="navbar-header">
+        <div style="position: absolute; left: 0; top: 0; padding: 6px 10px; text-align: center; line-height: 45px; width: 57px">
+          <a ng-click="showSidebar = !showSidebar" style="color: #fff" href="javascript:void(0)"><span class="fa fa-list"></span></a>
+        </div>
         <div class="logo pull-left">
-          <a href="<?php echo SITE_URL; ?>" title=""><?php if (!empty($shopData['image'])) { ?>
-              <span class="fa">&#xf260;</span> Smart Commerce
-            <?php } else { ?>
+          <a href="<?php echo SITE_URL; ?>" title="">
+            <span class="hidden-xs">
+              <?php if (!empty($shopData['image'])) { ?>
+                <img style="width: 120px; max-height: 45px" style="vertical-align: middle; filter: grayscale(100%);" src="<?php echo SITE_URL; ?>assets/clients/<?php echo $shopData['image']; ?>" />
+              <?php } else { ?>
+                <img width="60" src="<?php echo SITE_URL; ?>assets/img/logo.png" alt="" />
+              <?php } ?>
+            </span>
+            <span class="visible-xs" style="padding-left: 57px;">
               <img width="60" src="<?php echo SITE_URL; ?>assets/img/logo.png" alt="" />
-            <?php } ?></a>
+            </span>
+          </a>
         </div>
         <div class="pull-left welcome-header-section">
-          <span>Welcome <strong><?php echo $userData['full_name']; ?> (<?php echo $shop['full_name']; ?>)</strong></span>
+          <span class="hidden-xs">Welcome <strong><?php echo $userData['full_name']; ?> (<?php echo $shop['full_name']; ?>)</strong></span>
           <a href="javascript:void(0)" uib-tooltip="Refresh Products" tooltip-placement="right" ng-click="loadProduct('', true)" class="btn btn-primary btn-xs" style="margin-left: 10px"><span class="fa fa-refresh"></span></a>
         </div>
 
         <ul class="list-inline navbar-right navbar-nav nav">
-          <li class="dropdown" style="padding: 0">
+          <li class="hidden-xs dropdown" style="padding: 0">
             <a href="#" class="nav-menu-item btn btn-primary" data-toggle="dropdown">
               <img src="<?php echo SITE_URL . 'assets/img/stationary.png'; ?>" alt="" width="40" height="40" style="margin: -10px 0" />
             </a>
@@ -71,7 +81,7 @@ $customersList = $customerObj->getCustomers($shop['id']);
               </div>
             </ul>
           </li>
-          <li class="dropdown" style="padding: 0">
+          <li class="hidden-xs dropdown" style="padding: 0">
             <a href="#" class="nav-menu-item btn btn-primary" data-toggle="dropdown" uib-tooltip="Receivings" tooltip-placement="bottom" title="">
               Re.
             </a>
@@ -96,7 +106,7 @@ $customersList = $customerObj->getCustomers($shop['id']);
               <label class="pull-right"><input type="checkbox" name="adjustment" ng-model="payment.adjustment"> Adjustment</label>
             </form>
           </li>
-          <li class="dropdown" style="padding: 0">
+          <li class="hidden-xs dropdown" style="padding: 0">
             <a href="#" class="nav-menu-item btn btn-primary" data-toggle="dropdown" uib-tooltip="Payments" tooltip-placement="bottom" title="">
               Pay
             </a>
@@ -159,7 +169,7 @@ $customersList = $customerObj->getCustomers($shop['id']);
               <label class="pull-right"><input type="checkbox" name="adjustment" ng-model="payment.adjustment"> Adjustment</label>
             </form>
           </li> -->
-          <li class="dropdown" style="padding: 0">
+          <li class="hidden-xs dropdown" style="padding: 0">
             <a href="#" class="nav-menu-item btn btn-primary" data-toggle="dropdown" uib-tooltip="Expenses" tooltip-placement="bottom" title="">
               Exp
             </a>
@@ -183,12 +193,12 @@ $customersList = $customerObj->getCustomers($shop['id']);
               <input type="submit" value="Submit" class="btn btn-primary">
             </form>
           </li>
-          <li style="padding: 0; margin-right: -1px">
+          <li class="hidden-xs" style="padding: 0; margin-right: -1px">
             <a class="nav-menu-item btn btn-primary" href="<?php echo SITE_URL . 'pages/orders/adjustment.php'; ?>">
               Returns
             </a>
           </li>
-          <li class="dropdown" style="padding: 0">
+          <li class="dropdown hidden-xs" style="padding: 0">
             <a href="#" class="nav-menu-item btn btn-primary" data-toggle="dropdown">
               Create
             </a>
@@ -200,10 +210,10 @@ $customersList = $customerObj->getCustomers($shop['id']);
               <li><a class="dropdown-item" href="<?php echo SITE_URL; ?>pages/ob/" target="_blank">+ Opening Balance</a></li>
             </ul>
           </li>
-          <li><a style="padding-left: 8px; padding-right: 8px" uib-tooltip="Reports" tooltip-placement="bottom" title="" href="<?php echo SITE_URL . 'pages/reports'; ?>"><small><small class="nav-menu-text text-small"><img class="fa" width="24" height="24" src="<?php echo SITE_URL; ?>assets/img/svg/reports.svg" alt="" /></small></small></a></li>
-          <li><a href="<?php echo SITE_URL; ?>pages/product/running.php"><img width="22" uib-tooltip="Running Products" tooltip-placement="bottom" height="22" src="<?php echo SITE_URL; ?>assets/img/svg/lightning-bolt.svg" alt="" /></a></li>
-          <li><a href="<?php echo SITE_URL; ?>pages/product/reset.php"><img width="22" uib-tooltip="Reset Products" tooltip-placement="bottom" height="22" src="<?php echo SITE_URL; ?>assets/img/svg/lightning-bolt.svg" alt="" /></a></li>
-          <li>
+          <li class="hidden-xs"><a style="padding-left: 8px; padding-right: 8px" uib-tooltip="Reports" tooltip-placement="bottom" title="" href="<?php echo SITE_URL . 'pages/reports'; ?>"><small><small class="nav-menu-text text-small"><img class="fa" width="24" height="24" src="<?php echo SITE_URL; ?>assets/img/svg/reports.svg" alt="" /></small></small></a></li>
+          <li class="hidden-xs"><a href="<?php echo SITE_URL; ?>pages/product/running.php"><img width="22" uib-tooltip="Running Products" tooltip-placement="bottom" height="22" src="<?php echo SITE_URL; ?>assets/img/svg/lightning-bolt.svg" alt="" /></a></li>
+          <li class="hidden-xs"><a href="<?php echo SITE_URL; ?>pages/product/reset.php"><img width="22" uib-tooltip="Reset Products" tooltip-placement="bottom" height="22" src="<?php echo SITE_URL; ?>assets/img/svg/lightning-bolt.svg" alt="" /></a></li>
+          <li class="profile-menu">
             <a title="" href="javascript:void(0)" data-toggle="dropdown" tooltip-placement="bottom" uib-tooltip="Settings"><span class="fa fa-cog"></span> <span class="caret"></span></a>
             <ul class="dropdown-menu">
               <li><a title="" href="<?php echo SITE_URL; ?>pages/profile">Profile</a></li>
@@ -233,7 +243,7 @@ $customersList = $customerObj->getCustomers($shop['id']);
   </nav>
   <?php
   if (empty($params['hideSidebar'])) { ?>
-    <div class="sidebar">
+    <div class="sidebar" ng-class="{'showSidebar': showSidebar}">
       <ul class="nav">
         <li class="<?php if ($params['page'] == 'product-create') {
                       echo 'active';

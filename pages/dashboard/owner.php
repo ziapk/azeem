@@ -33,33 +33,35 @@ foreach ($publishersArr as $key => $value) {
 
 <div class="container" ng-controller="productController">
     <h4>My Shops <small>&lt;<?php echo $currentStore['full_name']; ?>&gt;</small></h4>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Sr.#</th>
-                <th>Title</th>
-                <th>City</th>
-                <th>Location</th>
-                <th colspan="5" style="text-align: center; background: #00000001">Sale Related Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr ng-repeat="store in shopData track by $index">
-                <td>{{ $index + 1 }}</td>
-                <td>{{ store.full_name }}</td>
-                <td>{{ store.city }}</td>
-                <td>{{ store.location }}</td>
-                <td>
-                    <span>{{ store.sale_date }}</span>
-                </td>
-                <td>
-                    <a class="btn btn-xs btn-danger" href="javascript:void(0)" ng-click="applyClosing(store.id, store)">Sale Close</a>
-                </td>
-                <td><a class="btn btn-xs btn-primary" href="<?php echo SITE_URL . "pages/store/update.php?id="; ?>{{store.id}}">Edit Shop</a></td>
-                <td><a class="btn btn-xs btn-success" href="<?php echo SITE_URL ?>api/loginInShop.php?id={{store.id}}">CheckIn <span class="fa fa-arrow-right"></span></a></td>
-            </tr>
-        </tbody>
-    </table>
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Sr.#</th>
+                    <th>Title</th>
+                    <th>City</th>
+                    <th>Location</th>
+                    <th colspan="5" style="text-align: center; background: #00000001">Sale Related Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="store in shopData track by $index">
+                    <td>{{ $index + 1 }}</td>
+                    <td>{{ store.full_name }}</td>
+                    <td>{{ store.city }}</td>
+                    <td>{{ store.location }}</td>
+                    <td>
+                        <span>{{ store.sale_date }}</span>
+                    </td>
+                    <td>
+                        <a class="btn btn-xs btn-danger" href="javascript:void(0)" ng-click="applyClosing(store.id, store)">Sale Close</a>
+                    </td>
+                    <td><a class="btn btn-xs btn-primary" href="<?php echo SITE_URL . "pages/store/update.php?id="; ?>{{store.id}}">Edit Shop</a></td>
+                    <td><a class="btn btn-xs btn-success" href="<?php echo SITE_URL ?>api/loginInShop.php?id={{store.id}}">CheckIn <span class="fa fa-arrow-right"></span></a></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
     <!-- <h4>Hot Products</h4> -->
     <a href="<?php echo SITE_URL . "pages/product/create.php" ?>" class="btn btn-primary btn-xs pull-right" style="margin-left: 12px">Create Product</a> <a href="<?php echo SITE_URL . "pages/product/assign.php" ?>" class="btn btn-primary btn-xs pull-right">Assign Product</a>
     <h4>Products in stores </h4>
@@ -84,39 +86,41 @@ foreach ($publishersArr as $key => $value) {
             </select>
         </div>
     </div>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Product ID - CODE</th>
-                <th>Branch</th>
-                <th>Title / Author - Group</th>
-                <th>Price</th>
-                <th>In</th>
-                <th>Out</th>
-                <th>In Hand</th>
-                <th>Min. Qty</th>
-                <th>Placement</th>
-                <th width="150"></th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr ng-repeat="li in list track by $index">
-                <td>{{li.product_id}} / {{li.code}}</td>
-                <td>{{shopData[li.shopId].full_name}}</td>
-                <td><strong>{{li.full_name}}</strong> <br />{{li.author}} - {{li.group}}</td>
-                <td>{{li.sale_price}}</td>
-                <td>{{li.qty}}</td>
-                <td>{{li.stock_out}}</td>
-                <td>{{li.qty - li.stock_out}}</td>
-                <td>{{li.min_qty}}</td>
-                <td>{{li.location}}</td>
-                <td>
-                    <a class="btn btn-xs btn-primary" href="{{url + 'pages/product/update_item.php?id=' + li.id}}">Modify</a> |
-                    <a class="btn btn-xs btn-danger" href="javascript:void(0)" ng-click="deleteStoreItem(li.id)">delete</a>
-                </td>
-            </tr>
-        </tbody>
-    </table>
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Product ID - CODE</th>
+                    <th>Branch</th>
+                    <th>Title / Author - Group</th>
+                    <th>Price</th>
+                    <th>In</th>
+                    <th>Out</th>
+                    <th>In Hand</th>
+                    <th>Min. Qty</th>
+                    <th>Placement</th>
+                    <th width="150"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="li in list track by $index">
+                    <td>{{li.product_id}} / {{li.code}}</td>
+                    <td>{{shopData[li.shopId].full_name}}</td>
+                    <td><strong>{{li.full_name}}</strong> <br />{{li.author}} - {{li.group}}</td>
+                    <td>{{li.sale_price}}</td>
+                    <td>{{li.qty}}</td>
+                    <td>{{li.stock_out}}</td>
+                    <td>{{li.qty - li.stock_out}}</td>
+                    <td>{{li.min_qty}}</td>
+                    <td>{{li.location}}</td>
+                    <td>
+                        <a class="btn btn-xs btn-primary" href="{{url + 'pages/product/update_item.php?id=' + li.id}}">Modify</a> |
+                        <a class="btn btn-xs btn-danger" href="javascript:void(0)" ng-click="deleteStoreItem(li.id)">delete</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
     <div style="display: flex; align-items: center; justify-content: space-between">
         <ul uib-pagination total-items="data.totalRecords" ng-model="currentPage" max-size="maxSize" class="pagination-sm" boundary-links="true" force-ellipses="true" ng-if="data.perPage < data.totalRecords" items-per-page="data.perPage" ng-change="pageChanged(currentPage)"></ul> <span>Per Page <select ng-change="perPage()" ng-model="data.perPage">
                 <option ng-value="10">10</option>
