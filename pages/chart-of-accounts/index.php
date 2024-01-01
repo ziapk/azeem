@@ -1,25 +1,8 @@
 <?php
-session_start();
 include_once dirname(__FILE__) . '/../../include/settings.php';
-global $shop;
 $doubleEntryObj = new DoubleEntry();
 $accountTypes = $doubleEntryObj->getAccountTypes();
-$ids = [];
 $storeObj = new Store();
-// if ($userData['role'] === 'owner') {
-//   $storeObj = new Store();
-//   $ownerStores = $storeObj->getOwnerStores($shop['owner_id']);
-//   foreach ($ownerStores as $v) {
-//     $ids[] = $v['id'];
-//   }
-// } else {
-$ids[] = $shop['id'];
-// }
-
-
-print_r($shop);
-print_r($ids);
-exit;
 // SELECT * FROM `accounts` WHERE id IN(21,22,24,25,26,27,28,48,75,76,81,211,236,238,263,274) order by account_type asc, id asc
 
 // SELECT * FROM `store_schema`
@@ -71,7 +54,7 @@ exit;
 // (NULL, 'EXPENSES', '05', '5', '0', NULL, :shop_id, '1', '0', '1'),
 // (NULL, 'Expenses', '05-01', '5', NULL, :parent_id, :shop_id, '1', '0', '2')";
 
-$accounts = $doubleEntryObj->getAccounts($ids);
+$accounts = $doubleEntryObj->getAccounts();
 echo mainHeader(['page' => 'coa']);
 ?>
 <div ng-controller="coaController">

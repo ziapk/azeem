@@ -21,15 +21,14 @@ class DoubleEntry extends Connection
 	private $table_ob = 'opening_balances';
 
 
-	public function getAccounts($shopId = [])
+	public function getAccounts()
 	{
 		try {
-			$shopIdCond = '';
-			if (!empty($shopId)) {
-				$shopIdCond = "and shopId IN (" . implode(', ', $shopId) . ")";
-			}
-			$stmt = "SELECT * from `$this->table` where status = 1 $shopIdCond order by code asc";
+			$userInfo = UserInfo();
+			$user = $userInfo['user'];
+			$stmt = "SELECT * from `$this->table` where status = 1 and shopId=:shopId order by code asc";
 			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':shopId', $user['shopId'], PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
 			return $result;
