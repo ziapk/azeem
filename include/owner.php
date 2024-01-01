@@ -51,7 +51,7 @@ $customersList = $customerObj->getCustomers($shop['id']);
           </a>
         </div>
         <div class="pull-left welcome-header-section">
-          <span class="hidden-xs">Welcome <strong><?php echo $userData['full_name']; ?> (<?php echo $shop['full_name']; ?>)</strong></span>
+          <span class="hidden-xs"><strong><?php echo $userData['full_name']; ?> (<?php echo $shop['full_name']; ?>)</strong></span>
           <a href="javascript:void(0)" uib-tooltip="Refresh Products" tooltip-placement="right" ng-click="loadProduct('', true)" class="btn btn-primary btn-xs" style="margin-left: 10px"><span class="fa fa-refresh"></span></a>
         </div>
 
