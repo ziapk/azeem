@@ -38,7 +38,6 @@ foreach ($publishersArr as $key => $value) {
             <tr>
                 <th>Sr.#</th>
                 <th>Title</th>
-                <th>Type</th>
                 <th>City</th>
                 <th>Location</th>
                 <th colspan="5" style="text-align: center; background: #00000001">Sale Related Actions</th>
@@ -48,7 +47,6 @@ foreach ($publishersArr as $key => $value) {
             <tr ng-repeat="store in shopData track by $index">
                 <td>{{ $index + 1 }}</td>
                 <td>{{ store.full_name }}</td>
-                <td>{{ store.storeType }}</td>
                 <td>{{ store.city }}</td>
                 <td>{{ store.location }}</td>
                 <td>
