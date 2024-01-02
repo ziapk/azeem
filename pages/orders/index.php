@@ -35,6 +35,7 @@ if ($userData['role'] == 'owner' || $userData['role'] == 'manager') {
                 </div>
             </div>
         </form>
+
         <uib-tabset active="activePill">
             <uib-tab select="getReport($event)" index="0" data-tab="all" heading="All Orders"></uib-tab>
             <uib-tab select="getReport($event)" index="1" data-tab="cash" heading="Paid"></uib-tab>
@@ -45,142 +46,144 @@ if ($userData['role'] == 'owner' || $userData['role'] == 'manager') {
                 <uib-tab select="getReport($event)" index="5" data-tab="linked" heading="Linked Order"></uib-tab>
             <?php } ?>
         </uib-tabset>
-        <table class="table">
-            <thead style="font-size: .7em;">
-                <tr>
-                    <th>Sr.#</th>
-                    <th>Order. #</th>
-                    <th>Customer</th>
-                    <th>Summery</th>
-                    <th>Price</th>
-                    <th ng-repeat="mode in modes">{{mode.title}}</th>
-                    <th>Running</th>
-                    <th>Status</th>
-                    <th>Date/time</th>
-                    <th width="140"></th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr ng-repeat="row in data.records">
-                    <td>{{$index + 1}}</td>
-                    <td style="white-space: nowrap;">
-                        <?php if ($userData['role'] == 'owner' || $userData['role'] == 'manager') { ?>
-                            <a ng-if="row.recon == 0" class="btn btn-xs btn-danger" ng-click="reconcileRecipt(row.id, 1)" href="javascript:void(0)"><span class="fa fa-check"></span></a>
-                            <a ng-if="row.recon == 1" class="btn btn-xs btn-success" ng-click="reconcileRecipt(row.id, 0)" href="javascript:void(0)"><span class="fa fa-check"></span></a>
-                        <?php } else { ?>
-                            <a ng-if="row.recon == 0" class="btn btn-xs btn-danger" href="javascript:void(0)"><span class="fa fa-check"></span></a>
-                            <a ng-if="row.recon == 1" class="btn btn-xs btn-success" href="javascript:void(0)"><span class="fa fa-check"></span></a>
-                        <?php } ?>
-                        <span>{{row.order_custom_id}}</span>
-                    </td>
-                    <td>{{row.customer_name || row.full_name}}</td>
-                    <td width="200" style="font-size: .7em;">{{row.summery}}</td>
-                    <td>{{row.price - row.discount | number: 0}}</td>
-                    <td ng-repeat="mode in modes">{{row.prices[mode.id] | number: 0}}</td>
-                    <td>{{row.runningTotal | number: 0}}</td>
-                    <td><span class="label" ng-class="{'label-success': row.status == 2, 'label-primary': row.status == 1, 'label-danger': row.status == 9}">{{statusArr[row.status].full_name | uppercase}}</span></td>
-                    <td>{{row.order_date | date: 'dd MMM'}}</td>
-                    <td align="right" class="dropdown">
-                        <?php if ($userData['role'] === 'owner') { ?>
-                            <a ng-if="row.is_default == 0" uib-tooltip="Ledger View" class="btn btn-default btn-xs" href="../chart-of-accounts/summery.php?t=c&id={{row.account_id}}" target="_blank"><span class="fa fa-eye"></span></a>
-                        <?php } ?>
-                        <?php if ($userData['role'] === 'manager') { ?>
-                            <a ng-if="row.is_default == 0 && row.shopId == <?php echo $userData['shopId']; ?>" uib-tooltip="Ledger View" class="btn btn-default btn-xs" href="../chart-of-accounts/summery.php?t=c&id={{row.account_id}}" target="_blank"><span class="fa fa-eye"></span></a>
-                        <?php } ?>
-                        <?php if ($userData['role'] == 'owner') { ?>
-                            <a uib-tooltip="EDIT" class="btn btn-default btn-xs" ng-if="row.status != 5" href="{{'<?php echo SITE_URL; ?>pages/recipt/edit.php?id=' + row.id }}" target="_blank"><span class="fa fa-edit"></span></a>
-                        <?php } else { ?>
-                            <a uib-tooltip="EDIT" class="btn btn-default btn-xs" ng-if="row.status == 1 && row.shopId == <?php echo $userData['shopId']; ?>" href="{{'<?php echo SITE_URL; ?>pages/recipt/edit.php?id=' + row.id }}" target="_blank"><span class="fa fa-edit"></span></a>
-                        <?php } ?>
-                        <a uib-tooltip="Print" class="btn btn-default btn-xs" ng-click="openRecipt(row.id)" href="javascript:void(0)"><span class="fa fa-print"></span></a>
-                        <a uib-tooltip="Large View" class="btn btn-default btn-xs" ng-click="openRecipt(row.id, 'details', 'large')" href="javascript:void(0)"><span class="fa fa-file"></span></a>
-                        <a uib-tooltip="More" class="btn btn-default btn-xs" href="javascript:void(0)" data-toggle="dropdown"><span class="fa fa-chevron-down"></span></a>
-                        <ul class="dropdown-menu pull-right">
-                            <li>
-                                <?php if ($userData['role'] == 'owner') { ?>
-                                    <a ng-if="row.status != 5" href="{{'<?php echo SITE_URL; ?>pages/recipt/edit.php?id=' + row.id }}" target="_blank"><span class="fa fa-edit"></span> Edit</a>
-                                <?php } else { ?>
-                                    <a ng-if="row.status == 1 && row.shopId == <?php echo $userData['shopId']; ?>" href="{{'<?php echo SITE_URL; ?>pages/recipt/edit.php?id=' + row.id }}" target="_blank"><span class="fa fa-edit"></span> Edit</a>
-                                <?php } ?>
-                            </li>
-                            <?php if ($userData['role'] == 'owner') { ?>
-                                <li>
-                                    <a ng-if="row.status == 2" href="{{'<?php echo SITE_URL; ?>pages/orders/adjustment.php?id=' + row.id }}">Return</a>
-                                </li>
-                                <li>
-                                    <a ng-click="deleteRecipt(row.id)" href="javascript:void(0)"><span class="fa fa-remove"></span> Delete</a>
-                                </li>
-                                <li>
-                                    <a href="{{'<?php echo SITE_URL; ?>pages/recipt/edit.php?dup=' + row.id }}"><span class="fa fa-copy"></span> Duplicate</a>
-                                </li>
-                            <?php } elseif ($userData['role'] == 'manager') { ?>
-                                <li ng-if="row.shopId == <?php echo $userData['shopId']; ?>">
-                                    <a ng-if="row.status == 2" href="{{'<?php echo SITE_URL; ?>pages/orders/adjustment.php?id=' + row.id }}">Return</a>
-                                </li>
-                                <li ng-if="row.shopId == <?php echo $userData['shopId']; ?>">
-                                    <a ng-click="deleteRecipt(row.id)" href="javascript:void(0)"><span class="fa fa-remove"></span> Delete</a>
-                                </li>
-                                <li ng-if="row.shopId == <?php echo $userData['shopId']; ?>">
-                                    <a href="{{'<?php echo SITE_URL; ?>pages/recipt/edit.php?dup=' + row.id }}"><span class="fa fa-copy"></span> Duplicate</a>
-                                </li>
+        <div class="table-responsive">
+            <table class="table">
+                <thead style="font-size: .7em;">
+                    <tr>
+                        <th>Sr.#</th>
+                        <th>Order. #</th>
+                        <th>Customer</th>
+                        <th>Summery</th>
+                        <th>Price</th>
+                        <th ng-repeat="mode in modes">{{mode.title}}</th>
+                        <th>Running</th>
+                        <th>Status</th>
+                        <th>Date/time</th>
+                        <th width="140"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="row in data.records">
+                        <td>{{$index + 1}}</td>
+                        <td style="white-space: nowrap;">
+                            <?php if ($userData['role'] == 'owner' || $userData['role'] == 'manager') { ?>
+                                <a ng-if="row.recon == 0" class="btn btn-xs btn-danger" ng-click="reconcileRecipt(row.id, 1)" href="javascript:void(0)"><span class="fa fa-check"></span></a>
+                                <a ng-if="row.recon == 1" class="btn btn-xs btn-success" ng-click="reconcileRecipt(row.id, 0)" href="javascript:void(0)"><span class="fa fa-check"></span></a>
+                            <?php } else { ?>
+                                <a ng-if="row.recon == 0" class="btn btn-xs btn-danger" href="javascript:void(0)"><span class="fa fa-check"></span></a>
+                                <a ng-if="row.recon == 1" class="btn btn-xs btn-success" href="javascript:void(0)"><span class="fa fa-check"></span></a>
                             <?php } ?>
-                            <li>
-                                <a ng-click="openRecipt(row.id)" href="javascript:void(0)"><span class="fa fa-print"></span> Print</a>
-                            </li>
-                            <li>
-                                <a ng-click="openRecipt(row.id, 'details')" href="javascript:void(0)"><span class="fa fa-eye"></span> View</a>
-                            </li>
-                            <li>
-                                <a ng-click="openRecipt(row.id, 'details', 'large')" href="javascript:void(0)"><span class="fa fa-file"></span> Large View</a>
-                            </li>
+                            <span>{{row.order_custom_id}}</span>
+                        </td>
+                        <td>{{row.customer_name || row.full_name}}</td>
+                        <td width="200" style="font-size: .7em;">{{row.summery}}</td>
+                        <td>{{row.price - row.discount | number: 0}}</td>
+                        <td ng-repeat="mode in modes">{{row.prices[mode.id] | number: 0}}</td>
+                        <td>{{row.runningTotal | number: 0}}</td>
+                        <td><span class="label" ng-class="{'label-success': row.status == 2, 'label-primary': row.status == 1, 'label-danger': row.status == 9}">{{statusArr[row.status].full_name | uppercase}}</span></td>
+                        <td>{{row.order_date | date: 'dd MMM'}}</td>
+                        <td align="right" class="dropdown">
                             <?php if ($userData['role'] === 'owner') { ?>
-                                <li>
-                                    <a ng-if="row.is_default == 0" href="../chart-of-accounts/summery.php?t=c&id={{row.account_id}}" target="_blank"><span class="fa fa-eye"></span> Ledger View</a>
-                                </li>
-                            <?php } elseif ($userData['role'] === 'manager') { ?>
-                                <li ng-if="row.shopId == <?php echo $userData['shopId']; ?>">
-                                    <a ng-if="row.is_default == 0" href="../chart-of-accounts/summery.php?t=c&id={{row.account_id}}" target="_blank"><span class="fa fa-eye"></span> Ledger View</a>
-                                </li>
+                                <a ng-if="row.is_default == 0" uib-tooltip="Ledger View" class="btn btn-default btn-xs" href="../chart-of-accounts/summery.php?t=c&id={{row.account_id}}" target="_blank"><span class="fa fa-eye"></span></a>
                             <?php } ?>
-                        </ul>
+                            <?php if ($userData['role'] === 'manager') { ?>
+                                <a ng-if="row.is_default == 0 && row.shopId == <?php echo $userData['shopId']; ?>" uib-tooltip="Ledger View" class="btn btn-default btn-xs" href="../chart-of-accounts/summery.php?t=c&id={{row.account_id}}" target="_blank"><span class="fa fa-eye"></span></a>
+                            <?php } ?>
+                            <?php if ($userData['role'] == 'owner') { ?>
+                                <a uib-tooltip="EDIT" class="btn btn-default btn-xs" ng-if="row.status != 5" href="{{'<?php echo SITE_URL; ?>pages/recipt/edit.php?id=' + row.id }}" target="_blank"><span class="fa fa-edit"></span></a>
+                            <?php } else { ?>
+                                <a uib-tooltip="EDIT" class="btn btn-default btn-xs" ng-if="row.status == 1 && row.shopId == <?php echo $userData['shopId']; ?>" href="{{'<?php echo SITE_URL; ?>pages/recipt/edit.php?id=' + row.id }}" target="_blank"><span class="fa fa-edit"></span></a>
+                            <?php } ?>
+                            <a uib-tooltip="Print" class="btn btn-default btn-xs" ng-click="openRecipt(row.id)" href="javascript:void(0)"><span class="fa fa-print"></span></a>
+                            <a uib-tooltip="Large View" class="btn btn-default btn-xs" ng-click="openRecipt(row.id, 'details', 'large')" href="javascript:void(0)"><span class="fa fa-file"></span></a>
+                            <a uib-tooltip="More" class="btn btn-default btn-xs" href="javascript:void(0)" data-toggle="dropdown"><span class="fa fa-chevron-down"></span></a>
+                            <ul class="dropdown-menu pull-right">
+                                <li>
+                                    <?php if ($userData['role'] == 'owner') { ?>
+                                        <a ng-if="row.status != 5" href="{{'<?php echo SITE_URL; ?>pages/recipt/edit.php?id=' + row.id }}" target="_blank"><span class="fa fa-edit"></span> Edit</a>
+                                    <?php } else { ?>
+                                        <a ng-if="row.status == 1 && row.shopId == <?php echo $userData['shopId']; ?>" href="{{'<?php echo SITE_URL; ?>pages/recipt/edit.php?id=' + row.id }}" target="_blank"><span class="fa fa-edit"></span> Edit</a>
+                                    <?php } ?>
+                                </li>
+                                <?php if ($userData['role'] == 'owner') { ?>
+                                    <li>
+                                        <a ng-if="row.status == 2" href="{{'<?php echo SITE_URL; ?>pages/orders/adjustment.php?id=' + row.id }}">Return</a>
+                                    </li>
+                                    <li>
+                                        <a ng-click="deleteRecipt(row.id)" href="javascript:void(0)"><span class="fa fa-remove"></span> Delete</a>
+                                    </li>
+                                    <li>
+                                        <a href="{{'<?php echo SITE_URL; ?>pages/recipt/edit.php?dup=' + row.id }}"><span class="fa fa-copy"></span> Duplicate</a>
+                                    </li>
+                                <?php } elseif ($userData['role'] == 'manager') { ?>
+                                    <li ng-if="row.shopId == <?php echo $userData['shopId']; ?>">
+                                        <a ng-if="row.status == 2" href="{{'<?php echo SITE_URL; ?>pages/orders/adjustment.php?id=' + row.id }}">Return</a>
+                                    </li>
+                                    <li ng-if="row.shopId == <?php echo $userData['shopId']; ?>">
+                                        <a ng-click="deleteRecipt(row.id)" href="javascript:void(0)"><span class="fa fa-remove"></span> Delete</a>
+                                    </li>
+                                    <li ng-if="row.shopId == <?php echo $userData['shopId']; ?>">
+                                        <a href="{{'<?php echo SITE_URL; ?>pages/recipt/edit.php?dup=' + row.id }}"><span class="fa fa-copy"></span> Duplicate</a>
+                                    </li>
+                                <?php } ?>
+                                <li>
+                                    <a ng-click="openRecipt(row.id)" href="javascript:void(0)"><span class="fa fa-print"></span> Print</a>
+                                </li>
+                                <li>
+                                    <a ng-click="openRecipt(row.id, 'details')" href="javascript:void(0)"><span class="fa fa-eye"></span> View</a>
+                                </li>
+                                <li>
+                                    <a ng-click="openRecipt(row.id, 'details', 'large')" href="javascript:void(0)"><span class="fa fa-file"></span> Large View</a>
+                                </li>
+                                <?php if ($userData['role'] === 'owner') { ?>
+                                    <li>
+                                        <a ng-if="row.is_default == 0" href="../chart-of-accounts/summery.php?t=c&id={{row.account_id}}" target="_blank"><span class="fa fa-eye"></span> Ledger View</a>
+                                    </li>
+                                <?php } elseif ($userData['role'] === 'manager') { ?>
+                                    <li ng-if="row.shopId == <?php echo $userData['shopId']; ?>">
+                                        <a ng-if="row.is_default == 0" href="../chart-of-accounts/summery.php?t=c&id={{row.account_id}}" target="_blank"><span class="fa fa-eye"></span> Ledger View</a>
+                                    </li>
+                                <?php } ?>
+                            </ul>
 
-                    </td>
-                </tr>
-            </tbody>
-            <tfoot>
-                <tr>
-                    <th colspan="{{9 + modes.length}}">
-                        <table class="table table-hover" style="box-shadow: none; text-align: right" width="100%" cellspacing="0" cellpadding="0">
-                            <tr>
-                                <td style="text-align: right">Number of Orders</td>
-                                <td style="text-align: right; font-weight: bold; font-size: 1.5em">{{data.total || 0}}</td>
-                            </tr>
+                        </td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th colspan="{{9 + modes.length}}">
+                            <table class="table table-hover" style="box-shadow: none; text-align: right" width="100%" cellspacing="0" cellpadding="0">
+                                <tr>
+                                    <td style="text-align: right">Number of Orders</td>
+                                    <td style="text-align: right; font-weight: bold; font-size: 1.5em">{{data.total || 0}}</td>
+                                </tr>
 
-                            <tr ng-repeat="(k, d) in data.via">
-                                <td style="text-align: right">Pay via {{modeNames[k]}}</td>
-                                <td style="text-align: right; font-weight: bold; font-size: 1.5em">{{(d || 0) | number: 2}}</td>
-                            </tr>
-                            <tr>
-                                <td style="text-align: right">Total Credit</td>
-                                <td style="text-align: right; font-weight: bold; font-size: 1.5em">{{(data.credit || 0) | number: 2}}</td>
-                            </tr>
-                            <tr>
-                                <td style="text-align: right">Total Parked</td>
-                                <td style="text-align: right; font-weight: bold; font-size: 1.5em">{{(data.park || 0) | number: 2}}</td>
-                            </tr>
-                            <tr>
-                                <td style="text-align: right">G. Total</td>
-                                <td style="text-align: right; font-weight: bold; font-size: 1.5em">{{(data.totalIncome || 0) | number: 2}}</td>
-                            </tr>
-                            <tr>
-                                <td style="text-align: right">Total Return</td>
-                                <td style="text-align: right; font-weight: bold; font-size: 1.5em">{{(data.return || 0) | number: 2}}</td>
-                            </tr>
-                        </table>
-                    </th>
-                </tr>
-            </tfoot>
-        </table>
+                                <tr ng-repeat="(k, d) in data.via">
+                                    <td style="text-align: right">Pay via {{modeNames[k]}}</td>
+                                    <td style="text-align: right; font-weight: bold; font-size: 1.5em">{{(d || 0) | number: 2}}</td>
+                                </tr>
+                                <tr>
+                                    <td style="text-align: right">Total Credit</td>
+                                    <td style="text-align: right; font-weight: bold; font-size: 1.5em">{{(data.credit || 0) | number: 2}}</td>
+                                </tr>
+                                <tr>
+                                    <td style="text-align: right">Total Parked</td>
+                                    <td style="text-align: right; font-weight: bold; font-size: 1.5em">{{(data.park || 0) | number: 2}}</td>
+                                </tr>
+                                <tr>
+                                    <td style="text-align: right">G. Total</td>
+                                    <td style="text-align: right; font-weight: bold; font-size: 1.5em">{{(data.totalIncome || 0) | number: 2}}</td>
+                                </tr>
+                                <tr>
+                                    <td style="text-align: right">Total Return</td>
+                                    <td style="text-align: right; font-weight: bold; font-size: 1.5em">{{(data.return || 0) | number: 2}}</td>
+                                </tr>
+                            </table>
+                        </th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
     </div>
     <?php
     echo mainFooter();

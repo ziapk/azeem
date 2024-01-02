@@ -34,13 +34,13 @@ echo mainHeader(['page' => 'category']);
             </tr>
         </tbody>
     </table>
-    <div style="display: flex; align-items: center; justify-content: space-between">
+    <div class="pagination-custom">
         <ul uib-pagination ng-if="data.perPage < data.totalRecords" items-per-page="data.perPage" total-items="data.totalRecords" ng-model="currentPage" ng-change="pageChanged(currentPage)"></ul> <span>Per Page <select ng-change="perPage()" ng-model="data.perPage">
                 <option value="10">10</option>
                 <option value="25">25</option>
                 <option value="50">50</option>
                 <option value="100">100</option>
-            </select></span> <span>Total number of Records <strong>{{data.totalRecords}}</strong></span>
+            </select></span> <span>Total Records <strong>{{data.totalRecords}}</strong></span>
     </div>
 
     <script type="text/ng-template" id="addCategory.html">

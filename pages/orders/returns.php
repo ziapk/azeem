@@ -38,62 +38,65 @@ echo mainHeader(['page' => 'sale_returns']);
             </div>
         </div>
     </form>
+
     <uib-tabset active="activePill">
         <uib-tab select="getReport($event)" index="0" data-tab="mine" heading="My Returns"></uib-tab>
         <uib-tab select="getReport($event)" index="1" data-tab="linked" heading="Link Returns"></uib-tab>
     </uib-tabset>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Sr.#</th>
-                <th>Order. #</th>
-                <th>Customer</th>
-                <th>Price</th>
-                <th ng-repeat="mode in modes">{{mode.title}}</th>
-                <th>Status</th>
-                <th>Date/time</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr ng-repeat="row in data.records">
-                <td>{{$index + 1}}</td>
-                <td>{{row.id}}</td>
-                <td>{{row.customer_name || row.full_name}}</td>
-                <td>{{row.price - row.discount}}</td>
-                <td ng-repeat="mode in modes">{{row.prices[mode.id]}}</td>
-                <td>{{statusArr[row.status].full_name}}</td>
-                <td>{{row.order_date}}</td>
-                <td align="right">
-                    <?php if ($userData['role'] === 'owner') { ?><a class="btn btn-xs btn-default" href="<?php echo SITE_URL; ?>pages/orders/adjustment.php?return={{row.id}}">Edit</a><?php } ?>
-                    <?php if ($userData['role'] === 'manager') { ?><a class="btn btn-xs btn-default" ng-if="row.flag == 1" href="<?php echo SITE_URL; ?>pages/orders/adjustment.php?return={{row.id}}">Edit</a><?php } ?>
-                    <?php if ($userData['role'] === 'owner') { ?><a class="btn btn-xs btn-danger" ng-click="deleteRecipt(row.id)" href="javascript:void(0)">Delete</a><?php } ?>
-                    <a class="btn btn-xs btn-default" ng-click="openRecipt(row.id, 'details', 'large')" href="javascript:void(0)">Large View</a>
-                </td>
-            </tr>
-        </tbody>
-        <tfoot>
-            <tr>
-                <th colspan="{{8 + modes.length}}">
-                    <table style="text-align: right" width="100%" cellspacing="0" cellpadding="0">
-                        <tr>
-                            <th style="text-align: right">Number of Orders</th>
-                            <th style="text-align: right">{{data.total}}</th>
-                        </tr>
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Sr.#</th>
+                    <th>Order. #</th>
+                    <th>Customer</th>
+                    <th>Price</th>
+                    <th ng-repeat="mode in modes">{{mode.title}}</th>
+                    <th>Status</th>
+                    <th>Date/time</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="row in data.records">
+                    <td>{{$index + 1}}</td>
+                    <td>{{row.id}}</td>
+                    <td>{{row.customer_name || row.full_name}}</td>
+                    <td>{{row.price - row.discount}}</td>
+                    <td ng-repeat="mode in modes">{{row.prices[mode.id]}}</td>
+                    <td>{{statusArr[row.status].full_name}}</td>
+                    <td>{{row.order_date}}</td>
+                    <td align="right">
+                        <?php if ($userData['role'] === 'owner') { ?><a class="btn btn-xs btn-default" href="<?php echo SITE_URL; ?>pages/orders/adjustment.php?return={{row.id}}">Edit</a><?php } ?>
+                        <?php if ($userData['role'] === 'manager') { ?><a class="btn btn-xs btn-default" ng-if="row.flag == 1" href="<?php echo SITE_URL; ?>pages/orders/adjustment.php?return={{row.id}}">Edit</a><?php } ?>
+                        <?php if ($userData['role'] === 'owner') { ?><a class="btn btn-xs btn-danger" ng-click="deleteRecipt(row.id)" href="javascript:void(0)">Delete</a><?php } ?>
+                        <a class="btn btn-xs btn-default" ng-click="openRecipt(row.id, 'details', 'large')" href="javascript:void(0)">Large View</a>
+                    </td>
+                </tr>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th colspan="{{8 + modes.length}}">
+                        <table style="text-align: right" width="100%" cellspacing="0" cellpadding="0">
+                            <tr>
+                                <th style="text-align: right">Number of Orders</th>
+                                <th style="text-align: right">{{data.total}}</th>
+                            </tr>
 
-                        <tr ng-repeat="(k, d) in data.via">
-                            <th style="text-align: right">Pay via {{modeNames[k]}}</th>
-                            <th style="text-align: right">{{d | number: 2}}</th>
-                        </tr>
-                        <tr>
-                            <th style="text-align: right">Total Return</th>
-                            <th style="text-align: right">{{data.return | number: 2}}</th>
-                        </tr>
-                    </table>
-                </th>
-            </tr>
-        </tfoot>
-    </table>
+                            <tr ng-repeat="(k, d) in data.via">
+                                <th style="text-align: right">Pay via {{modeNames[k]}}</th>
+                                <th style="text-align: right">{{d | number: 2}}</th>
+                            </tr>
+                            <tr>
+                                <th style="text-align: right">Total Return</th>
+                                <th style="text-align: right">{{data.return | number: 2}}</th>
+                            </tr>
+                        </table>
+                    </th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
 </div>
 <?php
 echo mainFooter();

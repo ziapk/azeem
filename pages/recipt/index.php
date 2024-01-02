@@ -102,61 +102,63 @@ $publishers = $publisherObj->getPublishers($userId);
             <?php } ?>
         </span>
         <div class="clearfix" id="dummyHeight"></div>
-
-        <table class="table table-striped recipt-table">
-            <thead id="fixme">
-                <th colspan="8" style="padding: 0">
-                    <table class="table" style="box-shadow: none; margin: 0">
-                        <thead>
-                            <?php if ($userData['role'] == 'owner') { ?>
+        <div class="table-responsive">
+            <table class="table table-striped recipt-table">
+                <thead id="fixme">
+                    <th colspan="8" style="padding: 0">
+                        <table class="table" style="box-shadow: none; margin: 0">
+                            <thead>
+                                <?php if ($userData['role'] == 'owner') { ?>
+                                    <tr>
+                                        <th>
+                                            <label class="text-danger"><strong>Shop Select</strong></label>
+                                        </th>
+                                        <th>
+                                            <select class="form-control c-select" ng-model="shopId">
+                                                <?php foreach ($ownerStores as $value) { ?>
+                                                    <option value="<?php echo $value['id']; ?>"><?php echo $value['full_name']; ?></option>
+                                                <?php } ?>
+                                            </select>
+                                        </th>
+                                        <th></th>
+                                        <th></th>
+                                    </tr>
+                                <?php } ?>
                                 <tr>
-                                    <th>
-                                        <label class="text-danger"><strong>Shop Select</strong></label>
-                                    </th>
-                                    <th>
-                                        <select class="form-control c-select" ng-model="shopId">
-                                            <?php foreach ($ownerStores as $value) { ?>
-                                                <option value="<?php echo $value['id']; ?>"><?php echo $value['full_name']; ?></option>
-                                            <?php } ?>
-                                        </select>
-                                    </th>
-                                    <th></th>
-                                    <th></th>
-                                </tr>
-                            <?php } ?>
-                            <tr>
-                                <th style="vertical-align: middle">Customer Name</th>
-                                <th style="width: 200px">
-                                    <div class="dropdown-wrapper" style="position: relative;">
-                                        <input type="text" class="form-control" ng-model="customerName" placeholder="Search Customer" uib-typeahead="address as address.full_name for address in searchCustomer($viewValue)" typeahead-on-select="selectCustomer($item)" ng-model-options="{debounce: 100}" typeahead-template-url="customer.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="1">
-                                    </div>
-                                </th>
-                                <th style="vertical-align: middle">
-                                    <label class="pull-left"><span style="vertical-align: middle"><input type="checkbox" ng-model="show_discount"></span> <span style="vertical-align: middle">Add Discount</span></label>
-                                    <label class="pull-left"><span style="vertical-align: middle; margin-left: 10px"><input type="checkbox" ng-model="show_bundle"></span> <span style="vertical-align: middle">Bundles</span></label>
-                                    <label class="pull-left"><span style="vertical-align: middle; margin-left: 10px"><input type="checkbox" ng-model="sep"></span> <span style="vertical-align: middle">SEP</span></label>
-                                    <div class="pull-right">
-                                        <label><span style="vertical-align: middle">QF</span> <span style="vertical-align: middle; margin-left: 4px;"><input type="checkbox" name="qf" ng-model="qf"><span></label>
-                                        <label><span style="vertical-align: middle">Search Product</span> <span style="vertical-align: middle; margin-left: 4px"><input type="checkbox" name="focus" ng-model="focus"><span></label>
-                                    </div>
-                                </th>
-                                <th width="100">
-                                    <div class="dropdown-wrapper align-right dropdown-height">
-                                        <div class="input-group">
-                                            <input type="text" autocomplete="off" class="form-control" id="searchProduct" ng-model="product" placeholder="Search Products" uib-typeahead="address as address.full_name for address in searchProduct($viewValue)" typeahead-on-select="selectProduct($item)" ng-model-options="{debounce: 100}" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="productCode ? 0 : 1">
-                                            <span class="input-group-btn" style="width: 90px">
-                                                <input type="text" ng-model="productCode" class="form-control" id="exampleInputAmount" placeholder="CODE">
-                                            </span>
+                                    <th style="vertical-align: middle">Customer Name</th>
+                                    <th style="width: 200px">
+                                        <div class="dropdown-wrapper" style="position: relative;">
+                                            <input type="text" class="form-control" ng-model="customerName" placeholder="Search Customer" uib-typeahead="address as address.full_name for address in searchCustomer($viewValue)" typeahead-on-select="selectCustomer($item)" ng-model-options="{debounce: 100}" typeahead-template-url="customer.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="1">
                                         </div>
-                                    </div>
-                                </th>
-                            </tr>
-                        </thead>
-                    </table>
-                </th>
+                                    </th>
+                                    <th style="vertical-align: middle">
+                                        <label class="pull-left"><span style="vertical-align: middle"><input type="checkbox" ng-model="show_discount"></span> <span style="vertical-align: middle">Add Discount</span></label>
+                                        <label class="pull-left"><span style="vertical-align: middle; margin-left: 10px"><input type="checkbox" ng-model="show_bundle"></span> <span style="vertical-align: middle">Bundles</span></label>
+                                        <label class="pull-left"><span style="vertical-align: middle; margin-left: 10px"><input type="checkbox" ng-model="sep"></span> <span style="vertical-align: middle">SEP</span></label>
+                                        <div class="pull-right">
+                                            <label><span style="vertical-align: middle">QF</span> <span style="vertical-align: middle; margin-left: 4px;"><input type="checkbox" name="qf" ng-model="qf"><span></label>
+                                            <label><span style="vertical-align: middle">Search Product</span> <span style="vertical-align: middle; margin-left: 4px"><input type="checkbox" name="focus" ng-model="focus"><span></label>
+                                        </div>
+                                    </th>
+                                    <th width="100">
+                                        <div class="dropdown-wrapper align-right dropdown-height">
+                                            <div class="input-group">
+                                                <input type="text" autocomplete="off" class="form-control" id="searchProduct" ng-model="product" placeholder="Search Products" uib-typeahead="address as address.full_name for address in searchProduct($viewValue)" typeahead-on-select="selectProduct($item)" ng-model-options="{debounce: 100}" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="productCode ? 0 : 1">
+                                                <span class="input-group-btn" style="width: 90px">
+                                                    <input type="text" ng-model="productCode" class="form-control" id="exampleInputAmount" placeholder="CODE">
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </th>
 
 
-                <?php echo include_once dirname(__FILE__) . '/table.php'; ?>
+                    <?php echo include_once dirname(__FILE__) . '/table.php'; ?>
+
+        </div>
     </div>
 
 </div>

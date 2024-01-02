@@ -7,53 +7,56 @@ echo mainHeader(['page' => 'supplier']);
 
 <div class="container" ng-controller="productController">
 
-    <a href="<?php echo SITE_URL . 'pages/supply'; ?>" class="btn btn-primary btn-xs pull-right">Add Supply</a>
-    <a href="javascript:void(0)" style="margin-right: 10px" ng-click="addSuppliers()" class="btn btn-primary btn-xs pull-right">Add Supplier</a>
+    <a href="<?php echo SITE_URL . 'pages/supply'; ?>" class="btn btn-primary btn-xs pull-right"><span class="fa fa-plus"></span> Supply</a>
+    <a href="javascript:void(0)" style="margin-right: 10px" ng-click="addSuppliers()" class="btn btn-primary btn-xs pull-right"><span class="fa fa-plus"></span> Supplier</a>
     <h4 class="section-title">All Suppliers</h4>
-    <h5 class="section-title">Total Payable Amount: {{data.closing_total | number}} <?php if ($userData['role'] === 'owner' || $userData['role'] === 'manager') { ?>
-            <button class="btn btn-sm btn-primary" ng-click="bulkSendSummery()">Send Ledgers</button>
+    <h5 class="section-title">Total Amount: <strong style="font-size: 1.3em;">{{data.closing_total | number}}</strong> <?php if ($userData['role'] === 'owner' || $userData['role'] === 'manager') { ?>
+            <button class="btn btn-sm btn-primary mt-10" ng-click="bulkSendSummery()"><span class="fa fa-envelope"></span> Send Ledgers</button>
         <?php } ?>
     </h5>
     <div class="form-group">
         <input class="form-control" ng-change="searchSupplier()" ng-model="search" placeholder="Type here for search..." />
     </div>
-    <table class="table">
-        <thead>
-            <tr>
-                <th></th>
-                <th></th>
-                <th>Contact</th>
-                <th>Company / Title / Address</th>
-                <th>Balance</th>
-                <th width="300"></th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr ng-repeat="li in list">
-                <td width="50"><input type="checkbox" ng-model="li.selected" /></td>
-                <td width="50">{{li.id}}</td>
-                <td><strong>{{li.name}}</strong> <br /> {{li.contact}}</td>
-                <td><strong>{{li.company}}</strong> - {{li.title}} <br />{{li.address}}</td>
-                <td style="text-align: right;" ng-class="{'text-danger': li.closing_balance < 0}">{{li.closing_balance | number}}</td>
-                <!-- <td>{{li.wallet}}</td> -->
-                <td>
-                    <a class="btn btn-primary btn-xs" href="<?php echo SITE_URL . "pages/suppliers/update.php?id=" ?>{{li.id}}">Edit</a>
-                    <?php if ($userData['role'] === 'owner' || $userData['role'] === 'manager') { ?><a class="btn btn-default btn-xs" href="../chart-of-accounts/summery.php?t=s&id={{li.account_id}}">Ledger</a><?php } ?>
-                    <?php if ($userData['role'] === 'owner' || $userData['role'] === 'manager') { ?><a ng-click="deleteCustomer(li.id)" class="btn btn-danger btn-xs" href="javascript:void(0)"><span class="fa fa-remove"><span></a><?php } ?>
-                    <a class="btn btn-danger btn-xs" href="<?php echo SITE_URL . "pages/suppliers/invoices.php?id=" ?>{{li.id}}">Bills</a>
-                    <a class="btn btn-danger btn-xs" href="<?php echo SITE_URL . "pages/suppliers/adjustment.php?id=" ?>{{li.id}}">Payment</a>
-                    <?php if ($userData['role'] === 'owner' || $userData['role'] === 'manager') { ?><a class="btn btn-default btn-xs" ng-click="sendSummery(li.account_id)" href="javascript:void(0)"><span class="fa fa-envelope"></span>{{sending[li.account_id] ? 'Sending' : ''}}</a><?php } ?>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-    <div style="display: flex; align-items: center; justify-content: space-between">
-        <ul uib-pagination ng-if="data.perPage < data.totalRecords" items-per-page="data.perPage" total-items="data.totalRecords" ng-model="currentPage" ng-change="pageChanged(currentPage)"></ul> <span>Per Page <select ng-change="perPage()" ng-model="data.perPage">
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th></th>
+                    <th>Contact</th>
+                    <th>Company / Title / Address</th>
+                    <th>Balance</th>
+                    <th width="300"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="li in list">
+                    <td width="50"><input type="checkbox" ng-model="li.selected" /></td>
+                    <td width="50">{{li.id}}</td>
+                    <td><strong>{{li.name}}</strong> <br /> {{li.contact}}</td>
+                    <td><strong>{{li.company}}</strong> - {{li.title}} <br />{{li.address}}</td>
+                    <td style="text-align: right;" ng-class="{'text-danger': li.closing_balance < 0}">{{li.closing_balance | number}}</td>
+                    <!-- <td>{{li.wallet}}</td> -->
+                    <td>
+                        <a class="btn btn-primary btn-xs" href="<?php echo SITE_URL . "pages/suppliers/update.php?id=" ?>{{li.id}}">Edit</a>
+                        <?php if ($userData['role'] === 'owner' || $userData['role'] === 'manager') { ?><a class="btn btn-default btn-xs" href="../chart-of-accounts/summery.php?t=s&id={{li.account_id}}">Ledger</a><?php } ?>
+                        <?php if ($userData['role'] === 'owner' || $userData['role'] === 'manager') { ?><a ng-click="deleteCustomer(li.id)" class="btn btn-danger btn-xs" href="javascript:void(0)"><span class="fa fa-remove"><span></a><?php } ?>
+                        <a class="btn btn-danger btn-xs" href="<?php echo SITE_URL . "pages/suppliers/invoices.php?id=" ?>{{li.id}}">Bills</a>
+                        <a class="btn btn-danger btn-xs" href="<?php echo SITE_URL . "pages/suppliers/adjustment.php?id=" ?>{{li.id}}">Payment</a>
+                        <?php if ($userData['role'] === 'owner' || $userData['role'] === 'manager') { ?><a class="btn btn-default btn-xs" ng-click="sendSummery(li.account_id)" href="javascript:void(0)"><span class="fa fa-envelope"></span>{{sending[li.account_id] ? 'Sending' : ''}}</a><?php } ?>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="pagination-custom">
+        <ul uib-pagination ng-if="data.perPage < data.totalRecords" items-per-page="data.perPage" total-items="data.totalRecords" ng-model="currentPage" ng-change="pageChanged(currentPage)"></ul>
+        <span>Per Page <select ng-change="perPage()" ng-model="data.perPage">
                 <option value="10">10</option>
                 <option value="25">25</option>
                 <option value="50">50</option>
                 <option value="100">100</option>
-            </select></span> <span>Total number of Records <strong>{{data.totalRecords}}</strong></span>
+            </select></span> <span>Total Records <strong>{{data.totalRecords}}</strong></span>
     </div>
 </div>
 

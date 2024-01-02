@@ -144,31 +144,6 @@ $customersList = $customerObj->getCustomers($shop['id']);
               </div>
             </form>
           </li>
-          <!-- <li class="dropdown" style="padding: 0">
-            <a href="#" class="nav-menu-item btn btn-primary" data-toggle="dropdown" uib-tooltip="Royalty" tooltip-placement="bottom" title="">
-              Roy.
-            </a>
-            <form ng-submit="directPayment(2)" class="dropdown-menu" style="padding: 20px; width: 300px">
-              <div class="form-group">
-                <div class="form-group">
-                  <ui-select custom-dropdown ng-model="payment.supplier" theme="bootstrap" ng-disabled="disabled" reset-search-input="false" title="Choose an author">
-                    <ui-select-match placeholder="Enter an author...">{{$select.selected.name}}</ui-select-match>
-                    <ui-select-choices repeat="address in authorsList track by $index" refresh="refreshAuthors($select.search)" refresh-delay="0">
-                      <div style="white-space: wrap;" ng-bind-html="address.name | highlight: $select.search"></div>
-                    </ui-select-choices>
-                  </ui-select>
-                </div>
-              </div>
-              <div class="form-group">
-                <input placeholder="Description" ng-model="payment.summery" type="text" class="form-control input-lg">
-              </div>
-              <div class="form-group">
-                <input placeholder="Amount" ng-model="payment.amount" type="text" class="form-control input-lg">
-              </div>
-              <input type="submit" value="Submit" class="btn btn-primary">
-              <label class="pull-right"><input type="checkbox" name="adjustment" ng-model="payment.adjustment"> Adjustment</label>
-            </form>
-          </li> -->
           <li class="hidden-xs dropdown" style="padding: 0">
             <a href="#" class="nav-menu-item btn btn-primary" data-toggle="dropdown" uib-tooltip="Expenses" tooltip-placement="bottom" title="">
               Exp
@@ -193,11 +168,6 @@ $customersList = $customerObj->getCustomers($shop['id']);
               <input type="submit" value="Submit" class="btn btn-primary">
             </form>
           </li>
-          <li class="hidden-xs" style="padding: 0; margin-right: -1px">
-            <a class="nav-menu-item btn btn-primary" href="<?php echo SITE_URL . 'pages/orders/adjustment.php'; ?>">
-              Returns
-            </a>
-          </li>
           <li class="dropdown hidden-xs" style="padding: 0">
             <a href="#" class="nav-menu-item btn btn-primary" data-toggle="dropdown">
               Create
@@ -207,21 +177,19 @@ $customersList = $customerObj->getCustomers($shop['id']);
               <li><a class="dropdown-item" href="<?php echo SITE_URL . 'pages/supply'; ?>">+ Supply</a></li>
               <li><a class="dropdown-item" href="<?php echo SITE_URL; ?>pages/demand/create.php">+ Demand</a></li>
               <li><a class="dropdown-item" href="<?php echo SITE_URL; ?>pages/recipt/" target="_blank">+ Recipt</a></li>
+              <li><a class="nav-menu-item" href="<?php echo SITE_URL . 'pages/orders/adjustment.php'; ?>">+ Returns</a></li>
               <li><a class="dropdown-item" href="<?php echo SITE_URL; ?>pages/ob/" target="_blank">+ Opening Balance</a></li>
             </ul>
           </li>
           <li class="hidden-xs"><a style="padding-left: 8px; padding-right: 8px" uib-tooltip="Reports" tooltip-placement="bottom" title="" href="<?php echo SITE_URL . 'pages/reports'; ?>"><small><small class="nav-menu-text text-small"><img class="fa" width="24" height="24" src="<?php echo SITE_URL; ?>assets/img/svg/reports.svg" alt="" /></small></small></a></li>
           <li class="hidden-xs"><a href="<?php echo SITE_URL; ?>pages/product/running.php"><img width="22" uib-tooltip="Running Products" tooltip-placement="bottom" height="22" src="<?php echo SITE_URL; ?>assets/img/svg/lightning-bolt.svg" alt="" /></a></li>
-          <li class="hidden-xs"><a href="<?php echo SITE_URL; ?>pages/product/reset.php"><img width="22" uib-tooltip="Reset Products" tooltip-placement="bottom" height="22" src="<?php echo SITE_URL; ?>assets/img/svg/lightning-bolt.svg" alt="" /></a></li>
           <li class="profile-menu">
             <a title="" href="javascript:void(0)" data-toggle="dropdown" tooltip-placement="bottom" uib-tooltip="Settings"><span class="fa fa-cog"></span> <span class="caret"></span></a>
             <ul class="dropdown-menu">
               <li><a title="" href="<?php echo SITE_URL; ?>pages/profile">Profile</a></li>
-              <li class="divider"></li>
               <li><a title="" ng-click="makeClosing(currentShop.id, currentShop)" href="javascript:void(0)">Closing</a></li>
-              <li class="divider"></li>
+              <li><a href="<?php echo SITE_URL; ?>pages/product/reset.php">Reset Products</a></li>
               <li><a title="" href="<?php echo SITE_URL; ?>logout.php">Logout</a></li>
-              <li class="divider"></li>
               <li style="padding: 0 10px">
                 <table width="100%" style="margin: auto;">
                   <tr>

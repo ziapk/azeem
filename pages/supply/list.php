@@ -26,74 +26,76 @@ echo mainHeader(['page' => 'supplies']);
         <uib-tab select="getReport($event)" index="2" data-tab="credit" heading="Un-Paid"></uib-tab>
         <uib-tab select="getReport($event)" index="3" data-tab="park" heading="Parked"></uib-tab>
     </uib-tabset>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Sr.#</th>
-                <th>Order Number</th>
-                <th>Ref.#</th>
-                <th>Supplier</th>
-                <th>Price</th>
-                <th>Status</th>
-                <th>Date/time</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr ng-repeat="row in data.records">
-                <td>{{$index + 1}}</td>
-                <td>{{row.id}}</td>
-                <td>{{row.ref_no}}</td>
-                <td>{{row.customer_name || row.full_name}}</td>
-                <td>{{row.price}}</td>
-                <td>{{statusArr[row.status].full_name}}</td>
-                <td>{{row.order_date}}</td>
-                <td align="right">
-                    <?php if ($userData['role'] == 'owner') { ?>
-                        <a class="btn btn-xs btn-default" ng-if="row.status != 5" href="{{'<?php echo SITE_URL; ?>pages/supply/index.php?id=' + row.id }}" target="_blank">Edit</a>
-                    <?php } else { ?>
-                        <a class="btn btn-xs btn-default" ng-if="row.status == 1" href="{{'<?php echo SITE_URL; ?>pages/supply/index.php?id=' + row.id }}" target="_blank">Edit</a>
-                    <?php } ?>
-                    <a class="btn btn-xs btn-danger" ng-click="deleteRecipt(row.id)" href="javascript:void(0)">Delete</a>
-                    <a class="btn btn-xs btn-info" ng-click="openRecipt(row.id)" href="javascript:void(0)">Print</a>
-                    <a class="btn btn-xs btn-default" ng-click="openRecipt(row.id, 'details')" href="javascript:void(0)">View</a>
-                    <a class="btn btn-xs btn-default" ng-click="openRecipt(row.id, 'details', 'large')" href="javascript:void(0)">Large View</a>
-                </td>
-            </tr>
-        </tbody>
-        <tfoot>
-            <tr>
-                <th colspan="8">
-                    <table style="text-align: right" width="100%" cellspacing="0" cellpadding="0">
-                        <tr>
-                            <th style="text-align: right">Number of Orders</th>
-                            <th style="text-align: right">{{data.total}}</th>
-                        </tr>
-                        <tr>
-                            <th style="text-align: right">Total Payment</th>
-                            <th style="text-align: right">{{data.income | number: 2}}</th>
-                        </tr>
-                        <tr>
-                            <th style="text-align: right">Total Credit</th>
-                            <th style="text-align: right">{{data.credit | number: 2}}</th>
-                        </tr>
-                        <tr>
-                            <th style="text-align: right">Total Parked</th>
-                            <th style="text-align: right">{{data.park | number: 2}}</th>
-                        </tr>
-                        <tr>
-                            <th style="text-align: right">G. Total</th>
-                            <th style="text-align: right">{{data.totalIncome | number: 2}}</th>
-                        </tr>
-                        <tr>
-                            <th style="text-align: right">Total Return</th>
-                            <th style="text-align: right">{{data.return | number: 2}}</th>
-                        </tr>
-                    </table>
-                </th>
-            </tr>
-        </tfoot>
-    </table>
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Sr.#</th>
+                    <th>Order Number</th>
+                    <th>Ref.#</th>
+                    <th>Supplier</th>
+                    <th>Price</th>
+                    <th>Status</th>
+                    <th>Date/time</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="row in data.records">
+                    <td>{{$index + 1}}</td>
+                    <td>{{row.id}}</td>
+                    <td>{{row.ref_no}}</td>
+                    <td>{{row.customer_name || row.full_name}}</td>
+                    <td>{{row.price}}</td>
+                    <td><span class="label" ng-class="{'label-success': row.status == 2, 'label-primary': row.status == 1, 'label-danger': row.status == 9}">{{statusArr[row.status].full_name | uppercase}}</span></td>
+                    <td>{{row.order_date}}</td>
+                    <td align="right">
+                        <?php if ($userData['role'] == 'owner') { ?>
+                            <a class="btn btn-xs btn-default" ng-if="row.status != 5" href="{{'<?php echo SITE_URL; ?>pages/supply/index.php?id=' + row.id }}" target="_blank">Edit</a>
+                        <?php } else { ?>
+                            <a class="btn btn-xs btn-default" ng-if="row.status == 1" href="{{'<?php echo SITE_URL; ?>pages/supply/index.php?id=' + row.id }}" target="_blank">Edit</a>
+                        <?php } ?>
+                        <a class="btn btn-xs btn-danger" ng-click="deleteRecipt(row.id)" href="javascript:void(0)">Delete</a>
+                        <a class="btn btn-xs btn-info" ng-click="openRecipt(row.id)" href="javascript:void(0)">Print</a>
+                        <a class="btn btn-xs btn-default" ng-click="openRecipt(row.id, 'details')" href="javascript:void(0)">View</a>
+                        <a class="btn btn-xs btn-default" ng-click="openRecipt(row.id, 'details', 'large')" href="javascript:void(0)">Large View</a>
+                    </td>
+                </tr>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th colspan="8">
+                        <table style="text-align: right" width="100%" cellspacing="0" cellpadding="0">
+                            <tr>
+                                <th style="text-align: right">Number of Orders</th>
+                                <th style="text-align: right">{{data.total}}</th>
+                            </tr>
+                            <tr>
+                                <th style="text-align: right">Total Payment</th>
+                                <th style="text-align: right">{{data.income | number: 2}}</th>
+                            </tr>
+                            <tr>
+                                <th style="text-align: right">Total Credit</th>
+                                <th style="text-align: right">{{data.credit | number: 2}}</th>
+                            </tr>
+                            <tr>
+                                <th style="text-align: right">Total Parked</th>
+                                <th style="text-align: right">{{data.park | number: 2}}</th>
+                            </tr>
+                            <tr>
+                                <th style="text-align: right">G. Total</th>
+                                <th style="text-align: right">{{data.totalIncome | number: 2}}</th>
+                            </tr>
+                            <tr>
+                                <th style="text-align: right">Total Return</th>
+                                <th style="text-align: right">{{data.return | number: 2}}</th>
+                            </tr>
+                        </table>
+                    </th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
 </div>
 <?php
 echo mainFooter();

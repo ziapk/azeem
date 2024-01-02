@@ -9,44 +9,46 @@ echo mainHeader(['page' => 'category']);
     <div class="form-group">
         <input class="form-control" ng-change="searchCategories()" ng-model="search" placeholder="Type here for search..." />
     </div>
-    <table class="table">
-        <thead>
-            <tr>
-                <th></th>
-                <th>Name</th>
-                <th>Group Name</th>
-                <th>Type</th>
-                <th>Account</th>
-                <th width="200"></th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr ng-repeat="li in list">
-                <td width="50"><img ng-if="li.image" width="40" class="image" src={{"<?php echo SITE_URL; ?>uploads/products/"+li.image}} /></td>
-                <td>{{li.full_name}}</td>
-                <td>{{li.groupName}}</td>
-                <td>{{catTypes[li.cat_type]}}</td>
-                <td>
-                    <a ng-if="!li.title && li.cat_type == 1" href="javascript:void(0)" ng-click="linkAccount(li)">Link and Account</a>
-                    <span ng-if="li.title">{{li.title}} ({{li.code}})</span>
-                </td>
-                <td>
-                    <?php if ($userData['role'] === 'manager' || $userData['role'] === 'owner') { ?>
-                        <a class="btn btn-primary btn-xs" href="javascript:void(0)" ng-click="addCategory(li)">Edit</a>
-                        <a class="btn btn-danger btn-xs" href="javascript:void(0)" ng-click="deleteCategory(li.id)">Delete</a>
-                        <a ng-if="li.account_id" class="btn btn-default btn-xs" href="../chart-of-accounts/summery.php?t=e&id={{li.account_id}}">Ledger</a>
-                    <?php } ?>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-    <div style="display: flex; align-items: center; justify-content: space-between">
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Name</th>
+                    <th>Group Name</th>
+                    <th>Type</th>
+                    <th>Account</th>
+                    <th width="200"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="li in list">
+                    <td width="50"><img ng-if="li.image" width="40" class="image" src={{"<?php echo SITE_URL; ?>uploads/products/"+li.image}} /></td>
+                    <td>{{li.full_name}}</td>
+                    <td>{{li.groupName}}</td>
+                    <td>{{catTypes[li.cat_type]}}</td>
+                    <td>
+                        <a ng-if="!li.title && li.cat_type == 1" href="javascript:void(0)" ng-click="linkAccount(li)">Link and Account</a>
+                        <span ng-if="li.title">{{li.title}} ({{li.code}})</span>
+                    </td>
+                    <td>
+                        <?php if ($userData['role'] === 'manager' || $userData['role'] === 'owner') { ?>
+                            <a class="btn btn-primary btn-xs" href="javascript:void(0)" ng-click="addCategory(li)">Edit</a>
+                            <a class="btn btn-danger btn-xs" href="javascript:void(0)" ng-click="deleteCategory(li.id)">Delete</a>
+                            <a ng-if="li.account_id" class="btn btn-default btn-xs" href="../chart-of-accounts/summery.php?t=e&id={{li.account_id}}">Ledger</a>
+                        <?php } ?>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="pagination-custom">
         <ul uib-pagination ng-if="data.perPage < data.totalRecords" items-per-page="data.perPage" total-items="data.totalRecords" ng-model="currentPage" ng-change="pageChanged(currentPage)"></ul> <span>Per Page <select ng-change="perPage()" ng-model="data.perPage">
                 <option value="10">10</option>
                 <option value="25">25</option>
                 <option value="50">50</option>
                 <option value="100">100</option>
-            </select></span> <span>Total number of Records <strong>{{data.totalRecords}}</strong></span>
+            </select></span> <span>Total Records <strong>{{data.totalRecords}}</strong></span>
     </div>
 
     <script type="text/ng-template" id="addCategory.html">

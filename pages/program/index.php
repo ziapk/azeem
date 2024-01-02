@@ -9,36 +9,38 @@ echo mainHeader(['page' => 'program']);
     <div class="form-group">
         <input class="form-control" ng-change="searchPrograms()" ng-model="search" placeholder="Type here for search..." />
     </div>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Degree</th>
-                <th>Program</th>
-                <th>Class/Part</th>
-                <th width="200"></th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr ng-repeat="li in list">
-                <td>{{li.degree}}</td>
-                <td>{{li.program}}</td>
-                <td>{{li.class}}</td>
-                <td>
-                    <a class="btn btn-primary btn-xs" href="<?php echo SITE_URL . "pages/program/update.php?id=" ?>{{li.id}}">Edit</a>
-                    <?php if ($userData['role'] === 'manager') { ?><a class="btn btn-danger btn-xs" href="javascript:void(0)" ng-click="deleteProgram(li.id)">Delete</a><?php } ?>
-                    <a class="btn btn-default btn-xs" href="javascript:void(0)" ng-click="assignBooks(li)">Assign</a>
-                </td>
-            </tr>
-        </tbody>
-    </table>
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Degree</th>
+                    <th>Program</th>
+                    <th>Class/Part</th>
+                    <th width="200"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="li in list">
+                    <td>{{li.degree}}</td>
+                    <td>{{li.program}}</td>
+                    <td>{{li.class}}</td>
+                    <td>
+                        <a class="btn btn-primary btn-xs" href="<?php echo SITE_URL . "pages/program/update.php?id=" ?>{{li.id}}">Edit</a>
+                        <?php if ($userData['role'] === 'manager') { ?><a class="btn btn-danger btn-xs" href="javascript:void(0)" ng-click="deleteProgram(li.id)">Delete</a><?php } ?>
+                        <a class="btn btn-default btn-xs" href="javascript:void(0)" ng-click="assignBooks(li)">Assign</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 
-    <div style="display: flex; align-items: center; justify-content: space-between">
+    <div class="pagination-custom">
         <ul uib-pagination ng-if="data.perPage < data.totalRecords" items-per-page="data.perPage" total-items="data.totalRecords" ng-model="currentPage" ng-change="pageChanged(currentPage)"></ul> <span>Per Page <select ng-change="perPage()" ng-model="data.perPage">
                 <option value="10">10</option>
                 <option value="25">25</option>
                 <option value="50">50</option>
                 <option value="100">100</option>
-            </select></span> <span>Total number of Records <strong>{{data.totalRecords}}</strong></span>
+            </select></span> <span>Total Records <strong>{{data.totalRecords}}</strong></span>
     </div>
 
     <script type="text/ng-template" id="addProgram.html">

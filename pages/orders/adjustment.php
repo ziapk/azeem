@@ -44,143 +44,145 @@ echo mainHeader();
             </select>
         </div>
     </div>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Sr.#</th>
-                <th width="100">Product Id</th>
-                <th>Product Name</th>
-                <th width="100">Discount</th>
-                <th></th>
-                <th width="100">Price</th>
-                <th width="100">Qty</th>
-                <th>Total</th>
-                <th></th>
-            </tr>
-            <tr>
-                <td colspan="7"><input type="text" class="form-control" id="searchProduct" ng-model="product" placeholder="Search Product to add" typeahead-on-select="selectProduct($item, row)" uib-typeahead="address as address.full_name for address in searchProduct($viewValue)" typeahead-template-url="row2.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="1" ng-model-options="{debounce: 500}" class="form-control" ng-model="row.product_name" /></td>
-                <td><input type="checkbox" ng-model="sep"> SEP</td>
-                <td><input type="checkbox" ng-model="qf"> Qty</td>
-            </tr>
-        </thead>
-        <tbody>
-            <tr ng-repeat-start="row in items track by $index" id="product-{{$index + 1}}">
-                <td>{{$index + 1}}</td>
-                <td><input type="text" class="form-control" ng-model="row.product_id" /></td>
-                <td>
-                    <input type="text" class="form-control" ng-model="row.full_name" placeholder="Product title" />
-                </td>
-                <td>
-                    <div class="input-group">
-                        <input type="number" class="form-control input-add-dist" ng-model="row.discount_value" ng-change="calculateSum()" style="padding-right: 6px">
-                        <span class="dropdown input-group-btn">
-                            <button class="btn btn-default" style="padding-inline: 8px" ng-click="row.discount_type = (row.discount_type == 1 ? 2 : 1); calculateSum();">{{row.discount_type == 2 ? 'FIX' : '%'}}</button>
-                            <!-- data-toggle="dropdown" -->
-                            <!-- <button class="dropdown-toggle btn btn-default" data-toggle="dropdown" style="padding-inline: 8px">{{row.discount_type == 2 ? 'FIX' : '%'}}</button>
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Sr.#</th>
+                    <th width="100">Product Id</th>
+                    <th>Product Name</th>
+                    <th width="100">Discount</th>
+                    <th></th>
+                    <th width="100">Price</th>
+                    <th width="100">Qty</th>
+                    <th>Total</th>
+                    <th></th>
+                </tr>
+                <tr>
+                    <td colspan="7"><input type="text" class="form-control" id="searchProduct" ng-model="product" placeholder="Search Product to add" typeahead-on-select="selectProduct($item, row)" uib-typeahead="address as address.full_name for address in searchProduct($viewValue)" typeahead-template-url="row2.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="1" ng-model-options="{debounce: 500}" class="form-control" ng-model="row.product_name" /></td>
+                    <td><input type="checkbox" ng-model="sep"> SEP</td>
+                    <td><input type="checkbox" ng-model="qf"> Qty</td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat-start="row in items track by $index" id="product-{{$index + 1}}">
+                    <td>{{$index + 1}}</td>
+                    <td><input type="text" class="form-control" ng-model="row.product_id" /></td>
+                    <td>
+                        <input type="text" class="form-control" ng-model="row.full_name" placeholder="Product title" />
+                    </td>
+                    <td>
+                        <div class="input-group">
+                            <input type="number" class="form-control input-add-dist" ng-model="row.discount_value" ng-change="calculateSum()" style="padding-right: 6px">
+                            <span class="dropdown input-group-btn">
+                                <button class="btn btn-default" style="padding-inline: 8px" ng-click="row.discount_type = (row.discount_type == 1 ? 2 : 1); calculateSum();">{{row.discount_type == 2 ? 'FIX' : '%'}}</button>
+                                <!-- data-toggle="dropdown" -->
+                                <!-- <button class="dropdown-toggle btn btn-default" data-toggle="dropdown" style="padding-inline: 8px">{{row.discount_type == 2 ? 'FIX' : '%'}}</button>
                             <ul class="dropdown-menu">
                                 <li><a href="javascript:void(0)" ng-click="row.discount_type = 1; calculateSum()">%</a></li>
                                 <li><a href="javascript:void(0)" ng-click="row.discount_type = 2; calculateSum()">Fix</a></li>
                             </ul> -->
-                        </span>
-                    </div>
-                </td>
-                <td>
-                    <span ng-if="row.discount">
-                        {{row.discount_percent ? row.discount_percent : ''}}
-                        <del class="text-danger">{{row.price | number: 2}}</del> / </span>
-                    <span class="text-success">{{(row.price - row.discount) | number: 2}}</span>
-                </td>
+                            </span>
+                        </div>
+                    </td>
+                    <td>
+                        <span ng-if="row.discount">
+                            {{row.discount_percent ? row.discount_percent : ''}}
+                            <del class="text-danger">{{row.price | number: 2}}</del> / </span>
+                        <span class="text-success">{{(row.price - row.discount) | number: 2}}</span>
+                    </td>
 
-                <td width="100"><input type="number" class="form-control" ng-model="row.price" ng-change="calculateSum()" /></td>
-                <td width="100">
-                    <input type="number" class="form-control" ng-change="isValid(row,  calculateSum)" max="row.maxQty" ng-model="row.qty" ng-keydown="initCheckKeypress($event)" />
-                </td>
-                <td width="60" style="font-weight: bold;" class="text-right">{{((row.price || 0) - (row.discount || 0)) * (row.qty || 0)}}</td>
-                <td width="60"><a href="#" class="btn btn-xs btn-danger pull-right" ng-click="remove(row)">Delete</a></td>
-            </tr>
-            <tr ng-repeat-end="row in items track by $index" ng-if="show_bundle">
-                <td colspan="9">
-                    <table style="margin-left: auto;" cellpadding="0" cellspacing="0">
-                        <tr>
-                            <td width="100px" style="padding: 8px" class="text-right">Bundles</td>
-                            <td colspan="{{show_discount ? 2 : 1}}">
-                                <input type="number" class="form-control" ng-model="row.pack_qty" placeholder="No of Bundles" ng-change="calculateSum()" />
-                            </td>
-                            <td class="text-right" style="padding: 8px">Bundle Size</td>
-                            <td>
-                                <input type="number" class="form-control" ng-model="row.pack_size" placeholder="Products In Bundle" ng-change="calculateSum()" />
-                            </td>
-                            <td class="text-right" style="padding: 8px">Ex. Items</td>
-                            <td>
-                                <input type="number" class="form-control" ng-model="row.unpack_qty" placeholder="Extra Products" ng-change="calculateSum()" />
-                            </td>
-                            <td style="padding: 8px">Total Qty</td>
-                            <td style="padding: 8px; font-weight: bold; font-size: 1.5em">{{row.qty + row.unpack_qty}}</td>
-                        </tr>
-                    </table>
-                </td>
-            </tr>
-        </tbody>
-        <tbody>
-            <tr>
-                <th rowspan="10"></th>
-                <th class="text-right" colspan="7">Sub Total</th>
-                <th>{{subTotal}}</th>
-            </tr>
-            <tr>
-                <td class="text-right" colspan="7">Given Discount</td>
-                <td><strong>{{givenDiscount | number: 2}}</strong></td>
-            </tr>
-            <tr ng-if="order.order.paid_amount">
-                <th class="text-right" colspan="7">Paid Total</th>
-                <th>{{order.order.paid_amount}}</th>
-            </tr>
-            <tr>
-                <th class="text-right" colspan="7">Discount</td>
-                <td width="150"><input type="search" ng-model="discountAmount" class="form-control" on-enter-press="addDiscount(discountAmount)"></td>
-            </tr>
-            <tr>
-                <td class="text-right" colspan="7">Additional Discount</td>
-                <td><strong>{{discount | number: 2}}</strong></td>
-            </tr>
-            <tr ng-if="grandTotal">
-                <th class="text-right" colspan="7">Grand Total</th>
-                <th>{{grandTotal}}</th>
-            </tr>
-            <tr ng-if="grandTotal">
-                <th class="text-right" colspan="7">Pay Amount</th>
-                <th width="200"><input type="number" ng-model="payment_amount" ng-change="calcBalanc(payment_amount)" class="form-control"></th>
-            </tr>
-            <tr ng-if="grandTotal">
-                <th class="text-right" colspan="7">Closing Balance</th>
-                <th width="200">{{ payment_amount - grandTotal }}</th>
-            </tr>
-        </tbody>
-        <tbody>
-            <tr>
-                <th colspan="2">
-                    <?php if (!empty($order['order']['main_shop_rid']) && $order['order']['main_shop_rid'] == $userData['shopId'] && $userData['role'] === 'owner') { ?>
-                        <a href="#" class="btn btn-danger" ng-click="checkout(2)"> Approve Return </a>
-                    <?php } ?>
-                </th>
-                <th colspan="7" class="text-right">
-                    <div class="btn-group">
-                        <label class="btn btn-default" ng-repeat="li in modes">
-                            <input type="radio" name="mode" ng-model="payment_mode" ng-value="li.id" ng-change="printValue(li)">
-                            {{li.title}}
-                        </label>
-                    </div>
-                    <?php if (!empty($order['order']['main_shop_rid']) && $order['order']['main_shop_rid'] == $userData['shopId'] && $userData['role'] === 'owner') { ?>
-                        <a href="#" class="btn btn-success" ng-click="checkout()"> Save</a>
-                    <?php } elseif ($userData['role'] === 'owner') { ?>
-                        <a href="#" class="btn btn-primary" ng-click="checkout(2)"> Return Submit</a>
-                    <?php } else { ?>
-                        <a href="#" class="btn btn-success" ng-click="checkout()"> Save</a>
-                    <?php } ?>
-                </th>
-            </tr>
-        </tbody>
-    </table>
+                    <td width="100"><input type="number" class="form-control" ng-model="row.price" ng-change="calculateSum()" /></td>
+                    <td width="100">
+                        <input type="number" class="form-control" ng-change="isValid(row,  calculateSum)" max="row.maxQty" ng-model="row.qty" ng-keydown="initCheckKeypress($event)" />
+                    </td>
+                    <td width="60" style="font-weight: bold;" class="text-right">{{((row.price || 0) - (row.discount || 0)) * (row.qty || 0)}}</td>
+                    <td width="60"><a href="#" class="btn btn-xs btn-danger pull-right" ng-click="remove(row)">Delete</a></td>
+                </tr>
+                <tr ng-repeat-end="row in items track by $index" ng-if="show_bundle">
+                    <td colspan="9">
+                        <table style="margin-left: auto;" cellpadding="0" cellspacing="0">
+                            <tr>
+                                <td width="100px" style="padding: 8px" class="text-right">Bundles</td>
+                                <td colspan="{{show_discount ? 2 : 1}}">
+                                    <input type="number" class="form-control" ng-model="row.pack_qty" placeholder="No of Bundles" ng-change="calculateSum()" />
+                                </td>
+                                <td class="text-right" style="padding: 8px">Bundle Size</td>
+                                <td>
+                                    <input type="number" class="form-control" ng-model="row.pack_size" placeholder="Products In Bundle" ng-change="calculateSum()" />
+                                </td>
+                                <td class="text-right" style="padding: 8px">Ex. Items</td>
+                                <td>
+                                    <input type="number" class="form-control" ng-model="row.unpack_qty" placeholder="Extra Products" ng-change="calculateSum()" />
+                                </td>
+                                <td style="padding: 8px">Total Qty</td>
+                                <td style="padding: 8px; font-weight: bold; font-size: 1.5em">{{row.qty + row.unpack_qty}}</td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </tbody>
+            <tbody>
+                <tr>
+                    <th rowspan="10"></th>
+                    <th class="text-right" colspan="7">Sub Total</th>
+                    <th>{{subTotal}}</th>
+                </tr>
+                <tr>
+                    <td class="text-right" colspan="7">Given Discount</td>
+                    <td><strong>{{givenDiscount | number: 2}}</strong></td>
+                </tr>
+                <tr ng-if="order.order.paid_amount">
+                    <th class="text-right" colspan="7">Paid Total</th>
+                    <th>{{order.order.paid_amount}}</th>
+                </tr>
+                <tr>
+                    <th class="text-right" colspan="7">Discount</td>
+                    <td width="150"><input type="search" ng-model="discountAmount" class="form-control" on-enter-press="addDiscount(discountAmount)"></td>
+                </tr>
+                <tr>
+                    <td class="text-right" colspan="7">Additional Discount</td>
+                    <td><strong>{{discount | number: 2}}</strong></td>
+                </tr>
+                <tr ng-if="grandTotal">
+                    <th class="text-right" colspan="7">Grand Total</th>
+                    <th>{{grandTotal}}</th>
+                </tr>
+                <tr ng-if="grandTotal">
+                    <th class="text-right" colspan="7">Pay Amount</th>
+                    <th width="200"><input type="number" ng-model="payment_amount" ng-change="calcBalanc(payment_amount)" class="form-control"></th>
+                </tr>
+                <tr ng-if="grandTotal">
+                    <th class="text-right" colspan="7">Closing Balance</th>
+                    <th width="200">{{ payment_amount - grandTotal }}</th>
+                </tr>
+            </tbody>
+            <tbody>
+                <tr>
+                    <th colspan="2">
+                        <?php if (!empty($order['order']['main_shop_rid']) && $order['order']['main_shop_rid'] == $userData['shopId'] && $userData['role'] === 'owner') { ?>
+                            <a href="#" class="btn btn-danger" ng-click="checkout(2)"> Approve Return </a>
+                        <?php } ?>
+                    </th>
+                    <th colspan="7" class="text-right">
+                        <div class="btn-group">
+                            <label class="btn btn-default" ng-repeat="li in modes">
+                                <input type="radio" name="mode" ng-model="payment_mode" ng-value="li.id" ng-change="printValue(li)">
+                                {{li.title}}
+                            </label>
+                        </div>
+                        <?php if (!empty($order['order']['main_shop_rid']) && $order['order']['main_shop_rid'] == $userData['shopId'] && $userData['role'] === 'owner') { ?>
+                            <a href="#" class="btn btn-success" ng-click="checkout()"> Save</a>
+                        <?php } elseif ($userData['role'] === 'owner') { ?>
+                            <a href="#" class="btn btn-primary" ng-click="checkout(2)"> Return Submit</a>
+                        <?php } else { ?>
+                            <a href="#" class="btn btn-success" ng-click="checkout()"> Save</a>
+                        <?php } ?>
+                    </th>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </div>
 <?php
 echo mainFooter();

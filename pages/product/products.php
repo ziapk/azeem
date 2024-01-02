@@ -59,71 +59,72 @@ $programs = $programObj->getPrograms();
             </div>
         </div>
     </div>
-
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th ng-click="sortBy('title')" ng-class="{active: sortByField === 'title'}">Title / Author - Group <em class="fa sort-icon fa-sort-amount-asc" ng-if="sortByOrder === 'asc'"></em> <em class="fa sort-icon fa-sort-amount-desc" ng-if="sortByOrder === 'desc'"></em></th>
-                <th>Description/Note</th>
-                <th>SKU/Code</th>
-                <th ng-click="sortBy('price')" ng-class="{active: sortByField === 'price'}">Price <em class="fa sort-icon fa-sort-amount-asc" ng-if="sortByOrder === 'asc'"></em> <em class="fa sort-icon fa-sort-amount-desc" ng-if="sortByOrder === 'desc'"></em></th>
-                <th ng-click="sortBy('stock')" ng-class="{active: sortByField === 'stock'}">In Stock <em class="fa sort-icon fa-sort-amount-asc" ng-if="sortByOrder === 'asc'"></em> <em class="fa sort-icon fa-sort-amount-desc" ng-if="sortByOrder === 'desc'"></em></th>
-                <th width="150"></th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr ng-repeat="li in list">
-                <td><strong>{{li.full_name}}</strong> <br />{{li.author}} - {{li.group}} - {{li.publisherName}}</td>
-                <td><span uib-tooltip="Racks" class="text-danger text-bold" style="font-size: 1.3em;"><img width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/bookshelf.png" alt="" /> {{li.rackNumbers.split(',').join(' | ')}}</span> <br />{{li.description}} <br /> {{li.note}}
-                </td>
-                <td>
-                    <span class="dropdown" style="padding: 0">
-                        <a href="#" data-toggle="dropdown">
-                            <span><img class="fa" width="14" height="14" src="<?php echo SITE_URL; ?>assets/img/svg/qrcode.svg" alt="" /><code>{{li.code || li.id}}</code></span>
-                        </a>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th ng-click="sortBy('title')" ng-class="{active: sortByField === 'title'}">Title / Author - Group <em class="fa sort-icon fa-sort-amount-asc" ng-if="sortByOrder === 'asc'"></em> <em class="fa sort-icon fa-sort-amount-desc" ng-if="sortByOrder === 'desc'"></em></th>
+                    <th>Description/Note</th>
+                    <th>SKU/Code</th>
+                    <th ng-click="sortBy('price')" ng-class="{active: sortByField === 'price'}">Price <em class="fa sort-icon fa-sort-amount-asc" ng-if="sortByOrder === 'asc'"></em> <em class="fa sort-icon fa-sort-amount-desc" ng-if="sortByOrder === 'desc'"></em></th>
+                    <th ng-click="sortBy('stock')" ng-class="{active: sortByField === 'stock'}">In Stock <em class="fa sort-icon fa-sort-amount-asc" ng-if="sortByOrder === 'asc'"></em> <em class="fa sort-icon fa-sort-amount-desc" ng-if="sortByOrder === 'desc'"></em></th>
+                    <th width="150"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="li in list">
+                    <td><strong>{{li.full_name}}</strong> <br />{{li.author}} - {{li.group}} - {{li.publisherName}}</td>
+                    <td><span uib-tooltip="Racks" class="text-danger text-bold" style="font-size: 1.3em;"><img width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/bookshelf.png" alt="" /> {{li.rackNumbers.split(',').join(' | ')}}</span> <br />{{li.description}} <br /> {{li.note}}
+                    </td>
+                    <td>
+                        <span class="dropdown" style="padding: 0">
+                            <a href="#" data-toggle="dropdown">
+                                <span><img class="fa" width="14" height="14" src="<?php echo SITE_URL; ?>assets/img/svg/qrcode.svg" alt="" /><code>{{li.code || li.id}}</code></span>
+                            </a>
+                            <?php if ($userData['role'] === 'owner') { ?>
+                                <form ng-submit="submitCode(li)" class="dropdown-menu" style="padding: 20px; width: 300px">
+                                    <div class="input-group">
+                                        <input type="text" placeholder="Bar Code" ng-model="li.newBarCode" type="text" class="form-control">
+                                        <span class="input-group-btn" style="width: 100px">
+                                            <input type="text" placeholder="Price" ng-model="li.newPrice" ng-value="li.price" type="text" class="form-control">
+                                        </span>
+                                        <span class="input-group-btn">
+                                            <button type="submit" class="btn btn-primary">Submit</button>
+                                        </span>
+                                    </div>
+                                </form>
+                            <?php } ?>
+                        </span>
+                    </td>
+                    <td>{{li.price}}</td>
+                    <td>{{li.in_hand < 0 ? 0 : li.in_hand}}</td>
+                    <td width="230">
+                        <a style="padding-left: 0; padding-right: 0" ng-if="li.pin != 1" href="javascript:void(0)" ng-click="addBookmark(li)" class="btn btn-bookmark" uib-tooltip="Pin as running items"><span class="fa fa-heart-o"></span></a>
+                        <a style="padding-left: 0; padding-right: 0" ng-if="li.pin == 1" href="javascript:void(0)" ng-click="removeBookmark(li)" class="btn btn-bookmark" uib-tooltip="Remove from Running items list"><span class="fa fa-heart"></span></a>
                         <?php if ($userData['role'] === 'owner') { ?>
-                            <form ng-submit="submitCode(li)" class="dropdown-menu" style="padding: 20px; width: 300px">
-                                <div class="input-group">
-                                    <input type="text" placeholder="Bar Code" ng-model="li.newBarCode" type="text" class="form-control">
-                                    <span class="input-group-btn" style="width: 100px">
-                                        <input type="text" placeholder="Price" ng-model="li.newPrice" ng-value="li.price" type="text" class="form-control">
-                                    </span>
-                                    <span class="input-group-btn">
-                                        <button type="submit" class="btn btn-primary">Submit</button>
-                                    </span>
-                                </div>
-                            </form>
+                            <a style="padding-left: 0; padding-right: 5px" ng-if="li.dup == 0" href="javascript:void(0)" ng-click="addDuplicate(li)" class="btn btn-bookmark" uib-tooltip="Mark as duplicate"><span class="fa fa-copy text-mute"></span></a>
+                            <a style="padding-left: 0; padding-right: 5px" ng-if="li.dup == 1" href="javascript:void(0)" ng-click="removeDuplicate(li)" class="btn btn-bookmark" uib-tooltip="Remove from duplicate"><span class="fa fa-copy text-danger"></span></a>
+                            <a ng-if="li.priority == '1'" href="javascript:void(0)" ng-click="setPriority(li)" class="btn btn-priority" uib-tooltip="Mark No Priority"><span class="fa fa-lg fa-check-circle text-success"></span></a>
+                            <a ng-if="li.priority != '1'" href="javascript:void(0)" ng-click="setPriority(li)" class="btn btn-priority" uib-tooltip="Mark Priority"><span class="fa fa-lg fa-check-circle-o text-mute"></span></a>
+                            <a href="javascript:void(0)" ng-click="setInactive(li)" class="btn btn-dup" uib-tooltip="Mark Inactive"><span class="fa fa-remove text-danger"></span></a>
                         <?php } ?>
-                    </span>
-                </td>
-                <td>{{li.price}}</td>
-                <td>{{li.in_hand < 0 ? 0 : li.in_hand}}</td>
-                <td width="230">
-                    <a style="padding-left: 0; padding-right: 0" ng-if="li.pin != 1" href="javascript:void(0)" ng-click="addBookmark(li)" class="btn btn-bookmark" uib-tooltip="Pin as running items"><span class="fa fa-heart-o"></span></a>
-                    <a style="padding-left: 0; padding-right: 0" ng-if="li.pin == 1" href="javascript:void(0)" ng-click="removeBookmark(li)" class="btn btn-bookmark" uib-tooltip="Remove from Running items list"><span class="fa fa-heart"></span></a>
-                    <?php if ($userData['role'] === 'owner') { ?>
-                        <a style="padding-left: 0; padding-right: 5px" ng-if="li.dup == 0" href="javascript:void(0)" ng-click="addDuplicate(li)" class="btn btn-bookmark" uib-tooltip="Mark as duplicate"><span class="fa fa-copy text-mute"></span></a>
-                        <a style="padding-left: 0; padding-right: 5px" ng-if="li.dup == 1" href="javascript:void(0)" ng-click="removeDuplicate(li)" class="btn btn-bookmark" uib-tooltip="Remove from duplicate"><span class="fa fa-copy text-danger"></span></a>
-                        <a ng-if="li.priority == '1'" href="javascript:void(0)" ng-click="setPriority(li)" class="btn btn-priority" uib-tooltip="Mark No Priority"><span class="fa fa-lg fa-check-circle text-success"></span></a>
-                        <a ng-if="li.priority != '1'" href="javascript:void(0)" ng-click="setPriority(li)" class="btn btn-priority" uib-tooltip="Mark Priority"><span class="fa fa-lg fa-check-circle-o text-mute"></span></a>
-                        <a href="javascript:void(0)" ng-click="setInactive(li)" class="btn btn-dup" uib-tooltip="Mark Inactive"><span class="fa fa-remove text-danger"></span></a>
-                    <?php } ?>
-                    <a uib-tooltip="Add to Cart" ng-click="addToCart(li)" class="btn btn-xs"><img width="18" height="18" src="<?php echo SITE_URL; ?>assets/img/svg/002-add-to-cart.svg" alt="" /></a>
-                    <?php if ($userData['role'] === 'owner') { ?>
-                        <a class="btn btn-primary btn-xs" href="<?php echo SITE_URL . "pages/product/update.php?id=" ?>{{li.id}}"><span class="fa fa-edit"></span></a> <a class="btn btn-danger btn-xs" href="<?php echo SITE_URL . "pages/product/create.php?id=" ?>{{li.id}}"><span class="fa fa-copy"></span></a>
-                    <?php } ?>
-                </td>
-            </tr>
-        </tbody>
-    </table>
+                        <a uib-tooltip="Add to Cart" ng-click="addToCart(li)" class="btn btn-xs"><img width="18" height="18" src="<?php echo SITE_URL; ?>assets/img/svg/002-add-to-cart.svg" alt="" /></a>
+                        <?php if ($userData['role'] === 'owner') { ?>
+                            <a class="btn btn-primary btn-xs" href="<?php echo SITE_URL . "pages/product/update.php?id=" ?>{{li.id}}"><span class="fa fa-edit"></span></a> <a class="btn btn-danger btn-xs" href="<?php echo SITE_URL . "pages/product/create.php?id=" ?>{{li.id}}"><span class="fa fa-copy"></span></a>
+                        <?php } ?>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 
-    <div style="display: flex; align-items: center; justify-content: space-between">
+    <div class="pagination-custom">
         <ul uib-pagination total-items="data.totalRecords" ng-model="currentPage" max-size="maxSize" class="pagination-sm" boundary-links="true" force-ellipses="true" ng-if="data.perPage < data.totalRecords" items-per-page="data.perPage" ng-change="pageChanged(currentPage)"></ul> <span>Per Page <select ng-change="perPage()" ng-model="data.perPage">
                 <option ng-value="10">10</option>
                 <option ng-value="25">25</option>
                 <option ng-value="50">50</option>
                 <option ng-value="100">100</option>
-            </select></span> <span>Total number of Records <strong>{{data.totalRecords}}</strong></span>
+            </select></span> <span>Total Records <strong>{{data.totalRecords}}</strong></span>
     </div>
 
 </div>

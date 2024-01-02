@@ -1,5 +1,7 @@
 <?php
+session_start();
 include_once dirname(__FILE__) . '/../../include/settings.php';
+global $shop;
 $doubleEntryObj = new DoubleEntry();
 $ids = [];
 if ($userData['role'] === 'owner') {
@@ -38,67 +40,75 @@ echo mainHeader(['page' => 'coa']);
             Create
         </a>
         <h4 class="clearfix" style="margin-top: 0">General Journal</h4>
-        <table class="table table-sm table-func table-hover">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Date</th>
-                    <th>Account</th>
-                    <th>Account Code</th>
-                    <th>Description</th>
-                    <th>Debit</th>
-                    <th>Credit</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tfoot>
-                <tr>
-                    <th>#</th>
-                    <th>Date</th>
-                    <th>Account</th>
-                    <th>Account Code</th>
-                    <th>Description</th>
-                    <th>Debit</th>
-                    <th>Credit</th>
-                    <th></th>
-                </tr>
-            </tfoot>
-            <tbody>
-                <?php $count = 1;
-                foreach ($grouping as $id => $rows) {  ?>
+        <div class="input-group">
+            <input date-range-picker class="form-control date-picker" type="text" ng-model="datePicker.date" options="{ locale: {format: 'DD/MM/YYYY'}}" />
+            <div class="input-group-btn">
+                <input type="submit" value="Submit" name="report" class="btn btn-primary" />
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-sm table-func table-hover">
+                <thead>
                     <tr>
-                        <td>
-                            <?php echo $count; ?>
-                        </td>
-                        <td>
-                            <?php echo $rows[0]['transaction_date']; ?>
-                        </td>
-                        <td colspan="6">
-                            TID: <?php echo $rows[0]['transaction_id']; ?> |
-                            <?php echo $rows[0]['reference']; ?> [ <?php echo $rows['0']['v_description']; ?> ]
-                            <?php if ($userData['role'] === 'owner') { ?><a href="javascript:void(0)" class="text-danger" ng-click="deleteTransaction(<?php echo $id; ?>)">Delete Transaction</a><?php } ?>
-                            <?php if ($userData['role'] === 'owner') { ?><a href="javascript:void(0)" class="text-danger" ng-click='addCustomer(<?php echo json_encode($rows['0']); ?>)'>EDIT</a><?php } ?>
-                            <?php if ($userData['role'] === 'owner') { ?><a href="javascript:void(0)" class="text-danger" ng-click='printRecipt(<?php echo $id; ?>)'>Print</a><?php } ?>
-                        </td>
+                        <th>#</th>
+                        <th>Date</th>
+                        <th>Account</th>
+                        <th>Account Code</th>
+                        <th>Description</th>
+                        <th>Debit</th>
+                        <th>Credit</th>
+                        <th></th>
                     </tr>
-                    <?php foreach ($rows as $key => $product) { ?>
+                </thead>
+                <tfoot>
+                    <tr>
+                        <th>#</th>
+                        <th>Date</th>
+                        <th>Account</th>
+                        <th>Account Code</th>
+                        <th>Description</th>
+                        <th>Debit</th>
+                        <th>Credit</th>
+                        <th></th>
+                    </tr>
+                </tfoot>
+                <tbody>
+                    <?php $count = 1;
+                    foreach ($grouping as $id => $rows) {  ?>
                         <tr>
-                            <td></td>
-                            <td></td>
-                            <td><?php echo $accountAssoc[$product['account_id']]['title']; ?></td>
-                            <td><?php echo $accountAssoc[$product['account_id']]['code']; ?></td>
-                            <td><?php echo $product['description']; ?></td>
-                            <td><?php echo ($product['entry_type'] == 'D') ? $product['amount'] : '' ?></td>
-                            <td><?php if ($product['entry_type'] == 'C') {
-                                    echo $product['amount'];
-                                } ?></td>
-                            <td></td>
+                            <td>
+                                <?php echo $count; ?>
+                            </td>
+                            <td>
+                                <?php echo $rows[0]['transaction_date']; ?>
+                            </td>
+                            <td colspan="6">
+                                TID: <?php echo $rows[0]['transaction_id']; ?> |
+                                <?php echo $rows[0]['reference']; ?> [ <?php echo $rows['0']['v_description']; ?> ]
+                                <?php if ($userData['role'] === 'owner') { ?><a href="javascript:void(0)" class="text-danger" ng-click="deleteTransaction(<?php echo $id; ?>)">Delete Transaction</a><?php } ?>
+                                <?php if ($userData['role'] === 'owner') { ?><a href="javascript:void(0)" class="text-danger" ng-click='addCustomer(<?php echo json_encode($rows['0']); ?>)'>EDIT</a><?php } ?>
+                                <?php if ($userData['role'] === 'owner') { ?><a href="javascript:void(0)" class="text-danger" ng-click='printRecipt(<?php echo $id; ?>)'>Print</a><?php } ?>
+                            </td>
                         </tr>
-                <?php }
-                    $count++;
-                } ?>
-            </tbody>
-        </table>
+                        <?php foreach ($rows as $key => $product) { ?>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td><?php echo $accountAssoc[$product['account_id']]['title']; ?></td>
+                                <td><?php echo $accountAssoc[$product['account_id']]['code']; ?></td>
+                                <td><?php echo $product['description']; ?></td>
+                                <td><?php echo ($product['entry_type'] == 'D') ? $product['amount'] : '' ?></td>
+                                <td><?php if ($product['entry_type'] == 'C') {
+                                        echo $product['amount'];
+                                    } ?></td>
+                                <td></td>
+                            </tr>
+                    <?php }
+                        $count++;
+                    } ?>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 <script type="text/ng-template" id="addCustomer.html">

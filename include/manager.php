@@ -34,20 +34,30 @@ $customersList = $customerObj->getCustomers($shop['id']);
     <div class="container-fluid">
       <!-- Brand and toggle get grouped for better mobile display -->
       <div class="navbar-header">
+        <div class="visible-xs" style="position: absolute; left: 0; top: 0; padding: 6px 10px; text-align: center; line-height: 45px; width: 57px">
+          <a ng-click="showSidebar = !showSidebar" style="color: #fff" href="javascript:void(0)"><span class="fa fa-list"></span></a>
+        </div>
         <div class="logo pull-left">
-          <a href="<?php echo SITE_URL; ?>" title=""><?php if (!empty($shopData['image'])) { ?>
-              <span class="fa">&#xf260;</span> Smart Commerce
-            <?php } else { ?>
+          <a href="<?php echo SITE_URL; ?>" title="">
+            <span class="hidden-xs">
+              <?php if (!empty($shopData['image'])) { ?>
+                <img style="width: 120px; max-height: 45px" style="vertical-align: middle; filter: grayscale(100%);" src="<?php echo SITE_URL; ?>assets/clients/<?php echo $shop['image']; ?>" />
+              <?php } else { ?>
+                <img width="60" src="<?php echo SITE_URL; ?>assets/img/logo.png" alt="" />
+              <?php } ?>
+            </span>
+            <span class="visible-xs" style="padding-left: 57px;">
               <img width="60" src="<?php echo SITE_URL; ?>assets/img/logo.png" alt="" />
-            <?php } ?></a>
+            </span>
+          </a>
         </div>
         <div class="pull-left welcome-header-section">
-          <span>Welcome <strong><?php echo $userData['full_name']; ?>!</strong></span>
+          <span class="hidden-xs"><strong><?php echo $userData['full_name']; ?> (<?php echo $shop['full_name']; ?>)</strong></span>
           <a href="javascript:void(0)" uib-tooltip="Refresh Products" tooltip-placement="right" ng-click="loadProduct('', true)" class="btn btn-primary btn-xs" style="margin-left: 10px"><span class="fa fa-refresh"></span></a>
         </div>
         <ul class="list-inline navbar-right navbar-nav nav">
           <?php if ($shop['sale_date_show']) { ?><div class="pull-left welcome-header-section sale-date"><button class="btn btn-danger" ng-click="applyClosing()"><span>Sale Close</span></button></div><?php } ?>
-          <li class="dropdown" style="padding: 0">
+          <li class="hidden-xs dropdown" style="padding: 0">
             <a href="#" class="nav-menu-item btn btn-primary" data-toggle="dropdown">
               <img src="<?php echo SITE_URL . 'assets/img/stationary.png'; ?>" alt="" width="40" height="40" style="margin: -10px 0" />
             </a>
@@ -70,27 +80,7 @@ $customersList = $customerObj->getCustomers($shop['id']);
               <?php } ?>
             </ul>
           </li>
-          <li class="dropdown" style="padding: 0">
-            <a href="#" class="nav-menu-item btn btn-primary" data-toggle="dropdown" uib-tooltip="Calculator" tooltip-placement="bottom" title="">
-              Calc
-            </a>
-            <form ng-submit="" class="dropdown-menu" style="padding: 20px; width: 300px">
-              <div class="row">
-                <div class="col-xs-6">
-                  <div class="form-group">
-                    <input type="number" placeholder="Qty" ng-model="frm.qty" type="text" class="form-control input-lg">
-                  </div>
-                </div>
-                <div class="col-xs-6">
-                  <div class="form-group">
-                    <input type="number" placeholder="Price" ng-model="frm.price" type="text" class="form-control input-lg">
-                  </div>
-                </div>
-              </div>
-              Total: {{(frm.price * frm.qty || 0) | number:2}}
-            </form>
-          </li>
-          <li class="dropdown" style="padding: 0">
+          <li class="hidden-xs dropdown" style="padding: 0">
             <a href="#" class="nav-menu-item btn btn-primary" data-toggle="dropdown" uib-tooltip="Receivings" tooltip-placement="bottom" title="">
               Re.
             </a>
@@ -115,7 +105,7 @@ $customersList = $customerObj->getCustomers($shop['id']);
               <label class="pull-right"><input type="checkbox" name="adjustment" ng-model="payment.adjustment"> Adjustment</label>
             </form>
           </li>
-          <li class="dropdown" style="padding: 0">
+          <li class="hidden-xs dropdown" style="padding: 0">
             <a href="#" class="nav-menu-item btn btn-primary" data-toggle="dropdown" uib-tooltip="Payments" tooltip-placement="bottom" title="">
               Pay
             </a>
@@ -153,34 +143,7 @@ $customersList = $customerObj->getCustomers($shop['id']);
               </div>
             </form>
           </li>
-          <!-- <li class="dropdown" style="padding: 0">
-            <a href="#" class="nav-menu-item btn btn-primary" data-toggle="dropdown" uib-tooltip="Royalty" tooltip-placement="bottom" title="">
-              Roy.
-            </a>
-            <form ng-submit="directPayment(2)" class="dropdown-menu" style="padding: 15px; width: 320px">
-              <div class="form-group">
-                <div class="form-group">
-                  <ui-select custom-dropdown ng-model="payment.supplier" theme="bootstrap" ng-disabled="disabled" reset-search-input="false" title="Choose an author">
-                    <ui-select-match placeholder="Enter a supplier...">{{$select.selected.name}}</ui-select-match>
-                    <ui-select-choices repeat="address in authorsList track by $index" refresh="refreshAuthors($select.search)" refresh-delay="0">
-                      <div style="white-space: wrap;" ng-bind-html="address.name | highlight: $select.search"></div>
-                    </ui-select-choices>
-                  </ui-select>
-                </div>
-              </div>
-              <div class="form-group">
-                <input placeholder="Description" ng-model="payment.summery" type="text" class="form-control input-lg">
-              </div>
-              <div class="row" style="margin: 0 -6px">
-                <div class="form-group col-sm-4" ng-repeat="mode in modes" style="padding: 0 3px">
-                  <input placeholder="{{mode.title}}" ng-model="payment.mode[mode.id]" type="text" class="form-control input-lg">
-                </div>
-              </div>
-              <input type="submit" value="Submit" class="btn btn-primary">
-              <label class="pull-right"><input type="checkbox" name="adjustment" ng-model="payment.adjustment"> Adjustment</label>
-            </form>
-          </li> -->
-          <li class="dropdown" style="padding: 0">
+          <li class="hidden-xs dropdown" style="padding: 0">
             <a href="#" class="nav-menu-item btn btn-primary" data-toggle="dropdown" uib-tooltip="Expenses" tooltip-placement="bottom" title="">
               Exp
             </a>
@@ -204,12 +167,7 @@ $customersList = $customerObj->getCustomers($shop['id']);
               <input type="submit" value="Submit" class="btn btn-primary">
             </form>
           </li>
-          <li style="padding: 0; margin-right: -1px">
-            <a class="nav-menu-item btn btn-primary" href="<?php echo SITE_URL . 'pages/orders/adjustment.php'; ?>">
-              Returns
-            </a>
-          </li>
-          <li class="dropdown" style="padding: 0">
+          <li class="hidden-xs dropdown" style="padding: 0">
             <a href="#" class="nav-menu-item btn btn-primary" data-toggle="dropdown">
               Create
             </a>
@@ -218,22 +176,22 @@ $customersList = $customerObj->getCustomers($shop['id']);
               <li><a class="dropdown-item" href="<?php echo SITE_URL . 'pages/supply'; ?>">+ Supply</a></li>
               <li><a class="dropdown-item" href="<?php echo SITE_URL; ?>pages/demand/create.php">+ Demand</a></li>
               <li><a class="dropdown-item" href="<?php echo SITE_URL; ?>pages/recipt/" target="_blank">+ Recipt</a></li>
+              <li><a class="dropdown-item" href="<?php echo SITE_URL; ?>pages/recipt/" target="_blank">+ Recipt</a></li>
+              <li><a class="dropdown-item" href="<?php echo SITE_URL . 'pages/orders/adjustment.php'; ?>">+ Returns</a></li>
               <li><a class="dropdown-item" href="<?php echo SITE_URL; ?>pages/ob/" target="_blank">+ Opening Balance</a></li>
             </ul>
           </li>
 
-          <li><a style="padding-left: 8px; padding-right: 8px" uib-tooltip="Reports" tooltip-placement="bottom" title="" href="<?php echo SITE_URL . 'pages/reports'; ?>"><small><small class="text-small"><img class="fa" width="24" height="24" src="<?php echo SITE_URL; ?>assets/img/svg/reports.svg" alt="" /></small></small></a></li>
-          <li><a href="<?php echo SITE_URL; ?>pages/product/running.php"><img width="22" uib-tooltip="Running Products" tooltip-placement="bottom" height="22" src="<?php echo SITE_URL; ?>assets/img/svg/lightning-bolt.svg" alt="" /></a></li>
+          <li class="hidden-xs"><a style="padding-left: 8px; padding-right: 8px" uib-tooltip="Reports" tooltip-placement="bottom" title="" href="<?php echo SITE_URL . 'pages/reports'; ?>"><small><small class="text-small"><img class="fa" width="24" height="24" src="<?php echo SITE_URL; ?>assets/img/svg/reports.svg" alt="" /></small></small></a></li>
+          <li class="hidden-xs"><a href="<?php echo SITE_URL; ?>pages/product/running.php"><img width="22" uib-tooltip="Running Products" tooltip-placement="bottom" height="22" src="<?php echo SITE_URL; ?>assets/img/svg/lightning-bolt.svg" alt="" /></a></li>
           <?php include_once dirname(__FILE__) . '/cart.php'; ?>
-          <li>
+          <li class="profile-menu">
             <a title="" href="javascript:void(0)" data-toggle="dropdown" tooltip-placement="bottom" uib-tooltip="Settings"><span class="fa fa-cog"></span> <span class="caret"></span></a>
             <ul class="dropdown-menu">
               <li><a title="" href="<?php echo SITE_URL; ?>pages/profile">Profile</a></li>
-              <li class="divider"></li>
               <li><a title="" ng-click="makeClosing(currentShop.id, currentShop)" href="javascript:void(0)">Closing</a></li>
-              <li class="divider"></li>
+              <li><a href="<?php echo SITE_URL . 'pages/orders/adjustment.php'; ?>">Returns</a></li>
               <li><a title="" href="<?php echo SITE_URL; ?>logout.php">Logout</a></li>
-              <li class="divider"></li>
               <li style="padding: 0 10px">
                 <table width="100%" style="margin: auto;">
                   <tr>
@@ -255,7 +213,7 @@ $customersList = $customerObj->getCustomers($shop['id']);
   </nav>
   <?php
   if (empty($params['hideSidebar'])) { ?>
-    <div class="sidebar">
+    <div class="sidebar" ng-class="{'showSidebar': showSidebar}">
       <ul class="nav">
         <li class="<?php if ($params['page'] == 'product-create') {
                       echo 'active';
@@ -307,9 +265,9 @@ $customersList = $customerObj->getCustomers($shop['id']);
         <!-- <li class="<?php if ($params['page'] == 'least') {
                           echo 'active';
                         } ?>"><a uib-tooltip="Least Products" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/product/least.php"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/product.svg" alt="" /> <span class="nav-menu-text">Min Products</span></a></li> -->
-        <li class="<?php if ($params['page'] == 'product' && $_GET["status"] == '0') {
-                      echo 'active';
-                    } ?>"><a uib-tooltip="Products" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/product/products.php?status=0"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/product.svg" alt="" /> <span class="nav-menu-text">In-Active Products</span></a></li>
+        <!-- <li class="<?php if ($params['page'] == 'product' && $_GET["status"] == '0') {
+                          echo 'active';
+                        } ?>"><a uib-tooltip="Products" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/product/products.php?status=0"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/product.svg" alt="" /> <span class="nav-menu-text">In-Active Products</span></a></li> -->
         <li class="<?php if ($params['page'] == 'coa') {
                       echo 'active';
                     } ?>"><a uib-tooltip="Chart of Accounts" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/chart-of-accounts"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/accounting.png" alt="" /> <span class="nav-menu-text">Accounts</span></a></li>

@@ -121,13 +121,13 @@ foreach ($publishersArr as $key => $value) {
             </tbody>
         </table>
     </div>
-    <div style="display: flex; align-items: center; justify-content: space-between">
+    <div class="pagination-custom">
         <ul uib-pagination total-items="data.totalRecords" ng-model="currentPage" max-size="maxSize" class="pagination-sm" boundary-links="true" force-ellipses="true" ng-if="data.perPage < data.totalRecords" items-per-page="data.perPage" ng-change="pageChanged(currentPage)"></ul> <span>Per Page <select ng-change="perPage()" ng-model="data.perPage">
                 <option ng-value="10">10</option>
                 <option ng-value="25">25</option>
                 <option ng-value="50">50</option>
                 <option ng-value="100">100</option>
-            </select></span> <span>Total number of Records <strong>{{data.totalRecords}}</strong></span>
+            </select></span> <span>Total Records <strong>{{data.totalRecords}}</strong></span>
     </div>
 
 

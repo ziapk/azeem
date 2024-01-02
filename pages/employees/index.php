@@ -52,41 +52,42 @@ function getMonthListBetweenDates($from, $to, $format = "F-Y-d", $intervals = '1
             </div>
         </div>
     </div>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Contact</th>
-                <th>Title / Company / Address</th>
-                <th>Status</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr ng-repeat="li in list">
-                <td>{{li.id}}</td>
-                <td><strong>{{li.full_name}}</strong> <br /> {{li.phoneNumber}}</td>
-                <td><strong>{{li.company}}</strong> - {{li.title}} <br />{{li.address}}</td>
-                <td>{{statusArr[li.status]}}</td>
-                <td>
-                    <?php if ($userData['role'] === 'owner' || $userData['role'] === 'manager') { ?><a class="btn btn-info btn-xs" href="javascript:void(0)" ng-click="assignBooks(li)">Disc.</a><?php } ?>
-                    <?php if ($userData['role'] === 'owner' || $userData['role'] === 'manager') { ?><a class="btn btn-default btn-xs" href="../chart-of-accounts/summery.php?t=emp&id={{li.account_id}}">Ledger</a><?php } ?>
-                    <?php if ($userData['role'] === 'owner' || $userData['role'] === 'manager') { ?><a class="btn btn-xs btn-primary" href="adjustment.php?id={{li.account_id}}">Payments</a><?php } ?>
-                    <?php if ($userData['role'] === 'manager') { ?><a class="btn btn-danger btn-xs" href="<?php echo SITE_URL; ?>pages/orders/customerOrders.php?id={{li.id}}">Orders</a><?php } ?>
-                    <?php if ($userData['role'] === 'owner' || $userData['role'] === 'manager') { ?><a class="btn btn-default btn-xs" href="<?php echo SITE_URL; ?>pages/employees/update.php?id={{li.id}}"><span class="fa fa-edit"><span></a><?php } ?>
-                    <?php if ($userData['role'] === 'manager') { ?><a ng-click="deleteCustomer(li.id)" class="btn btn-danger btn-xs" href="javascript:void(0)"><span class="fa fa-remove"><span></a><?php } ?>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-
-    <div style="display: flex; align-items: center; justify-content: space-between">
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Contact</th>
+                    <th>Title / Company / Address</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="li in list">
+                    <td>{{li.id}}</td>
+                    <td><strong>{{li.full_name}}</strong> <br /> {{li.phoneNumber}}</td>
+                    <td><strong>{{li.company}}</strong> - {{li.title}} <br />{{li.address}}</td>
+                    <td>{{statusArr[li.status]}}</td>
+                    <td>
+                        <?php if ($userData['role'] === 'owner' || $userData['role'] === 'manager') { ?><a class="btn btn-info btn-xs" href="javascript:void(0)" ng-click="assignBooks(li)">Disc.</a><?php } ?>
+                        <?php if ($userData['role'] === 'owner' || $userData['role'] === 'manager') { ?><a class="btn btn-default btn-xs" href="../chart-of-accounts/summery.php?t=emp&id={{li.account_id}}">Ledger</a><?php } ?>
+                        <?php if ($userData['role'] === 'owner' || $userData['role'] === 'manager') { ?><a class="btn btn-xs btn-primary" href="adjustment.php?id={{li.account_id}}">Payments</a><?php } ?>
+                        <?php if ($userData['role'] === 'manager') { ?><a class="btn btn-danger btn-xs" href="<?php echo SITE_URL; ?>pages/orders/customerOrders.php?id={{li.id}}">Orders</a><?php } ?>
+                        <?php if ($userData['role'] === 'owner' || $userData['role'] === 'manager') { ?><a class="btn btn-default btn-xs" href="<?php echo SITE_URL; ?>pages/employees/update.php?id={{li.id}}"><span class="fa fa-edit"><span></a><?php } ?>
+                        <?php if ($userData['role'] === 'manager') { ?><a ng-click="deleteCustomer(li.id)" class="btn btn-danger btn-xs" href="javascript:void(0)"><span class="fa fa-remove"><span></a><?php } ?>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="pagination-custom">
         <ul uib-pagination ng-if="data.perPage < data.totalRecords" items-per-page="data.perPage" total-items="data.totalRecords" ng-model="currentPage" ng-change="pageChanged(currentPage)"></ul> <span>Per Page <select ng-change="perPage()" ng-model="data.perPage">
                 <option value="10">10</option>
                 <option value="25">25</option>
                 <option value="50">50</option>
                 <option value="100">100</option>
-            </select></span> <span>Total number of Records <strong>{{data.totalRecords}}</strong></span>
+            </select></span> <span>Total Records <strong>{{data.totalRecords}}</strong></span>
     </div>
 
 </div>

@@ -32,53 +32,55 @@ foreach ($ownerStores as $store) {
 <div class="container" ng-controller="categoryController">
     <a href="<?php echo SITE_URL . "pages/demand/create.php" ?>" class="btn btn-primary btn-xs pull-right">Create Demand</a>
     <h4>Demand Stocks</h4>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Sr.#</th>
-                <th>Title</th>
-                <th>Shop</th>
-                <th>Demand Date</th>
-                <th>Assign Date</th>
-                <th>Status</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-
-            <?php $count = 1;
-            foreach ($demands as $demand) { ?>
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
                 <tr>
-                    <td><?php echo $count; ?></td>
-                    <td><?php echo $demand['title']; ?></td>
-                    <td><?php echo $storeList[$demand['shop_id']]['full_name']; ?></td>
-                    <td><?php echo $demand['demand_date']; ?></td>
-                    <td><?php echo !empty($demand['assign_date']) ? $demand['assign_date'] : 'NULL'; ?></td>
-                    <td><?php echo $demandStatusArr[$demand['flag']]['full_name']; ?></td>
-                    <td>
-                        <?php if ($userData['role'] == 'owner') { ?>
-                            <a class="btn btn-success btn-xs" href="<?php echo SITE_URL . "pages/demand/modify.php?id=" . $demand['id']; ?>">Modify</a>
-                            <a class="btn btn-success btn-xs" href="<?php echo SITE_URL . "pages/demand/assign.php?id=" . $demand['id']; ?>">Assign</a>
-                            <?php
-                            if ($demand['flag'] == 0) { ?>
-                                <a class="btn btn-info btn-xs" href="#" ng-click="rejectDemand(<?php echo $demand['id']; ?>)">Reject</a>
-                                <a class="btn btn-danger btn-xs" href="#" ng-click="deleteDemand(<?php echo $demand['id']; ?>)">Delete</a>
-                            <?php } ?>
-                            <?php } else {
-                            if ($demand['flag'] == 0) { ?>
-                                <a class="btn btn-info btn-xs" href="#" ng-click="withdrawalDemand(<?php echo $demand['id']; ?>)">Withdrawal</a>
-                                <a class="btn btn-danger btn-xs" href="#" ng-click="deleteDemand(<?php echo $demand['id']; ?>)">Delete</a>
-                                <a class="btn btn-success btn-xs" href="<?php echo SITE_URL . "pages/demand/modify.php?id=" . $demand['id']; ?>">Modify</a>
-                            <?php } ?>
-                        <?php } ?>
-                        <a class="btn btn-info btn-xs" href="<?php echo SITE_URL . "pages/barcode/index.php?id=" . $demand['id']; ?>">Code</a>
-                        <a class="btn btn-success btn-xs" href="<?php echo SITE_URL . "pages/demand/print.php?id=" . $demand['id']; ?>">Print</a>
-                    </td>
+                    <th>Sr.#</th>
+                    <th>Title</th>
+                    <th>Shop</th>
+                    <th>Demand Date</th>
+                    <th>Assign Date</th>
+                    <th>Status</th>
+                    <th></th>
                 </tr>
-            <?php $count++;
-            } ?>
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+
+                <?php $count = 1;
+                foreach ($demands as $demand) { ?>
+                    <tr>
+                        <td><?php echo $count; ?></td>
+                        <td><?php echo $demand['title']; ?></td>
+                        <td><?php echo $storeList[$demand['shop_id']]['full_name']; ?></td>
+                        <td><?php echo $demand['demand_date']; ?></td>
+                        <td><?php echo !empty($demand['assign_date']) ? $demand['assign_date'] : 'NULL'; ?></td>
+                        <td><?php echo $demandStatusArr[$demand['flag']]['full_name']; ?></td>
+                        <td>
+                            <?php if ($userData['role'] == 'owner') { ?>
+                                <a class="btn btn-success btn-xs" href="<?php echo SITE_URL . "pages/demand/modify.php?id=" . $demand['id']; ?>">Modify</a>
+                                <a class="btn btn-success btn-xs" href="<?php echo SITE_URL . "pages/demand/assign.php?id=" . $demand['id']; ?>">Assign</a>
+                                <?php
+                                if ($demand['flag'] == 0) { ?>
+                                    <a class="btn btn-info btn-xs" href="#" ng-click="rejectDemand(<?php echo $demand['id']; ?>)">Reject</a>
+                                    <a class="btn btn-danger btn-xs" href="#" ng-click="deleteDemand(<?php echo $demand['id']; ?>)">Delete</a>
+                                <?php } ?>
+                                <?php } else {
+                                if ($demand['flag'] == 0) { ?>
+                                    <a class="btn btn-info btn-xs" href="#" ng-click="withdrawalDemand(<?php echo $demand['id']; ?>)">Withdrawal</a>
+                                    <a class="btn btn-danger btn-xs" href="#" ng-click="deleteDemand(<?php echo $demand['id']; ?>)">Delete</a>
+                                    <a class="btn btn-success btn-xs" href="<?php echo SITE_URL . "pages/demand/modify.php?id=" . $demand['id']; ?>">Modify</a>
+                                <?php } ?>
+                            <?php } ?>
+                            <a class="btn btn-info btn-xs" href="<?php echo SITE_URL . "pages/barcode/index.php?id=" . $demand['id']; ?>">Code</a>
+                            <a class="btn btn-success btn-xs" href="<?php echo SITE_URL . "pages/demand/print.php?id=" . $demand['id']; ?>">Print</a>
+                        </td>
+                    </tr>
+                <?php $count++;
+                } ?>
+            </tbody>
+        </table>
+    </div>
 </div>
 
 

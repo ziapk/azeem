@@ -1,6 +1,6 @@
 <?php
 ?>
-<li uib-dropdown auto-close="outsideClick" on-toggle="refreshList()">
+<li class="hidden-xs" uib-dropdown auto-close="outsideClick" on-toggle="refreshList()">
   <a href="javascript:void(0)" uib-dropdown-toggle tooltip-placement="bottom" uib-tooltip="Shopping Cart"><img width="22" height="22" src="<?php echo SITE_URL; ?>assets/img/svg/010-shopping-bag-white.svg" alt="" /></a>
   <div class="dropdown-menu cart-menu" uib-dropdown-menu>
     <div class="cart-list">

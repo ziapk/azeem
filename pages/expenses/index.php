@@ -44,52 +44,54 @@ echo mainHeader(['page' => 'expense']);
         <input type="hidden" id="to" name="to" value="<?php echo $end; ?>">
 
     </form>
-    <table class="table">
-        <thead>
-            <tr>
-                <th width="100px">Sr.#</th>
-                <th width="150px">Name</th>
-                <th>Description</th>
-                <th width="150px">Price</th>
-                <th width="150px">Date</th>
-                <th width="150px"></th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php
-            $total = 0;
-            foreach ($expenseData as $key => $cust) {
-                $total += $cust['price']; ?>
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
                 <tr>
-                    <td><?php echo $key + 1; ?></td>
-                    <td><?php echo $cust['title']; ?></td>
-                    <td><?php echo $cust['description']; ?></td>
-                    <td><?php echo $cust['price']; ?></td>
-                    <td><?php echo date('d M Y', strtotime($cust['exp_date'])); ?></td>
-                    <td>
-                        <?php if ($userData['role'] === 'owner') { ?><a onclick="deleteExpense(<?php echo $cust['id']; ?>)" class="btn btn-primary btn-xs" href="javascript:void(0)">Delete</a><?php } ?>
-                    </td>
+                    <th width="100px">Sr.#</th>
+                    <th width="150px">Name</th>
+                    <th>Description</th>
+                    <th width="150px">Price</th>
+                    <th width="150px">Date</th>
+                    <th width="150px"></th>
                 </tr>
-            <?php } ?>
-        </tbody>
-        <tfoot>
-            <tr>
-                <th>Total</th>
-                <th colspan="6">
-                    <table style="text-align: right" width="100%" cellspacing="0" cellpadding="0">
-                        <tr>
-                            <th style="text-align: right">Number of Expenses</th>
-                            <th style="text-align: right"><?php echo sizeof($expenseData); ?></th>
-                        </tr>
-                        <tr>
-                            <th style="text-align: right">Total Payment</th>
-                            <th style="text-align: right"><?php echo $total; ?></th>
-                        </tr>
-                    </table>
-                </th>
-            </tr>
-        </tfoot>
-    </table>
+            </thead>
+            <tbody>
+                <?php
+                $total = 0;
+                foreach ($expenseData as $key => $cust) {
+                    $total += $cust['price']; ?>
+                    <tr>
+                        <td><?php echo $key + 1; ?></td>
+                        <td><?php echo $cust['title']; ?></td>
+                        <td><?php echo $cust['description']; ?></td>
+                        <td><?php echo $cust['price']; ?></td>
+                        <td><?php echo date('d M Y', strtotime($cust['exp_date'])); ?></td>
+                        <td>
+                            <?php if ($userData['role'] === 'owner') { ?><a onclick="deleteExpense(<?php echo $cust['id']; ?>)" class="btn btn-primary btn-xs" href="javascript:void(0)">Delete</a><?php } ?>
+                        </td>
+                    </tr>
+                <?php } ?>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th>Total</th>
+                    <th colspan="6">
+                        <table style="text-align: right" width="100%" cellspacing="0" cellpadding="0">
+                            <tr>
+                                <th style="text-align: right">Number of Expenses</th>
+                                <th style="text-align: right"><?php echo sizeof($expenseData); ?></th>
+                            </tr>
+                            <tr>
+                                <th style="text-align: right">Total Payment</th>
+                                <th style="text-align: right"><?php echo $total; ?></th>
+                            </tr>
+                        </table>
+                    </th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
 </div>
 <?php
 echo mainFooter();

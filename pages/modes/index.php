@@ -9,38 +9,40 @@ echo mainHeader(['page' => 'mode']);
     <div class="form-group">
         <input class="form-control" ng-change="searchCategories()" ng-model="search" placeholder="Type here for search..." />
     </div>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Sr</th>
-                <th>Name</th>
-                <th>Code</th>
-                <th>Default</th>
-                <th>Status</th>
-                <th width="200"></th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr ng-repeat="li in list track by $index">
-                <td>{{$index + 1}}</td>
-                <td>{{li.title}}</td>
-                <td>{{li.code}}</td>
-                <td>{{li.is_default == 1 ? 'Yes' : 'No'}}</td>
-                <td>{{catTypes[li.status]}}</td>
-                <td>
-                    <a class="btn btn-primary btn-xs" href="javascript:void(0)" ng-click="addCategory(li)">Edit</a>
-                    <?php if ($userData['role'] === 'manager') { ?><a class="btn btn-danger btn-xs" href="javascript:void(0)" ng-click="deleteCategory(li.id)">Delete</a><?php } ?>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-    <div style="display: flex; align-items: center; justify-content: space-between">
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Sr</th>
+                    <th>Name</th>
+                    <th>Code</th>
+                    <th>Default</th>
+                    <th>Status</th>
+                    <th width="200"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="li in list track by $index">
+                    <td>{{$index + 1}}</td>
+                    <td>{{li.title}}</td>
+                    <td>{{li.code}}</td>
+                    <td>{{li.is_default == 1 ? 'Yes' : 'No'}}</td>
+                    <td>{{catTypes[li.status]}}</td>
+                    <td>
+                        <a class="btn btn-primary btn-xs" href="javascript:void(0)" ng-click="addCategory(li)">Edit</a>
+                        <?php if ($userData['role'] === 'manager') { ?><a class="btn btn-danger btn-xs" href="javascript:void(0)" ng-click="deleteCategory(li.id)">Delete</a><?php } ?>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="pagination-custom">
         <ul uib-pagination ng-if="data.perPage < data.totalRecords" items-per-page="data.perPage" total-items="data.totalRecords" ng-model="currentPage" ng-change="pageChanged(currentPage)"></ul> <span>Per Page <select ng-change="perPage()" ng-model="data.perPage">
                 <option value="10">10</option>
                 <option value="25">25</option>
                 <option value="50">50</option>
                 <option value="100">100</option>
-            </select></span> <span>Total number of Records <strong>{{data.totalRecords}}</strong></span>
+            </select></span> <span>Total Records <strong>{{data.totalRecords}}</strong></span>
     </div>
 
     <script type="text/ng-template" id="addCategory.html">

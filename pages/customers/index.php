@@ -5,50 +5,52 @@ echo mainHeader(['page' => 'customer']);
 
 <div class="container" ng-controller="customerController">
     <a href="javascript:void(0)" ng-click="addCustomer()" class="btn btn-primary btn-xs pull-right">Add New</a>
-    <h4 class="section-title">Customers <a class="btn btn-primary" href="<?php echo 'summeryDownload.php' . $url; ?>" target="_blank">Generate PDF</a></h4>
-    <h5 class="section-title">Total Receivable Amount: {{data.closing_total | number}}
+    <h4 class="section-title">Customers <a class="btn btn-primary" href="<?php echo 'summeryDownload.php' . $url; ?>" target="_blank">PDF</a></h4>
+    <h5 class="section-title">Total Amount: <strong style="font-size: 1.3em;">{{data.closing_total | number}}</strong>
         <?php if ($userData['role'] === 'owner' || $userData['role'] === 'manager') { ?>
-            <button class="btn btn-sm btn-primary" ng-click="bulkSendSummery()">Send Ledgers</button>
+            <button class="btn btn-sm btn-primary mt-10" ng-click="bulkSendSummery()"><span class="fa fa-envelope"></span> Send Ledgers</button>
         <?php } ?>
     </h5>
 
     <div class="form-group">
         <input class="form-control" ng-change="searchCustomer()" ng-model="search" placeholder="Type here for search..." />
     </div>
-    <table class="table">
-        <thead>
-            <tr>
-                <th width="50"></th>
-                <th>Id</th>
-                <th>Contact</th>
-                <th>Title / Company / Address</th>
-                <th>On Closing Report</th>
-                <th>Balance</th>
-                <th width="300"></th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr ng-repeat="li in list">
-                <td><input type="checkbox" ng-model="li.selected" /></td>
-                <td>{{li.id}}</td>
-                <td><strong>{{li.full_name}}</strong> <br /> {{li.phoneNumber}}</td>
-                <td><strong>{{li.company}}</strong> - {{li.title}} <br />{{li.address}}</td>
-                <td>{{li.type == '2' ? 'NO': 'YES'}}</td>
-                <td style="text-align: right;" ng-class="{'text-danger': li.closing_balance < 0}">{{li.closing_balance | number}}</td>
-                <td>
-                    <?php if ($userData['role'] === 'owner' || $userData['role'] === 'manager') { ?><a class="btn btn-info btn-xs" href="javascript:void(0)" ng-click="assignBooks(li)">Disc.</a><?php } ?>
-                    <?php if ($userData['role'] === 'owner' || $userData['role'] === 'manager') { ?><a class="btn btn-default btn-xs" href="../chart-of-accounts/summery.php?t=c&id={{li.account_id}}">Ledger</a><?php } ?>
-                    <!-- <?php if ($userData['role'] === 'owner' || $userData['role'] === 'manager') { ?><a class="btn btn-xs btn-primary" href="adjustment.php?id={{li.account_id}}">Receiving</a><?php } ?> -->
-                    <?php if ($userData['role'] === 'manager') { ?><a class="btn btn-danger btn-xs" href="<?php echo SITE_URL; ?>pages/orders/customerOrders.php?id={{li.id}}">Orders</a><?php } ?>
-                    <?php if ($userData['role'] === 'owner' || $userData['role'] === 'manager') { ?><a class="btn btn-default btn-xs" href="<?php echo SITE_URL; ?>pages/customers/update.php?id={{li.id}}"><span class="fa fa-edit"><span></a><?php } ?>
-                    <?php if ($userData['role'] === 'owner') { ?><a ng-click="deleteCustomer(li.id)" class="btn btn-danger btn-xs" href="javascript:void(0)"><span class="fa fa-remove"><span></a><?php } ?>
-                    <?php if ($userData['role'] === 'owner' || $userData['role'] === 'manager') { ?><a ng-if="li.is_default == 0" class="btn btn-default btn-xs" ng-click="sendSummery(li.account_id)" href="javascript:void(0)"><span class="fa fa-envelope"></span>{{sending[li.account_id] ? 'Sending' : ''}}</a><?php } ?>
-                </td>
-            </tr>
-        </tbody>
-    </table>
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th width="50"></th>
+                    <th>Id</th>
+                    <th>Contact</th>
+                    <th>Title / Company / Address</th>
+                    <th>On Closing Report</th>
+                    <th>Balance</th>
+                    <th width="300"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="li in list">
+                    <td><input type="checkbox" ng-model="li.selected" /></td>
+                    <td>{{li.id}}</td>
+                    <td><strong>{{li.full_name}}</strong> <br /> {{li.phoneNumber}}</td>
+                    <td><strong>{{li.company}}</strong> - {{li.title}} <br />{{li.address}}</td>
+                    <td>{{li.type == '2' ? 'NO': 'YES'}}</td>
+                    <td style="text-align: right;" ng-class="{'text-danger': li.closing_balance < 0}">{{li.closing_balance | number}}</td>
+                    <td>
+                        <?php if ($userData['role'] === 'owner' || $userData['role'] === 'manager') { ?><a class="btn btn-info btn-xs" href="javascript:void(0)" ng-click="assignBooks(li)">Disc.</a><?php } ?>
+                        <?php if ($userData['role'] === 'owner' || $userData['role'] === 'manager') { ?><a class="btn btn-default btn-xs" href="../chart-of-accounts/summery.php?t=c&id={{li.account_id}}">Ledger</a><?php } ?>
+                        <!-- <?php if ($userData['role'] === 'owner' || $userData['role'] === 'manager') { ?><a class="btn btn-xs btn-primary" href="adjustment.php?id={{li.account_id}}">Receiving</a><?php } ?> -->
+                        <?php if ($userData['role'] === 'manager') { ?><a class="btn btn-danger btn-xs" href="<?php echo SITE_URL; ?>pages/orders/customerOrders.php?id={{li.id}}">Orders</a><?php } ?>
+                        <?php if ($userData['role'] === 'owner' || $userData['role'] === 'manager') { ?><a class="btn btn-default btn-xs" href="<?php echo SITE_URL; ?>pages/customers/update.php?id={{li.id}}"><span class="fa fa-edit"><span></a><?php } ?>
+                        <?php if ($userData['role'] === 'owner') { ?><a ng-click="deleteCustomer(li.id)" class="btn btn-danger btn-xs" href="javascript:void(0)"><span class="fa fa-remove"><span></a><?php } ?>
+                        <?php if ($userData['role'] === 'owner' || $userData['role'] === 'manager') { ?><a ng-if="li.is_default == 0" class="btn btn-default btn-xs" ng-click="sendSummery(li.account_id)" href="javascript:void(0)"><span class="fa fa-envelope"></span>{{sending[li.account_id] ? 'Sending' : ''}}</a><?php } ?>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 
-    <div style="display: flex; align-items: center; justify-content: space-between">
+    <div class="pagination-custom">
         <ul uib-pagination ng-if="data.perPage < data.totalRecords" items-per-page="data.perPage" total-items="data.totalRecords" ng-model="currentPage" ng-change="pageChanged(currentPage)"></ul>
         <span>
             Per Page
@@ -59,7 +61,7 @@ echo mainHeader(['page' => 'customer']);
                 <option value="100">100</option>
             </select>
         </span>
-        <span>Total number of Records <strong>{{data.totalRecords}}</strong></span>
+        <span>Total Records <strong>{{data.totalRecords}}</strong></span>
     </div>
 
 </div>

@@ -909,6 +909,16 @@ thead.navbar-fixed-top {
   color: #fff;
 }
 
+.pagination-custom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ml-10 {
+  margin-left: 10px;
+}
+
 @media (max-width: 767px) {
   .sidebar:not(.showSidebar) {
     left: -220px;
@@ -949,6 +959,31 @@ thead.navbar-fixed-top {
   }
   .profile-menu .dropdown-menu > li > a {
     color: #fff;
+  }
+  .pagination-custom {
+    display: block;
+  }
+  .feature-product {
+    min-width: 100%;
+  }
+  .mt-10 {
+    margin-top: 10px;
+  }
+  .pagination-custom span {
+    display: inline-block;
+  }
+  .login-screen-inner {
+    box-shadow: none;
+    background: none;
+  }
+  .login-screen {
+    background: #fff;
+  }
+  .login-form {
+    padding: 15px;
+  }
+  .login-form h2 {
+    font-size: 2.6em;
   }
 }
 

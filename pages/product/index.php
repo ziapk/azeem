@@ -109,13 +109,13 @@ $programs = $programObj->getPrograms();
             </div>
         </li>
     </ul>
-    <div style="display: flex; align-items: center; justify-content: space-between">
+    <div class="pagination-custom">
         <ul uib-pagination total-items="data.totalRecords" ng-model="currentPage" max-size="maxSize" class="pagination-sm" boundary-links="true" force-ellipses="true" ng-if="data.perPage < data.totalRecords" items-per-page="data.perPage" ng-change="pageChanged(currentPage)"></ul> <span>Per Page <select ng-change="perPage()" ng-model="data.perPage">
                 <option ng-value="12">12</option>
                 <option ng-value="24">24</option>
                 <option ng-value="48">48</option>
                 <option ng-value="96">96</option>
-            </select></span> <span>Total number of Records <strong>{{data.totalRecords}}</strong></span>
+            </select></span> <span>Total Records <strong>{{data.totalRecords}}</strong></span>
     </div>
 </div>
 <script type="text/javascript">

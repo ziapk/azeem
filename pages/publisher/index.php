@@ -4,44 +4,46 @@ echo mainHeader(['page' => 'publisher']);
 ?>
 
 <div class="container" ng-controller="publisherController">
-    <a href="javascript:void(0)" style="margin-right: 10px" ng-click="addPublisher({pin: 0})" class="btn btn-primary btn-xs pull-right">Add Publisher</a>
+    <a href="javascript:void(0)" style="margin-right: 10px" ng-click="addPublisher({pin: 0})" class="btn btn-primary btn-xs pull-right"><span class="fa fa-plus"></span> Publisher</a>
     <h4 class="section-title">All Publisher</h4>
     <div class="form-group">
         <input class="form-control" ng-change="searchPublishers()" ng-model="search" placeholder="Type here for search..." />
     </div>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Discount Type</th>
-                <th>Discount Amount</th>
-                <th>Discount Allow</th>
-                <th>Assigned Books</th>
-                <th width="200"></th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr ng-repeat="li in list">
-                <td>{{li.full_name}}</td>
-                <td>{{discountTypes[li.discount_type]}}</td>
-                <td>{{li.discount_amount}}</td>
-                <td>{{statusArr[li.discount_status]}}</td>
-                <td>{{li.total}}</td>
-                <td>
-                    <a class="btn btn-primary btn-xs" href="javascript:void(0)" ng-click="addPublisher(li)">Edit</a>
-                    <?php if ($userData['role'] === 'manager') { ?><a class="btn btn-danger btn-xs" href="javascript:void(0)" ng-click="deletePublisher(li.id)">Delete</a><?php } ?>
-                    <?php if ($userData['role'] === 'manager') { ?><a ng-if="li.total > 0" class="btn btn-danger btn-xs" href="<?php echo SITE_URL; ?>pages/product/?publisher_id={{li.id}}">View Books</a><?php } ?>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-    <div style="display: flex; align-items: center; justify-content: space-between">
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Discount Type</th>
+                    <th>Discount Amount</th>
+                    <th>Discount Allow</th>
+                    <th>Assigned Books</th>
+                    <th width="200"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="li in list">
+                    <td>{{li.full_name}}</td>
+                    <td>{{discountTypes[li.discount_type]}}</td>
+                    <td>{{li.discount_amount}}</td>
+                    <td>{{statusArr[li.discount_status]}}</td>
+                    <td>{{li.total}}</td>
+                    <td>
+                        <a class="btn btn-primary btn-xs" href="javascript:void(0)" ng-click="addPublisher(li)">Edit</a>
+                        <?php if ($userData['role'] === 'manager') { ?><a class="btn btn-danger btn-xs" href="javascript:void(0)" ng-click="deletePublisher(li.id)">Delete</a><?php } ?>
+                        <?php if ($userData['role'] === 'manager') { ?><a ng-if="li.total > 0" class="btn btn-danger btn-xs" href="<?php echo SITE_URL; ?>pages/product/?publisher_id={{li.id}}">View Books</a><?php } ?>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="pagination-custom">
         <ul uib-pagination items-per-page="data.perPage" total-items="data.totalRecords" ng-model="currentPage" ng-change="pageChanged(currentPage)"></ul> <span>Per Page <select ng-change="perPage()" ng-model="data.perPage">
                 <option value="10">10</option>
                 <option value="25">25</option>
                 <option value="50">50</option>
                 <option value="100">100</option>
-            </select></span> <span>Total number of Records <strong>{{data.totalRecords}}</strong></span>
+            </select></span> <span>Total Records <strong>{{data.totalRecords}}</strong></span>
     </div>
 
     <script type="text/ng-template" id="addPublisher.html">
