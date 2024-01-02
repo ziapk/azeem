@@ -995,6 +995,9 @@ thead.navbar-fixed-top {
         padding-left: 0;
     }
     
+    .profile-menu.open {
+        min-width: 100vw;
+    }
     .profile-menu table {
         color: #fff;
     }
