@@ -574,6 +574,10 @@ th {
     vertical-align: middle;
     padding: 2px 4px;
 }
+
+.table-sm>tbody>tr>td,.table-sm>tbody>tr>th {
+    height: 28px;
+}
 .recipt-table.table>tbody>tr>td,
 .recipt-table.table>tbody>tr>th {
     font-size: inherit;
@@ -1027,6 +1031,7 @@ thead.navbar-fixed-top {
 
     .login-screen {
         background: #fff;
+        min-height: 100vh;
     }
     .login-form {
         padding: 15px;

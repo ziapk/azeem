@@ -36,59 +36,57 @@ foreach ($_GET as $key => $value) {
 mainHeader();
 ?>
 <div class="container" ng-controller="coaController">
-    <table width="100%">
-        <tr>
-            <td>
-                <h2>Account Summary <a class="btn btn-primary" href="<?php echo 'summeryDownload.php' . $url; ?>" target="_blank">Generate PDF</a>
-                    <?php if (empty($user['is_default'])) { ?><a class="btn btn-primary" href="javascript:void(0)" ng-click="sendSummery()"><span class="fa fa-envelope"></span>&nbsp; {{sending ? 'Sending...' : 'Send Summery'}}</a><?php } ?>
-                </h2>
-                <p><?php echo $user['full_name']; ?></p>
-                <p><?php echo $user['address']; ?> (<?php echo $user['company']; ?>) </p>
-                <p>Contact No: <?php echo $user['phoneNumber']; ?></p>
-            </td>
-            <td width="300">
-                <table width="100%">
-                    <tr>
-                        <td>Openining Balance:</td>
-                        <td width="140"><?php echo number_format($user['account']['opening_balance'], 0); ?><br /></td>
-                    </tr>
-                    <tr>
-                        <td>Total Invoices:</td>
-                        <td><?php echo $summery['total']; ?><br /></td>
-                    </tr>
-                    <tr>
-                        <td>Total Amount:</td>
-                        <td><?php echo number_format($amount, 0); ?><br /></td>
-                    </tr>
-                    <tr>
-                        <td>Total Paid:</td>
-                        <td><?php echo number_format($paid, 0); ?><br /></td>
-                    </tr>
-                    <tr>
-                        <td>Closing Balance:</td>
-                        <td><?php echo number_format($balance, 0); ?></td>
-                    </tr>
-                </table>
-
-            </td>
-        </tr>
-    </table>
+    <div class="row">
+        <div class="col-sm-8">
+            <h2>Account Summary <br class="visible-xs" /> <a class="btn btn-primary mt-10" href="<?php echo 'summeryDownload.php' . $url; ?>" target="_blank"><span class="fa fa-file"></span> PDF</a>
+                <?php if (empty($user['is_default'])) { ?><a class="btn btn-primary mt-10" href="javascript:void(0)" ng-click="sendSummery()"><span class="fa fa-envelope"></span>&nbsp; {{sending ? 'Sending...' : 'Send Summery'}}</a><?php } ?>
+            </h2>
+            <p><?php echo $user['full_name']; ?></p>
+            <p><?php echo $user['address']; ?> (<?php echo $user['company']; ?>) </p>
+            <p>Contact No: <?php echo $user['phoneNumber']; ?></p>
+        </div>
+        <div class="col-sm-4 form-group">
+            <table class="table table-sm table-striped">
+                <tr>
+                    <td>Openining Balance:</td>
+                    <td style="font-weight: bold; font-size: 1.3em" width="140"><?php echo number_format($user['account']['opening_balance'], 0); ?><br /></td>
+                </tr>
+                <tr>
+                    <td>Total Invoices:</td>
+                    <td style="font-weight: bold; font-size: 1.3em"><?php echo $summery['total']; ?><br /></td>
+                </tr>
+                <tr>
+                    <td>Total Amount:</td>
+                    <td style="font-weight: bold; font-size: 1.3em"><?php echo number_format($amount, 0); ?><br /></td>
+                </tr>
+                <tr>
+                    <td>Total Paid:</td>
+                    <td style="font-weight: bold; font-size: 1.3em"><?php echo number_format($paid, 0); ?><br /></td>
+                </tr>
+                <tr>
+                    <td>Closing Balance:</td>
+                    <td style="font-weight: bold; font-size: 1.3em"><?php echo number_format($balance, 0); ?></td>
+                </tr>
+            </table>
+        </div>
+    </div>
     <!-- <form method="GET" action=""> -->
-    <table width="100%" class="table table-striped">
-        <thead>
-            <tr>
-                <th>T.ID</th>
-                <th>Date</th>
-                <th>Order ID</th>
-                <th>Ref.#</th>
-                <th>Description</th>
-                <th>Entry Type</th>
-                <th>Debit</th>
-                <th>Credit</th>
-                <th>Running Balance</th>
-                <th></th>
-            </tr>
-            <!-- <tr>
+    <div class="table-responsive">
+        <table width="100%" class="table table-striped">
+            <thead>
+                <tr>
+                    <th>T.ID</th>
+                    <th>Date</th>
+                    <th>Order ID</th>
+                    <th>Ref.#</th>
+                    <th>Description</th>
+                    <th>Entry Type</th>
+                    <th>Debit</th>
+                    <th>Credit</th>
+                    <th>Running Balance</th>
+                    <th></th>
+                </tr>
+                <!-- <tr>
                     <th>
                         <input type="hidden" name="from" value="{{startDate}}">
                         <input type="hidden" name="to" value="{{endDate}}">
@@ -106,30 +104,31 @@ mainHeader();
                     <th><input class="form-control" name="entry_type" /></th>
                     <th colspan="3"><button type="submit" class="btn btn-default">Go</button></th>
                 </tr> -->
-        </thead>
-        <tbody>
-            <tr ng-repeat="row in rows">
-                <td>{{row.transaction_id}}</td>
-                <td>{{row.transaction_date}}</td>
-                <td>
-                    <a ng-if="row.order_ref" href="javascript:void(0)" ng-click="openRecipt(row.order_ref)">{{row.order_custom_id}}</a>
-                    <a ng-if="row.supply_ref" href="javascript:void(0)" ng-click="openRecipt2(row.supply_ref)">{{row.supply_ref}}</a>
-                    <a ng-if="row.return_ref" href="javascript:void(0)" ng-click="openRecipt3(row.return_ref)">{{row.return_ref}}</a>
-                </td>
-                <td>{{row.reference}}</td>
-                <td>{{row.v_description}}</td>
-                <td>{{row.transsaction_type}}</td>
-                <td style="text-align: right">{{row.debitAmount | number: 0}}</td>
-                <td style="text-align: right">{{row.creditAmount | number: 0}}</td>
-                <td style="text-align: right;" ng-class="{'text-danger': row.balance < 0}">{{row.balance | number: 0}}</td>
-                <td>
-                    <?php if ($userData['role'] === 'owner') { ?>
-                        <a ng-if="['DIRECT_RECEIVING', 'DIRECT_PAYMENT', 'ROYALTY PAYMENT', 'ADJUSTMENT', 'EXPENSE'].includes(row.transsaction_type) " href="javascript:void(0)" class="text-danger" ng-click="addCustomer(row)">EDIT</a>
-                    <?php } ?>
-                </td>
-            </tr>
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                <tr ng-repeat="row in rows">
+                    <td>{{row.transaction_id}}</td>
+                    <td>{{row.transaction_date}}</td>
+                    <td>
+                        <a ng-if="row.order_ref" href="javascript:void(0)" ng-click="openRecipt(row.order_ref)">{{row.order_custom_id}}</a>
+                        <a ng-if="row.supply_ref" href="javascript:void(0)" ng-click="openRecipt2(row.supply_ref)">{{row.supply_ref}}</a>
+                        <a ng-if="row.return_ref" href="javascript:void(0)" ng-click="openRecipt3(row.return_ref)">{{row.return_ref}}</a>
+                    </td>
+                    <td>{{row.reference}}</td>
+                    <td>{{row.v_description}}</td>
+                    <td>{{row.transsaction_type}}</td>
+                    <td style="text-align: right">{{row.debitAmount | number: 0}}</td>
+                    <td style="text-align: right">{{row.creditAmount | number: 0}}</td>
+                    <td style="text-align: right; font-weight: bold; font-size: 1.3em" ng-class="{'text-danger': row.balance < 0}">{{row.balance | number: 0}}</td>
+                    <td>
+                        <?php if ($userData['role'] === 'owner') { ?>
+                            <a ng-if="['DIRECT_RECEIVING', 'DIRECT_PAYMENT', 'ROYALTY PAYMENT', 'ADJUSTMENT', 'EXPENSE'].includes(row.transsaction_type) " href="javascript:void(0)" class="text-danger" ng-click="addCustomer(row)">EDIT</a>
+                        <?php } ?>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
     <!-- </form> -->
 </div>
 
