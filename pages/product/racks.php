@@ -21,7 +21,7 @@ $products = $productsObj->getRackProductsPagination($shop['owner_id'], [], $shop
         </div>
         <div class="col-sm-4 form-group">
             <label>&nbsp;</label> <br />
-            <a href="javascript:void(0)" class="btn btn-primary" ng-click="addCustomer()">Add Product to Rack</a>
+            <a href="javascript:void(0)" class="btn btn-primary" ng-click="addCustomer()"><span class="fa fa-plus"></span> Product to Rack</a>
         </div>
     </div>
     <div class="row" style="margin: 0 -6px">

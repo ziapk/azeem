@@ -43,7 +43,7 @@ if (!empty($_POST) && isset($_POST['update'])) {
     }
 }
 
-echo mainHeader(['page' => 'supplier']);
+echo mainHeader(['page' => 'author']);
 if (empty($_GET['id']) || !is_numeric($_GET['id'])) {
     header('location: ' . SITE_URL . '');
 }

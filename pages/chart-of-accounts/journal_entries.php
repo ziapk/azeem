@@ -12,7 +12,16 @@ if ($userData['role'] === 'owner') {
   $ids[] = $shop['id'];
 }
 
-$demands = $doubleEntryObj->getJournals(['from' => $shop['sale_date'], 'to' => $shop['sale_date']], $ids);
+$startDate = $shop['sale_date'];
+$endDate = $shop['sale_date'];
+
+if (!empty($_GET['startDate'])) {
+  $startDate = date('Y-m-d', strtotime($_GET['startDate']));
+}
+if (!empty($_GET['endDate'])) {
+  $endDate = date('Y-m-d', strtotime($_GET['endDate']));
+}
+$demands = $doubleEntryObj->getJournals(['from' => $startDate, 'to' => $endDate], $ids);
 $acd_ids = [];
 $grouping = [];
 foreach ($demands as $value) {
@@ -34,10 +43,17 @@ echo mainHeader(['page' => 'coa']);
 ?>
 <div class="container" ng-controller="coaController">
   <div class="content-section">
-    <a href="<?php echo $commonArray['site_url'] . 'journal.php'; ?>" class="btn btn-primary btn-sm pull-right">
-      Create
-    </a>
-    <h4 class="clearfix" style="margin-top: 0">General Journal</h4>
+    <h4 class="clearfix" style="margin-top: 0">General Journal <span class="text-danger"><?php echo $startDate; ?> - <?php echo $endDate; ?></span></h4>
+    <form method="GET" action="">
+      <div class="input-group form-group">
+        <input date-range-picker placeholder="Date Range" class="form-control date-picker" type="text" ng-model="datePicker.date" options="{ locale: {format: 'DD/MM/YYYY'}}" />
+        <div class="input-group-btn">
+          <input type="submit" value="Submit" name="report" class="btn btn-primary" />
+        </div>
+      </div>
+      <input type="hidden" name="startDate" value="{{datePicker.date.startDate | date:'yyyy-MM-dd'}}" />
+      <input type="hidden" name="endDate" value="{{datePicker.date.endDate | date:'yyyy-MM-dd'}}" />
+    </form>
     <div class="table-responsive">
       <table class="table table-sm table-func table-hover">
         <thead>

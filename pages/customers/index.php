@@ -4,8 +4,8 @@ echo mainHeader(['page' => 'customer']);
 ?>
 
 <div class="container" ng-controller="customerController">
-    <a href="javascript:void(0)" ng-click="addCustomer()" class="btn btn-primary btn-xs pull-right">Add New</a>
-    <h4 class="section-title">Customers <a class="btn btn-primary" href="<?php echo 'summeryDownload.php' . $url; ?>" target="_blank">PDF</a></h4>
+    <a href="javascript:void(0)" ng-click="addCustomer()" class="btn btn-primary btn-xs pull-right"><span class="fa fa-plus"></span> Customer</a>
+    <h2 class="section-title">Customers</h2>
     <h5 class="section-title">Total Amount: <strong style="font-size: 1.3em;">{{data.closing_total | number}}</strong>
         <?php if ($userData['role'] === 'owner' || $userData['role'] === 'manager') { ?>
             <button class="btn btn-sm btn-primary mt-10" ng-click="bulkSendSummery()"><span class="fa fa-envelope"></span> Send Ledgers</button>

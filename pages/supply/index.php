@@ -17,7 +17,7 @@ if ($userData['role'] == 'owner') {
     $isOwner = true;
 }
 
-echo mainHeader();
+echo mainHeader(['page' => 'suppliers']);
 ?>
 <style>
     .uib-typeahead-match.active span.text-danger {
@@ -50,7 +50,7 @@ echo mainHeader();
         <?php } ?>
         <div class="col-sm-3">
             <label>&nbsp;</label><br />
-            <a href="javascript:void(0)" title="Add Product" ng-click="addFreshProduct()" class="btn btn-danger">Add Product</a>
+            <a href="javascript:void(0)" title="Add Product" ng-click="addFreshProduct()" class="btn btn-danger"><span class="fa fa-plus"></span> Product</a>
         </div>
         <div class="col-sm-12 form-group">
             <label>Description</label>

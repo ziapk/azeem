@@ -23,7 +23,7 @@ function getMonthListBetweenDates($from, $to, $format = "F-Y-d", $intervals = '1
 ?>
 
 <div class="container" ng-controller="customerController">
-    <a href="javascript:void(0)" ng-click="addCustomer()" class="btn btn-primary btn-xs pull-right">Add New</a>
+    <a href="javascript:void(0)" ng-click="addCustomer()" class="btn btn-primary btn-xs pull-right"><span class="fa fa-plus"></span> Loan</a>
     <h4 class="section-title">Loans</h4>
     <div class="table-responsive">
         <table class="table">

@@ -2,7 +2,7 @@
 include_once dirname(__FILE__) . '/../../include/settings.php';
 $category = new  Categories();
 $categoryData = $category->getOwnerCategories($userData['created_by']);
-echo mainHeader(['page' => 'supplier']);
+echo mainHeader(['page' => 'suppliers']);
 ?>
 
 <div class="container" ng-controller="productController">

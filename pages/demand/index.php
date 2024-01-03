@@ -30,7 +30,7 @@ foreach ($ownerStores as $store) {
 
 ?>
 <div class="container" ng-controller="categoryController">
-    <a href="<?php echo SITE_URL . "pages/demand/create.php" ?>" class="btn btn-primary btn-xs pull-right">Create Demand</a>
+    <a href="<?php echo SITE_URL . "pages/demand/create.php" ?>" class="btn btn-primary btn-xs pull-right"><span class="fa fa-plus"></span> Demand</a>
     <h4>Demand Stocks</h4>
     <div class="table-responsive">
         <table class="table">

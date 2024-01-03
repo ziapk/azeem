@@ -40,7 +40,7 @@ $programs = $programObj->getPrograms();
                 <div class="btn-group btn-group-sm">
                     <a href="<?php echo SITE_URL; ?>pages/product" class="btn btn-danger"><i class="fa fa-th" aria-hidden="true"></i></a>
                     <a href="<?php echo SITE_URL; ?>pages/product/products.php" class="btn btn-danger active"><i class="fa fa-bars" aria-hidden="true"></i></a>
-                    <?php if ($userData['role'] == 'owner') { ?><a href="<?php echo SITE_URL . "pages/product/create.php" ?>" class="btn btn-info">Create Product</a><?php } ?>
+                    <?php if ($userData['role'] == 'owner') { ?><a href="<?php echo SITE_URL . "pages/product/create.php" ?>" class="btn btn-info"><span class="fa fa-plus"></span> Product</a><?php } ?>
                 </div>
             </div>
         </div>

@@ -98,11 +98,7 @@ $categories = $categoryObj->getCategories('pro', $ownerId);
 ?>
 <div class="container" ng-controller="orderController">
     <div class="clearfix">
-        <div class="btn-group btn-group-sm pull-right">
-            <a href="<?php echo SITE_URL; ?>pages/product" class="btn btn-danger"><i class="fa fa-th" aria-hidden="true"></i></a>
-            <a href="<?php echo SITE_URL; ?>" class="btn btn-danger"><i class="fa fa-bars" aria-hidden="true"></i></a>
-            <a href="<?php echo SITE_URL . "pages/product/create.php" ?>" class="btn btn-info active">Create Product</a>
-        </div>
+
         <h3 class="section-title"><?php if (!empty($product)) {
                                         echo 'Duplicate Product';
                                     } else {
@@ -191,7 +187,7 @@ $categories = $categoryObj->getCategories('pro', $ownerId);
                 </div>
 
                 <div class="col-sm-12 form-group text-right">
-                    <input type="submit" name="create" value="Create Product" class="btn btn-primary btn-submit">
+                    <input type="submit" name="create" value="Create" class="btn btn-primary btn-submit">
                 </div>
             </div>
         </form>

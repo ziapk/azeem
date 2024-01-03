@@ -16,7 +16,7 @@ if (!empty($return)) {
     $order = $orders->getOrder($id);
 }
 
-echo mainHeader();
+echo mainHeader(['page' => 'sale_returns']);
 ?>
 
 <div class="container" ng-controller="reportController">
