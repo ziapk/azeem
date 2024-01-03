@@ -122,7 +122,7 @@ mainHeader();
                     <td style="text-align: right; font-weight: bold; font-size: 1.3em" ng-class="{'text-danger': row.balance < 0}">{{row.balance | number: 0}}</td>
                     <td>
                         <?php if ($userData['role'] === 'owner') { ?>
-                            <a ng-if="['DIRECT_RECEIVING', 'DIRECT_PAYMENT', 'ROYALTY PAYMENT', 'ADJUSTMENT', 'EXPENSE'].includes(row.transsaction_type) " href="javascript:void(0)" class="text-danger" ng-click="addCustomer(row)">EDIT</a>
+                            <a ng-if="['DIRECT_RECEIVING', 'DIRECT_PAYMENT', 'ROYALTY PAYMENT', 'ADJUSTMENT', 'EXPENSE'].includes(row.transsaction_type) " href="javascript:void(0)" class="btn btn-xs btn-primary" ng-click="addCustomer(row)"><span class="fa fa-pencil"></span></a>
                         <?php } ?>
                     </td>
                 </tr>

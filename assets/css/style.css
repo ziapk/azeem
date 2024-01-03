@@ -270,10 +270,6 @@ body {
   z-index: 1;
 }
 
-.btn {
-  border-radius: 0;
-}
-
 .btn-primary {
   background-color: #3f51b5;
   border-color: #303f9f;
