@@ -49,13 +49,13 @@ echo mainHeader(['bodyClasses' => ['login-screen']]);
 ?>
 <div class="login-screen-inner">
     <div class="row">
-        <div class="col-sm-6">
+        <div class="col-sm-6 hidden-xs">
             <div class="login-left">
                 <img src="assets/img/logo.png" class="login-logo-left img-responsive" width="80px" alt="" />
                 <img src="assets/img/login-bg.svg" class="login-image-left img-responsive " width="90%" alt="" />
                 <div class="author-info clearfix">
-                    <span class="pull-left">Powered By: <strong>Zia ur Rehman</strong></span>
-                    <span class="pull-right">Contact Us: <strong>0324-5120412</strong></span>
+                    <span class="pull-left">Software Develope By: <strong>Zia ur Rehman</strong></span>
+                    <span class="pull-right">Contact: <strong>0324-5120412</strong></span>
                 </div>
             </div>
         </div>
@@ -85,6 +85,10 @@ echo mainHeader(['bodyClasses' => ['login-screen']]);
                 </div>
                 <button type="submit" name="login" class="btn btn-lg btn-block btn-primary">Go</button>
             </form>
+            <div class="author-info clearfix visible-xs">
+                <span style="font-weight: bold; color: #999;">Software Develope By: <br /><strong>Zia ur Rehman</strong> <em style="font-style: normal; margin-left: 20px">Contact Us:</em> <strong>0324-5120412</strong></span>
+
+            </div>
         </div>
     </div>
 </div>
