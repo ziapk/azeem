@@ -3,17 +3,17 @@
 
 class Connection
 {
-	private $host = 'localhost';
-	private $dbname = 'reclydmy_azeem';
-	private $user = 'reclydmy_pos';
-	private $pass = ';4B)pQC=K0&v';
-
-
 	// private $host = 'localhost';
 	// private $dbname = 'reclydmy_azeem';
-	// private $user = 'root';
-	// private $pass = 'root';
-	// private $sql_mode = 'STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION';
+	// private $user = 'reclydmy_pos';
+	// private $pass = ';4B)pQC=K0&v';
+
+
+	private $host = 'localhost';
+	private $dbname = 'reclydmy_azeem';
+	private $user = 'root';
+	private $pass = 'root';
+	private $sql_mode = 'STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION';
 
 	public $dbh;
 
@@ -25,7 +25,7 @@ class Connection
 	{
 		try {
 			// , PDO::MYSQL_ATTR_INIT_COMMAND => 'SET sql_mode="' . $this->sql_mode . '"'
-			$this->dbh = new PDO('mysql:host=' . $this->host . ';dbname=' . $this->dbname, $this->user, $this->pass, array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION));
+			$this->dbh = new PDO('mysql:host=' . $this->host . ';dbname=' . $this->dbname, $this->user, $this->pass, array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::MYSQL_ATTR_INIT_COMMAND => 'SET sql_mode="' . $this->sql_mode . '"'));
 		} catch (PDOException $e) {
 			print "Error!: " . $e->getMessage() . "<br/>";
 			die();
@@ -84,6 +84,7 @@ class Connection
 		$type = $type;
 		$from = $from;
 		$to = $to;
+		$subtitle = "Ledger Summery Between " . $from . " and " . $to;
 		include dirname(__FILE__) . '/../pages/chart-of-accounts/summeryContent.php';
 		$html = ob_get_clean();
 		ob_end_clean();

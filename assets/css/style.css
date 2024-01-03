@@ -919,6 +919,10 @@ thead.navbar-fixed-top {
   margin-left: 10px;
 }
 
+.fontsizer {
+  padding: 0 10px;
+}
+
 @media (max-width: 767px) {
   .sidebar:not(.showSidebar) {
     left: -220px;
@@ -988,6 +992,12 @@ thead.navbar-fixed-top {
   }
   .login-form h2 {
     font-size: 2.6em;
+  }
+  .navbar-nav .open .dropdown-menu .dropdown-header, .navbar-nav .open .dropdown-menu > li > a {
+    padding: 5px 15px;
+  }
+  .fontsizer {
+    padding: 0 15px;
   }
 }
 

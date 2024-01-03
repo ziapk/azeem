@@ -19,7 +19,7 @@ echo mainHeader(['page' => 'customer']);
         <table class="table">
             <thead>
                 <tr>
-                    <th width="50"></th>
+                    <th width="50"><input type="checkbox" ng-model="selectAll" ng-change="selectAllItems(selectAll)" /></th>
                     <th>Id</th>
                     <th>Contact</th>
                     <th>Title / Company / Address</th>
@@ -83,6 +83,10 @@ echo mainFooter();
         $scope.search = ""; //$scope.data.records;
         $scope.siteUrl = '<?php echo SITE_URL ?>';
         $scope.sending = {};
+
+        $scope.selectAllItems = (value) => {
+            $scope.list.map(row => row.selected = value)
+        }
 
         $scope.bulkSendSummery = async () => {
             const getList = $scope.list.filter(row => row.selected).map(row => row.account_id);

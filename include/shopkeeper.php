@@ -84,7 +84,7 @@ $categoryProducts = $productCls->getCategoryProducts($shop['owner_id'], $ids, $s
               <li class="divider"></li>
               <li><a title="" href="<?php echo SITE_URL; ?>logout.php">Logout</a></li>
               <li class="divider"></li>
-              <li style="padding: 0 10px">
+              <li class="fontsizer">
                 <table width="100%" style="margin: auto;">
                   <tr>
                     <td>

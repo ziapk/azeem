@@ -190,7 +190,7 @@ $customersList = $customerObj->getCustomers($shop['id']);
               <li><a title="" ng-click="makeClosing(currentShop.id, currentShop)" href="javascript:void(0)">Closing</a></li>
               <li><a href="<?php echo SITE_URL; ?>pages/product/reset.php">Reset Products</a></li>
               <li><a title="" href="<?php echo SITE_URL; ?>logout.php">Logout</a></li>
-              <li style="padding: 0 10px">
+              <li class="fontsizer">
                 <table width="100%" style="margin: auto;">
                   <tr>
                     <td>

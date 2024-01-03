@@ -12,52 +12,52 @@ $programs = $programObj->getPrograms();
     }
 </style>
 <div class="container" ng-controller="productsController">
-    <div class="form-group">
-        <div class="row">
-            <div class="col-sm-4" ng-if="searchBy != 'multi'">
-                <input ng-if="searchBy != 'cource'" class="form-control" ng-change="searchProducts(search, courceId, full_name, group, author, board)" ng-model="search" placeholder="Type here for search..." />
-                <select ng-if="searchBy == 'cource'" ng-model="courceId" ng-change="searchProducts(search, courceId, full_name, group, author, board)" class="c-select form-control">
-                    <option value="">Select a Course</option>
-                    <?php foreach ($programs as $prog) { ?>
-                        <option value="<?php echo $prog['id']; ?>"><?php echo $prog['degree'] . " -> " . $prog['program'] . " -> " . $prog['class']; ?></option>
-                    <?php } ?>
-                </select>
-            </div>
-            <div class="col-sm-2 form-group">
-                <select class="form-control" ng-model="searchBy" ng-change="searchProducts(search, courceId, full_name, group, author, board)">
-                    <option value="">Search By Any</option>
-                    <option value="group">Search By Group</option>
-                    <option value="author">Search By Author</option>
-                    <option value="board">Search By Board</option>
-                    <option value="publisher">Search By Publisher</option>
-                    <option value="cource">Search By Cource</option>
-                    <option value="multi">Search By Multiple Colums</option>
-                </select>
-            </div>
-            <div class="col-sm-2" ng-if="searchBy == 'cource' && courceId && list.length">
-                <button ng-click="addToCart(list, 'list')" class="btn btn-primary">All move to <img width="18" height="18" src="<?php echo SITE_URL; ?>assets/img/svg/010-shopping-bag-white.svg" alt="" /></button>
-            </div>
-            <div class="col-sm-4 text-right pull-right">
-                <div class="btn-group btn-group-sm">
-                    <a href="<?php echo SITE_URL; ?>pages/product" class="btn btn-danger active"><i class="fa fa-th" aria-hidden="true"></i></a>
-                    <a href="<?php echo SITE_URL; ?>pages/product/products.php" class="btn btn-danger"><i class="fa fa-bars" aria-hidden="true"></i></a>
-                    <?php if ($userData['role'] == 'owner') { ?><a href="<?php echo SITE_URL . "pages/product/create.php" ?>" class="btn btn-info">Create Product</a><?php } ?>
-                </div>
+    <div class="row">
+        <div class="col-sm-4" ng-if="searchBy != 'multi'">
+            <input ng-if="searchBy != 'cource'" class="form-control form-group" ng-change="searchProducts(search, courceId, full_name, group, author, board)" ng-model="search" placeholder="Type here for search..." />
+            <select ng-if="searchBy == 'cource'" ng-model="courceId" ng-change="searchProducts(search, courceId, full_name, group, author, board)" class="c-select form-control form-group">
+                <option value="">Select a Course</option>
+                <?php foreach ($programs as $prog) { ?>
+                    <option value="<?php echo $prog['id']; ?>"><?php echo $prog['degree'] . " -> " . $prog['program'] . " -> " . $prog['class']; ?></option>
+                <?php } ?>
+            </select>
+        </div>
+        <div class="col-sm-2 form-group">
+            <select class="form-control" ng-model="searchBy" ng-change="searchProducts(search, courceId, full_name, group, author, board)">
+                <option value="">Search By Any</option>
+                <option value="group">Search By Group</option>
+                <option value="author">Search By Author</option>
+                <option value="board">Search By Board</option>
+                <option value="category">Search By Category</option>
+                <option value="publisher">Search By Publisher</option>
+                <option value="subCategory">Search By Sub Category</option>
+                <option value="cource">Search By Cource</option>
+                <option value="multi">Search By Multiple Colums</option>
+            </select>
+        </div>
+        <div class="col-sm-2 form-group" ng-if="searchBy == 'cource' && courceId && list.length">
+            <button ng-click="addToCart(list, 'list')" class="btn btn-primary">All move to <img width="18" height="18" src="<?php echo SITE_URL; ?>assets/img/svg/010-shopping-bag-white.svg" alt="" /></button>
+        </div>
+        <div class="col-sm-4 text-right pull-right form-group">
+            <div class="btn-group btn-group-sm">
+                <a href="<?php echo SITE_URL; ?>pages/product" class="btn btn-danger active"><i class="fa fa-th" aria-hidden="true"></i></a>
+                <a href="<?php echo SITE_URL; ?>pages/product/products.php" class="btn btn-danger"><i class="fa fa-bars" aria-hidden="true"></i></a>
+                <?php if ($userData['role'] == 'owner') { ?><a href="<?php echo SITE_URL . "pages/product/create.php" ?>" class="btn btn-info"><span class="fa fa-plus"></span> Product</a><?php } ?>
             </div>
         </div>
-        <div class="row">
-            <div class="col-sm-2" ng-if="searchBy == 'multi'">
-                <input type="text" class="form-control" ng-change="searchProducts(search, courceId, full_name, group, author, board)" placeholder="Title" ng-model="full_name">
-            </div>
-            <div class="col-sm-2" ng-if="searchBy == 'multi'">
-                <input type="text" class="form-control" ng-change="searchProducts(search, courceId, full_name, group, author, board)" placeholder="Group" ng-model="group">
-            </div>
-            <div class="col-sm-2" ng-if="searchBy == 'multi'">
-                <input type="text" class="form-control" ng-change="searchProducts(search, courceId, full_name, group, author, board)" placeholder="Author" ng-model="author">
-            </div>
-            <div class="col-sm-2" ng-if="searchBy == 'multi'">
-                <input type="text" class="form-control" ng-change="searchProducts(search, courceId, full_name, group, author, board)" placeholder="Board" ng-model="board">
-            </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-2 col-xs-6 form-group" ng-if="searchBy == 'multi'">
+            <input type="text" class="form-control" ng-change="searchProducts(search, courceId, full_name, group, author, board)" placeholder="Title" ng-model="full_name">
+        </div>
+        <div class="col-sm-2 col-xs-6 form-group" ng-if="searchBy == 'multi'">
+            <input type="text" class="form-control" ng-change="searchProducts(search, courceId, full_name, group, author, board)" placeholder="Group" ng-model="group">
+        </div>
+        <div class="col-sm-2 col-xs-6 form-group" ng-if="searchBy == 'multi'">
+            <input type="text" class="form-control" ng-change="searchProducts(search, courceId, full_name, group, author, board)" placeholder="Author" ng-model="author">
+        </div>
+        <div class="col-sm-2 col-xs-6 form-group" ng-if="searchBy == 'multi'">
+            <input type="text" class="form-control" ng-change="searchProducts(search, courceId, full_name, group, author, board)" placeholder="Board" ng-model="board">
         </div>
     </div>
     <ul class="feature-products">

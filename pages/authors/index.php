@@ -20,7 +20,7 @@ echo mainHeader(['page' => 'author']);
         <table class="table">
             <thead>
                 <tr>
-                    <th></th>
+                    <th><input type="checkbox" ng-model="selectAll" ng-change="selectAllItems(selectAll)" /></th>
                     <th></th>
                     <th>Contact</th>
                     <th>Company / Title / Address</th>
@@ -146,6 +146,10 @@ echo mainHeader(['page' => 'author']);
                         $scope.list = response.data.records;
                     }
                 })
+        }
+
+        $scope.selectAllItems = (value) => {
+            $scope.list.map(row => row.selected = value)
         }
 
         $scope.bulkSendSummery = async () => {
