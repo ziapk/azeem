@@ -3,17 +3,17 @@
 
 class Connection
 {
-	// private $host = 'localhost';
-	// private $dbname = 'reclydmy_azeem';
-	// private $user = 'reclydmy_pos';
-	// private $pass = ';4B)pQC=K0&v';
-
-
 	private $host = 'localhost';
 	private $dbname = 'reclydmy_azeem';
-	private $user = 'root';
-	private $pass = 'root';
-	private $sql_mode = 'STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION';
+	private $user = 'reclydmy_pos';
+	private $pass = ';4B)pQC=K0&v';
+
+
+	// private $host = 'localhost';
+	// private $dbname = 'reclydmy_azeem';
+	// private $user = 'root';
+	// private $pass = 'root';
+	// private $sql_mode = 'STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION';
 
 	public $dbh;
 
