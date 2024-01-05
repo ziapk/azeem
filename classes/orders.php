@@ -1398,7 +1398,7 @@ class Orders extends Connection
 
         $returnType = !empty($LinkedCustomer) ? 1 : (!empty($array['return_type']) ? $array['return_type'] : 1); // 1 = sale return, 2 = purchase return
         $isSupplier = !empty($LinkedCustomer) ? 1 : (!empty($array['is_supplier']) ? $array['is_supplier'] : 1); // 1 = customer, 2 = supplier
-        $supplierObj = $isSupplier === 1 ? new Customers() : new Suppliers();
+        $supplierObj = $isSupplier == 1 ? new Customers() : new Suppliers();
         $accountsData = $shopAccounts->getSAs($storeDATA['id']);
         $storeAccounts = [];
         foreach ($accountsData as $a) {
