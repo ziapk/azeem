@@ -4,6 +4,7 @@ class Suppliers extends Connection
 {
 
 	private $table = 'suppliers';
+	private $table_accounts = 'accounts';
 
 	public function searchSupplier($search, $shopId = null, $type = 1)
 	{
@@ -202,8 +203,8 @@ class Suppliers extends Connection
 			$total_pages = ceil($total_rows / $no_of_records_per_page);
 			$currentPage = $total_pages >= $params['page'] ? $params['page'] : $total_pages;
 			$offset = (($currentPage - 1) < 0 ? 0 : ($currentPage - 1)) * $no_of_records_per_page;
-			$search = "(name LIKE '%" . $params["search"] . "%' OR contact LIKE '%" . $params["search"] . "%' OR address LIKE '%" . $params["search"] . "%' ) ";
-			$stmt = "SELECT * FROM `{$this->table}` WHERE $search and flag=1 and shopId=:shopId and type=:type LIMIT :offset, :perPage";
+			$search = "(s.name LIKE '%" . $params["search"] . "%' OR s.contact LIKE '%" . $params["search"] . "%' OR s.address LIKE '%" . $params["search"] . "%' ) ";
+			$stmt = "SELECT s.*, a.opening_balance FROM `{$this->table}` as s left join `{$this->table_accounts}` as a on a.id=s.account_id WHERE $search and s.flag=1 and s.shopId=:shopId and s.type=:type LIMIT :offset, :perPage";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':shopId', $params['shopId'], PDO::PARAM_INT);
 			$prepare->bindParam(':offset', $offset, PDO::PARAM_INT);
@@ -217,7 +218,7 @@ class Suppliers extends Connection
 
 			foreach ($result as $key => $supplier) {
 				if (!empty($supplier['account_id'])) {
-					$result[$key]['closing_balance'] = (!empty($closing[$supplier['account_id']]['balance'])) ? $closing[$supplier['account_id']]['balance'] : (!empty($supplier['closing_balance']) ? $supplier['closing_balance'] : 0);
+					$result[$key]['closing_balance'] = (!empty($closing[$supplier['account_id']]['balance'])) ? $closing[$supplier['account_id']]['balance'] : (!empty($supplier['opening_balance']) ? $supplier['opening_balance'] : 0);
 				}
 			}
 
