@@ -10,7 +10,7 @@ class Demands extends Connection
 	public function getOwnerDemands($owner_id)
 	{
 		try {
-			$stmt = "SELECT * FROM `{$this->table}` WHERE `owner_id`=:owner_id";
+			$stmt = "SELECT * FROM `{$this->table}` WHERE `owner_id`=:owner_id order by id desc";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':owner_id', $owner_id, PDO::PARAM_STR);
 			$prepare->execute();
@@ -37,7 +37,7 @@ class Demands extends Connection
 	public function getUserDemands($shop_id, $user_id)
 	{
 		try {
-			$stmt = "SELECT * FROM `{$this->table}` WHERE `shop_id`=:shop_id and created_by=:user_id and flag < 4";
+			$stmt = "SELECT * FROM `{$this->table}` WHERE `shop_id`=:shop_id and created_by=:user_id and flag < 4 order by id desc";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':shop_id', $shop_id, PDO::PARAM_STR);
 			$prepare->bindParam(':user_id', $user_id, PDO::PARAM_STR);
@@ -52,7 +52,7 @@ class Demands extends Connection
 	public function getStoreDemand($id, $owner_id)
 	{
 		try {
-			$stmt = "SELECT * FROM `{$this->table}` WHERE id=:id AND owner_id = :owner_id";
+			$stmt = "SELECT * FROM `{$this->table}` WHERE id=:id AND owner_id = :owner_id order by id desc";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':id', $id, PDO::PARAM_STR);
 			$prepare->bindParam(':owner_id', $owner_id, PDO::PARAM_STR);
