@@ -18,7 +18,8 @@
 .logo {
   padding: 6px 15px;
   width: 220px;
-  background: #303f9f;
+  background: #fff;
+  color: #282828;
   margin-left: -15px;
   display: inline-flex;
   height: 57px;
@@ -29,10 +30,6 @@
 .logo img {
   max-width: 100%;
   height: auto;
-}
-.logo a,
-.logo .fa {
-  color: #fff;
 }
 .logo a:hover {
   text-decoration: none;
@@ -941,7 +938,7 @@ thead.navbar-fixed-top {
     width: 200px;
   }
   .navbar-nav > li > a {
-    line-height: 40px;
+    line-height: 35px;
   }
   .thumb-menu-screen .footer {
     left: 0;

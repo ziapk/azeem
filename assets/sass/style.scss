@@ -34,7 +34,8 @@ $sidebarWidth: 220px;
 .logo {
     padding: 6px 15px;
     width: $sidebarWidth;
-    background: $themeColorSecondary;
+    background: $sidebarBg;
+    color: $tableHeadColor;
     margin-left: -15px;
     display: inline-flex;
     height: 57px;
@@ -45,11 +46,6 @@ $sidebarWidth: 220px;
     img {
         max-width: 100%;
         height: auto;
-    }
-
-    a,
-    .fa {
-        color: $logoText;
     }
 
     a:hover {
@@ -977,7 +973,7 @@ thead.navbar-fixed-top {
         width: 200px;
     }
     .navbar-nav > li > a {
-        line-height: 40px;
+        line-height: 35px;
     }
 
 
