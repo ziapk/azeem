@@ -404,10 +404,10 @@ class DoubleEntry extends Connection
 			die("Error!: " . $e->getMessage() . "<br/>");
 		}
 	}
-	public function getOpeningBalances($account_ids, $type = '')
+	public function getOpeningBalances($ids, $type = '')
 	{
 		try {
-			$account_ids = implode(',', $account_ids);
+			$account_ids = implode(',', $ids);
 			$stmt = "SELECT a.opening_balance, a.id, SUM(CASE WHEN e.entry_type = 'D' THEN e.amount ELSE 0 END) AS debitAmount, SUM(CASE WHEN e.entry_type = 'C' THEN e.amount ELSE 0 END) AS creditAmount FROM `$this->table` as a LEFT JOIN `$this->table_ledger_entries` as e ON a.id = e.account_id and a.status = 1 left join `{$this->table_transactions}` as t on t.id=e.transaction_id WHERE  (a.id IN ($account_ids) and t.flag is null) or (a.id IN ($account_ids) and t.flag = 1) GROUP BY a.id";
 			$prepare = $this->dbh->prepare($stmt);
 			// $prepare->bindParam(':account_id', $account_id, PDO::PARAM_STR);
@@ -415,9 +415,9 @@ class DoubleEntry extends Connection
 			$results = $prepare->fetchAll(PDO::FETCH_ASSOC);
 
 			$arr = [];
+			$foundIds = [];
 			foreach ($results as $key => $result) {
-
-
+				$foundIds[] = $result['id'];
 				if ($type == 'c') {
 					$result['debitAmount'] += $result['opening_balance'];
 				} else {
@@ -432,6 +432,34 @@ class DoubleEntry extends Connection
 				$result['balance'] = ($amount - $paid);
 
 				$arr[$result['id']] = $result;
+			}
+			$emptyAccounts = array_diff($ids, $foundIds);
+
+			if (!empty($emptyAccounts)) {
+
+				$account_ids = implode(',', $emptyAccounts);
+				$stmt = "SELECT opening_balance, id FROM `$this->table` WHERE  id IN ($account_ids)";
+				$prepare = $this->dbh->prepare($stmt);
+				// $prepare->bindParam(':account_id', $account_id, PDO::PARAM_STR);
+				$prepare->execute();
+				$results = $prepare->fetchAll(PDO::FETCH_ASSOC);
+
+				foreach ($results as $key => $result) {
+					if ($type == 'c') {
+						$result['debitAmount'] += $result['opening_balance'];
+					} else {
+						$result['creditAmount'] += $result['opening_balance'];
+					}
+
+					$paid = $type == 's' ? $result['debitAmount'] : $result['creditAmount'];
+					$amount = $type == 's' ? $result['creditAmount'] : $result['debitAmount'];
+
+					$result['paid'] = $paid;
+					$result['amount'] = $amount;
+					$result['balance'] = ($amount - $paid);
+
+					$arr[$result['id']] = $result;
+				}
 			}
 			return $arr;
 		} catch (PDOException $e) {
