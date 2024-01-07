@@ -18,11 +18,13 @@ $categoryProducts = $productCls->getCategoryProducts($shop['owner_id'], $ids, $s
       <!-- Brand and toggle get grouped for better mobile display -->
       <div class="navbar-header">
         <div class="logo pull-left">
-          <a href="<?php echo SITE_URL; ?>" title=""><?php if (!empty($shop['image'])) { ?>
-              <span class="fa">&#xf260;</span> Smart Commerce
+          <a href="<?php echo SITE_URL; ?>" title="">
+            <?php if (!empty($shop['image'])) { ?>
+              <img style="width: 120px; max-height: 45px" style="vertical-align: middle; filter: grayscale(100%);" src="<?php echo SITE_URL; ?>assets/clients/<?php echo $shop['image']; ?>" />
             <?php } else { ?>
               <img width="60" src="<?php echo SITE_URL; ?>assets/img/logo.png" alt="" />
-            <?php } ?></a>
+            <?php } ?>
+          </a>
         </div>
         <div class="pull-left welcome-header-section">
           <span>Welcome to <strong><?php echo $shop['full_name']; ?></strong></span>

@@ -39,16 +39,11 @@ $customersList = $customerObj->getCustomers($shop['id']);
         </div>
         <div class="logo pull-left">
           <a href="<?php echo SITE_URL; ?>" title="">
-            <span class="hidden-xs">
-              <?php if (!empty($shopData['image'])) { ?>
-                <img style="width: 120px; max-height: 45px" style="vertical-align: middle; filter: grayscale(100%);" src="<?php echo SITE_URL; ?>assets/clients/<?php echo $shop['image']; ?>" />
-              <?php } else { ?>
-                <img width="60" src="<?php echo SITE_URL; ?>assets/img/logo.png" alt="" />
-              <?php } ?>
-            </span>
-            <span class="visible-xs" style="padding-left: 57px;">
+            <?php if (!empty($shop['image'])) { ?>
+              <img style="width: 120px; max-height: 45px" style="vertical-align: middle; filter: grayscale(100%);" src="<?php echo SITE_URL; ?>assets/clients/<?php echo $shop['image']; ?>" />
+            <?php } else { ?>
               <img width="60" src="<?php echo SITE_URL; ?>assets/img/logo.png" alt="" />
-            </span>
+            <?php } ?>
           </a>
         </div>
         <div class="pull-left welcome-header-section">
