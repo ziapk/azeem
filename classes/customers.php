@@ -281,7 +281,8 @@ class Customers extends Connection
 			$closing = $de->getOpeningBalances(explode(',', $resultTotal['ids']), 'c');
 
 			foreach ($result as $key => $customer) {
-				print_r($closing[$customer['account_id']]);
+				var_dump($customer['account_id']);
+				var_dump($closing[$customer['account_id']]);
 				if (!empty($customer['account_id'])) {
 					$result[$key]['closing_balance'] = (!empty($closing[$customer['account_id']]['balance'])) ? $closing[$customer['account_id']]['balance'] : 0;
 				}
