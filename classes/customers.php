@@ -282,6 +282,7 @@ class Customers extends Connection
 
 			foreach ($result as $key => $customer) {
 				var_dump($customer['account_id']);
+				var_dump($resultTotal['ids']);
 				var_dump($closing);
 				if (!empty($customer['account_id'])) {
 					$result[$key]['closing_balance'] = (!empty($closing[$customer['account_id']]['balance'])) ? $closing[$customer['account_id']]['balance'] : 0;
