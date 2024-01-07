@@ -219,6 +219,9 @@ class Suppliers extends Connection
 			foreach ($result as $key => $supplier) {
 				if (!empty($supplier['account_id'])) {
 					$result[$key]['closing_balance'] = !empty($closing[$supplier['account_id']]) ? ((!empty($closing[$supplier['account_id']]['balance'])) ? $closing[$supplier['account_id']]['balance'] : 0) : (!empty($supplier['opening_balance']) ? $supplier['opening_balance'] : 0);
+					if (empty($closing[$supplier['account_id']])) {
+						$closing[$supplier['account_id']]['balance'] = !empty($supplier['opening_balance']) ? $supplier['opening_balance'] : 0;
+					}
 				}
 			}
 
