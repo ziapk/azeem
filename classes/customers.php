@@ -4,7 +4,6 @@ class Customers extends Connection
 {
 
 	private $table = 'customers';
-	private $table_accounts = 'accounts';
 	private $table_discount = 'customer_discount';
 	private $table_publisher = 'publishers';
 
@@ -266,8 +265,8 @@ class Customers extends Connection
 			$total_pages = ceil($total_rows / $no_of_records_per_page);
 			$currentPage = $total_pages >= $params['page'] ? $params['page'] : $total_pages;
 			$offset = (($currentPage - 1) < 0 ? 0 : ($currentPage - 1)) * $no_of_records_per_page;
-			$search = " AND (c.full_name LIKE '%" . $params["search"] . "%' OR c.phoneNumber LIKE '%" . $params["search"] . "%' OR c.address LIKE '%" . $params["search"] . "%' ) ";
-			$stmt = "SELECT c.*, a.opening_balance FROM `{$this->table}` as c left join `{$this->table_accounts}` as a on a.id = c.account_id WHERE c.shopId=:shopId and c.flag=1 $search LIMIT :offset, :perPage";
+			$search = " AND (full_name LIKE '%" . $params["search"] . "%' OR phoneNumber LIKE '%" . $params["search"] . "%' OR address LIKE '%" . $params["search"] . "%' ) ";
+			$stmt = "SELECT * FROM `{$this->table}` WHERE shopId=:shopId and flag=1 $search LIMIT :offset, :perPage";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':offset', $offset, PDO::PARAM_INT);
 			$prepare->bindParam(':perPage', $no_of_records_per_page, PDO::PARAM_INT);
@@ -283,7 +282,7 @@ class Customers extends Connection
 
 			foreach ($result as $key => $customer) {
 				if (!empty($customer['account_id'])) {
-					$result[$key]['closing_balance'] = (!empty($closing[$customer['account_id']]['balance'])) ? $closing[$customer['account_id']]['balance'] : (!empty($customer['opening_balance']) ? $customer['opening_balance'] : 0);
+					$result[$key]['closing_balance'] = (!empty($closing[$customer['account_id']]['balance'])) ? $closing[$customer['account_id']]['balance'] : 0;
 				}
 			}
 
