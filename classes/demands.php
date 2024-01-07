@@ -24,7 +24,7 @@ class Demands extends Connection
 	public function getStoreDemands($shop_id)
 	{
 		try {
-			$stmt = "SELECT * FROM `{$this->table}` WHERE `shop_id`=:shop_id and flag < 4";
+			$stmt = "SELECT * FROM `{$this->table}` WHERE `shop_id`=:shop_id and flag < 4 order by id desc";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':shop_id', $shop_id, PDO::PARAM_STR);
 			$prepare->execute();
