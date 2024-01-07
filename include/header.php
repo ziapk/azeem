@@ -34,7 +34,7 @@ function mainHeader($params = null)
         <link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/vendors/angular-daterangepicker/daterangepicker.css">
         <link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/vendors/angularjs-toaster/toaster.min.css">
         <link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/vendor/select2/select.min.css">
-        <link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/css/style.css?v=1.2.2">
+        <link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/css/style.css?v=1.2.3">
         <link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/css/tree.css">
         <link rel="preconnect" href="https://fonts.gstatic.com">
         <link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/vendor/font-awesome/font-awesome-4.7.0/css/font-awesome.min.css">

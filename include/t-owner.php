@@ -11,9 +11,12 @@ $list = $productCls->getOwnerProducts($ownerId);
       <!-- Brand and toggle get grouped for better mobile display -->
       <div class="navbar-header">
         <div class="logo pull-left">
+          <div class="visible-xs" style="position: absolute; left: 0; top: 0; padding: 6px 10px; text-align: center; line-height: 45px; width: 57px">
+            <a ng-click="showSidebar = !showSidebar" style="color: #fff" href="javascript:void(0)"><span class="fa fa-list"></span></a>
+          </div>
           <a href="<?php echo SITE_URL; ?>" title="">
             <?php if (!empty($shop['image'])) { ?>
-              <img style="width: 120px; max-height: 45px" style="vertical-align: middle; filter: grayscale(100%);" src="<?php echo SITE_URL; ?>assets/clients/<?php echo $shop['image']; ?>" />
+              <img style="width: 110px; max-height: 45px" style="vertical-align: middle; filter: grayscale(100%);" src="<?php echo SITE_URL; ?>assets/clients/<?php echo $shop['image']; ?>" />
             <?php } else { ?>
               <img width="60" src="<?php echo SITE_URL; ?>assets/img/logo.png" alt="" />
             <?php } ?>
@@ -58,7 +61,7 @@ $list = $productCls->getOwnerProducts($ownerId);
   </nav>
   <?php
   if (empty($params['hideSidebar'])) { ?>
-    <div class="sidebar">
+    <div class="sidebar" ng-class="{'showSidebar': showSidebar}">
       <ul class="nav">
         <li class="<?php if ($params['page'] == 'order') {
                       echo 'active';

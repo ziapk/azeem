@@ -11,6 +11,9 @@ $list = $productCls->getOwnerProducts($ownerId);
       <!-- Brand and toggle get grouped for better mobile display -->
       <div class="navbar-header">
         <div class="logo pull-left">
+          <div class="visible-xs" style="position: absolute; left: 0; top: 0; padding: 6px 10px; text-align: center; line-height: 45px; width: 57px">
+            <a ng-click="showSidebar = !showSidebar" style="color: #fff" href="javascript:void(0)"><span class="fa fa-list"></span></a>
+          </div>
           <a href="<?php echo SITE_URL; ?>" title=""><?php if (!empty($shopData['image'])) { ?>
               <span class="fa">&#xf260;</span> Smart Commerce
             <?php } else { ?>
@@ -48,7 +51,7 @@ $list = $productCls->getOwnerProducts($ownerId);
   </nav>
   <?php
   if (empty($params['hideSidebar'])) { ?>
-    <div class="sidebar">
+    <div class="sidebar" ng-class="{'showSidebar': showSidebar}">
       <ul class="nav">
         <li class="<?php if ($params['page'] == 'dashboard') {
                       echo 'active';
