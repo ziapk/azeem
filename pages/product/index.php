@@ -88,16 +88,19 @@ $programs = $programObj->getPrograms();
                         <span><img class="fa" width="14" height="14" src="<?php echo SITE_URL; ?>assets/img/svg/qrcode.svg" alt="" /><code>{{li.code || li.id}}</code></span>
                     </a>
                     <?php if ($userData['role'] === 'owner') { ?>
-                        <form ng-submit="submitCode(li)" class="dropdown-menu" style="padding: 20px; width: 300px">
-                            <div class="input-group">
+                        <form ng-submit="submitCode(li)" class="dropdown-menu" style="padding: 12px; width: 300px">
+                            <div>
                                 <input type="text" placeholder="Bar Code" ng-model="li.newBarCode" type="text" class="form-control">
-                                <span class="input-group-btn" style="width: 100px">
+                            </div>
+                            <div class="input-group">
+                                <span class="input-group-btn">
                                     <input type="text" placeholder="Price" ng-model="li.newPrice" ng-value="li.price" type="text" class="form-control">
                                 </span>
                                 <span class="input-group-btn">
-                                    <button type="submit" class="btn btn-primary">Submit</button>
+                                    <input type="text" placeholder="Whole Sale Price" ng-model="li.wh_price" ng-value="li.wh_price" type="text" class="form-control">
                                 </span>
                             </div>
+                            <button type="submit" class="btn btn-primary btn-block">Submit</button>
                         </form>
                     <?php } ?>
                 </span>
@@ -168,6 +171,7 @@ $programs = $programObj->getPrograms();
         $scope.submitCode = (form) => {
             $http.post("<?php echo SITE_URL ?>pages/product/update.php?id=" + form.id, $httpParamSerializerJQLike({
                     code: form.newBarCode,
+                    wh_price: form.wh_price,
                     price: form.newPrice,
                     createCode: true,
                     json_response: true,

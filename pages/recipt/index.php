@@ -6,6 +6,7 @@ $ordersObj = new Orders();
 $data = ['from' => $shop['sale_date'], 'to' => null];
 $orders = $ordersObj->userOrders($shop['id'], $data, 1, false);
 $stores = new Store();
+$isOwner = $userData['role'] == 'owner';
 $userId = $userData['role'] == 'owner' ? $userData['id'] : $userData['created_by'];
 $ownerStores = $stores->getOwnerStores($userId);
 
@@ -135,6 +136,9 @@ $publishers = $publisherObj->getPublishers($userId);
                                         <label class="pull-left"><span style="vertical-align: middle"><input type="checkbox" ng-model="show_discount"></span> <span style="vertical-align: middle">Add Discount</span></label>
                                         <label class="pull-left"><span style="vertical-align: middle; margin-left: 10px"><input type="checkbox" ng-model="show_bundle"></span> <span style="vertical-align: middle">Bundles</span></label>
                                         <label class="pull-left"><span style="vertical-align: middle; margin-left: 10px"><input type="checkbox" ng-model="sep"></span> <span style="vertical-align: middle">SEP</span></label>
+                                        <?php if ($isOwner) { ?>
+                                            <label class="pull-left"><span style="vertical-align: middle; margin-left: 10px"><input type="checkbox" ng-model="wsp"></span> <span style="vertical-align: middle">WSP</span></label>
+                                        <?php } ?>
                                         <div class="pull-right">
                                             <label><span style="vertical-align: middle">QF</span> <span style="vertical-align: middle; margin-left: 4px;"><input type="checkbox" name="qf" ng-model="qf"><span></label>
                                             <label><span style="vertical-align: middle">Search Product</span> <span style="vertical-align: middle; margin-left: 4px"><input type="checkbox" name="focus" ng-model="focus"><span></label>
@@ -214,6 +218,7 @@ echo mainFooter();
         $scope.focus = false;
         $scope.qf = false;
         $scope.sep = false;
+        $scope.wsp = false;
         $scope.productCode = "";
         $scope.selectedList = {};
         $scope.indexes = [];
@@ -596,6 +601,9 @@ echo mainFooter();
             if ($scope.sep) {
                 sep = true
             }
+            if ($scope.wsp) {
+                p.price = p.wh_price || p.price
+            }
             if (sep) {
                 $scope.items.push({
                     ...p,
@@ -964,6 +972,7 @@ echo mainFooter();
                     product_id: form.product_id,
                     publisher_id: form?.publisher?.id || '',
                     price: form.newPrice,
+                    wh_price: form.wh_price,
                     rackNo: form.rackNo,
                     createCode: true,
                     json_response: true,
@@ -982,17 +991,4 @@ echo mainFooter();
         }
 
     })
-</script>
-
-<script type="text/ng-template" id="row.html">
-    <a style="display: flex; align-items: center">
-        <span style="margin-right: auto; flex: 1" class="{{match.model.code ? 'text-danger' : ''}}" ng-bind-html="match.model.full_name | uibTypeaheadHighlight:query"></span>
-        <span ng-if="match.model.pprice" class="label" style="font-size: 14px">{{match.model.pprice}}</span><span ng-if="match.model.pprice">|</span><span ng-if="match.model.pack_size" class="label label-primary" style="font-size: 14px">{{match.model.pack_size}}B</span><span ng-if="match.model.pack_size">|</span><span class="label label-success" style="margin-left: auto; font-size: 14px">{{match.model.qty}}</span> | <span class="label label-danger" style="font-size: 14px">{{match.model.price}}</span>
-    </a>
-</script>
-<script type="text/ng-template" id="customer.html">
-    <a class="clearfix" style="border-bottom: 1px solid #ccc; display: block">
-      <span ng-bind-html="match.model.full_name | uibTypeaheadHighlight:query"></span><br />
-      <small><em>{{match.model.company}}</em></small>
-  </a>
 </script>

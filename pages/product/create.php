@@ -59,11 +59,12 @@ if (!empty($_POST) && isset($_POST['create'])) {
             'publisher_id' => !empty($_POST['publisher_id']) ? $_POST['publisher_id'] : 0,
             'note' => !empty($_POST['note']) ? $_POST['note'] : '',
             'image' => $uploaded ? $image : "",
-            'price' => !empty($_POST['price']) ? $_POST['price'] : "",
             'product_type' => !empty($_POST['product_type']) ? $_POST['product_type'] : "1",
             'gst' => !empty($_POST['gst']) ? $_POST['gst'] : null,
             'service_charges' => !empty($_POST['service_charges']) ? $_POST['service_charges'] : null,
             'expiry' => !empty($_POST['expiry']) ? $_POST['expiry'] : null,
+            'price' => !empty($_POST['price']) ? $_POST['price'] : "",
+            'wh_price' => !empty($_POST['wh_price']) ? $_POST['wh_price'] : null,
             'pprice' => !empty($_POST['pprice']) ? $_POST['pprice'] : null,
         ];
         $create = $productObj->createProduct($data);
@@ -129,6 +130,10 @@ $categories = $categoryObj->getCategories('pro', $ownerId);
                 <div class="col-sm-3 form-group">
                     <label>Price (RETAIL)</label>
                     <input name="price" ng-model="form.price" type="text" class="form-control" placeholder="price">
+                </div>
+                <div class="col-sm-3 form-group">
+                    <label>Price (WholeSale)</label>
+                    <input name="wh_price" ng-model="form.wh_price" type="text" class="form-control" placeholder="Whole Sale Price">
                 </div>
                 <div class="col-sm-3 form-group">
                     <label>Purchase Price</label>

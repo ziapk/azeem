@@ -43,7 +43,7 @@ foreach ($statuses as  $value) {
                     <form ng-submit="submitCode(cart)" class="dropdown-menu" style="padding: 10px; width: 450px">
                         <div class="input-group" style="width: 100%">
                             <input type="text" placeholder="Title" ng-model="cart.newTitle" type="text" class="form-control">
-                            <span class="input-group-btn" style="width: 50%">
+                            <span class="input-group-btn" style="width: 100px">
                                 <ui-select custom-dropdown ng-model="cart.publisher" theme="bootstrap" ng-disabled="disabled" reset-search-input="false" title="Choose a publisher">
                                     <ui-select-match placeholder="Enter a publisher...">{{$select.selected.full_name}}</ui-select-match>
                                     <ui-select-choices repeat="address in publishers track by $index" refresh="refreshPublishers($select.search)" refresh-delay="0">
@@ -51,15 +51,18 @@ foreach ($statuses as  $value) {
                                     </ui-select-choices>
                                 </ui-select>
                             </span>
+                            <span class="input-group-btn" style="width: 104px">
+                                <input type="text" placeholder="Rack No" ng-model="cart.rackNo" type="text" class="form-control">
+                            </span>
                         </div>
                         <div class="input-group">
                             <span class="input-group-btn" style="width: 100px">
                                 <input type="text" placeholder="Author" ng-model="cart.author" type="text" class="form-control">
                             </span>
-                            <span class="input-group-btn" style="width: 100px">
-                                <input type="text" placeholder="Rack No" ng-model="cart.rackNo" type="text" class="form-control">
-                            </span>
                             <input type="text" placeholder="Bar Code" ng-model="cart.newBarCode" type="text" class="form-control">
+                            <span class="input-group-btn" style="width: 80px">
+                                <input type="text" placeholder="WH Price" ng-model="cart.wh_price" ng-value="cart.wh_price" type="text" class="form-control">
+                            </span>
                             <span class="input-group-btn" style="width: 80px">
                                 <input type="text" placeholder="Price" ng-model="cart.newPrice" ng-value="cart.price" type="text" class="form-control">
                             </span>
@@ -86,11 +89,11 @@ foreach ($statuses as  $value) {
         </td>
         <td width="100">
             <div style="display: flex;">
-                <input ng-model="cart.price" class="form-control" ng-if="cart.product_type == 2" ng-change="calculateSum()" />
-                <span ng-if="cart.discount" ng-if="cart.product_type != 2">
+                <input ng-model="cart.price" class="form-control" ng-if="cart.product_type == 2 || wsp" ng-change="calculateSum()" />
+                <span ng-if="cart.discount" ng-if="cart.product_type != 2 && !wsp">
                     {{cart.discount_percent ? cart.discount_percent : ''}}
                     <del class="text-danger">{{cart.price | number: 2}}</del> / </span>
-                <span ng-if="cart.product_type != 2" class="text-success">{{(cart.price - cart.discount) | number: 2}}</span>
+                <span ng-if="cart.product_type != 2 && !wsp" class="text-success">{{(cart.price - cart.discount) | number: 2}}</span>
             </div>
         </td>
         <!-- <td width="120"><input type="search" ng-model="newqty" class="form-control input-qty" on-enter-press="addMoreQty(cart, newqty, $event)"></td> -->
@@ -297,3 +300,17 @@ foreach ($statuses as  $value) {
     </tr>
 </tbody>
 </table>
+
+
+<script type="text/ng-template" id="row.html">
+    <a style="display: flex; align-items: center">
+        <span style="margin-right: auto; flex: 1" class="{{match.model.code ? 'text-danger' : ''}}" ng-bind-html="match.model.full_name | uibTypeaheadHighlight:query"></span>
+        <span ng-if="match.model.wh_price" class="label" style="font-size: 14px">{{match.model.wh_price}}</span><span ng-if="match.model.wh_price">|</span><span ng-if="match.model.pprice" class="label" style="font-size: 14px">{{match.model.pprice}}</span><span ng-if="match.model.pprice">|</span><span ng-if="match.model.pack_size" class="label label-primary" style="font-size: 14px">{{match.model.pack_size}}B</span><span ng-if="match.model.pack_size">|</span><span class="label label-success" style="margin-left: auto; font-size: 14px">{{match.model.qty}}</span> | <span class="label label-danger" style="font-size: 14px">{{match.model.price}}</span>
+    </a>
+</script>
+<script type="text/ng-template" id="customer.html">
+    <a class="clearfix" style="border-bottom: 1px solid #ccc; display: block">
+      <span ng-bind-html="match.model.full_name | uibTypeaheadHighlight:query"></span><br />
+      <small><em>{{match.model.company}}</em></small>
+  </a>
+</script>

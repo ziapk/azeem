@@ -282,7 +282,7 @@ class Products extends Connection
 			}
 
 			$mobileCols = "p.id,p.full_name";
-			$allCols = "group_concat(DISTINCT r.title ORDER BY r.title ASC) as rackNumbers, p.priority, group_concat(DISTINCT pc.code ORDER BY pc.code ASC) as other_codes, p.author, p.barcode, p.code, p.cat_id, p.board, p.group, p.id, p.pprice, sp.pin, p.publisher_id, concat(p.id, ' | ', p.full_name) as full_name, sp.pack_qty, sp.pack_size, pub.full_name as publisherName, pub.discount_type, pub.discount_amount, CONVERT(case when (pub.discount_amount > 0) then (p.price * (1 - (pub.discount_amount / 100)) ) else p.price end, DECIMAL) as price, is_active, product_type $column";
+			$allCols = "group_concat(DISTINCT r.title ORDER BY r.title ASC) as rackNumbers, p.priority, p.wh_price, group_concat(DISTINCT pc.code ORDER BY pc.code ASC) as other_codes, p.author, p.barcode, p.code, p.cat_id, p.board, p.group, p.id, p.pprice, sp.pin, p.publisher_id, concat(p.id, ' | ', p.full_name) as full_name, sp.pack_qty, sp.pack_size, pub.full_name as publisherName, pub.discount_type, pub.discount_amount, CONVERT(case when (pub.discount_amount > 0) then (p.price * (1 - (pub.discount_amount / 100)) ) else p.price end, DECIMAL) as price, is_active, product_type $column";
 
 			$mainCols = "";
 			if (!empty($mobileCol)) {
@@ -843,6 +843,20 @@ class Products extends Connection
 			die("Error!: " . $e->getMessage() . "<br/>");
 		}
 	}
+	public function updateProductWHPrice($array)
+	{
+		try {
+			$stmt = "UPDATE `{$this->table}` SET  `wh_price`=:wh_price WHERE id=:id";
+			$prepare = $this->dbh->prepare($stmt);
+			$prepare->bindParam(':wh_price', $array['wh_price'], PDO::PARAM_STR);
+			$prepare->bindParam(':id', $array['product_id'], PDO::PARAM_STR);
+			$prepare->execute();
+			$prepare->rowCount();
+			return $array['product_id'];
+		} catch (PDOException $e) {
+			die("Error!: " . $e->getMessage() . "<br/>");
+		}
+	}
 	public function updateProductPrice($array)
 	{
 		try {
@@ -903,9 +917,10 @@ class Products extends Connection
 	public function updateProduct($array)
 	{
 		try {
-			$stmt = "UPDATE `{$this->table}` SET `full_name`=:full_name, `price`=:price, `pprice`=:pprice, `code`=:code, `description`=:description, `group`=:group, `board`=:board, `author`=:author, `image`=:image, `publisher_id`=:publisher_id, `cat_id`=:cat_id, pack_size=:pack_size, pack_qty=:pack_qty, product_type=:product_type WHERE id=:id AND owner_id=:owner_id";
+			$stmt = "UPDATE `{$this->table}` SET `full_name`=:full_name, `wh_price`=:wh_price, `price`=:price, `pprice`=:pprice, `code`=:code, `description`=:description, `group`=:group, `board`=:board, `author`=:author, `image`=:image, `publisher_id`=:publisher_id, `cat_id`=:cat_id, pack_size=:pack_size, pack_qty=:pack_qty, product_type=:product_type WHERE id=:id AND owner_id=:owner_id";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':full_name', $array['full_name'], PDO::PARAM_STR);
+			$prepare->bindParam(':wh_price', $array['wh_price'], PDO::PARAM_STR);
 			$prepare->bindParam(':price', $array['price'], PDO::PARAM_STR);
 			$prepare->bindParam(':pprice', $array['pprice'], PDO::PARAM_STR);
 			$prepare->bindParam(':image', $array['image'], PDO::PARAM_STR);
@@ -1214,11 +1229,12 @@ class Products extends Connection
 	public function createProduct($array)
 	{
 		try {
-			$stmt = "INSERT INTO `{$this->table}` (`full_name`, `owner_id`, `user_id`, `price`, `pprice`, `image`, `code`, `barcode`, `description`, `group`, `board`, `author`, `publisher_id`, `cat_id`, `note`, `product_type`) VALUES (:full_name, :owner_id, :user_id, :price, :pprice, :image, :code, :barcode, :description, :group, :board, :author, :publisher_id, :cat_id, :note, :product_type)";
+			$stmt = "INSERT INTO `{$this->table}` (`full_name`, `owner_id`, `user_id`,`wh_price`, `price`, `pprice`, `image`, `code`, `barcode`, `description`, `group`, `board`, `author`, `publisher_id`, `cat_id`, `note`, `product_type`) VALUES (:full_name, :owner_id, :user_id, :wh_price, :price, :pprice, :image, :code, :barcode, :description, :group, :board, :author, :publisher_id, :cat_id, :note, :product_type)";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':full_name', $array['full_name'], PDO::PARAM_STR);
 			$prepare->bindParam(':owner_id', $array['owner_id'], PDO::PARAM_INT);
 			$prepare->bindParam(':user_id', $array['user_id'], PDO::PARAM_INT);
+			$prepare->bindParam(':wh_price', $array['wh_price'], PDO::PARAM_INT);
 			$prepare->bindParam(':price', $array['price'], PDO::PARAM_INT);
 			$prepare->bindParam(':pprice', $array['pprice'], PDO::PARAM_INT);
 			$prepare->bindParam(':image', $array['image'], PDO::PARAM_STR);

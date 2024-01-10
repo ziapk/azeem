@@ -68,6 +68,10 @@ if (!empty($_POST) && isset($_POST['createCode'])) {
         $data['price'] = $_POST['price'];
         $create = $productObj->updateProductPrice($data);
     }
+    if (!empty($_POST['wh_price'])) {
+        $data['wh_price'] = $_POST['wh_price'];
+        $create = $productObj->updateProductWHPrice($data);
+    }
     if (!empty($_POST['author'])) {
         $data['author'] = $_POST['author'];
         $create = $productObj->updateProductAuthor($data);
@@ -204,7 +208,6 @@ if (!empty($_POST) && isset($_POST['update'])) {
             'owner_id' => $ownerId,
             'userId' => $userId,
             'full_name' => $_POST['full_name'],
-            'price' => $_POST['price'],
             'code' => $_POST['code'],
             'publisher_id' => !empty($_POST['publisher_id']) ? $_POST['publisher_id'] : null,
             'cat_id' => !empty($_POST['cat_id']) ? $_POST['cat_id'] : null,
@@ -215,7 +218,9 @@ if (!empty($_POST) && isset($_POST['update'])) {
             'group' => $_POST['group'],
             'author' => $_POST['author'],
             'board' => $_POST['board'],
+            'price' => $_POST['price'],
             'pprice' => $_POST['pprice'],
+            'wh_price' => !empty($_POST['wh_price']) ? $_POST['wh_price'] : null,
             'image' => $uploaded ? $image : $p['image'],
         ];
 
@@ -284,6 +289,10 @@ echo mainHeader(['page' => 'product']);
             <div class="col-sm-3 form-group">
                 <label>Price (RETAIL)</label>
                 <input name="price" ng-model="form.price" type="text" class="form-control" placeholder="price">
+            </div>
+            <div class="col-sm-3 form-group">
+                <label>Price (WholeSale)</label>
+                <input name="wh_price" ng-model="form.wh_price" type="text" class="form-control" placeholder="Whole Sale Price">
             </div>
             <div class="col-sm-3 form-group">
                 <label>Purchase Price</label>

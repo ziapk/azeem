@@ -10,6 +10,7 @@ if (!empty($_GET['dup'])) { // remove id from order
 
 
 $publisherObj = new Publishers();
+$isOwner = $userData['role'] == 'owner';
 $userId = $userData['role'] == 'owner' ? $userData['id'] : $userData['created_by'];
 $publishers = $publisherObj->getPublishers($userId);
 
@@ -103,7 +104,9 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                                             <label class="pull-left"><span style="vertical-align: middle"><input type="checkbox" ng-model="show_discount"></span> <span style="vertical-align: middle">Add Discount</span></label>
                                             <label class="pull-left"><span style="vertical-align: middle; margin-left: 10px"><input type="checkbox" ng-model="show_bundle" ng-change="calculateSum()"></span> <span style="vertical-align: middle">Bundles</span></label>
                                             <label class="pull-left"><span style="vertical-align: middle; margin-left: 10px"><input type="checkbox" ng-model="sep" ng-change="calculateSum()"></span> <span style="vertical-align: middle">SEP</span></label>
-
+                                            <?php if ($isOwner) { ?>
+                                                <label class="pull-left"><span style="vertical-align: middle; margin-left: 10px"><input type="checkbox" ng-model="wsp"></span> <span style="vertical-align: middle">WSP</span></label>
+                                            <?php } ?>
                                             <div class="pull-right">
                                                 <label><span style="vertical-align: middle">QF</span> <span style="vertical-align: middle; margin-left: 4px;"><input type="checkbox" name="qf" ng-model="qf"><span></label>
                                                 <label><span style="vertical-align: middle">Search Product</span> <span style="vertical-align: middle; margin-left: 4px"><input type="checkbox" name="focus" ng-model="focus"><span></label>
@@ -181,6 +184,7 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
             $scope.focus = false;
             $scope.qf = false;
             $scope.sep = false;
+            $scope.wsp = false;
             $scope.productCode = "";
 
             $scope.selectedList = {};
@@ -633,6 +637,9 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                     tempSep = true;
                 }
 
+                if ($scope.wsp) {
+                    p.price = p.wh_price || p.price
+                }
 
 
                 if (tempSep) {
@@ -892,6 +899,7 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                         product_id: form.product_id,
                         publisher_id: form?.publisher?.id || '',
                         code: form.newBarCode,
+                        wh_price: form.wh_price,
                         price: form.newPrice,
                         rackNo: form.rackNo,
                         createCode: true,
@@ -920,18 +928,6 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
     </script>
 
 
-    <script type="text/ng-template" id="row.html">
-        <a style="display: flex; align-items: center">
-        <span class="{{match.model.code ? 'text-danger' : ''}}" ng-bind-html="match.model.full_name | uibTypeaheadHighlight:query"></span>
-        <span ng-if="match.model.pack_size" class="label label-primary" style="font-size: 14px">{{match.model.pack_size}}B</span><span ng-if="match.model.pack_size">|</span><span class="label label-success" style="font-size: 14px">{{match.model.qty}}</span> | <span class="label label-danger" style="font-size: 14px">{{match.model.price}}</span>
-    </a>
-</script>
-    <script type="text/ng-template" id="customer.html">
-        <a class="clearfix" style="border-bottom: 1px solid #ccc; display: block">
-      <span ng-bind-html="match.model.full_name | uibTypeaheadHighlight:query"></span><br />
-      <small><em>{{match.model.company}}</em></small>
-  </a>
-</script>
 <?php } else {
     echo '<div class="container-fluid"><div class="alert alert-success">This Ordre Has been Processed from Park State</div></div>';
 } ?>
