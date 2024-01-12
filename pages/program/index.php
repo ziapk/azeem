@@ -117,8 +117,9 @@ echo mainHeader(['page' => 'program']);
             }
 
             $scope.getPrograms($scope.currentPage);
-            $scope.pageChanged = () => {
-                $scope.getPrograms($scope.currentPage)
+            $scope.pageChanged = (page) => {
+                $scope.currentPage = page;
+                $scope.getPrograms(page)
             }
 
             $scope.addProgram = function(size, parentSelector) {
