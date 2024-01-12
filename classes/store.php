@@ -80,9 +80,6 @@ class Store extends Connection
 		$usrs = new Users();
 		$customer = new Customers();
 
-		$owner = $usrs->getUser($owner_id);
-
-
 		foreach ($rows as $row) {
 			if (!empty($row['row'])) {
 				$current = $row['row'];
@@ -211,6 +208,31 @@ class Store extends Connection
 			}
 		}
 
+		$de->createPaymentMode([
+			"title" => "Cash",
+			"code" => "CASH",
+			"status" => "1",
+			"is_default" => "1",
+			"shopId" => $shopId,
+			"owner_id" => $owner_id,
+		]);
+		$de->createPaymentMode([
+			"title" => "EasyPaisa",
+			"code" => "ONLINE",
+			"status" => "1",
+			"is_default" => "0",
+			"shopId" => $shopId,
+			"owner_id" => $owner_id,
+		]);
+		$de->createPaymentMode([
+			"title" => "Bank",
+			"code" => "ONLINE",
+			"status" => "1",
+			"is_default" => "0",
+			"shopId" => $shopId,
+			"owner_id" => $owner_id,
+		]);
+
 		return $rows;
 	}
 	public function updateStore($array)
@@ -254,6 +276,7 @@ class Store extends Connection
 
 			$owner_id = $array['owner_id'];
 			$users = new Users();
+			$clients = new Clients();
 
 			if (!empty($array['shopUsers'])) {
 
@@ -270,9 +293,24 @@ class Store extends Connection
 							"photo" => "avatar1.jpg",
 							"shopId" => null,
 							"role" => $usr['role'],
+							"status" => 1,
 							"created_by" => 1,
 							"password" => $usr['password'],
 							"email" => $usr['email'],
+						]);
+
+						$clients->createClient([
+							"product_title" => $array['full_name'],
+							"tag_line" => "",
+							"start_date" => date('Y-m-d'),
+							"end_date" => date('Y-m-d', strtotime("+1 year")),
+							"address" => $array['location'] . ', ' . $array['city'],
+							"phone_1" => $array['phoneNumber1'],
+							"phone_2" => $array['phoneNumber2'],
+							"phone_3" => $array['phoneNumber3'],
+							"phone_4" => '',
+							"image" => $array['image'],
+							"owner_id" => $owner_id,
 						]);
 					}
 				}
@@ -280,6 +318,8 @@ class Store extends Connection
 
 			$array['last_bill_no'] = 1;
 			$array['sale_date'] = date('Y-m-d');
+
+			$client = $clients->getClientByOwnerId($owner_id);
 
 			$stmt = "INSERT INTO `{$this->table}` (full_name, store_type, status, location, city, company_email, company_ledger_inbox, postalCode, phoneNumber1, phoneNumber2, phoneNumber3, image, owner_id, client_id, user_id, last_bill_no, sale_date, invoice_prefix) VALUES (:full_name, :store_type, :status, :location, :city, :company_email, :company_ledger_inbox, :postalCode, :phoneNumber1, :phoneNumber2, :phoneNumber3, :image, :owner_id, :client_id, :user_id, :last_bill_no, :sale_date, :invoice_prefix)";
 			$prepare = $this->dbh->prepare($stmt);
@@ -296,7 +336,7 @@ class Store extends Connection
 			$prepare->bindParam(':phoneNumber3', $array['phoneNumber3'], PDO::PARAM_STR);
 			$prepare->bindParam(':image', $array['image'], PDO::PARAM_STR);
 			$prepare->bindParam(':owner_id', $owner_id, PDO::PARAM_STR);
-			$prepare->bindParam(':client_id', $owner_id, PDO::PARAM_STR);
+			$prepare->bindParam(':client_id', $client['id'], PDO::PARAM_STR);
 			$prepare->bindParam(':user_id', $array['user_id'], PDO::PARAM_STR);
 			$prepare->bindParam(':last_bill_no', $array['last_bill_no'], PDO::PARAM_STR);
 			$prepare->bindParam(':sale_date', $array['sale_date'], PDO::PARAM_STR);
@@ -316,6 +356,7 @@ class Store extends Connection
 							"photo" => "avatar1.jpg",
 							"shopId" => $result,
 							"role" => $usr['role'],
+							"status" => 1,
 							"created_by" => $owner_id,
 							"password" => $usr['password'],
 							"email" => $usr['email'],

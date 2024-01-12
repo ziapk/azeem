@@ -120,7 +120,7 @@ class Users extends Connection
 	{
 		try {
 			$password = $this->normalToPassword($array['password']);
-			$stmt = "INSERT INTO `{$this->table}` (`password`,`full_name`,`city`,`cnic`,`phoneNumber1`,`phoneNumber2`,`phoneNumber3`,`photo`,`shopId`,`role`, `created_by`, `email`) values (:password, :full_name, :city, :cnic, :phoneNumber1, :phoneNumber2, :phoneNumber3, :photo, :shopId, :role, :created_by, :email)";
+			$stmt = "INSERT INTO `{$this->table}` (`password`,`full_name`,`city`,`cnic`,`phoneNumber1`,`phoneNumber2`,`phoneNumber3`,`photo`,`shopId`,`role`, `created_by`, `email`, `status`) values (:password, :full_name, :city, :cnic, :phoneNumber1, :phoneNumber2, :phoneNumber3, :photo, :shopId, :role, :created_by, :email, :status)";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':full_name', $array['full_name'], PDO::PARAM_STR);
 			$prepare->bindParam(':city', $array['city'], PDO::PARAM_STR);
@@ -134,8 +134,9 @@ class Users extends Connection
 			$prepare->bindParam(':created_by', $array['created_by'], PDO::PARAM_STR);
 			$prepare->bindParam(':password', $password, PDO::PARAM_STR);
 			$prepare->bindParam(':email', $array['email'], PDO::PARAM_STR);
+			$prepare->bindParam(':status', $array['status'], PDO::PARAM_STR);
 			$prepare->execute();
-			$result = $prepare->rowCount();
+			$result = $this->dbh->lastInsertId();
 			return $result;
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
