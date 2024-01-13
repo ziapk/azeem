@@ -222,10 +222,11 @@ class Demands extends Connection
 	public function modifyDemand($array)
 	{
 		try {
-			$stmt = "UPDATE `{$this->table}` SET `title`=:title, `demand_date`=:demand_date WHERE id=:id";
+			$stmt = "UPDATE `{$this->table}` SET `title`=:title, `demand_date`=:demand_date, shop_id=:shop_id WHERE id=:id";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':title', $array['title'], PDO::PARAM_STR);
 			$prepare->bindParam(':demand_date', $array['demand_date'], PDO::PARAM_STR);
+			$prepare->bindParam(':shop_id', $array['shop_id'], PDO::PARAM_STR);
 			$prepare->bindParam(':id', $array['id'], PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $prepare->rowCount();

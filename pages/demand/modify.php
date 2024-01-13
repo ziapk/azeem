@@ -14,6 +14,7 @@ $demandDetail = $demandObj->getDemandDetail($id, $shop['owner_id']);
 $ownerId = $shop['owner_id'];
 $userId = $userData['id'];
 
+$ownerStores = $stores->getOwnerStores($ownerId);
 
 $error = "";
 $message = "";
@@ -24,7 +25,10 @@ $categories = $categoryObj->getOwnerCategories($ownerId);
 $all = false;
 $products = [];
 $storeObj = new Store();
-
+$isOwner = false;
+if ($userData['role'] == 'owner') {
+    $isOwner = true;
+}
 
 ?>
 <div class="container" ng-controller="categoryController">
@@ -42,6 +46,16 @@ $storeObj = new Store();
                 <input name="demand_date_piker" type="text" class="form-control datepicker-single" placeholder="YYYY-MM-DD">
                 <input id="demand_date" type="hidden" class="form-control datepicker-hidden" value="<?php echo $demandDetail['demand_date']; ?>">
             </div>
+            <?php if ($isOwner) { ?>
+                <div class="col-sm-3 form-group">
+                    <label>Shop Select</label>
+                    <select class="form-control c-select" ng-model="form.shop_id">
+                        <?php foreach ($ownerStores as $value) { ?>
+                            <option value="<?php echo $value['id']; ?>"><?php echo $value['full_name']; ?></option>
+                        <?php } ?>
+                    </select>
+                </div>
+            <?php } ?>
         </div>
         <div class="row" ng-repeat="li in form.items track by $index">
             <div class="col-sm-3 form-group" ng-if="li.id">
