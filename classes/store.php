@@ -158,7 +158,8 @@ class Store extends Connection
 									"shopId" => $shopId,
 									"account_id" => $accountId,
 									"code" => 'wc',
-									"default_discount" => 1,
+									"default_discount" => 0,
+									"is_default" => 1,
 									"linked_shop" => null
 								]);
 							}
@@ -242,7 +243,7 @@ class Store extends Connection
 			if (!empty($array['image'])) {
 				$imgTxt = ", image=:image ";
 			}
-			$stmt = "UPDATE `{$this->table}` SET full_name=:full_name, store_type=:store_type,status=:status, location=:location, city=:city, company_email=:company_email, company_ledger_inbox=:company_ledger_inbox, postalCode=:postalCode, phoneNumber1=:phoneNumber1, phoneNumber2=:phoneNumber2, phoneNumber3=:phoneNumber3, sale_terms=:sale_terms, sale_terms_lg=:sale_terms_lg, invoice_prefix=:invoice_prefix $imgTxt WHERE id=:id";
+			$stmt = "UPDATE `{$this->table}` SET full_name=:full_name, store_type=:store_type,status=:status, location=:location, city=:city, company_email=:company_email, company_ledger_inbox=:company_ledger_inbox, postalCode=:postalCode, phoneNumber1=:phoneNumber1, phoneNumber2=:phoneNumber2, phoneNumber3=:phoneNumber3, gst=:gst, service_charges=:service_charges, sale_terms=:sale_terms, sale_terms_lg=:sale_terms_lg, invoice_prefix=:invoice_prefix $imgTxt WHERE id=:id";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':full_name', $array['full_name'], PDO::PARAM_STR);
 			$prepare->bindParam(':store_type', $array['store_type'], PDO::PARAM_STR);
@@ -255,6 +256,8 @@ class Store extends Connection
 			$prepare->bindParam(':phoneNumber1', $array['phoneNumber1'], PDO::PARAM_STR);
 			$prepare->bindParam(':phoneNumber2', $array['phoneNumber2'], PDO::PARAM_STR);
 			$prepare->bindParam(':phoneNumber3', $array['phoneNumber3'], PDO::PARAM_STR);
+			$prepare->bindParam(':gst', $array['gst'], PDO::PARAM_STR);
+			$prepare->bindParam(':service_charges', $array['service_charges'], PDO::PARAM_STR);
 			$prepare->bindParam(':sale_terms', $array['sale_terms'], PDO::PARAM_STR);
 			$prepare->bindParam(':sale_terms_lg', $array['sale_terms_lg'], PDO::PARAM_STR);
 			$prepare->bindParam(':invoice_prefix', $array['invoice_prefix'], PDO::PARAM_STR);
@@ -319,9 +322,11 @@ class Store extends Connection
 			$array['last_bill_no'] = 1;
 			$array['sale_date'] = date('Y-m-d');
 
-			$client = $clients->getClientByOwnerId($owner_id);
+			$gst = !empty($array['gst']) ? $array['gst'] : 0;
+			$service_charges = !empty($array['service_charges']) ? $array['service_charges'] : 0;
 
-			$stmt = "INSERT INTO `{$this->table}` (full_name, store_type, status, location, city, company_email, company_ledger_inbox, postalCode, phoneNumber1, phoneNumber2, phoneNumber3, image, owner_id, client_id, user_id, last_bill_no, sale_date, invoice_prefix) VALUES (:full_name, :store_type, :status, :location, :city, :company_email, :company_ledger_inbox, :postalCode, :phoneNumber1, :phoneNumber2, :phoneNumber3, :image, :owner_id, :client_id, :user_id, :last_bill_no, :sale_date, :invoice_prefix)";
+			$client = $clients->getClientByOwnerId($owner_id);
+			$stmt = "INSERT INTO `{$this->table}` (full_name, store_type, status, location, city, company_email, company_ledger_inbox, postalCode, phoneNumber1, phoneNumber2, phoneNumber3, gst, service_charges, image, owner_id, client_id, user_id, last_bill_no, sale_date, invoice_prefix) VALUES (:full_name, :store_type, :status, :location, :city, :company_email, :company_ledger_inbox, :postalCode, :phoneNumber1, :phoneNumber2, :phoneNumber3, :gst, :service_charges, :image, :owner_id, :client_id, :user_id, :last_bill_no, :sale_date, :invoice_prefix)";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':full_name', $array['full_name'], PDO::PARAM_STR);
 			$prepare->bindParam(':store_type', $array['store_type'], PDO::PARAM_STR);
@@ -334,6 +339,8 @@ class Store extends Connection
 			$prepare->bindParam(':phoneNumber1', $array['phoneNumber1'], PDO::PARAM_STR);
 			$prepare->bindParam(':phoneNumber2', $array['phoneNumber2'], PDO::PARAM_STR);
 			$prepare->bindParam(':phoneNumber3', $array['phoneNumber3'], PDO::PARAM_STR);
+			$prepare->bindParam(':gst', $gst, PDO::PARAM_STR);
+			$prepare->bindParam(':service_charges', $service_charges, PDO::PARAM_STR);
 			$prepare->bindParam(':image', $array['image'], PDO::PARAM_STR);
 			$prepare->bindParam(':owner_id', $owner_id, PDO::PARAM_STR);
 			$prepare->bindParam(':client_id', $client['id'], PDO::PARAM_STR);

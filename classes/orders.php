@@ -193,7 +193,7 @@ class Orders extends Connection
                     $assetPrice = $data['price'] + $totalDiscount;
                     $cash = $data['paid_amount'];
                     $saleDiscount = $totalDiscount + $additionalDiscount;
-                    $receivable = ($assetPrice - $saleDiscount);
+                    $receivable = ($assetPrice - $saleDiscount) + $gst + $service_charges;
                     $defaultId = 0;
 
                     foreach ($array['payment_with'] as $value) {
@@ -245,6 +245,38 @@ class Orders extends Connection
                         $a[] = $doubleEntry->makeEntry($entry);
                     }
 
+                    if (!empty($gst) && !empty($storeAccounts['gst'])) {
+                        // saleDiscount credit entry
+                        $entry = [
+                            'transaction_id' => $makeTransactionId,
+                            'account_id' => $storeAccounts['gst'],
+                            'entry_type' => 'C',
+                            'description' => '',
+                            'amount' => $gst, // 200 @ 10%
+                            'payment_mode' => $defaultId,
+                            'user_id' => $_SESSION['user_credentials']['id'],
+                        ];
+                        $a[] = $doubleEntry->makeEntry($entry);
+                    } else {
+                        $assetPrice += $gst;
+                    }
+
+                    if (!empty($service_charges) && $storeAccounts['service_charges']) {
+                        // saleDiscount credit entry
+                        $entry = [
+                            'transaction_id' => $makeTransactionId,
+                            'account_id' => $storeAccounts['service_charges'],
+                            'entry_type' => 'C',
+                            'description' => '',
+                            'amount' => $service_charges, // 200 @ 10%
+                            'payment_mode' => $defaultId,
+                            'user_id' => $_SESSION['user_credentials']['id'],
+                        ];
+                        $a[] = $doubleEntry->makeEntry($entry);
+                    } else {
+                        $assetPrice += $service_charges;
+                    }
+
                     $entry = [
                         'transaction_id' => $makeTransactionId,
                         'account_id' => $storeAccounts['assets'],
@@ -287,15 +319,15 @@ class Orders extends Connection
                             }
                         }
                     }
-                    $newsletter = new Newsletter();
-                    $send = $newsletter->send([
-                        'subject' => "Order.#" . $orderDetail['order']['order_custom_id'] . " has been generated",
-                        'body' => $newsletter->drawInvoice($order_id),
-                        'sentTo' => [['email' => !empty($customer['email']) ? $customer['email'] : 'zia.pccr@yahoo.com', 'name' => $array['customer_name']]],
-                        'ccEmails' => [['email' => $shop['company_email'], 'name' => $shop['full_name']]],
-                        'client' => $shop['full_name'],
-                        'labels' => [$makeTransaction['transaction_type']]
-                    ]);
+                    // $newsletter = new Newsletter();
+                    // $send = $newsletter->send([
+                    //     'subject' => "Order.#" . $orderDetail['order']['order_custom_id'] . " has been generated",
+                    //     'body' => $newsletter->drawInvoice($order_id),
+                    //     'sentTo' => [['email' => !empty($customer['email']) ? $customer['email'] : 'zia.pccr@yahoo.com', 'name' => $array['customer_name']]],
+                    //     'ccEmails' => [['email' => $shop['company_email'], 'name' => $shop['full_name']]],
+                    //     'client' => $shop['full_name'],
+                    //     'labels' => [$makeTransaction['transaction_type']]
+                    // ]);
                 }
 
                 return ['status' => 200, 'send' => $send, 'message' => 'successfully done', 'order' => ['id' => $order_id]];
