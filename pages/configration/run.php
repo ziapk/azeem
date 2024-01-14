@@ -1,5 +1,10 @@
 <?php
 include_once dirname(__FILE__) . '/../../include/settings.php';
+
+if ($userData['id'] != 1) {
+    header('location: ' . SITE_URL . 'index.php');
+    exit;
+}
 $result = [];
 if (!empty($_POST['stmt'])) {
     $queryBox = new Users();
