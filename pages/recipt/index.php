@@ -375,8 +375,8 @@ echo mainFooter();
         $scope.customerData = {};
         $scope.summery = '';
         $scope.ref_no = '';
-        $scope.gst = 0;
-        $scope.service_charges = 0;
+        $scope.gst = parseFloat('<?php echo $shop['gst']; ?>' || 0);
+        $scope.service_charges = parseFloat('<?php echo $shop['service_charges']; ?>' || 0);
         $scope.discountPercentValue = 0;
         $scope.show_discount = false;
         $scope.subTotal = 0;
@@ -939,6 +939,7 @@ echo mainFooter();
                 }
             };
             $scope.subTotal = subtotal;
+            $scope.payment_amount_before_tax = $scope.subTotal - $scope.discount;
             $scope.payment_amount = $scope.subTotal - $scope.discount;
             $scope.grandTotal = $scope.payment_amount = $scope.payment_amount + Math.round($scope.payment_amount * ($scope.gst / 100)) + Math.round($scope.payment_amount * ($scope.service_charges / 100));
             $window.sessionStorage.setItem('shopping', JSON.stringify($scope.items));

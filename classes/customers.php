@@ -29,7 +29,7 @@ class Customers extends Connection
 	{
 		try {
 			$linkedShop = !empty($array['linked_shop']) ? $array['linked_shop'] : null;
-			$stmt = "INSERT INTO `{$this->table}` (`full_name`, `address`,`type`, `company`, `email`, `title`, `phoneNumber`, `shopId`, `account_id`, `code`, `default_discount`, `linked_shop`) VALUES (:full_name, :address, :type, :company, :email, :title, :phoneNumber, :shopId, :account_id, :code, :default_discount, :linked_shop)";
+			$stmt = "INSERT INTO `{$this->table}` (`full_name`, `address`,`type`, `company`, `email`, `title`, `phoneNumber`, `shopId`, `account_id`, `code`, `default_discount`, `is_default`, `linked_shop`) VALUES (:full_name, :address, :type, :company, :email, :title, :phoneNumber, :shopId, :account_id, :code, :default_discount, :is_default, :linked_shop)";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':full_name', $array['full_name'], PDO::PARAM_STR);
 			$prepare->bindParam(':phoneNumber', $array['phoneNumber'], PDO::PARAM_STR);
@@ -42,6 +42,7 @@ class Customers extends Connection
 			$prepare->bindParam(':account_id', $array['account_id'], PDO::PARAM_INT);
 			$prepare->bindParam(':code', $array['code'], PDO::PARAM_STR);
 			$prepare->bindParam(':default_discount', $array['default_discount'], PDO::PARAM_STR);
+			$prepare->bindParam(':is_default', $array['is_default'], PDO::PARAM_STR);
 			$prepare->bindParam(':linked_shop', $linkedShop, PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $this->dbh->lastInsertId();

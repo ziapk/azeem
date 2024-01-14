@@ -30,6 +30,8 @@ if (!empty($_POST) && isset($_POST['update'])) {
             'company_ledger_inbox' => !empty($_POST['company_ledger_inbox']) ? $_POST['company_ledger_inbox'] : "",
             'postalCode' => !empty($_POST['postalCode']) ? $_POST['postalCode'] : "",
             'phoneNumber1' => !empty($_POST['phoneNumber1']) ? $_POST['phoneNumber1'] : "",
+            'gst' => !empty($_POST['gst']) ? $_POST['gst'] : 0,
+            'service_charges' => !empty($_POST['service_charges']) ? $_POST['service_charges'] : 0,
             'phoneNumber2' => !empty($_POST['phoneNumber2']) ? $_POST['phoneNumber2'] : "",
             'phoneNumber3' => !empty($_POST['phoneNumber3']) ? $_POST['phoneNumber3'] : "",
             'sale_terms' => !empty($_POST['sale_terms']) ? $_POST['sale_terms'] : "",

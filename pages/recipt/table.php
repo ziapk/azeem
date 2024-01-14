@@ -266,6 +266,14 @@ foreach ($statuses as  $value) {
         <td class="text-right" style="color: red; font-weight: bold;">Total Discount</td>
         <td style="color: red; font-weight: bold; font-size: 1.5em" class="text-right"><strong>{{(discount + discountPercentValue) | number: 2}}</strong></td>
     </tr>
+    <tr ng-if="gst">
+        <td class="text-right text-mute">GST {{gst}}%</td>
+        <td style="font-size: 1.5em" class="text-right text-mute"><strong>{{(payment_amount_before_tax * (gst / 100)).toFixed(0) | number: 2}}</strong></td>
+    </tr>
+    <tr ng-if="service_charges">
+        <td class="text-right text-mute">Service Charges {{service_charges}}%</td>
+        <td style="font-size: 1.5em" class="text-right text-mute"><strong>{{payment_amount_before_tax * (service_charges / 100) | number: 2}}</strong></td>
+    </tr>
     <tr>
         <td class="text-right">Grand Total</td>
         <td class="text-success text-right" style="font-weight: bold; font-size: 1.5em">{{grandTotal | number: 2}}</td>

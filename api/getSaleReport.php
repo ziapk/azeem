@@ -20,9 +20,11 @@ foreach ($orders as $key => $row) {
 array_multisort(array_column($orders, 'order_custom_id'), SORT_DESC, $orders);
 
 $data = [];
-$data['records'] = $orders;
 $data['income'] = 0;
 foreach ($orders as $key => $row) {
+    $orders[$key]['gst'] = round($row['price'] * (intval($row['gst']) / 100));
+    $orders[$key]['service_charges'] = round($row['price'] * (intval($row['service_charges']) / 100));
+    $orders[$key]['price'] += $orders[$key]['service_charges'] + $orders[$key]['gst'];
     if ($row['flag'] == 1) {
         $data['totalIncome'] += $row['price'] - $row['discount'];
         if (!empty($row['prices'])) {
@@ -46,6 +48,7 @@ foreach ($orders as $key => $row) {
         }
     }
 }
+$data['records'] = $orders;
 $data['total'] = sizeof($orders);
 
 echo json_encode($data);
