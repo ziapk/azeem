@@ -59,3 +59,4 @@ echo mainHeader();
         </div>
     <?php } ?>
 </div>
+<?php echo mainHeader();
