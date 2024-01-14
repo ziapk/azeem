@@ -140,6 +140,12 @@ $storeTypesArr = $storeObj->getStoreTypes();
                 <input name="phoneNumber3" type="text" class="form-control" placeholder="Cell 3" value="<?php echo $storeData['phoneNumber3']; ?>">
             </div>
             <div class="col-sm-4 form-group">
+                <input name="gst" type="text" class="form-control" placeholder="GST (0%)" value="<?php echo $storeData['gst']; ?>">
+            </div>
+            <div class="col-sm-4 form-group">
+                <input name="service_charges" type="text" class="form-control" placeholder="Service Charges (0%)" value="<?php echo $storeData['service_charges']; ?>">
+            </div>
+            <div class="col-sm-4 form-group">
                 <select name="status" class="form-control">
                     <?php foreach ($statusArr as $key => $type) { ?>
                         <option value="<?php echo $key ?>" <?php if ($storeData['status'] == $key) {
