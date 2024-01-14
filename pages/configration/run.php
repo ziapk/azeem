@@ -11,7 +11,7 @@ if (!empty($_POST['stmt'])) {
     $query = $queryBox->runQuery($_POST['stmt']);
     $result = $query;
 }
-echo mainHeader();
+echo mainHeader(['page' => 'query']);
 ?>
 <div class="container">
     <h4>Query BOX</h4>
@@ -59,4 +59,4 @@ echo mainHeader();
         </div>
     <?php } ?>
 </div>
-<?php echo mainHeader();
+<?php echo mainFooter();
