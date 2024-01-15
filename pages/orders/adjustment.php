@@ -59,7 +59,7 @@ echo mainHeader(['page' => 'sale_returns']);
                     <th></th>
                 </tr>
                 <tr>
-                    <td colspan="7"><input type="text" class="form-control" id="searchProduct" ng-model="product" placeholder="Search Product to add" typeahead-on-select="selectProduct($item, row)" uib-typeahead="address as address.full_name for address in searchProduct($viewValue)" typeahead-template-url="row2.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="1" ng-model-options="{debounce: 500}" class="form-control" ng-model="row.product_name" /></td>
+                    <td colspan="7"><input type="text" class="form-control" id="searchProduct" ng-model="product" placeholder="Search Product to add" typeahead-on-select="selectProduct($item, row)" uib-typeahead="address as address.full_name for address in searchProduct($viewValue)" typeahead-template-url="product-format.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="1" ng-model-options="{debounce: 500}" class="form-control" ng-model="row.product_name" /></td>
                     <td><input type="checkbox" ng-model="sep"> SEP</td>
                     <td><input type="checkbox" ng-model="qf"> Qty</td>
                 </tr>
@@ -618,11 +618,4 @@ echo mainFooter();
       <span ng-bind-html="match.model.full_name | uibTypeaheadHighlight:query"></span> <br />
       <span>{{match.model.contact}}</span>
   </a>
-</script>
-
-<script type="text/ng-template" id="row2.html">
-    <a style="display: flex">
-        <span style="margin-right: auto" class="{{match.model.code ? 'text-danger' : ''}}" ng-bind-html="match.model.full_name | uibTypeaheadHighlight:query"></span>
-        <span ng-if="match.model.pack_size" class="label label-primary" style="font-size: 14px">{{match.model.pack_size}}B</span><span ng-if="match.model.pack_size">|</span><span class="label label-success" style="font-size: 14px">{{match.model.qty}}</span> | <span class="label label-danger" style="font-size: 14px">{{match.model.price}}</span>
-    </a>
 </script>

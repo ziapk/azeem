@@ -997,5 +997,15 @@ thead.navbar-fixed-top {
     padding: 0 15px;
   }
 }
+.btn-fab {
+  position: fixed;
+  bottom: 40px;
+  right: 40px;
+  background-color: #333;
+  padding: 10px;
+  border-radius: 500px;
+  z-index: 99;
+  box-shadow: 0 0 20px #333;
+}
 
 /*# sourceMappingURL=style.css.map */

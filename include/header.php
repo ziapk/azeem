@@ -34,7 +34,7 @@ function mainHeader($params = null)
         <link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/vendors/angular-daterangepicker/daterangepicker.css">
         <link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/vendors/angularjs-toaster/toaster.min.css">
         <link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/vendor/select2/select.min.css">
-        <link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/css/style.css?v=1.2.4">
+        <link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/css/style.css?v=1.2.5">
         <link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/css/tree.css">
         <link rel="preconnect" href="https://fonts.gstatic.com">
         <link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/vendor/font-awesome/font-awesome-4.7.0/css/font-awesome.min.css">
@@ -70,6 +70,7 @@ function mainHeader($params = null)
     <body ng-app="mainApp" class="<?php if (!empty($params['bodyClasses'])) {
                                         echo implode(' ', $params['bodyClasses']);
                                     }; ?>">
+
         <!--[if lt IE 7]>
                 <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.</p>
             <![endif]-->
@@ -82,7 +83,7 @@ function mainHeader($params = null)
             if (!empty($_SESSION['user_credentials']) && $_SESSION['user_credentials']['role'] == 'owner') {
                 include_once dirname(__FILE__) . '/owner.php';
         ?>
-    <?php
+        <?php
             }
             if (!empty($_SESSION['user_credentials']) && $_SESSION['user_credentials']['role'] == 'manager') {
                 include_once dirname(__FILE__) . '/manager.php';
@@ -97,5 +98,10 @@ function mainHeader($params = null)
                 include_once dirname(__FILE__) . '/superadmin.php';
             }
         }
-        ob_get_flush();
-    }
+        ?>
+        <a uib-tooltip="New Bill" tooltip-placement="top" title="" href="<?php echo SITE_URL; ?>pages/recipt" target="_blank" class="btn btn-fab">
+            <img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/receipt.svg" alt="" />
+        </a>
+    <?php
+    ob_get_flush();
+}
