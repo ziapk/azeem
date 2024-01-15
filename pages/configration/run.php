@@ -59,4 +59,3 @@ echo mainHeader(['page' => 'query']);
         </div>
     <?php } ?>
 </div>
-<?php echo mainFooter();
