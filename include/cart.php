@@ -193,11 +193,11 @@
       $scope.cart.map(row => {
         $scope.finalList.push({
           ...row,
-          price: row.price || obj.price,
+          price: row.price,
           discount: row.discount,
           qty: row.qty
         })
-        $scope.totalPrice += parseFloat(row.qty) * (parseFloat(row.price || obj.price || 0) - parseFloat(row.discount || 0))
+        $scope.totalPrice += parseFloat(row.qty) * (parseFloat(row.price || 0) - parseFloat(row.discount || 0))
       })
       document.dispatchEvent(event);
     }

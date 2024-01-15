@@ -56,6 +56,9 @@ $list = $productCls->getOwnerProducts($ownerId);
         <li class="<?php if ($params['page'] == 'dashboard') {
                       echo 'active';
                     } ?>"><a uib-tooltip="Dashboard" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/product.svg" alt="" /> <span class="nav-menu-text">Dashboard</span></a></li>
+        <li class="<?php if ($params['page'] == 'query') {
+                      echo 'active';
+                    } ?>"><a uib-tooltip="Query Box" tooltip-placement="right" title="" href="<?php echo SITE_URL; ?>pages/configration/run.php"><img class="fa" width="20" height="20" src="<?php echo SITE_URL; ?>assets/img/svg/product.svg" alt="" /> <span class="nav-menu-text">Query Box</span></a></li>
       </ul>
       <a href="javascript:void(0)" ng-click="toggleSidebar()" class="toggle-sidebar"><img width="16" height="16" src="<?php echo SITE_URL; ?>assets/img/svg/left-arrow.svg" alt="" /></a>
     </div>

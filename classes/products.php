@@ -282,7 +282,7 @@ class Products extends Connection
 			}
 
 			$mobileCols = "p.id,p.full_name";
-			$allCols = "group_concat(DISTINCT r.title ORDER BY r.title ASC) as rackNumbers, p.priority, p.wh_price, group_concat(DISTINCT pc.code ORDER BY pc.code ASC) as other_codes, p.author, p.barcode, p.code, p.cat_id, p.board, p.group, p.id, p.pprice, sp.pin, p.publisher_id, concat(p.id, ' | ', p.full_name) as full_name, sp.pack_qty, sp.pack_size, pub.full_name as publisherName, pub.discount_type, pub.discount_amount, CONVERT(case when (pub.discount_amount > 0) then (p.price * (1 - (pub.discount_amount / 100)) ) else p.price end, DECIMAL) as price, is_active, product_type $column";
+			$allCols = "group_concat(DISTINCT r.title ORDER BY r.title ASC) as rackNumbers, p.priority, p.wh_price, p.image, group_concat(DISTINCT pc.code ORDER BY pc.code ASC) as other_codes, p.author, p.barcode, p.code, p.cat_id, p.board, p.group, p.id, p.pprice, sp.pin, p.publisher_id, concat(p.id, ' | ', p.full_name) as full_name, sp.pack_qty, sp.pack_size, pub.full_name as publisherName, pub.discount_type, pub.discount_amount, CONVERT(case when (pub.discount_amount > 0) then (p.price * (1 - (pub.discount_amount / 100)) ) else p.price end, DECIMAL) as price, is_active, product_type $column";
 
 			$mainCols = "";
 			if (!empty($mobileCol)) {
@@ -492,7 +492,6 @@ class Products extends Connection
 		try {
 
 			$searchQry = "";
-			$sortByQry = "";
 
 			$prefix = "%";
 
@@ -542,49 +541,10 @@ class Products extends Connection
 				$searchQry = "AND (p.id = '" . $params["search"] . "' OR p.code = '" . $params["search"] . "' OR p.full_name LIKE '" . $prefix . $params["search"] . "%' OR p.group LIKE '" . $prefix . $params["search"] . "%' OR p.description LIKE '" . $prefix . $params["search"] . "%' OR p.board LIKE '" . $prefix . $params["search"] . "%' OR p.author LIKE '" . $prefix . $params["search"] . "%' OR p.price LIKE '" . $prefix . $params["search"] . "%' OR pc.code LIKE '" . $prefix . $params["search"] . "%' ) ";
 			}
 
-			if (!empty($params['sortByField'])) {
-				$name = $params['sortByField'];
-				$order = $params['sortByOrder'];
-				if ($name == 'title') {
-					$sortByQry = " ORDER BY p.full_name " . $params['sortByOrder'];
-				}
-				if ($name == 'group') {
-					$sortByQry = " ORDER BY p.group " . $params['sortByOrder'];
-				}
-				if ($name == 'author') {
-					$sortByQry = " ORDER BY p.author " . $params['sortByOrder'];
-				}
-				if ($name == 'price') {
-					$sortByQry = " ORDER BY p.price " . $params['sortByOrder'];
-				}
-				if ($name == 'stock') {
-					$sortByQry = " ORDER BY p.in_hand " . $params['sortByOrder'];
-				}
-			}
-
 			$innerJoin = "";
 			if (!empty($shopId)) {
 				$innerJoin .= " INNER JOIN {$this->table_st} as sp on sp.product_id = p.id and shopId=$shopId and sp.status = 1 ";
 			}
-
-			$column = "";
-
-			if (!empty($shopId)) {
-				$column = ", (sp.qty - sp.stock_out) as qty ";
-			}
-
-			// $stmt = "SELECT count(p.id) as count FROM `{$this->table}` as p $innerJoin LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id  LEFT JOIN program_books as c ON c.product_id = p.id WHERE p.owner_id=:owner_id $publisher_query $pin $searchQry";
-			// $prepare = $this->dbh->prepare($stmt);
-			// $prepare->bindParam(':owner_id',$owner_id,PDO::PARAM_STR);
-			// $prepare->execute();
-			// $total = $prepare->fetch(PDO::FETCH_ASSOC);
-			// $no_of_records_per_page = !empty($params['perPage']) ? $params['perPage'] : 10;
-			// $total_rows = empty($total) ? 0 : $total['count'];
-			// $total_pages = ceil($total_rows / $no_of_records_per_page);
-			// $currentPage = $total_pages >= $params['page'] ? $params['page'] : $total_pages;
-			// $offset =  ((!empty($currentPage) ? $currentPage : 1) -1) * $no_of_records_per_page;
-
-
 
 
 			$stmt = "UPDATE `{$this->table}` as p  $innerJoin LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id LEFT JOIN program_books as c ON c.product_id = p.id LEFT JOIN publishers as pub on p.publisher_id = pub.id SET p.publisher_id=:publisher_id WHERE p.`owner_id`=:owner_id and p.is_active = 1  $publisher_query  $pin $searchQry";

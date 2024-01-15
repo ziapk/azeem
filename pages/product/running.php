@@ -137,7 +137,7 @@ $programs = $programObj->getPrograms();
                         found = true
                         row.qty++;
                         toaster.success({
-                            body: 'Book Added to Cart successfully!'
+                            body: 'Product Added to Cart successfully!'
                         });
                     }
                 });

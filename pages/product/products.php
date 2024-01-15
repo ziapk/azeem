@@ -225,6 +225,7 @@ $programs = $programObj->getPrograms();
                         ...r,
                         qty: 1
                     })) : [{
+                        ...item,
                         id: item.id,
                         qty: 1
                     }])]));
@@ -236,12 +237,13 @@ $programs = $programObj->getPrograms();
                     ...r,
                     qty: 1
                 })) : [{
+                    ...item,
                     id: item.id,
                     qty: 1
                 }]))
             }
             toaster.success({
-                body: 'Book Added to Cart successfully!'
+                body: 'Product Added to Cart successfully!'
             });
         }
 
