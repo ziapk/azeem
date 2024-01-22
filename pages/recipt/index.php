@@ -32,21 +32,6 @@ $publishers = $publisherObj->getPublishers($userId);
 </style>
 <div ng-controller="cartController">
     <div class="container">
-        <!-- <div class="form-group" ng-if="pinPrograms && key.toLowerCase().includes('uniform')" ng-repeat="(key, li) in pinPrograms">
-            <a href="javascript:void(0)">{{key}}</a>
-            >
-
-            <span ng-repeat="(k, l) in li">
-                <a href="javascript:void(0)" ng-class="{'text-danger text-bold': selectedSize == k }">{{k}}</a>
-                > <span ng-repeat="(dd, i) in l">
-                    <a class="btn btn-xs" ng-class="{'btn-danger': dd == 'Girls', 'btn-primary': dd == 'Boys'}" style="border-radius: 4px" href="#" ng-click="setSelectedProgramItems(i.items, dd, k)">{{dd}}</a>
-                    <a href="javascript:void(0)" class="btn btn-default btn-xs" ng-click="addAllBooks(i.items)">All</a>
-                </span>
-            </span>
-        </div>
-        <div class="form-group" ng-if="selectedProgramItems.length">
-            <span ng-repeat="row in selectedProgramItems" style="display: inline-block; padding: 2px"><a href="javascript:void(0)" class="btn" style="border-radius: 4px; padding: 2px 6px" ng-class="{'btn-danger': selectedUniform == 'Girls', 'btn-primary': selectedUniform == 'Boys', 'btn-default': selectedUniform && !['Boys', 'Girls'].includes(selectedUniform)}" ng-click="selectProduct(row)"><strong>{{row.full_name}}</strong> <span class="badge badge-warning">{{row.board}}</span></a></span>
-        </div> -->
         <span class="btn-group btn-group-sm form-group dropdown">
             <a class="dropdown-item btn btn-primary" href="#" data-toggle="dropdown"><span class="nav-menu-icon" style="margin-right: 6px"></span><span class="nav-menu-text">Syllabus</span>
                 <div class="fa fa-caret-down"></div>
@@ -136,52 +121,48 @@ $publishers = $publisherObj->getPublishers($userId);
         </table>
         <table class="table table-striped visible-xs">
             <thead>
-                <tr>
-                    <?php echo include_once dirname(__FILE__) . '/table-sm.php'; ?>
-                </tr>
-            </thead>
-        </table>
-        <table class="table table-striped recipt-table hidden-xs">
-            <thead id="fixme">
-                <th colspan="8" style="padding: 0">
-                    <table class="table" style="box-shadow: none; margin: 0">
-                        <thead>
-                            <tr>
-                                <th style="vertical-align: middle">Customer Name</th>
-                                <th style="width: 200px">
-                                    <div class="dropdown-wrapper" style="position: relative;">
-                                        <input type="text" class="form-control" ng-model="customerName" placeholder="Search Customer" uib-typeahead="address as address.full_name for address in searchCustomer($viewValue)" typeahead-on-select="selectCustomer($item)" ng-model-options="{debounce: 100}" typeahead-template-url="customer.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="1">
-                                    </div>
-                                </th>
-                                <th style="vertical-align: middle">
-                                    <label class="pull-left"><span style="vertical-align: middle"><input type="checkbox" ng-model="show_discount"></span> <span style="vertical-align: middle">Add Discount</span></label>
-                                    <label class="pull-left"><span style="vertical-align: middle; margin-left: 10px"><input type="checkbox" ng-model="show_bundle"></span> <span style="vertical-align: middle">Bundles</span></label>
-                                    <label class="pull-left"><span style="vertical-align: middle; margin-left: 10px"><input type="checkbox" ng-model="sep"></span> <span style="vertical-align: middle">SEP</span></label>
-                                    <?php if ($isOwner) { ?>
-                                        <label class="pull-left"><span style="vertical-align: middle; margin-left: 10px"><input type="checkbox" ng-model="wsp"></span> <span style="vertical-align: middle">WSP</span></label>
-                                    <?php } ?>
-                                    <div class="pull-right">
-                                        <label><span style="vertical-align: middle">QF</span> <span style="vertical-align: middle; margin-left: 4px;"><input type="checkbox" name="qf" ng-model="qf"><span></label>
-                                        <label><span style="vertical-align: middle">Search Product</span> <span style="vertical-align: middle; margin-left: 4px"><input type="checkbox" name="focus" ng-model="focus"><span></label>
-                                    </div>
-                                </th>
-                                <th width="100">
-                                    <div class="dropdown-wrapper align-right dropdown-height">
-                                        <div class="input-group">
-                                            <input type="text" autocomplete="off" class="form-control" id="searchProduct" ng-model="product" placeholder="Search Products" uib-typeahead="address as address.full_name for address in searchProduct($viewValue)" typeahead-on-select="selectProduct($item)" ng-model-options="{debounce: 100}" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="productCode ? 0 : 1">
-                                            <span class="input-group-btn" style="width: 90px">
-                                                <input type="text" ng-model="productCode" class="form-control" id="exampleInputAmount" placeholder="CODE">
-                                            </span>
-                                        </div>
-                                    </div>
-                                </th>
-                            </tr>
-                        </thead>
-                    </table>
-                </th>
+                <?php echo include_once dirname(__FILE__) . '/table-sm.php'; ?>
+                <table class="table table-striped recipt-table hidden-xs">
+                    <thead id="fixme">
+                        <th colspan="8" style="padding: 0">
+                            <table class="table" style="box-shadow: none; margin: 0">
+                                <thead>
+                                    <tr>
+                                        <th style="vertical-align: middle">Customer Name</th>
+                                        <th style="width: 200px">
+                                            <div class="dropdown-wrapper" style="position: relative;">
+                                                <input type="text" class="form-control" ng-model="customerName" placeholder="Search Customer" uib-typeahead="address as address.full_name for address in searchCustomer($viewValue)" typeahead-on-select="selectCustomer($item)" ng-model-options="{debounce: 100}" typeahead-template-url="customer.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="1">
+                                            </div>
+                                        </th>
+                                        <th style="vertical-align: middle">
+                                            <label class="pull-left"><span style="vertical-align: middle"><input type="checkbox" ng-model="show_discount"></span> <span style="vertical-align: middle">Add Discount</span></label>
+                                            <label class="pull-left"><span style="vertical-align: middle; margin-left: 10px"><input type="checkbox" ng-model="show_bundle"></span> <span style="vertical-align: middle">Bundles</span></label>
+                                            <label class="pull-left"><span style="vertical-align: middle; margin-left: 10px"><input type="checkbox" ng-model="sep"></span> <span style="vertical-align: middle">SEP</span></label>
+                                            <?php if ($isOwner) { ?>
+                                                <label class="pull-left"><span style="vertical-align: middle; margin-left: 10px"><input type="checkbox" ng-model="wsp"></span> <span style="vertical-align: middle">WSP</span></label>
+                                            <?php } ?>
+                                            <div class="pull-right">
+                                                <label><span style="vertical-align: middle">QF</span> <span style="vertical-align: middle; margin-left: 4px;"><input type="checkbox" name="qf" ng-model="qf"><span></label>
+                                                <label><span style="vertical-align: middle">Search Product</span> <span style="vertical-align: middle; margin-left: 4px"><input type="checkbox" name="focus" ng-model="focus"><span></label>
+                                            </div>
+                                        </th>
+                                        <th width="100">
+                                            <div class="dropdown-wrapper align-right dropdown-height">
+                                                <div class="input-group">
+                                                    <input type="text" autocomplete="off" class="form-control" id="searchProduct" ng-model="product" placeholder="Search Products" uib-typeahead="address as address.full_name for address in searchProduct($viewValue)" typeahead-on-select="selectProduct($item)" ng-model-options="{debounce: 100}" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="productCode ? 0 : 1">
+                                                    <span class="input-group-btn" style="width: 90px">
+                                                        <input type="text" ng-model="productCode" class="form-control" id="exampleInputAmount" placeholder="CODE">
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </th>
 
 
-                <?php echo include_once dirname(__FILE__) . '/table.php'; ?>
+                        <?php echo include_once dirname(__FILE__) . '/table.php'; ?>
 
     </div>
 

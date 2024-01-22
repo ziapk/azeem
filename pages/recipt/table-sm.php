@@ -18,7 +18,6 @@ foreach ($statuses as  $value) {
 ?>
 <tr>
     <th>Description</th>
-    <!-- <th width="100">Total</th> -->
     <th style="text-align: right;">
         <a href="#" class="btn btn-xs btn-danger" ng-click="deleteAll(indexes, items)">Del</a> |
         <a href="#" class="btn btn-xs btn-primary" ng-click="inActiveAll(indexes, items)">InAct</a>
