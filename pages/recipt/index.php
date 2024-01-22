@@ -105,7 +105,7 @@ $publishers = $publisherObj->getPublishers($userId);
         </span>
         <div class="clearfix" id="dummyHeight"></div>
 
-        <table class="table">
+        <table class="table visible-xs">
             <tr>
                 <td>
                     <input type="text" class="form-control" ng-model="customerName" placeholder="Search Customer" uib-typeahead="address as address.full_name for address in searchCustomer($viewValue)" typeahead-on-select="selectCustomer($item)" ng-model-options="{debounce: 100}" typeahead-template-url="customer.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="1">
