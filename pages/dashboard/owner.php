@@ -33,8 +33,20 @@ foreach ($publishersArr as $key => $value) {
 
 <div class="container" ng-controller="productController">
     <h4>My Shops <small>&lt;<?php echo $currentStore['full_name']; ?>&gt;</small></h4>
+
     <div class="table-responsive">
-        <table class="table">
+        <ol class="table-list visible-xs">
+            <li ng-repeat="store in shopData track by $index">
+                <strong>{{ store.full_name }}</strong> <br />
+                {{ store.city }} - {{ store.location }} <br />
+                <small ng-if="store.sale_date">SaleDate:</small> <strong ng-if="store.sale_date" class="sale-date-text">{{ store.sale_date }}</strong><br />
+                <a class="btn btn-xs btn-danger" href="javascript:void(0)" ng-click="applyClosing(store.id, store)">Sale Close</a>
+                <a class="btn btn-xs btn-primary" href="<?php echo SITE_URL . "pages/store/update.php?id="; ?>{{store.id}}">Edit Shop</a>
+                <a class="btn btn-xs btn-success" href="<?php echo SITE_URL ?>api/loginInShop.php?id={{store.id}}">CheckIn <span class="fa fa-arrow-right"></span></a>
+
+            </li>
+        </ol>
+        <table class="table hidden-xs">
             <thead>
                 <tr>
                     <th>Sr.#</th>
@@ -87,7 +99,19 @@ foreach ($publishersArr as $key => $value) {
         </div>
     </div>
     <div class="table-responsive">
-        <table class="table">
+        <ol class="table-list visible-xs">
+            <li ng-repeat="li in list track by $index">
+                {{li.product_id}} | <strong>{{li.full_name}}</strong>
+                <span class="label label-success">{{li.author}}</span><br />
+                <strong>{{shopData[li.shopId].full_name}}</strong><br />
+                Rs. <strong>{{li.price | number}}</strong> - Qty: <strong>{{li.qty - li.stock_out | number}}</strong>
+                <span class="pull-right">
+                    <a class="btn btn-xs btn-primary" href="{{url + 'pages/product/update_item.php?id=' + li.id}}">Modify</a> |
+                    <a class="btn btn-xs btn-danger" href="javascript:void(0)" ng-click="deleteStoreItem(li.id)">delete</a>
+                </span>
+            </li>
+        </ol>
+        <table class="table hidden-xs">
             <thead>
                 <tr>
                     <th>Product ID - CODE</th>
@@ -107,7 +131,7 @@ foreach ($publishersArr as $key => $value) {
                     <td>{{li.product_id}} / {{li.code}}</td>
                     <td>{{shopData[li.shopId].full_name}}</td>
                     <td><strong>{{li.full_name}}</strong> <br />{{li.author}} - {{li.group}}</td>
-                    <td>{{li.sale_price}}</td>
+                    <td>{{li.price}}</td>
                     <td>{{li.qty}}</td>
                     <td>{{li.stock_out}}</td>
                     <td>{{li.qty - li.stock_out}}</td>

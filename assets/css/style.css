@@ -1008,4 +1008,31 @@ thead.navbar-fixed-top {
   box-shadow: 0 0 20px #333;
 }
 
+.table-list {
+  background: #fff;
+  list-style-position: inside;
+  padding: 0;
+  margin: 0;
+}
+.table-list li {
+  padding: 6px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1137254902);
+}
+.table-list li:nth-child(odd) {
+  background: #eee;
+}
+.table-list .sale-date-text {
+  display: inline-block;
+  margin-bottom: 5px;
+}
+
+@media (max-width: 767px) {
+  .dropdown-menu {
+    width: calc(100vw - 30px);
+  }
+  .dropdown-menu > li > a {
+    white-space: normal;
+  }
+}
+
 /*# sourceMappingURL=style.css.map */

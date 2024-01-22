@@ -21,9 +21,7 @@ foreach ($statuses as  $value) {
     <th width="450">Description</th>
     <th width="120" ng-if="show_discount">Discount</th>
     <th width="100">Unit Price</th>
-    <!-- <th width="120">Add Qty</th> -->
     <th width="180" style="text-align: center;">Qty</th>
-    <!-- <th width="100">Total</th> -->
     <th width="180" style="text-align: right;">
         <a href="#" class="btn btn-xs btn-danger" ng-click="deleteAll(indexes, items)">Del</a> |
         <a href="#" class="btn btn-xs btn-primary" ng-click="inActiveAll(indexes, items)">InAct</a>
