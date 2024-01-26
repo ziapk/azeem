@@ -137,6 +137,37 @@
                 <th style="border: 0" colspan="2"><input ng-model="form.ppprice_1" type="number" /></th>
             </tr>
         </table>
+        <h2>Summery</h2>
+        <table cellspacing="0" cellpadding="0" width="100%" border="1">
+            <tr>
+                <th>LABOUR</th>
+                <td><input ng-change="calculatePrice()" ng-model="form.labour" type="number" /></td>
+            </tr>
+            <tr>
+                <th>FACT EXPEND</th>
+                <td><input ng-change="calculatePrice()" ng-model="form.expense" type="number" /></td>
+            </tr>
+            <tr>
+                <th>CAR RENT</th>
+                <td><input ng-change="calculatePrice()" ng-model="form.rent" type="number" /></td>
+            </tr>
+            <tr>
+                <th>INCOME TAX</th>
+                <td><input ng-change="calculatePrice()" ng-model="form.tax" type="number" /></td>
+            </tr>
+            <tr>
+                <th>TOTAL RATE</th>
+                <td><input ng-change="calculatePrice()" ng-model="form.totalRate" type="number" /></td>
+            </tr>
+            <tr>
+                <th>Profit</th>
+                <td><input ng-change="calculatePrice()" ng-model="form.profit" type="number" /></td>
+            </tr>
+            <tr>
+                <th>TOTAL RATE</th>
+                <td><input ng-change="calculatePrice()" ng-model="form.grossTotal" type="number" /></td>
+            </tr>
+        </table>
     </form>
     <script type="text/javascript" src="assets/js/angular.min.js"></script>
     <script>
@@ -153,7 +184,7 @@
                 spsheet_1: 2,
 
                 sprate_2: 50,
-                spsheet_2: 2,
+                spsheet_2: 0,
 
                 pprate_1: 1,
                 ppsheet_1: 1,
@@ -166,6 +197,15 @@
                 spprice_2: 0,
                 ppprice_1: 0,
                 sliprice_1: 0,
+
+
+                labour: 3,
+                expense: 3,
+                rent: 0,
+                tax: 0,
+                totalRate: 0,
+                profit: 0,
+                grossTotal: 0
             }
 
             $scope.calculatePrice = () => {
@@ -174,6 +214,7 @@
                 $scope.form.spprice_2 = 0;
                 $scope.form.ppprice_1 = 0;
                 $scope.form.sliprice_1 = 0;
+                $scope.form.totalRate = 0;
 
                 if (
                     $scope.form.size &&
@@ -196,7 +237,7 @@
                     let amount = Math.round(2400 / $scope.form.cutting) > (2400 / $scope.form.cutting) ? Math.round(2400 / $scope.form.cutting) - 1 : Math.round(2400 / $scope.form.cutting);
                     console.log('top', $scope.form.spsheet_1 * $scope.form.size * $scope.form.sprate_1);
                     console.log('bottom', amount);
-                    $scope.form.spprice_1 = parseFloat(($scope.form.spsheet_1 * $scope.form.size * $scope.form.sprate_1 / amount).toFixed(3));
+                    $scope.form.spprice_1 = parseFloat(($scope.form.spsheet_1 * $scope.form.size * $scope.form.sprate_1 / amount).toFixed(2));
 
                 }
 
@@ -211,7 +252,7 @@
                     let amount = Math.round(2400 / $scope.form.cutting) > (2400 / $scope.form.cutting) ? Math.round(2400 / $scope.form.cutting) - 1 : Math.round(2400 / $scope.form.cutting);
                     console.log('top', $scope.form.spsheet_2 * $scope.form.size * $scope.form.sprate_2);
                     console.log('bottom', amount);
-                    $scope.form.spprice_2 = parseFloat(($scope.form.spsheet_2 * $scope.form.size * $scope.form.sprate_2 / amount).toFixed(3));
+                    $scope.form.spprice_2 = parseFloat(($scope.form.spsheet_2 * $scope.form.size * $scope.form.sprate_2 / amount).toFixed(2));
                 }
                 if (
                     $scope.form.ppsheet_1 &&
@@ -228,6 +269,13 @@
                     $scope.form.slirate_1 = parseFloat(($scope.form.size * $scope.form.cutting * 0.0025).toFixed(3));
                     $scope.form.sliprice_1 = parseFloat(($scope.form.slisheet_1 * $scope.form.slirate_1).toFixed(3));
                 }
+
+
+
+
+                $scope.form.totalRate = $scope.form.spprice_1 + $scope.form.spprice_2 + $scope.form.ppprice_1 + $scope.form.sliprice_1 + $scope.form.price + ($scope.form.labour || 0) + ($scope.form.expense || 0) + ($scope.form.rent || 0) + ($scope.form.tax || 0)
+                $scope.form.profit = parseFloat(($scope.form.totalRate * 0.2).toFixed(3));
+                $scope.form.grossTotal = parseFloat(($scope.form.totalRate + $scope.form.profit).toFixed(3));
             }
 
             $scope.calculatePrice();
