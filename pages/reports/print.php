@@ -81,12 +81,14 @@ switch ($reportType) {
 		if (!empty($_POST['product_id'])) {
 			$product_ids[] = $_POST['product_id'];
 		}
+		$publisher_id = !empty($_POST['publisher_id']) ? $_POST['publisher_id'] : "";
+		$account_id = !empty($_POST['account_id']) ? $_POST['account_id'] : "";
 		if (!empty($product_ids)) {
-			$orders = $ordersObj->ordersReport($shopId, $from, $to, $product_ids);
+			$orders = $ordersObj->ordersReport($shopId, $from, $to, $product_ids, $publisher_id, $account_id);
 			$reportTitle = "Purchase Orders (Product Wise)";
 			include_once dirname(__FILE__) . '/salesProductsReport.php';
 		} else {
-			$orders = $ordersObj->ordersReport($shopId, $from, $to, $product_ids);
+			$orders = $ordersObj->ordersReport($shopId, $from, $to, $product_ids, $publisher_id, $account_id);
 			$reportTitle = "Purchase Orders";
 			include_once dirname(__FILE__) . '/salesReport.php';
 		}
