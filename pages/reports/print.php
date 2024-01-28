@@ -85,8 +85,8 @@ switch ($reportType) {
 		$account_id = !empty($_POST['account_id']) ? $_POST['account_id'] : "";
 		if (!empty($product_ids)) {
 			$orders = $ordersObj->ordersReport($shopId, $from, $to, $product_ids, $publisher_id, $account_id);
-			$reportTitle = "Purchase Orders (Product Wise)";
-			include_once dirname(__FILE__) . '/salesProductsReport.php';
+			$reportTitle = "Purchase Orders";
+			include_once dirname(__FILE__) . '/salesReport.php';
 		} else {
 			$orders = $ordersObj->ordersReport($shopId, $from, $to, $product_ids, $publisher_id, $account_id);
 			$reportTitle = "Purchase Orders";
@@ -99,6 +99,24 @@ switch ($reportType) {
 
 		break;
 	case '18':
+		$ordersObj = new Supply();
+		$product_ids = [];
+		if (!empty($_POST['product_id'])) {
+			$product_ids[] = $_POST['product_id'];
+		}
+		$publisher_id = !empty($_POST['publisher_id']) ? $_POST['publisher_id'] : "";
+		$account_id = !empty($_POST['account_id']) ? $_POST['account_id'] : "";
+		if (!empty($product_ids)) {
+			$orders = $ordersObj->ordersReport($shopId, $from, $to, $product_ids, $publisher_id, $account_id);
+			$reportTitle = "Purchase Orders (Product Wise)";
+			include_once dirname(__FILE__) . '/salesProductsReport.php';
+		} else {
+			$orders = $ordersObj->ordersReport($shopId, $from, $to, $product_ids, $publisher_id, $account_id);
+			$reportTitle = "Purchase Orders (Product Wise)";
+			include_once dirname(__FILE__) . '/salesProductsReport.php';
+		}
+		exit;
+	case '19':
 		$product_ids = [];
 		if (!empty($_POST['product_id'])) {
 			$product_ids[] = $_POST['product_id'];
@@ -115,7 +133,7 @@ switch ($reportType) {
 		exit;
 
 		break;
-	case '19':
+	case '20':
 		$publisher_id = !empty($_POST['publisher_id']) ? $_POST['publisher_id'] : "";
 		$product_ids = [];
 		if (!empty($_POST['product_id'])) {

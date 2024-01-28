@@ -190,8 +190,9 @@ $reportsArray = [
     15 => ['id' => 15, 'title' => 'EasyPaisa &amp; Bank Report (Summery)', 'access' => ['owner', 'manager']],
     16 => ['id' => 16, 'title' => 'Pin Products (Min Qty)', 'access' => ['owner', 'manager']],
     17 => ['id' => 17, 'title' => 'Purchase Report', 'access' => ['owner', 'manager']],
-    18 => ['id' => 18, 'title' => 'Sample Report Order Wise', 'access' => ['owner', 'manager']],
-    19 => ['id' => 19, 'title' => 'Sample Report Product Wise', 'access' => ['owner', 'manager']],
+    18 => ['id' => 18, 'title' => 'Purchase Report (Product wise)', 'access' => ['owner', 'manager']],
+    19 => ['id' => 19, 'title' => 'Sample Report Order Wise', 'access' => ['owner', 'manager']],
+    20 => ['id' => 20, 'title' => 'Sample Report Product Wise', 'access' => ['owner', 'manager']],
 ];
 
 $returnArray = [
