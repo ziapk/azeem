@@ -1188,7 +1188,7 @@ class Orders extends Connection
             $toCondition = " AND o.order_date>='" . $date . "' AND o.order_date<='" . $to . "'";
 
             if (!empty($report) && $report == 'sample') {
-                $toCondition .= " AND o.price = o.discount AND o.price > 0 ";
+                $toCondition .= " AND o.price = o.discount ";
             }
 
             $join = "";
@@ -1223,7 +1223,7 @@ class Orders extends Connection
             $toCondition = " AND o.order_date>='" . $date . "' AND o.order_date<='" . $to . "'";
 
             if (!empty($report) && $report == 'sample') {
-                $toCondition .= " AND o.price = o.discount AND o.price > 0 ";
+                $toCondition .= " AND o.price = o.discount ";
             }
             if (!empty($publisher_id)) {
                 $toCondition .= " and p.publisher_id = $publisher_id ";
