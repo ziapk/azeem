@@ -71,6 +71,22 @@ foreach ($statuses as  $value) {
                     </form>
                 </span>
             <?php } ?>
+            <?php if ($userData['role'] === 'manager') { ?>
+                <span class="dropdown">
+                    <button class="dropdown-toggle btn btn-default" data-toggle="dropdown" style="padding-inline: 8px"><span class="fa fa-caret-down"></span></button>
+                    <form ng-submit="submitCode(cart)" class="dropdown-menu" style="padding: 10px; width: 300px">
+                        <div class="input-group" style="width: 100%">
+                            <input type="text" placeholder="Rack No" ng-model="cart.rackNo" type="text" class="form-control">
+                            <span class="input-group-btn" style="width: 104px">
+                                <input type="text" placeholder="Bar Code" ng-model="cart.newBarCode" type="text" class="form-control">
+                            </span>
+                            <span class="input-group-btn">
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                            </span>
+                        </div>
+                    </form>
+                </span>
+            <?php } ?>
             <input type="text" ng-change="calculateSum()" ng-model="cart.description" placeholder="Description" ng-if="cart.show" class="form-control">
         </td>
         <td width="120" ng-if="show_discount">

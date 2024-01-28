@@ -69,6 +69,22 @@ foreach ($statuses as  $value) {
                         </form>
                     </span>
                 <?php } ?>
+                <?php if ($userData['role'] === 'manager') { ?>
+                    <span class="dropdown pull-right">
+                        <button class="dropdown-toggle btn btn-xs btn-default" data-toggle="dropdown" style="padding-inline: 8px; padding-block: 2px"><span class="fa fa-caret-down"></span></button>
+                        <form ng-submit="submitCode(cart)" class="dropdown-menu " style="padding: 10px; width: 300px">
+                            <div class="input-group">
+                                <input type="text" placeholder="Bar Code" ng-model="cart.newBarCode" type="text" class="form-control">
+                                <span class="input-group-btn" style="width: 40%">
+                                    <input type="text" placeholder="Rack No" ng-model="cart.rackNo" type="text" class="form-control">
+                                </span>
+                                <span class="input-group-btn">
+                                    <button type="submit" class="btn btn-primary">Submit</button>
+                                </span>
+                            </div>
+                        </form>
+                    </span>
+                <?php } ?>
                 <a href="#" class="btn btn-xs btn-danger pull-right" style="margin-right: 4px" ng-click="remove(cart)"><span class="fa fa-remove"></span></a>
                 {{cart.full_name}} | <strong class="text-danger">{{cart.rackNumbers}}</strong> | <strong class="text-success">{{cart.pack_size}}B</strong>
             </div>

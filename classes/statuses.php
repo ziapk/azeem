@@ -35,7 +35,6 @@ class Statuses extends Connection
     public function update($array)
     {
         try {
-            print_r($array);
             $stmt = "UPDATE `{$this->table}` SET title=:title, type=:type, progress_value=:progress_value WHERE id=:id";
             $prepare = $this->dbh->prepare($stmt);
             $prepare->bindParam(':title', $array['title'], PDO::PARAM_STR);
