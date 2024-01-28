@@ -994,7 +994,7 @@ class Orders extends Connection
             $toCondition = " AND o.order_date>='" . $date . "' AND o.order_date<='" . $to . "' ";
 
             if (!empty($report) && $report == 'sample') {
-                $toCondition .= " AND o.price = o.discount AND o.price > 0 ";
+                $toCondition .= " AND o.price = o.discount ";
             }
             if (!empty($account_id) || !empty($publisher_id) || !empty($ids)) {
                 if (!empty($ids)) {

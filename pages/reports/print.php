@@ -127,7 +127,7 @@ switch ($reportType) {
 			$orders = $ordersObj->ordersReport($shopId, $from, $to, $product_ids, $publisher_id, $account_id, 'sample');
 			include_once dirname(__FILE__) . '/salesProductsReport.php';
 		} else {
-			$orders = $ordersObj->ordersReport($shopId, $from, $to, $product_ids, '', '', 'sample');
+			$orders = $ordersObj->ordersReport($shopId, $from, $to, $product_ids, $publisher_id, $account_id, 'sample');
 			include_once dirname(__FILE__) . '/salesReport.php';
 		}
 		exit;
