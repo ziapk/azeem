@@ -1,9 +1,11 @@
 <?php
 include_once dirname(__FILE__) . '/../../include/settings.php';
 
-if ($userData['role'] != 'owner') {
-    echo '[403] ACCESS ISSUE, Please ask shop owner';
-    exit;
+if (empty($_POST) && empty($_POST['createCode'])) {
+    if ($userData['role'] != 'owner') {
+        echo '[403] ACCESS ISSUE, Please ask shop owner';
+        exit;
+    }
 }
 $productObj = new Products();
 $programObj = new Programs();
