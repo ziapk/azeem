@@ -59,7 +59,7 @@ if ($userData['role'] == 'owner') {
         </div>
         <div class="row" ng-repeat="li in form.items track by $index">
             <div class="col-sm-3 form-group" ng-if="li.id">
-                <label for="">Product</label>
+                <label for="">{{$index+1}}. Product</label>
                 <span class="form-control">{{li.full_name}}</span>
             </div>
             <div class="col-sm-3 form-group" ng-if="!li.id">

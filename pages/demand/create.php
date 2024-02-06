@@ -58,7 +58,7 @@ $ownerStores = $storeObj->getOwnerStores($ownerId);
         </div>
         <div class="row" ng-repeat="li in formList track by $index">
             <div class="col-md-3 col-sm-4 form-group">
-                <label for=""><input type="checkbox" ng-model="li.searchBy" style="vertical-align: top"> Search by code</label>
+                <label for="">{{$index+1}}. Product<input type="checkbox" ng-model="li.searchBy" style="vertical-align: top"> Search by code</label>
                 <input type="text" class="form-control" ng-model="li.product" placeholder="Search Products" typeahead-on-select="selectProduct($item)" uib-typeahead="address as address.full_name for address in searchProduct($viewValue, li.searchBy)" typeahead-template-url="product-format.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="0">
             </div>
             <div class="col-md-3 col-sm-4 form-group">

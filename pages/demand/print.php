@@ -47,9 +47,9 @@ $userId = $userData['id'];
         </tr>
     </thead>
     <tbody>
-        <?php foreach ($demandDetail['items'] as $value) { ?>
+        <?php foreach ($demandDetail['items'] as $key => $value) { ?>
             <tr>
-                <td align="center">1</td>
+                <td align="center"><?php echo $key + 1; ?></td>
                 <td><?php echo $value['full_name']; ?></td>
                 <td align="center"><?php echo $value['product_qty']; ?></td>
                 <td align="center"><?php echo $value['product_assign_qty']; ?></td>
