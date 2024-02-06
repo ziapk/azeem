@@ -18,7 +18,7 @@ $shopAccounts = new ShopAccounts();
 $accountsData = $shopAccounts->getSAs($shop['id']);
 $storeAccounts = [];
 $cash = !empty($_POST['payment_amount']) ? $_POST['payment_amount'] : 0;
-$isDemandCreate = !empty($_POST['createDemand']);
+$isDemandCreate = !empty($_POST['createDemand']) && $_POST['createDemand'] == "true";
 $payment_with_credit = !empty($_POST['payment_with_credit']) ? $_POST['payment_with_credit'] : 0;
 $de = new DoubleEntry();
 foreach ($accountsData as $a) {

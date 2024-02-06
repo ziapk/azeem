@@ -64,7 +64,7 @@ if ($userData['role'] == 'owner') {
             </div>
             <div class="col-sm-3 form-group" ng-if="!li.id">
                 <label for=""><input type="checkbox" ng-model="li.searchBy" style="vertical-align: top"> Search by code</label>
-                <input type="text" class="form-control" ng-model="li.product" placeholder="Search Products" typeahead-on-select="selectProduct($item)" uib-typeahead="address as address.full_name for address in searchProduct($viewValue, li.searchBy)" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="0">
+                <input type="text" class="form-control" ng-model="li.product" placeholder="Search Products" typeahead-on-select="selectProduct($item)" uib-typeahead="address as address.full_name for address in searchProduct($viewValue, li.searchBy)" typeahead-template-url="product-format.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="0">
             </div>
             <div class="col-sm-3 form-group">
                 <label for="">Demand Qty</label>
@@ -182,12 +182,6 @@ if ($userData['role'] == 'owner') {
             $uibModalInstance.dismiss('cancel');
         };
     });
-</script>
-
-<script type="text/ng-template" id="row.html">
-    <a style="min-width: 250px">
-      <span ng-bind-html="match.model.full_name | uibTypeaheadHighlight:query"></span>
-  </a>
 </script>
 
 <?php
