@@ -27,7 +27,7 @@ $userId = $userData['id'];
 <table width="100%" border="1" style="border-collapse: collapse;">
     <thead>
         <tr>
-            <th colspan="4">
+            <th colspan="5">
                 <table width="100%">
                     <tr>
                         <th width="100" align="left">Demand Title:</th>
@@ -43,6 +43,7 @@ $userId = $userData['id'];
             <th align="left">Name</th>
             <th width="100">Qty</th>
             <th width="100">Assigned</th>
+            <th width="100">Price</th>
         </tr>
     </thead>
     <tbody>
@@ -52,6 +53,7 @@ $userId = $userData['id'];
                 <td><?php echo $value['full_name']; ?></td>
                 <td align="center"><?php echo $value['product_qty']; ?></td>
                 <td align="center"><?php echo $value['product_assign_qty']; ?></td>
+                <td align="center"><?php echo $value['price']; ?></td>
             </tr>
         <?php
         } ?>
