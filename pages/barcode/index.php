@@ -18,10 +18,6 @@ $isOwner = false;
 if ($userData['role'] == 'owner') {
     $isOwner = true;
 }
-if (!empty($_GET['debug'])) {
-    print_r($demandDetail);
-    exit;
-}
 
 if (!empty($_GET['all']) && $_GET['all'] == '1') {
     $shopId = $_GET['shopId'];

@@ -63,7 +63,7 @@ $ownerStores = $storeObj->getOwnerStores($ownerId);
             </div>
             <div class="col-md-3 col-sm-4 form-group">
                 <label for="">Demand Qty</label>
-                <input name="demand_qty" type="number" ng-model="li.qty" class="form-control" placeholder="Qty">
+                <input name="demand_qty" ng-disabled="!li.product.id" type="number" ng-model="li.qty" class="form-control" placeholder="Qty">
             </div>
             <label>&nbsp;</label><br />
             <button type="button" ng-if="formList.length > 1" ng-click="deleteItem($index)" class="btn btn-danger btn-sm">Delete</button>
@@ -126,10 +126,12 @@ $ownerStores = $storeObj->getOwnerStores($ownerId);
             $scope.form.create = true;
 
             $scope.formList.forEach(row => {
-                $scope.form.items.push({
-                    id: row.product.id,
-                    qty: row.qty
-                })
+                if (row?.product?.id && row.qty) {
+                    $scope.form.items.push({
+                        id: row.product.id,
+                        qty: row.qty
+                    })
+                }
             });
 
             $http.post("./createDemand.php", $httpParamSerializerJQLike($scope.form), {
