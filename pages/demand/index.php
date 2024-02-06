@@ -37,6 +37,7 @@ foreach ($ownerStores as $store) {
             <thead>
                 <tr>
                     <th>Sr.#</th>
+                    <th>ID</th>
                     <th>Title</th>
                     <th>Shop</th>
                     <th>Demand Date</th>
@@ -51,6 +52,7 @@ foreach ($ownerStores as $store) {
                 foreach ($demands as $demand) { ?>
                     <tr>
                         <td><?php echo $count; ?></td>
+                        <td><?php echo $demand['id']; ?></td>
                         <td><?php echo $demand['title']; ?></td>
                         <td><?php echo $storeList[$demand['shop_id']]['full_name']; ?></td>
                         <td><?php echo $demand['demand_date']; ?></td>
