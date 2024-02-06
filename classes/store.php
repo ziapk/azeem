@@ -10,7 +10,7 @@ class Store extends Connection
 	public function getStores()
 	{
 		try {
-			$stmt = "SELECT s.*, st.full_name as storeType FROM `{$this->table}` as s left join `{$this->table}` as st on st.id=s.store_type WHERE 1";
+			$stmt = "SELECT s.*, st.full_name as storeType FROM `{$this->table}` as s left join `{$this->table_st}` as st on st.id=s.store_type WHERE 1";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->execute();
 			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
@@ -22,7 +22,7 @@ class Store extends Connection
 	public function getOwnerStores($userId)
 	{
 		try {
-			$stmt = "SELECT s.*, st.full_name as storeType FROM `{$this->table}` as s left join `{$this->table}` as st on st.id=s.store_type WHERE `owner_id`=:userId";
+			$stmt = "SELECT s.*, st.full_name as storeType FROM `{$this->table}` as s left join `{$this->table_st}` as st on st.id=s.store_type WHERE `owner_id`=:userId";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':userId', $userId, PDO::PARAM_STR);
 			$prepare->execute();
