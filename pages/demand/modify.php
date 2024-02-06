@@ -68,7 +68,7 @@ if ($userData['role'] == 'owner') {
             </div>
             <div class="col-sm-3 form-group">
                 <label for="">Demand Qty</label>
-                <input type="number" ng-model="li.product_qty" class="form-control" placeholder="Qty">
+                <input type="number" ng-model="li.product_qty" ng-disabled="!li.product.id && !li.product_id" class="form-control" placeholder="Qty">
             </div>
             <label>&nbsp;</label><br />
             <button type="button" ng-if="form.items.length > 1" ng-click="deleteItem($index)" class="btn btn-danger btn-sm">Delete</button>
@@ -106,14 +106,23 @@ if ($userData['role'] == 'owner') {
         $scope.submitForm = ($event) => {
             $event.preventDefault();
             $scope.form.demand_date = $('#demand_date').val();
-            console.log($scope.form);
+            const list = [];
 
             $scope.form.items.map(row => {
-                row.id = row.product_id || row.product.id;
-                row.qty = row.product_qty || row.product.qty;
+                if ((row.product_id || row.product.id) && (row.product_qty || row.product.qty)) {
+                    list.push({
+                        ...row,
+                        id: row.product_id || row.product.id,
+                        qty: row.product_qty || row.product.qty
+                    });
+
+                }
             });
 
-            $http.post("./modifyDemand.php", $httpParamSerializerJQLike($scope.form), {
+            $http.post("./modifyDemand.php", $httpParamSerializerJQLike({
+                    ...$scope.form,
+                    items: list
+                }), {
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded'
                     }
