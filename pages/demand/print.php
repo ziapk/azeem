@@ -41,9 +41,9 @@ $userId = $userData['id'];
         <tr>
             <th width="60">Sr.#</th>
             <th align="left">Name</th>
-            <th width="100">Qty</th>
-            <th width="100">Assigned</th>
-            <th width="100">Price</th>
+            <th width="60">Qty</th>
+            <th width="60">Assigned</th>
+            <th width="60">Price</th>
         </tr>
     </thead>
     <tbody>
