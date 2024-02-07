@@ -39,7 +39,7 @@ $userId = $userData['id'];
             </th>
         </tr>
         <tr>
-            <th width="60">Sr.#</th>
+            <th width="30">Sr.#</th>
             <th align="left">Name</th>
             <th width="60">Qty</th>
             <th width="60">Assigned</th>
