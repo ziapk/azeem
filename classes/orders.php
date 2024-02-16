@@ -319,15 +319,15 @@ class Orders extends Connection
                             }
                         }
                     }
-                    // $newsletter = new Newsletter();
-                    // $send = $newsletter->send([
-                    //     'subject' => "Order.#" . $orderDetail['order']['order_custom_id'] . " has been generated",
-                    //     'body' => $newsletter->drawInvoice($order_id),
-                    //     'sentTo' => [['email' => !empty($customer['email']) ? $customer['email'] : 'zia.pccr@yahoo.com', 'name' => $array['customer_name']]],
-                    //     'ccEmails' => [['email' => $shop['company_email'], 'name' => $shop['full_name']]],
-                    //     'client' => $shop['full_name'],
-                    //     'labels' => [$makeTransaction['transaction_type']]
-                    // ]);
+                    $newsletter = new Newsletter();
+                    $send = $newsletter->send([
+                        'subject' => "Order.#" . $orderDetail['order']['order_custom_id'] . " has been generated",
+                        'body' => $newsletter->drawInvoice($order_id),
+                        'sentTo' => [['email' => !empty($customer['email']) ? $customer['email'] : 'zia.pccr@yahoo.com', 'name' => $array['customer_name']]],
+                        'ccEmails' => [['email' => $shop['company_email'], 'name' => $shop['full_name']]],
+                        'client' => $shop['full_name'],
+                        'labels' => [$makeTransaction['transaction_type']]
+                    ]);
                 }
 
                 return ['status' => 200, 'send' => $send, 'message' => 'successfully done', 'order' => ['id' => $order_id]];
