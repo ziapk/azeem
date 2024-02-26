@@ -1250,7 +1250,7 @@ class Orders extends Connection
 
             $supply = new Supply();
 
-            $supplyReport = $supply->ordersReportProductWise($shopId, $date, $to, $publisher_id = null, $product_id = []);
+            $supplyReport = $supply->ordersReportProductWise($shopId, $date, $to, $publisher_id, $product_id);
 
             $summery = $this->ordersReportSummery($shopId, $date, $to, $publisher_id, $product_id);
 
