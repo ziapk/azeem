@@ -1251,6 +1251,9 @@ class Orders extends Connection
             $supply = new Supply();
 
             $supplyReport = $supply->ordersReportProductWise($shopId, $date, $to, $publisher_id, $product_id);
+            $returnReport = $this->returnReportAuditProductWise($shopId, $date, $to, $publisher_id, $product_id);
+            print_r($returnReport);
+            exit;
 
             $summery = $this->ordersReportSummery($shopId, $date, $to, $publisher_id, $product_id);
 
@@ -1293,6 +1296,31 @@ class Orders extends Connection
         }
     }
 
+    public function returnReportAuditProductWise($shopId, $date, $to, $publisher_id = null, $product_id = [])
+    {
+        try {
+
+            $toCondition = " AND o.order_date>='" . $date . "' AND o.order_date<='" . $to . "'";
+            $toCondition = " AND o.order_date>='" . $date . "' AND o.order_date<='" . $to . "'";
+
+            if (!empty($publisher_id)) {
+                $toCondition .= " and p.publisher_id = $publisher_id ";
+            }
+            if (!empty($product_id)) {
+                $ids = implode(',', $product_id);
+                $toCondition .= " and p.id IN( $ids ) ";
+            }
+
+            $stmt = "SELECT pr.product_id, o.return_type, rp.price AS price, sum(rp.quantity) AS quantity, p.full_name  rp.*, p.full_name  FROM `{$this->table}` AS o LEFT JOIN `{$this->table_rp}` AS rp ON rp.order_id = o.id LEFT JOIN `{$this->table_sub}` AS oi ON o.id=oi.order_id and oi.id=rp.product_id LEFT JOIN `{$this->table_pro}` AS p on p.id=oi.product_id  WHERE o.shopId=:shopId " . $toCondition . ' and o.flag = 2 and o.status IN (5,6,7) group by o.return_type, rp.product_id';
+            $prepare = $this->dbh->prepare($stmt);
+            $prepare->bindParam(':shopId', $shopId, PDO::PARAM_STR);
+            $prepare->execute();
+            $result = $prepare->fetchAll(PDO::FETCH_ASSOC);
+            return $result;
+        } catch (PDOException $e) {
+            die("Error!: " . $e->getMessage() . "<br/>");
+        }
+    }
     public function returnReportProductWise($shopId, $date, $to)
     {
         try {
