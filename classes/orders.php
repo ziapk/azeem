@@ -1287,6 +1287,12 @@ class Orders extends Connection
                 $item[$value['product_id']]['sale_qty'] = $value['quantity'];
             }
             foreach ($returnReport as $product_id => $value) {
+                if (empty($item[$product_id]['full_name'])) {
+                    $item[$product_id]['full_name'] = $value['full_name'];
+                }
+                if (empty($item[$product_id]['product_id'])) {
+                    $item[$product_id]['product_id'] = $value['product_id'];
+                }
                 $item[$product_id]['purchase_return'] = $value['purchase_return'];
                 $item[$product_id]['sale_return'] = $value['sale_return'];
             }
@@ -1332,6 +1338,9 @@ class Orders extends Connection
             $final = [];
             foreach ($report as $product_id => $rows) {
                 $final[!empty($rows[1]) ? $rows[1]['product_id'] : $rows[2]['product_id']] = [
+                    'product_id' => !empty($rows[2]) ? $rows[2]['product_id'] : $rows[1]['product_id'],
+                    'full_name' => !empty($rows[2]) ? $rows[2]['full_name'] : $rows[1]['full_name'],
+                    'purchase_return' => !empty($rows[2]) ? $rows[2]['purchase_qty'] : 0,
                     'purchase_return' => !empty($rows[2]) ? $rows[2]['purchase_qty'] : 0,
                     'sale_return' => !empty($rows[1]) ? $rows[1]['sale_qty'] : 0,
                 ];
