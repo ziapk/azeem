@@ -1269,7 +1269,7 @@ class Orders extends Connection
             }
 
 
-            $stmt = "SELECT oi.product_id, oi.price AS price, sum(oi.quantity) AS quantity, p.full_name  FROM `{$this->table}` AS o LEFT JOIN `{$this->table_sub}` AS oi ON oi.order_id=o.id LEFT JOIN `{$this->table_pro}` AS p on p.id=oi.product_id  WHERE o.shopId=:shopId " . $toCondition . ' and o.flag = 1 GROUP BY oi.product_id ORDER BY oi.quantity desc';
+            $stmt = "SELECT oi.product_id, oi.price AS price, sum(oi.quantity) AS quantity, p.full_name  FROM `{$this->table}` AS o LEFT JOIN `{$this->table_sub}` AS oi ON oi.order_id=o.id LEFT JOIN `{$this->table_pro}` AS p on p.id=oi.product_id  WHERE o.shopId=:shopId " . $toCondition . ' and o.flag = 1 GROUP BY oi.product_id ORDER BY sum(oi.quantity) desc';
             $prepare = $this->dbh->prepare($stmt);
             $prepare->bindParam(':shopId', $shopId, PDO::PARAM_STR);
             $prepare->execute();
@@ -1278,12 +1278,12 @@ class Orders extends Connection
             $item = [];
             foreach ($supplyReport['rows'] as $key => $value) {
                 $item[$value['product_id']]['full_name'] = $value['full_name'];
-                $item[$value['product_id']]['id'] = $value['product_id'];
+                $item[$value['product_id']]['product_id'] = $value['product_id'];
                 $item[$value['product_id']]['purchase_qty'] = $value['quantity'];
             }
             foreach ($result as $key => $value) {
                 $item[$value['product_id']]['full_name'] = $value['full_name'];
-                $item[$value['product_id']]['id'] = $value['product_id'];
+                $item[$value['product_id']]['product_id'] = $value['product_id'];
                 $item[$value['product_id']]['sale_qty'] = $value['quantity'];
             }
 
