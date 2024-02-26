@@ -1310,7 +1310,7 @@ class Orders extends Connection
                 $toCondition .= " and p.id IN( $ids ) ";
             }
 
-            $stmt = "SELECT rp.product_id, o.return_type,  sum(rp.quantity) AS quantity, p.full_name  FROM `{$this->table_ro}` AS o LEFT JOIN `{$this->table_rp}` AS rp ON rp.order_id = o.id LEFT JOIN `{$this->table_pro}` AS p on p.id=rp.product_id  WHERE o.shopId=:shopId " . $toCondition . ' and o.flag IN (1, 2) group by o.return_type, rp.product_id';
+            $stmt = "SELECT o.id, rp.product_id, o.return_type,  sum(rp.quantity) AS quantity, p.full_name  FROM `{$this->table_ro}` AS o LEFT JOIN `{$this->table_rp}` AS rp ON rp.order_id = o.id LEFT JOIN `{$this->table_pro}` AS p on p.id=rp.product_id  WHERE o.shopId=:shopId " . $toCondition . ' and o.flag IN (1, 2) group by o.return_type, rp.product_id';
             $prepare = $this->dbh->prepare($stmt);
             $prepare->bindParam(':shopId', $shopId, PDO::PARAM_STR);
             $prepare->execute();
@@ -1318,6 +1318,8 @@ class Orders extends Connection
             $report = [];
             foreach ($result as $key => $row) {
 
+                $report[$row['product_id']][$row['return_type']]['id'] = $row['id'];
+                $report[$row['product_id']][$row['return_type']]['product_id'] = $row['product_id'];
                 $report[$row['product_id']][$row['return_type']]['product_id'] = $row['product_id'];
                 $report[$row['product_id']][$row['return_type']]['return_type'] = $row['return_type'];
                 if ($row['return_type'] == 2) {
