@@ -138,29 +138,42 @@ if ($userData['role'] == 'owner') {
 
         $scope.items = [];
 
-        $scope.searchProduct = function(term, isCodeEnable) {
-            let searchBy;
-            if (isCodeEnable) {
-                searchBy = 'id';
-            }
-            if (term) {
-                return $http.get("<?php echo SITE_URL ?>api/getStores.php", {
-                        params: {
-                            term,
-                            searchBy,
-                            shopId: $scope.shopId
-                        }
-                    })
-                    .then(function(response) {
+        // $scope.searchProduct = function(term, isCodeEnable) {
+        //     let searchBy;
+        //     if (isCodeEnable) {
+        //         searchBy = 'id';
+        //     }
+        //     if (term) {
+        //         return $http.get("<?php echo SITE_URL ?>api/getStores.php", {
+        //                 params: {
+        //                     term,
+        //                     searchBy,
+        //                     shopId: $scope.shopId
+        //                 }
+        //             })
+        //             .then(function(response) {
 
-                        $scope.list = response.data;
-                        $scope.priceList = response.data;
-                        return response.data
-                    });
+        //                 $scope.list = response.data;
+        //                 $scope.priceList = response.data;
+        //                 return response.data
+        //             });
+        //     } else {
+        //         return [];
+        //     }
+        // }
+
+        $scope.searchProduct = function(term, isCodeEnable) {
+            if (isCodeEnable === true) {
+                params.term = parseFloat(term.split('-')[0]);
+                return window.mainList.records.filter(r => r.id == params.term || r.code == params.term || r.barcode == params.term || r.searchString?.split('|')?.pop()?.toLowerCase()?.includes(params?.term?.toString()?.toLowerCase()));
             } else {
-                return [];
+                const filteredArray = window.mainList.records.filter(r => r.id == term || r.code?.toLowerCase() == term?.toLowerCase() || r.searchString.split('|').pop()?.toLowerCase().includes(term?.toLowerCase()))
+                const secondfilteredArray = !filteredArray.length ? window.mainList.records.filter(obj => obj.searchString.toLowerCase().includes(term?.toLowerCase() || term)) : filteredArray;
+                return secondfilteredArray.slice(0, 30);
             }
         }
+
+
 
         $scope.deleteCategory = function(id) {
             $scope.items = $scope.items.filter(r => r.id !== id);
