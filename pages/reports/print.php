@@ -228,6 +228,18 @@ switch ($reportType) {
 		$selectShop = $stores->getStore($shopId);
 		include_once dirname(__FILE__) . '/shop_products.php';
 		exit;
+	case '21':
+		$publisher_id = !empty($_POST['publisher_id']) ? $_POST['publisher_id'] : "";
+		$product_ids = [];
+		if (!empty($_POST['product_id'])) {
+			$product_ids[] = $_POST['product_id'];
+		}
+		$orders = $ordersObj->stockAuditProductWise($shopId, $from, $to, $publisher_id, $product_ids);
+		print_r($orders);
+		exit;
+		include_once dirname(__FILE__) . '/salesReportProductWise.php';
+		exit;
+		break;
 	default:
 		# code...
 		break;
