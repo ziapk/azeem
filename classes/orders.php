@@ -5,6 +5,7 @@ class Orders extends Connection
 
     private $table = 'orders';
     private $table_store = 'store';
+    private $table_st = 'store_products';
     private $table_sub = 'order_items';
     private $table_services = 'services';
     private $table_oservice = 'order_services';
@@ -1253,6 +1254,7 @@ class Orders extends Connection
             $supplyReport = $supply->ordersReportProductWise($shopId, $date, $to, $publisher_id, $product_id);
             $returnReport = $this->returnReportAuditProductWise($shopId, $date, $to, $publisher_id, $product_id);
             $summery = $this->ordersReportSummery($shopId, $date, $to, $publisher_id, $product_id);
+            $stock = $this->auditStockInHandProductWise($shopId, $publisher_id, $product_id);
 
 
             $toCondition = " AND o.order_date>='" . $date . "' AND o.order_date<='" . $to . "'";
@@ -1296,8 +1298,49 @@ class Orders extends Connection
                 $item[$product_id]['purchase_return'] = $value['purchase_return'];
                 $item[$product_id]['sale_return'] = $value['sale_return'];
             }
+            foreach ($stock as $product_id => $value) {
+                if (empty($item[$product_id]['full_name'])) {
+                    $item[$product_id]['full_name'] = $value['full_name'];
+                }
+                if (empty($item[$product_id]['product_id'])) {
+                    $item[$product_id]['product_id'] = $value['product_id'];
+                }
+                $item[$product_id]['in_hand'] = $value['in_hand'];
+            }
 
             return ['summery' => $summery, 'rows' => $item];
+        } catch (PDOException $e) {
+            die("Error!: " . $e->getMessage() . "<br/>");
+        }
+    }
+    public function auditStockInHandProductWise($shopId, $publisher_id = null, $product_id = [])
+    {
+        try {
+
+            $toCondition = "";
+
+            if (!empty($publisher_id)) {
+                $toCondition .= " and p.publisher_id = $publisher_id ";
+            }
+            if (!empty($product_id)) {
+                $ids = implode(',', $product_id);
+                $toCondition .= " and p.id IN( $ids ) ";
+            }
+
+
+            $stmt = "SELECT st.product_id, st.qty - st.stock_out AS quantity, p.full_name  FROM `{$this->table_st}` AS st LEFT JOIN `{$this->table_pro}` AS p on p.id=st.product_id  WHERE st.shopId=:shopId " . $toCondition . ' and st.status = 1';
+            $prepare = $this->dbh->prepare($stmt);
+            $prepare->bindParam(':shopId', $shopId, PDO::PARAM_STR);
+            $prepare->execute();
+            $result = $prepare->fetchAll(PDO::FETCH_ASSOC);
+
+            $item = [];
+            foreach ($result as $key => $value) {
+                $item[$value['product_id']]['full_name'] = $value['full_name'];
+                $item[$value['product_id']]['product_id'] = $value['product_id'];
+                $item[$value['product_id']]['in_hand'] = $value['quantity'];
+            }
+            return $item;
         } catch (PDOException $e) {
             die("Error!: " . $e->getMessage() . "<br/>");
         }

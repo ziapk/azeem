@@ -14,7 +14,8 @@
             <th>S. Qty</th>
             <th>S. Return</th>
             <th>Balance</th>
-            <th>Qty</th>
+            <th>Audit Qty</th>
+            <th>In Stock</th>
         </tr>
     </thead>
     <tbody>
@@ -36,6 +37,7 @@
                 <td><?php echo $s['sale_return']; ?></td>
                 <td><?php echo $saleQty - $saleReturn; ?></td>
                 <td><?php echo (($purchaseQty - $purchaseReturn) - ($saleQty - $saleReturn)); ?></td>
+                <td><?php echo $s['in_hand']; ?></td>
             </tr>
         <?php $count++;
         } ?>
