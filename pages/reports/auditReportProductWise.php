@@ -23,7 +23,7 @@
                 <td><?php echo $s['full_name']; ?></td>
                 <td><?php echo $s['purchase_qty']; ?></td>
                 <td><?php echo $s['sale_qty']; ?></td>
-                <td><?php echo $s['purcahse_qty'] - $s['sale_qty']; ?></td>
+                <td><?php echo ($s['purcahse_qty'] - $s['sale_qty']); ?></td>
             </tr>
         <?php $count++;
         } ?>
