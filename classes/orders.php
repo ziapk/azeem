@@ -1319,7 +1319,7 @@ class Orders extends Connection
             foreach ($result as $key => $row) {
 
                 $report[$row['product_id']][$row['return_type']]['id'] = $row['id'];
-                $report[$row['product_id']][$row['return_type']]['product_id'] = $row['product_id'];
+                $report[$row['product_id']][$row['return_type']]['full_name'] = $row['full_name'];
                 $report[$row['product_id']][$row['return_type']]['product_id'] = $row['product_id'];
                 $report[$row['product_id']][$row['return_type']]['return_type'] = $row['return_type'];
                 if ($row['return_type'] == 2) {
@@ -1328,10 +1328,19 @@ class Orders extends Connection
                     $report[$row['product_id']][$row['return_type']]['sale_qty'] = $row['quantity'];
                 }
             }
+            $final = [];
+            foreach ($report as $product_id => $rows) {
+                $final[] = [
+                    'full_name' => !empty($rows[1]) ? $rows[1]['full_name'] : $rows[2]['full_name'],
+                    'product_id' => !empty($rows[1]) ? $rows[1]['product_id'] : $rows[2]['product_id'],
+                    'purchase_qty' => !empty($rows[2]) ? $rows[2]['purchase_qty'] : 0,
+                    'sale_qty' => !empty($rows[1]) ? $rows[1]['sale_qty'] : 0,
+                ];
+            }
             echo '<pre>';
-            print_r($report);
+            print_r($final);
             exit;
-            return $report;
+            return $final;
         } catch (PDOException $e) {
             die("Error!: " . $e->getMessage() . "<br/>");
         }
