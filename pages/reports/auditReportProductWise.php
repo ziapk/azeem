@@ -16,6 +16,8 @@
     <tbody>
         <?php $count = 1;
         foreach ($orders['rows'] as $s) {
+            $saleQty = !empty($s['sale_qty']) ? $s['sale_qty'] : 0;
+            $purchaseQty = !empty($s['purcahse_qty']) ? $s['purcahse_qty'] : 0;
         ?>
             <tr>
                 <td><?php echo $count; ?></td>
@@ -23,7 +25,7 @@
                 <td><?php echo $s['full_name']; ?></td>
                 <td><?php echo $s['purchase_qty']; ?></td>
                 <td><?php echo $s['sale_qty']; ?></td>
-                <td><?php echo ($s['purcahse_qty'] - $s['sale_qty']); ?></td>
+                <td><?php echo ($purchaseQty - $saleQty); ?></td>
             </tr>
         <?php $count++;
         } ?>
