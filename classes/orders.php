@@ -1252,9 +1252,6 @@ class Orders extends Connection
 
             $supplyReport = $supply->ordersReportProductWise($shopId, $date, $to, $publisher_id, $product_id);
             $returnReport = $this->returnReportAuditProductWise($shopId, $date, $to, $publisher_id, $product_id);
-            print_r($returnReport);
-            exit;
-
             $summery = $this->ordersReportSummery($shopId, $date, $to, $publisher_id, $product_id);
 
 
@@ -1288,6 +1285,10 @@ class Orders extends Connection
                 $item[$value['product_id']]['full_name'] = $value['full_name'];
                 $item[$value['product_id']]['product_id'] = $value['product_id'];
                 $item[$value['product_id']]['sale_qty'] = $value['quantity'];
+            }
+            foreach ($returnReport as $product_id => $value) {
+                $item[$product_id]['purchase_return'] = $value['purchase_return'];
+                $item[$product_id]['sale_return'] = $value['sale_return'];
             }
 
             return ['summery' => $summery, 'rows' => $item];
@@ -1330,16 +1331,11 @@ class Orders extends Connection
             }
             $final = [];
             foreach ($report as $product_id => $rows) {
-                $final[] = [
-                    'full_name' => !empty($rows[1]) ? $rows[1]['full_name'] : $rows[2]['full_name'],
-                    'product_id' => !empty($rows[1]) ? $rows[1]['product_id'] : $rows[2]['product_id'],
-                    'purchase_qty' => !empty($rows[2]) ? $rows[2]['purchase_qty'] : 0,
-                    'sale_qty' => !empty($rows[1]) ? $rows[1]['sale_qty'] : 0,
+                $final[!empty($rows[1]) ? $rows[1]['product_id'] : $rows[2]['product_id']] = [
+                    'purchase_return' => !empty($rows[2]) ? $rows[2]['purchase_qty'] : 0,
+                    'sale_return' => !empty($rows[1]) ? $rows[1]['sale_qty'] : 0,
                 ];
             }
-            echo '<pre>';
-            print_r($final);
-            exit;
             return $final;
         } catch (PDOException $e) {
             die("Error!: " . $e->getMessage() . "<br/>");

@@ -9,7 +9,9 @@
             <th>Product ID</th>
             <th>Product Title</th>
             <th>P. Qty</th>
+            <th>P. Return</th>
             <th>S. Qty</th>
+            <th>S. Return</th>
             <th>Qty</th>
         </tr>
     </thead>
@@ -24,7 +26,9 @@
                 <td><?php echo $s['product_id']; ?></td>
                 <td><?php echo $s['full_name']; ?></td>
                 <td><?php echo $s['purchase_qty']; ?></td>
+                <td><?php echo $s['purchase_return']; ?></td>
                 <td><?php echo $s['sale_qty']; ?></td>
+                <td><?php echo $s['sale_return']; ?></td>
                 <td><?php echo ($purchaseQty - $saleQty); ?></td>
             </tr>
         <?php $count++;
