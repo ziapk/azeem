@@ -1307,8 +1307,17 @@ class Orders extends Connection
                 }
                 $item[$product_id]['in_hand'] = $value['in_hand'];
             }
+            $final = [];
+            foreach ($item as $val) {
+                $val['purchase_balance'] = $val['purchase_qty'] - $val['purchase_return'];
+                $val['sale_balance'] = $val['sale_qty'] - $val['sale_return'];
+                $val['audit_qty'] = $val['purchase_balance'] - $val['sale_balance'];
+                $final[] = $val;
+            }
 
-            return ['summery' => $summery, 'rows' => $item];
+            array_multisort(array_column($final, 'audit_qty'), SORT_ASC, $final);
+
+            return ['summery' => $summery, 'rows' => $final];
         } catch (PDOException $e) {
             die("Error!: " . $e->getMessage() . "<br/>");
         }
