@@ -1254,6 +1254,7 @@ class Orders extends Connection
 
             $summery = $this->ordersReportSummery($shopId, $date, $to, $publisher_id, $product_id);
 
+
             $toCondition = " AND o.order_date>='" . $date . "' AND o.order_date<='" . $to . "'";
 
             if (!empty($report) && $report == 'sample') {
@@ -1273,7 +1274,20 @@ class Orders extends Connection
             $prepare->bindParam(':shopId', $shopId, PDO::PARAM_STR);
             $prepare->execute();
             $result = $prepare->fetchAll(PDO::FETCH_ASSOC);
-            return ['summery' => $summery, 'rows' => $result, 'supplyReport' => $supplyReport];
+
+            $item = [];
+            foreach ($supplyReport['rows'] as $key => $value) {
+                $item[$value['product_id']]['full_name'] = $value['full_name'];
+                $item[$value['product_id']]['id'] = $value['product_id'];
+                $item[$value['product_id']]['purchase_qty'] = $value['quantity'];
+            }
+            foreach ($result as $key => $value) {
+                $item[$value['product_id']]['full_name'] = $value['full_name'];
+                $item[$value['product_id']]['id'] = $value['product_id'];
+                $item[$value['product_id']]['sale_qty'] = $value['quantity'];
+            }
+
+            return ['summery' => $summery, 'rows' => $item];
         } catch (PDOException $e) {
             die("Error!: " . $e->getMessage() . "<br/>");
         }
