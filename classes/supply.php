@@ -275,9 +275,43 @@ class Supply extends Connection
         }
     }
 
+    public function ordersReportSummery($shopId, $date, $to, $publisher_id = null, $product_id = [])
+    {
+        try {
+
+            $toCondition = " AND o.supply_date>='" . $date . "' AND o.supply_date<='" . $to . "'";
+
+
+            $join = "";
+            if (!empty($publisher_id) || !empty($product_id)) {
+                $join = " LEFT JOIN `{$this->table_sub}` AS oi ON oi.supply_id=o.id LEFT JOIN `{$this->table_pro}` AS p on p.id=oi.product_id ";
+            }
+            if (!empty($publisher_id)) {
+                $toCondition .= " and p.publisher_id = $publisher_id ";
+            }
+            if (!empty($product_id)) {
+                $ids = implode(',', $product_id);
+                $toCondition .= " and p.id IN( $ids ) ";
+            }
+
+            $stmt = "SELECT count(o.id) AS total, ROUND(SUM(o.price), 2) AS gross, ROUND(SUM(o.discount), 2) AS dist, ROUND(SUM(o.payment_amount), 2) AS paid, ROUND(SUM(o.`price` - o.`discount` - o.`payment_amount`), 2) AS balance FROM `{$this->table}` AS o " . $join . " WHERE o.shopId=:shopId " . $toCondition . ' and o.flag = 1 ORDER BY o.id desc';
+            $prepare = $this->dbh->prepare($stmt);
+            $prepare->bindParam(':shopId', $shopId, PDO::PARAM_STR);
+            $prepare->execute();
+            $result = $prepare->fetch(PDO::FETCH_ASSOC);
+            return $result;
+        } catch (PDOException $e) {
+            die("Error!: " . $e->getMessage() . "<br/>");
+        }
+    }
+
+
     public function ordersReport($shopId, $date, $to, $ids = [], $publisher_id = null, $account_id = null)
     {
         try {
+
+            print_r($this->ordersReportSummery($shopId, $date, $to, $publisher_id, $ids));
+            exit;
 
             $toCondition = " AND o.supply_date>='" . $date . "' AND o.supply_date<='" . $to . "' ";
 
