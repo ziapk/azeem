@@ -1326,6 +1326,7 @@ class Orders extends Connection
                     $report[$row['product_id']]['sale_qty'] = $row['quantity'];
                 }
             }
+            print_r($result);
             print_r($report);
             exit;
             return $report;
