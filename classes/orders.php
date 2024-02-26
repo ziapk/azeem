@@ -1318,12 +1318,12 @@ class Orders extends Connection
             $report = [];
             foreach ($result as $key => $row) {
 
-                $result[$row['product_id']]['product_id'] = $row['product_id'];
-                $result[$row['product_id']]['return_type'] = $row['return_type'];
+                $report[$row['product_id']]['product_id'] = $row['product_id'];
+                $report[$row['product_id']]['return_type'] = $row['return_type'];
                 if ($row['return_type'] == 2) {
-                    $result[$row['product_id']]['purchase_qty'] = $row['quantity'];
+                    $report[$row['product_id']]['purchase_qty'] = $row['quantity'];
                 } else {
-                    $result[$row['product_id']]['sale_qty'] = $row['quantity'];
+                    $report[$row['product_id']]['sale_qty'] = $row['quantity'];
                 }
             }
             return $report;
