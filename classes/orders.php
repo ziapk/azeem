@@ -1310,19 +1310,21 @@ class Orders extends Connection
                 $toCondition .= " and p.id IN( $ids ) ";
             }
 
-            $stmt = "SELECT rp.product_id, p.publisher_id, o.return_type, rp.price AS price, sum(rp.quantity) AS quantity, p.full_name  FROM `{$this->table_ro}` AS o LEFT JOIN `{$this->table_rp}` AS rp ON rp.order_id = o.id LEFT JOIN `{$this->table_pro}` AS p on p.id=rp.product_id  WHERE o.shopId=:shopId " . $toCondition . ' and o.flag IN (1, 2) group by o.return_type, rp.product_id';
+            $stmt = "SELECT rp.product_id, o.return_type,  sum(rp.quantity) AS quantity, p.full_name  FROM `{$this->table_ro}` AS o LEFT JOIN `{$this->table_rp}` AS rp ON rp.order_id = o.id LEFT JOIN `{$this->table_pro}` AS p on p.id=rp.product_id  WHERE o.shopId=:shopId " . $toCondition . ' and o.flag IN (1, 2) group by o.return_type, rp.product_id';
             $prepare = $this->dbh->prepare($stmt);
             $prepare->bindParam(':shopId', $shopId, PDO::PARAM_STR);
             $prepare->execute();
             $result = $prepare->fetchAll(PDO::FETCH_ASSOC);
             $report = [];
-            foreach ($result as $row) {
+            foreach ($result as $key => $row) {
+
+                $result[$row['product_id']]['product_id'] = $row['product_id'];
+                $result[$row['product_id']]['return_type'] = $row['return_type'];
                 if ($row['return_type'] == 2) {
-                    $row['purchase_qty'] = $row['quantity'];
+                    $result[$row['product_id']]['purchase_qty'] = $row['quantity'];
                 } else {
-                    $row['sale_qty'] = $row['quantity'];
+                    $result[$row['product_id']]['sale_qty'] = $row['quantity'];
                 }
-                $report[$row['product_id']] = array_merge($report[$row['product_id']], $row);
             }
             return $report;
         } catch (PDOException $e) {
