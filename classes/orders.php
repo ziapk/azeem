@@ -1315,7 +1315,16 @@ class Orders extends Connection
             $prepare->bindParam(':shopId', $shopId, PDO::PARAM_STR);
             $prepare->execute();
             $result = $prepare->fetchAll(PDO::FETCH_ASSOC);
-            return $result;
+            $report = [];
+            foreach ($result as $row) {
+                if ($row['return_type'] == 2) {
+                    $row['purchase_qty'] = $row['quantity'];
+                } else {
+                    $row['sale_qty'] = $row['quantity'];
+                }
+                $report[$row['product_id']] = array_merge($report[$row['product_id']], $row);
+            }
+            return $report;
         } catch (PDOException $e) {
             die("Error!: " . $e->getMessage() . "<br/>");
         }
