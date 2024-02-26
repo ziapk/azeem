@@ -1244,6 +1244,40 @@ class Orders extends Connection
             die("Error!: " . $e->getMessage() . "<br/>");
         }
     }
+    public function stockAuditProductWise($shopId, $date, $to, $publisher_id = null, $product_id = [])
+    {
+        try {
+
+            $supply = new Supply();
+
+            $supplyReport = $supply->ordersReportProductWise($shopId, $date, $to, $publisher_id = null, $product_id = []);
+
+            $summery = $this->ordersReportSummery($shopId, $date, $to, $publisher_id, $product_id);
+
+            $toCondition = " AND o.order_date>='" . $date . "' AND o.order_date<='" . $to . "'";
+
+            if (!empty($report) && $report == 'sample') {
+                $toCondition .= " AND o.price = o.discount ";
+            }
+            if (!empty($publisher_id)) {
+                $toCondition .= " and p.publisher_id = $publisher_id ";
+            }
+            if (!empty($product_id)) {
+                $ids = implode(',', $product_id);
+                $toCondition .= " and p.id IN( $ids ) ";
+            }
+
+
+            $stmt = "SELECT oi.product_id, oi.price AS price, sum(oi.quantity) AS quantity, p.full_name  FROM `{$this->table}` AS o LEFT JOIN `{$this->table_sub}` AS oi ON oi.order_id=o.id LEFT JOIN `{$this->table_pro}` AS p on p.id=oi.product_id  WHERE o.shopId=:shopId " . $toCondition . ' and o.flag = 1 GROUP BY oi.product_id ORDER BY oi.quantity desc';
+            $prepare = $this->dbh->prepare($stmt);
+            $prepare->bindParam(':shopId', $shopId, PDO::PARAM_STR);
+            $prepare->execute();
+            $result = $prepare->fetchAll(PDO::FETCH_ASSOC);
+            return ['summery' => $summery, 'rows' => $result, 'supplyReport' => $supplyReport];
+        } catch (PDOException $e) {
+            die("Error!: " . $e->getMessage() . "<br/>");
+        }
+    }
 
     public function returnReportProductWise($shopId, $date, $to)
     {

@@ -193,6 +193,7 @@ $reportsArray = [
     18 => ['id' => 18, 'title' => 'Purchase Report (Product wise)', 'access' => ['owner', 'manager']],
     19 => ['id' => 19, 'title' => 'Sample Report Order Wise', 'access' => ['owner', 'manager']],
     20 => ['id' => 20, 'title' => 'Sample Report Product Wise', 'access' => ['owner', 'manager']],
+    21 => ['id' => 21, 'title' => 'Stock Audit (Product Wise)', 'access' => ['owner', 'manager']],
 ];
 
 $returnArray = [

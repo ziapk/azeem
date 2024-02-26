@@ -305,13 +305,38 @@ class Supply extends Connection
         }
     }
 
+    public function ordersReportProductWise($shopId, $date, $to, $publisher_id = null, $product_id = [])
+    {
+        try {
+
+            $summery = $this->ordersReportSummery($shopId, $date, $to, $publisher_id, $product_id);
+
+            $toCondition = " AND o.supply_date>='" . $date . "' AND o.supply_date<='" . $to . "'";
+
+            if (!empty($publisher_id)) {
+                $toCondition .= " and p.publisher_id = $publisher_id ";
+            }
+            if (!empty($product_id)) {
+                $ids = implode(',', $product_id);
+                $toCondition .= " and p.id IN( $ids ) ";
+            }
+
+
+            $stmt = "SELECT oi.product_id, oi.price AS price, sum(oi.quantity) AS quantity, p.full_name  FROM `{$this->table}` AS o LEFT JOIN `{$this->table_sub}` AS oi ON oi.supply_id=o.id LEFT JOIN `{$this->table_pro}` AS p on p.id=oi.product_id  WHERE o.shopId=:shopId " . $toCondition . ' and o.flag = 1 GROUP BY oi.product_id ORDER BY oi.quantity desc';
+            $prepare = $this->dbh->prepare($stmt);
+            $prepare->bindParam(':shopId', $shopId, PDO::PARAM_STR);
+            $prepare->execute();
+            $result = $prepare->fetchAll(PDO::FETCH_ASSOC);
+            return ['summery' => $summery, 'rows' => $result];
+        } catch (PDOException $e) {
+            die("Error!: " . $e->getMessage() . "<br/>");
+        }
+    }
+
 
     public function ordersReport($shopId, $date, $to, $ids = [], $publisher_id = null, $account_id = null)
     {
         try {
-
-            print_r($this->ordersReportSummery($shopId, $date, $to, $publisher_id, $ids));
-            exit;
 
             $toCondition = " AND o.supply_date>='" . $date . "' AND o.supply_date<='" . $to . "' ";
 
