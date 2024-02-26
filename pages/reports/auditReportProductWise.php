@@ -17,7 +17,7 @@
         <?php $count = 1;
         foreach ($orders['rows'] as $s) {
             $saleQty = !empty($s['sale_qty']) ? $s['sale_qty'] : 0;
-            $purchaseQty = !empty($s['purcahse_qty']) ? $s['purcahse_qty'] : 0;
+            $purchaseQty = !empty($s['purchase_qty']) ? $s['purchase_qty'] : 0;
         ?>
             <tr>
                 <td><?php echo $count; ?></td>
