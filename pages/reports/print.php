@@ -235,9 +235,7 @@ switch ($reportType) {
 			$product_ids[] = $_POST['product_id'];
 		}
 		$orders = $ordersObj->stockAuditProductWise($shopId, $from, $to, $publisher_id, $product_ids);
-		print_r($orders);
-		exit;
-		include_once dirname(__FILE__) . '/salesReportProductWise.php';
+		include_once dirname(__FILE__) . '/auditReportProductWise.php';
 		exit;
 		break;
 	default:

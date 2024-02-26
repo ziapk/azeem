@@ -10,9 +10,7 @@ $isOwner = $userData['role'] == 'owner';
 $userId = $userData['role'] == 'owner' ? $userData['id'] : $userData['created_by'];
 $ownerStores = $stores->getOwnerStores($userId);
 
-
 $publisherObj = new Publishers();
-
 $publishers = $publisherObj->getPublishers($userId);
 
 ?>
