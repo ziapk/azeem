@@ -1335,7 +1335,7 @@ class Orders extends Connection
             }
 
 
-            $stmt = "SELECT st.product_id, st.qty - st.stock_out AS quantity, p.full_name  FROM `{$this->table_st}` AS st LEFT JOIN `{$this->table_pro}` AS p on p.id=st.product_id  WHERE st.shopId=:shopId " . $toCondition . ' and st.status = 1';
+            $stmt = "SELECT st.product_id, st.qty - st.stock_out AS quantity, p.full_name  FROM `{$this->table_st}` AS st INNER JOIN `{$this->table_pro}` AS p on p.id=st.product_id  WHERE st.shopId=:shopId " . $toCondition . ' and st.status = 1';
             $prepare = $this->dbh->prepare($stmt);
             $prepare->bindParam(':shopId', $shopId, PDO::PARAM_STR);
             $prepare->execute();
