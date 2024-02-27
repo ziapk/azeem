@@ -234,6 +234,16 @@ switch ($reportType) {
 		if (!empty($_POST['product_id'])) {
 			$product_ids[] = $_POST['product_id'];
 		}
+
+		$reportTitle = "";
+		if (!empty($publisher_id)) {
+			$ownerId = $userData['role'] == 'owner' ? $userData['id'] : $userData['created_by'];
+
+			$publisherObj = new Publishers();
+			$publisher = $publisherObj->getPublishers($publisher_id, $ownerId);
+
+			$reportTitle = "Publisher: " . $publisher['full_name'];
+		}
 		$orders = $ordersObj->stockAuditProductWise($shopId, $from, $to, $publisher_id, $product_ids);
 		include_once dirname(__FILE__) . '/auditReportProductWise.php';
 		exit;

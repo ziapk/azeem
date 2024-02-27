@@ -1,5 +1,6 @@
 <center>
     <h2>Audit Report Product Wise</h2>
+    <h3><?php echo !empty($reportTitle) ? $reportTitle : 'Overall Result'; ?></h3>
     <h4>Between <?php echo $from; ?> and <?php echo $to; ?></h4>
 </center>
 <table class="table">

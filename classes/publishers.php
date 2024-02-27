@@ -48,6 +48,17 @@ class Publishers extends Connection
 		$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
 		return $result;
 	}
+	public function getPublisher($id, $ownerId)
+	{
+		$stmt = "SELECT * FROM  `{$this->table}` where id=:id and owner_id=:owner_id";
+		$prepare = $this->dbh->prepare($stmt);
+		$prepare->bindParam(':owner_id', $ownerId, PDO::PARAM_STR);
+		$prepare->bindParam(':id', $id, PDO::PARAM_STR);
+		//$prepare->bindParam(':search',$search,PDO::PARAM_STR);
+		$prepare->execute();
+		$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
+		return $result;
+	}
 
 	public function updatePublisher($array)
 	{
