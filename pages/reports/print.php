@@ -240,7 +240,7 @@ switch ($reportType) {
 			$ownerId = $userData['role'] == 'owner' ? $userData['id'] : $userData['created_by'];
 
 			$publisherObj = new Publishers();
-			$publisher = $publisherObj->getPublishers($publisher_id, $ownerId);
+			$publisher = $publisherObj->getPublisher($publisher_id, $ownerId);
 
 			$reportTitle = "Publisher: " . $publisher['full_name'];
 		}
