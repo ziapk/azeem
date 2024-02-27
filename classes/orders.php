@@ -1299,9 +1299,7 @@ class Orders extends Connection
                 $item[$product_id]['sale_return'] = $value['sale_return'];
             }
             foreach ($stock as $product_id => $value) {
-                if (empty($item[$product_id]['full_name'])) {
-                    $item[$product_id]['full_name'] = $value['full_name'];
-                }
+                $item[$product_id]['full_name'] = $value['full_name'];
                 if (empty($item[$product_id]['product_id'])) {
                     $item[$product_id]['product_id'] = $value['product_id'];
                 }
