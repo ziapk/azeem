@@ -56,7 +56,7 @@ class Publishers extends Connection
 		$prepare->bindParam(':id', $id, PDO::PARAM_STR);
 		//$prepare->bindParam(':search',$search,PDO::PARAM_STR);
 		$prepare->execute();
-		$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
+		$result = $prepare->fetch(PDO::FETCH_ASSOC);
 		return $result;
 	}
 
