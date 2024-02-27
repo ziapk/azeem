@@ -184,10 +184,10 @@ $ownerStores = $storeObj->getOwnerStores($ownerId);
         $scope.searchProduct = function(term, isCodeEnable) {
             if (isCodeEnable === true) {
                 params.term = parseFloat(term.split('-')[0]);
-                return window.mainList.records.filter(r => r.id == params.term || r.code == params.term || r.barcode == params.term || r.searchString?.split('|')?.pop()?.toLowerCase()?.includes(params?.term?.toString()?.toLowerCase()));
+                return window.mainList.records.filter(r => r.is_active == 1).filter(r => r.id == params.term || r.code == params.term || r.barcode == params.term || r.searchString?.split('|')?.pop()?.toLowerCase()?.includes(params?.term?.toString()?.toLowerCase()));
             } else {
-                const filteredArray = window.mainList.records.filter(r => r.id == term || r.code?.toLowerCase() == term?.toLowerCase() || r.searchString.split('|').pop()?.toLowerCase().includes(term?.toLowerCase()))
-                const secondfilteredArray = !filteredArray.length ? window.mainList.records.filter(obj => obj.searchString.toLowerCase().includes(term?.toLowerCase() || term)) : filteredArray;
+                const filteredArray = window.mainList.records.filter(r => r.is_active == 1).filter(r => r.id == term || r.code?.toLowerCase() == term?.toLowerCase() || r.searchString.split('|').pop()?.toLowerCase().includes(term?.toLowerCase()))
+                const secondfilteredArray = !filteredArray.length ? window.mainList.records.filter(r => r.is_active == 1).filter(obj => obj.searchString.toLowerCase().includes(term?.toLowerCase() || term)) : filteredArray;
                 return secondfilteredArray.slice(0, 30);
             }
         }

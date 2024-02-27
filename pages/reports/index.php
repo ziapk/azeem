@@ -164,11 +164,11 @@ echo mainHeader(['page' => 'reports']);
             const params = {};
             if ($scope.focus === true) {
                 params.term = parseFloat(term.split('-')[0]);
-                const item = window.mainList.records.find(r => r.id == params.term || r.code == params.term || r.barcode == params.term);
+                const item = window.mainList.records.filter(r => r.is_active == 1).find(r => r.id == params.term || r.code == params.term || r.barcode == params.term);
                 return [];
             } else {
-                const filteredArray = window.mainList.records.filter(r => r.id == term || r.code == term || r.searchString.split('|').pop()?.toLowerCase().includes(term?.toLowerCase()) || r.searchString.includes(term + '|') || r.searchString.includes('|' + term) || r.searchString.includes('|' + term + '|'));
-                const secondfilteredArray = !filteredArray.length ? window.mainList.records.filter(obj => obj.searchString.toLowerCase().includes(term?.toLowerCase() || term)) : filteredArray;
+                const filteredArray = window.mainList.records.filter(r => r.is_active == 1).filter(r => r.id == term || r.code == term || r.searchString.split('|').pop()?.toLowerCase().includes(term?.toLowerCase()) || r.searchString.includes(term + '|') || r.searchString.includes('|' + term) || r.searchString.includes('|' + term + '|'));
+                const secondfilteredArray = !filteredArray.length ? window.mainList.records.filter(r => r.is_active == 1).filter(obj => obj.searchString.toLowerCase().includes(term?.toLowerCase() || term)) : filteredArray;
                 return secondfilteredArray.slice(0, 30);
             }
         }

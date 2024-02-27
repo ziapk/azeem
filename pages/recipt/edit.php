@@ -108,6 +108,9 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                                 <span class="input-group-btn" style="width: 40%">
                                     <input type="text" ng-model="productCode" class="form-control" id="exampleInputAmount" placeholder="CODE">
                                 </span>
+                                <span class="input-group-addon" style="width: 40px">
+                                    <label><span style="vertical-align: middle">I-A</span> <span style="vertical-align: middle; margin-left: 4px;"><input type="checkbox" name="is_active" ng-model="is_active"></span></label>
+                                </span>
                             </div>
                         </div>
                     </td>
@@ -151,6 +154,9 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                                                 <input type="text" autocomplete="off" class="form-control" id="searchProduct" ng-model="product" placeholder="Search Products" uib-typeahead="address as address.full_name for address in searchProduct($viewValue)" typeahead-on-select="selectProduct($item)" ng-model-options="{debounce: 100}" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="productCode ? 0 : 1">
                                                 <span class="input-group-btn" style="width: 90px">
                                                     <input type="text" ng-model="productCode" class="form-control" id="exampleInputAmount" placeholder="CODE">
+                                                </span>
+                                                <span class="input-group-addon" style="width: 40px">
+                                                    <label><span style="vertical-align: middle">I-A</span> <span style="vertical-align: middle; margin-left: 4px;"><input type="checkbox" name="is_active" ng-model="is_active"></span></label>
                                                 </span>
                                             </div>
                                         </div>
@@ -250,14 +256,14 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
 
             }
             $scope.inActiveAll = (indexes, list) => {
-                if (confirm('Are you sure you want delete?')) {
+                if (confirm('Are you sure you want in-active?')) {
                     if (indexes?.length) {
                         const removableItems = [];
                         $scope.items = list.reduce((acc, value, index) => {
                             if (!indexes.includes(value.srno)) {
                                 acc.push(value);
                             } else {
-                                $scope.setInactive(value);
+                                $scope.setInactive(value, 0);
                             }
                             return acc;
                         }, []);
@@ -266,14 +272,35 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                     $scope.selectedList = {};
                     $scope.calculateSum();
                 }
-
+            }
+            $scope.activeAll = (indexes, list) => {
+                if (confirm('Are you sure you want active?')) {
+                    if (indexes?.length) {
+                        const removableItems = [];
+                        $scope.items = list.reduce((acc, value, index) => {
+                            if (!indexes.includes(value.srno)) {
+                                acc.push(value);
+                            } else {
+                                $scope.setInactive(value, 1);
+                                acc.push({
+                                    ...value,
+                                    is_active: 1
+                                });
+                            }
+                            return acc;
+                        }, []);
+                    }
+                    $scope.indexes = [];
+                    $scope.selectedList = {};
+                    $scope.calculateSum();
+                }
             }
 
-            $scope.setInactive = function(item) {
+            $scope.setInactive = function(item, action) {
                 $http.get("<?php echo SITE_URL ?>api/setInactive.php", {
                     params: {
                         id: item.id,
-                        action: 0
+                        action
                     }
                 })
             }
@@ -286,6 +313,7 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
             $scope.ref_no = $scope.data.order.ref_no;
             $scope.show_discount = parseInt($scope.data.order.show_discount) ? true : false;
             $scope.show_bundle = parseInt($scope.data.order.show_bundle) ? true : false;
+            $scope.is_active = false;
             $scope.gst = $scope.data.order.gst;
             $scope.service_charges = $scope.data.order.service_charges;
             $scope.subTotal = $scope.data.order.price;
@@ -769,13 +797,13 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                 const params = {};
                 if ($scope.focus === true) {
                     params.term = parseFloat(term.split('-')[0]);
-                    const item = window.mainList.records.find(r => r.id == params.term || r.code == params.term || r.barcode == params.term || r.searchString?.split('|')?.pop()?.toLowerCase()?.includes(params?.term?.toString()?.toLowerCase()));
+                    const item = window.mainList.records.filter(r => $scope.is_active ? r.is_active == 0 : r.is_active == 1).find(r => r.id == params.term || r.code == params.term || r.barcode == params.term || r.searchString?.split('|')?.pop()?.toLowerCase()?.includes(params?.term?.toString()?.toLowerCase()));
                     $scope.product = '';
                     $scope.selectProduct(item);
                     return [];
                 } else {
                     if ($scope.productCode) {
-                        const filteredArray = window.mainList.records.filter(r => {
+                        const filteredArray = mainList.records.filter(r => $scope.is_active ? r.is_active == 0 : r.is_active == 1).filter(r => {
                             const txt = r.searchString.split('|').pop()?.toLowerCase();
                             const exits = txt?.split(',')?.filter(tt => tt?.toLowerCase()?.startsWith($scope.productCode?.toLowerCase()));
                             return exits.length;
@@ -783,8 +811,8 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                         const secondfilteredArray = term ? filteredArray.filter(obj => obj.searchString.toLowerCase().includes(term?.toLowerCase() || term)) : filteredArray;
                         return secondfilteredArray;
                     } else {
-                        const filteredArray = window.mainList.records.filter(r => r.id == term || r.code == term || r.searchString.split('|').pop()?.toLowerCase().includes(term?.toLowerCase()) || r.searchString.includes(term + '|') || r.searchString.includes('|' + term) || r.searchString.includes('|' + term + '|'))
-                        const secondfilteredArray = !filteredArray.length ? window.mainList.records.filter(obj => obj.searchString.toLowerCase().includes(term?.toLowerCase() || term)) : filteredArray;
+                        const filteredArray = window.mainList.records.filter(r => $scope.is_active ? r.is_active == 0 : r.is_active == 1).filter(r => r.id == term || r.code?.toLowerCase() == term?.toLowerCase() || r.searchString.split('|').pop()?.toLowerCase().includes(term?.toLowerCase()))
+                        const secondfilteredArray = !filteredArray.length ? window.mainList.records.filter(r => $scope.is_active ? r.is_active == 0 : r.is_active == 1).filter(obj => obj.searchString.toLowerCase().includes(term?.toLowerCase() || term)) : filteredArray;
                         return secondfilteredArray.slice(0, 30);
 
                     }

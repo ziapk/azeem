@@ -201,12 +201,8 @@ class Products extends Connection
 				$publisher_query = " AND p.product_type = '" . $params['product_type'] . "' ";
 			}
 
-			$status_query = "";
-			if ($params['status'] == 0) {
-				$status_query = " AND p.is_active = 0 ";
-			} else {
-				$status_query = ' AND p.is_active = 1';
-			}
+			$status_query = " AND p.is_active IN (" . implode(',', $params['status']) . ") ";
+
 			if ($params['searchBy'] == 'id' && !empty($params["search"])) {
 				$searchQry = "AND (p.id = " . $params["search"] . " OR p.code = " . $params["search"] . ")";
 			} else if ($params['searchBy'] == 'cource' && !empty($params["courceId"])) {
@@ -702,7 +698,7 @@ class Products extends Connection
 	public function getCategoryProducts($owner_id, $ids, $shopId)
 	{
 		try {
-			$result = $this->getOwnerProductsPagination($owner_id, ['page' => 1, 'perPage' => 1000, 'cat_ids' => $ids, 'status' => 1], $shopId);
+			$result = $this->getOwnerProductsPagination($owner_id, ['page' => 1, 'perPage' => 1000, 'cat_ids' => $ids, 'status' => [1]], $shopId);
 			$res = [];
 			foreach ($result['records'] as $key => $value) {
 				$res[$value['cat_id']][] = $value;
@@ -934,7 +930,6 @@ class Products extends Connection
 	}
 	public function setInactive($id, $action)
 	{
-		echo $action;
 		try {
 			$stmt = "UPDATE `{$this->table}` SET `is_active`=:is_active WHERE id=:id";
 			$prepare = $this->dbh->prepare($stmt);

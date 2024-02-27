@@ -333,10 +333,9 @@
       const p = $window.localStorage.getItem('mainList');
       if (!p || init) {
         // console.log('abce')
-        $http.get("<?php echo SITE_URL ?>api/getProducts.php?perPage=10000&status=1&racks=1&session=1")
+        $http.get("<?php echo SITE_URL ?>api/getProducts.php?perPage=10000&status=&racks=1&session=1")
           .then(function(response) {
             const records = response.data.records.map(({
-                is_active,
                 min_qty,
                 other_codes,
                 discount_amount,
