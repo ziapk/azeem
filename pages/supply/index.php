@@ -73,6 +73,7 @@ echo mainFooter();
         $scope.product = "";
         $scope.shopId = '4';
         $scope.createDemand = false;
+        $scope.is_active = false;
         $scope.qf = false;
 
         $scope.selectSupplier = function(p) {
@@ -164,6 +165,54 @@ echo mainFooter();
                     }
                     return response.data
                 });
+        }
+
+        $scope.inActiveAll = () => {
+            if (confirm('Are you sure you want in-active?')) {
+                const items = $scope.items.filter(r => r.id);
+                console.log('items', items);
+                if (items?.length) {
+                    $scope.items = items.reduce((acc, value) => {
+                        if (!value.pin) {
+                            acc.push(value)
+                        } else {
+                            $scope.setInactive(value, 0);
+                        }
+                        return acc;
+                    }, []);
+
+                    console.log('$scope.items', $scope.items);
+                    $scope.calculateSum();
+                }
+            }
+        }
+        $scope.activeAll = () => {
+            if (confirm('Are you sure you want active?')) {
+                const items = $scope.items.filter(r => r.id);
+                if (items?.length) {
+                    $scope.items = items.reduce((acc, value) => {
+                        if (!value.pin) {
+                            acc.push(value)
+                        } else {
+                            $scope.setInactive(value, 1);
+                            acc.push({
+                                ...value,
+                                is_active: 1
+                            });
+                        }
+                        return acc;
+                    }, []);
+                    $scope.calculateSum();
+                }
+            }
+        }
+        $scope.setInactive = function(item, action) {
+            $http.get("<?php echo SITE_URL ?>api/setInactive.php", {
+                params: {
+                    id: item.id,
+                    action
+                }
+            })
         }
 
 
@@ -262,8 +311,8 @@ echo mainFooter();
         }
 
         $scope.searchProduct = function(term) {
-            const filteredArray = window.mainList.records.filter(r => r.is_active == 1).filter(r => r.id == term || r.code == term || r.searchString.split('|').pop()?.toLowerCase().includes(term?.toLowerCase()) || r.searchString.includes(term + '|') || r.searchString.includes('|' + term) || r.searchString.includes('|' + term + '|'));
-            const secondfilteredArray = !filteredArray.length ? window.mainList.records.filter(r => r.is_active == 1).filter(obj => obj.searchString.toLowerCase().includes(term?.toLowerCase() || term)) : filteredArray;
+            const filteredArray = window.mainList.records.filter(r => $scope.is_active ? r.is_active == 0 : r.is_active == 1).filter(r => r.id == term || r.code == term || r.searchString.split('|').pop()?.toLowerCase().includes(term?.toLowerCase()) || r.searchString.includes(term + '|') || r.searchString.includes('|' + term) || r.searchString.includes('|' + term + '|'));
+            const secondfilteredArray = !filteredArray.length ? window.mainList.records.filter(r => $scope.is_active ? r.is_active == 0 : r.is_active == 1).filter(obj => obj.searchString.toLowerCase().includes(term?.toLowerCase() || term)) : filteredArray;
             return secondfilteredArray.slice(0, 30);
         }
 

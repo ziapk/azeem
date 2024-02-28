@@ -13,10 +13,22 @@
             <th width="70"></th>
         </tr>
         <tr>
-            <td colspan="6"><input type="text" id="searchProduct" class="form-control" ng-model="product" placeholder="Search Product to add" typeahead-on-select="selectProduct($item, row)" uib-typeahead="address as address.full_name for address in searchProduct($viewValue)" typeahead-template-url="product-format.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="1" class="form-control" ng-model="row.product_name" ng-model-options="{debounce: 100}" /></td>
-            <th colspan="1"><label><span style="vertical-align: middle">Sep</span> <span style="vertical-align: middle; margin-left: 4px;"><input type="checkbox" name="sep" ng-model="sep"><span></label></th>
-            <th colspan="2"><label><span style="vertical-align: middle">Bundles</span> <span style="vertical-align: middle; margin-left: 4px;"><input type="checkbox" name="show_bundle" ng-model="show_bundle"><span></label></th>
-            <th colspan="1"><label><span style="vertical-align: middle">Qty</span> <span style="vertical-align: middle; margin-left: 4px;"><input type="checkbox" name="qf" ng-model="qf"><span></label></th>
+            <td colspan="6">
+                <div class="input-group" style="width: 100%">
+                    <input type="text" id="searchProduct" class="form-control" ng-model="product" placeholder="Search Product to add" typeahead-on-select="selectProduct($item, row)" uib-typeahead="address as address.full_name for address in searchProduct($viewValue)" typeahead-template-url="product-format.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="1" class="form-control" ng-model="row.product_name" ng-model-options="{debounce: 100}" />
+                    <span class="input-group-addon" style="width: 40px">
+                        <label><span style="vertical-align: middle">I-A</span> <span style="vertical-align: middle; margin-left: 4px;"><input type="checkbox" name="is_active" ng-model="is_active"></span></label>
+                    </span>
+                </div>
+            </td>
+            <th colspan="4">
+                <label><span style="vertical-align: middle">Sep</span> <span style="vertical-align: middle; margin-left: 4px;"><input type="checkbox" name="sep" ng-model="sep"><span></label>
+                <label><span style="vertical-align: middle">Bundles</span> <span style="vertical-align: middle; margin-left: 4px;"><input type="checkbox" name="show_bundle" ng-model="show_bundle"><span></label>
+                <label><span style="vertical-align: middle">Qty</span> <span style="vertical-align: middle; margin-left: 4px;"><input type="checkbox" name="qf" ng-model="qf"><span></label>
+                <?php if ($userData['role'] == 'owner') { ?>
+                    <div><button class="btn btn-xs btn-success" ng-click="activeAll()">Active</button> | <button class="btn btn-xs btn-danger" ng-click="inActiveAll()">In-Active</button></div>
+                <?php } ?>
+            </th>
         </tr>
     </thead>
     <tbody>

@@ -459,7 +459,7 @@
 </script>
 <script type="text/ng-template" id="product-format.html">
   <a style="display: flex; align-items: center">
-        <span style="margin-right: auto; flex: 1" class="{{match.model.code ? 'text-danger' : ''}}" ng-bind-html="match.model.full_name | uibTypeaheadHighlight:query"></span>
+        <span style="margin-right: auto; flex: 1" class="{{match.model.code ? 'text-danger' : ''}}" ng-bind-html="(match.model.is_active != 1 ? '****' : '')+match.model.full_name | uibTypeaheadHighlight:query"></span>
         <span ng-if="match.model.wh_price" class="label" style="font-size: 14px">{{match.model.wh_price}}</span><span ng-if="match.model.wh_price">|</span><span ng-if="match.model.pprice" class="label" style="font-size: 14px">{{match.model.pprice}}</span><span ng-if="match.model.pprice">|</span><span ng-if="match.model.pack_size" class="label label-primary" style="font-size: 14px">{{match.model.pack_size}}B</span><span ng-if="match.model.pack_size">|</span><span class="label label-success" style="margin-left: auto; font-size: 14px">{{match.model.qty}}</span> | <span class="label label-danger" style="font-size: 14px">{{match.model.price}}</span>
     </a>
 </script>
