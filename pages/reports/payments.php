@@ -32,6 +32,7 @@ $total = 0;
             <th style="border: 1px solid">Sr.#</th>
             <th style="border: 1px solid">Date</th>
             <th style="border: 1px solid">Narration</th>
+            <th style="border: 1px solid">Via</th>
             <th style="border: 1px solid">Amount</th>
         </tr>
     </thead>
@@ -43,6 +44,7 @@ $total = 0;
                 <td style="border: 1px solid"><?php echo ($k + 2); ?></td>
                 <td style="border: 1px solid"><?php echo $v['transaction_date']; ?></td>
                 <td style="border: 1px solid"><?php echo $v['v_description']; ?></td>
+                <td style="border: 1px solid"><?php echo $v['mode']; ?></td>
                 <td style="border: 1px solid" align="right"><?php echo number_format($v['amount']); ?></td>
             </tr>
         <?php } ?>

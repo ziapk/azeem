@@ -213,7 +213,7 @@ class DoubleEntry extends Connection
 			$userInfo = UserInfo();
 			$user = $userInfo['user'];
 
-			$stmt = "SELECT a.title, t.description as v_description, t.transsaction_type, t.transaction_date, e.* FROM `{$this->table_ledger_entries}` as e left join `{$this->table}` as a on a.id=e.account_id left join `{$this->table_transactions}` as t on t.id=e.transaction_id WHERE e.account_id=:account_id and e.entry_type='D' and t.shopId=:shopId and date(transaction_date) between :fromDate and :toDate";
+			$stmt = "SELECT a.title, m.title as mode, t.description as v_description, t.transsaction_type, t.transaction_date, e.* FROM `{$this->table_ledger_entries}` as e left join `{$this->table}` as a on a.id=e.account_id left join `{$this->table_transactions}` as t on t.id=e.transaction_id left join `{$this->table_modes}` as m on m.id=e.payment_mode WHERE e.account_id=:account_id and e.entry_type='D' and t.shopId=:shopId and date(transaction_date) between :fromDate and :toDate";
 			$prepare = $this->dbh->prepare($stmt);
 			$prepare->bindParam(':shopId', $user['shopId'], PDO::PARAM_STR);
 			$prepare->bindParam(':account_id', $arr['account_id'], PDO::PARAM_STR);
