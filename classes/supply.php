@@ -349,7 +349,7 @@ class Supply extends Connection
                     $toCondition .= " AND p.publisher_id=$publisher_id ";
                 }
                 if (!empty($account_id)) {
-                    $toCondition .= " AND p.account_id=$account_id ";
+                    $toCondition .= " AND s.account_id=$account_id ";
                 }
 
                 $stmt = "SELECT sub.*, sub.supply_id as order_custom_id, o.supply_date as order_date, p.full_name as productName,c.full_name, s.name FROM `{$this->table_sub}` AS sub left join `{$this->table_pro}` as p on p.id = sub.product_id left join `{$this->table}` as o on sub.supply_id = o.id LEFT JOIN customers AS c ON c.id = o.supplier_id and o.supplier_type = 2 LEFT JOIN `{$this->table_suppliers}` AS s ON s.id = o.supplier_id and o.supplier_type = 1 WHERE o.shopId=:shopId " . $toCondition . ' and o.flag = 1 ORDER BY o.supply_date asc, sub.quantity desc';
