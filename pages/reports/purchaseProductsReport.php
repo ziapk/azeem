@@ -33,6 +33,8 @@ $totals = ['price' => 0, 'samples_qty' => 0, 'samples' => 0, 'discount' => 0, 'p
                 $totals['qty'] += $s['quantity'];
             }
 
+            $distPrice = $s['price'] - ($s['price'] * ($s['discount'] / 100));
+
         ?>
             <tr>
                 <td><?php echo $count; ?></td>
@@ -42,9 +44,9 @@ $totals = ['price' => 0, 'samples_qty' => 0, 'samples' => 0, 'discount' => 0, 'p
                 <td><?php echo !empty($s['full_name']) ? $s['full_name'] : $s['name']; ?></td>
                 <td><?php echo $s['productName']; ?></td>
                 <td><?php echo $s['quantity']; ?></td>
-                <td><?php echo $s['pprice']; ?></td>
+                <td><?php echo $distPrice; ?></td>
                 <td><?php echo $s['discount']; ?></td>
-                <td><?php echo $s['pprice'] * $s['quantity']; ?></td>
+                <td><?php echo $distPrice * $s['quantity']; ?></td>
             </tr>
         <?php $count++;
         } ?>
