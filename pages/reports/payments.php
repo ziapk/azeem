@@ -38,7 +38,7 @@ $total = 0;
             $total += $v['amount'];
         ?>
             <tr>
-                <td style="border: 1px solid"><?php echo ($k + 2); ?></td>
+                <td style="border: 1px solid"><?php echo ($k + 1); ?></td>
                 <td style="border: 1px solid"><?php echo $v['transaction_date']; ?></td>
                 <td style="border: 1px solid"><?php echo $v['v_description']; ?></td>
                 <td style="border: 1px solid"><?php echo $v['mode']; ?></td>
