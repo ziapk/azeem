@@ -109,11 +109,11 @@ switch ($reportType) {
 		if (!empty($product_ids)) {
 			$orders = $ordersObj->ordersReport($shopId, $from, $to, $product_ids, $publisher_id, $account_id);
 			$reportTitle = "Purchase Orders (Product Wise)";
-			include_once dirname(__FILE__) . '/salesProductsReport.php';
+			include_once dirname(__FILE__) . '/purchaseProductsReport.php';
 		} else {
 			$orders = $ordersObj->ordersReport($shopId, $from, $to, $product_ids, $publisher_id, $account_id);
 			$reportTitle = "Purchase Orders (Product Wise)";
-			include_once dirname(__FILE__) . '/salesProductsReport.php';
+			include_once dirname(__FILE__) . '/purchaseProductsReport.php';
 		}
 		exit;
 	case '19':
