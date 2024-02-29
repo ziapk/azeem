@@ -26,9 +26,6 @@ $total = 0;
 <table id="resultTable" width="100%" style="border-collapse: collapse" border="0">
     <thead>
         <tr>
-            <th style="border-width: 0; font-size: 14px; font-style: italic; font-family: 'Times New Roman', Times, serif; line-height: 1.8" colspan="5">Payment Details for the month of <?php echo $key; ?></th>
-        </tr>
-        <tr>
             <th style="border: 1px solid">Sr.#</th>
             <th style="border: 1px solid">Date</th>
             <th style="border: 1px solid">Narration</th>
