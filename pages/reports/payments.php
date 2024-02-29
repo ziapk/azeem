@@ -11,7 +11,7 @@ $account_id = $_POST['account_id'];
 $entries = $doubleEntry->getPaymentsByAccounts($_POST);
 $reportTitle = $shop['full_name'] . ' - ' . $shop['city'];
 
-$subtitle = "Payment Details for " . $entries[0]['title'];
+$subtitle = "Payment Details for " . $entries[0]['title'] . '<br />Between ' . date('d-m-Y', strtotime($from)) . ' to ' . date('d-m-Y', strtotime($to));
 
 //$time = new datetime('Y');
 $d = new DateTime('Y');

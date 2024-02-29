@@ -212,6 +212,7 @@ switch ($reportType) {
 		include_once dirname(__FILE__) . '/ledger.php';
 		exit;
 		break;
+
 	case '14':
 		include_once dirname(__FILE__) . '/online.php';
 		exit;
@@ -246,6 +247,10 @@ switch ($reportType) {
 		}
 		$orders = $ordersObj->stockAuditProductWise($shopId, $from, $to, $publisher_id, $product_ids);
 		include_once dirname(__FILE__) . '/auditReportProductWise.php';
+		exit;
+		break;
+	case '22':
+		include_once dirname(__FILE__) . '/payments.php';
 		exit;
 		break;
 	default:
