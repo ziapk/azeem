@@ -1301,6 +1301,7 @@ class Orders extends Connection
             }
             foreach ($stock as $product_id => $value) {
                 $item[$product_id]['full_name'] = $value['full_name'];
+                $item[$product_id]['publisherName'] = $value['publisherName'];
                 if (empty($item[$product_id]['product_id'])) {
                     $item[$product_id]['product_id'] = $value['product_id'];
                 }
