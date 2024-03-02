@@ -9,6 +9,7 @@
             <th>Sr.#</th>
             <th>Product ID</th>
             <th>Product Title</th>
+            <th>Publisher</th>
             <th>P. Qty</th>
             <th>P. Return</th>
             <th>Balance</th>
@@ -28,6 +29,7 @@
                 <td><?php echo $count; ?></td>
                 <td><?php echo $s['product_id']; ?></td>
                 <td><?php echo $s['full_name']; ?></td>
+                <td><?php echo $s['publisherName']; ?></td>
                 <td><?php echo $s['purchase_qty']; ?></td>
                 <td><?php echo $s['purchase_return']; ?></td>
                 <td><?php echo $s['purchase_balance']; ?></td>

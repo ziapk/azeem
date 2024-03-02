@@ -14,6 +14,7 @@ class Orders extends Connection
     private $table_transaction = 'transaction';
     private $table_customers = 'customers';
     private $table_ro = 'return_orders';
+    private $table_publisher = 'publishers';
 
     public function searchCustomer($shopId, $search)
     {
@@ -1271,7 +1272,7 @@ class Orders extends Connection
             }
 
 
-            $stmt = "SELECT oi.product_id, oi.price AS price, sum(oi.quantity) AS quantity, p.full_name  FROM `{$this->table}` AS o LEFT JOIN `{$this->table_sub}` AS oi ON oi.order_id=o.id LEFT JOIN `{$this->table_pro}` AS p on p.id=oi.product_id  WHERE o.shopId=:shopId " . $toCondition . ' and o.flag = 1 GROUP BY oi.product_id ORDER BY sum(oi.quantity) desc';
+            $stmt = "SELECT oi.product_id, pub.full_name as publisherName, oi.price AS price, sum(oi.quantity) AS quantity, p.full_name  FROM `{$this->table}` AS o LEFT JOIN `{$this->table_sub}` AS oi ON oi.order_id=o.id LEFT JOIN `{$this->table_pro}` AS p on p.id=oi.product_id left join `{$this->table_publisher}` as pub on p.publisher_id=pub.id WHERE o.shopId=:shopId " . $toCondition . ' and o.flag = 1 GROUP BY oi.product_id ORDER BY sum(oi.quantity) desc';
             $prepare = $this->dbh->prepare($stmt);
             $prepare->bindParam(':shopId', $shopId, PDO::PARAM_STR);
             $prepare->execute();
