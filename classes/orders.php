@@ -1272,7 +1272,7 @@ class Orders extends Connection
             }
 
 
-            $stmt = "SELECT oi.product_id, pub.full_name as publisherName, oi.price AS price, sum(oi.quantity) AS quantity, p.full_name  FROM `{$this->table}` AS o LEFT JOIN `{$this->table_sub}` AS oi ON oi.order_id=o.id LEFT JOIN `{$this->table_pro}` AS p on p.id=oi.product_id left join `{$this->table_publisher}` as pub on p.publisher_id=pub.id WHERE o.shopId=:shopId " . $toCondition . ' and o.flag = 1 GROUP BY oi.product_id ORDER BY sum(oi.quantity) desc';
+            $stmt = "SELECT oi.product_id, oi.price AS price, sum(oi.quantity) AS quantity, p.full_name  FROM `{$this->table}` AS o LEFT JOIN `{$this->table_sub}` AS oi ON oi.order_id=o.id LEFT JOIN `{$this->table_pro}` AS p on p.id=oi.product_id WHERE o.shopId=:shopId " . $toCondition . ' and o.flag = 1 GROUP BY oi.product_id ORDER BY sum(oi.quantity) desc';
             $prepare = $this->dbh->prepare($stmt);
             $prepare->bindParam(':shopId', $shopId, PDO::PARAM_STR);
             $prepare->execute();
@@ -1337,7 +1337,7 @@ class Orders extends Connection
             }
 
 
-            $stmt = "SELECT st.product_id, st.qty - st.stock_out AS quantity, p.full_name  FROM `{$this->table_st}` AS st INNER JOIN `{$this->table_pro}` AS p on p.id=st.product_id  WHERE st.shopId=:shopId " . $toCondition . ' and st.status = 1';
+            $stmt = "SELECT st.product_id, st.qty - st.stock_out AS quantity, p.full_name, pub.full_name as publisherName  FROM `{$this->table_st}` AS st INNER JOIN `{$this->table_pro}` AS p on p.id=st.product_id LEFT JOIN `{$this->table_publisher}` as pub on p.publisher_id=pub.id  WHERE st.shopId=:shopId " . $toCondition . ' and st.status = 1';
             $prepare = $this->dbh->prepare($stmt);
             $prepare->bindParam(':shopId', $shopId, PDO::PARAM_STR);
             $prepare->execute();
@@ -1345,6 +1345,7 @@ class Orders extends Connection
 
             $item = [];
             foreach ($result as $key => $value) {
+                $item[$value['product_id']]['publisherName'] = $value['publisherName'];
                 $item[$value['product_id']]['full_name'] = $value['full_name'];
                 $item[$value['product_id']]['product_id'] = $value['product_id'];
                 $item[$value['product_id']]['in_hand'] = $value['quantity'];
