@@ -121,46 +121,84 @@ class Expenses extends Connection
 			$shopAccounts = new ShopAccounts();
 			$accountsData = $shopAccounts->getSAs($array['shop_id']);
 			$storeAccounts = [];
+
+			$amount = $array['price'];
+			$mode_id = !empty($array['mode']) ? $array['mode'] : 1;
+			$accountId = $c['account_id'];
+
 			foreach ($accountsData as $a) {
 				$storeAccounts[$a['key_value']] = $a['account_id'];
 			}
 
+			$settings = [
+				'summery' => $array['title'] . ' - ' . $array['description'],
+				'title' => 'EXPENSE',
+				'payable' => 'D',
+				'shop_account' => $storeAccounts['cash'],
+				'type' => 'C'
+			];
+
+
+			if (!empty($_POST['adjustment']) && $amount < 0) {
+				$amount *= -1;
+				$settings = [
+					'summery' => 'ADJUSTMENT',
+					'title' => 'ADJUSTMENT',
+					'payable' => 'C',
+					'shop_account' => $storeAccounts['adjustment'],
+					'type' => 'D'
+				];
+			}
+
+			if (!empty($_POST['adjustment']) && $amount > 0) {
+				$settings = [
+					'summery' => 'ADJUSTMENT',
+					'title' => 'ADJUSTMENT',
+					'payable' => 'D',
+					'shop_account' => $storeAccounts['adjustment'],
+					'type' => 'C'
+				];
+			}
+
 			$makeTransaction = [
-				'description' => $array['title'] . ' - ' . $array['description'],
+				'description' => $settings['summery'],
 				'transaction_date' => $storeDATA['sale_date'],
-				'transaction_type' => 'EXPENSE',
 				'reference' => 'EXP-' . $result,
+				'transaction_type' => $settings['title'],
 				'shopId' => $array['shop_id'],
 				'created_by' => $_SESSION['user_credentials']['id'],
 				'order_ref' => null,
-				'supply_ref' => null,
+				'supply_ref' => null
 			];
 
-			$makeTransactionId = $doubleEntry->makeTransaction($makeTransaction);
+			if (!empty($accountId)) {
 
-			$entry = [
-				'transaction_id' => $makeTransactionId,
-				'account_id' => $c['account_id'],
-				'entry_type' => 'D',
-				'description' => '',
-				'amount' => $array['price'], // 2000
-				'payment_mode' => !empty($array['mode']) ? $array['mode'] : 1,
-				'user_id' => $_SESSION['user_credentials']['id'],
-			];
+				$makeTransactionId = $doubleEntry->makeTransaction($makeTransaction);
 
-			$a[] = $doubleEntry->makeEntry($entry);
 
-			$entry = [
-				'transaction_id' => $makeTransactionId,
-				'account_id' => $storeAccounts['cash'],
-				'entry_type' => 'C',
-				'description' => '',
-				'amount' => $array['price'], // 2000
-				'payment_mode' => !empty($array['mode']) ? $array['mode'] : 1,
-				'user_id' => $_SESSION['user_credentials']['id'],
-			];
+				$entry = [
+					'transaction_id' => $makeTransactionId,
+					'account_id' => $accountId,
+					'entry_type' => $settings['payable'],
+					'description' => $settings['summery'],
+					'amount' => $amount,
+					'payment_mode' => $mode_id,
+					'user_id' => $_SESSION['user_credentials']['id'],
+				];
+				$a[] = $doubleEntry->makeEntry($entry);
 
-			$a[] = $doubleEntry->makeEntry($entry);
+				$entry = [
+					'transaction_id' => $makeTransactionId,
+					'account_id' => $settings['shop_account'],
+					'entry_type' => $settings['type'],
+					'description' => !empty($_POST['summery']) ? $_POST['summery'] : $settings['summery'],
+					'amount' => $amount,
+					'payment_mode' => $mode_id,
+					'user_id' => $_SESSION['user_credentials']['id'],
+				];
+
+				$a[] = $doubleEntry->makeEntry($entry);
+			}
 
 			return $result;
 		} catch (PDOException $e) {

@@ -161,6 +161,9 @@ $customersList = $customerObj->getCustomers($shop['id']);
                 </div>
               </div>
               <input type="submit" value="Submit" class="btn btn-primary">
+              <div class="pull-right">
+                <label><input type="checkbox" name="adjustment" ng-model="exp.adjustment"> Adjustment</label>
+              </div>
             </form>
           </li>
           <li class="dropdown hidden-xs" style="padding: 0">
