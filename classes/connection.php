@@ -1,7 +1,7 @@
 <?php
 
 
-class Connection
+class Connection extends ConnectionPool
 {
 	private static $instance = null;
 	public $connectionPool;
