@@ -12,23 +12,28 @@ class Supply extends Connection
 
     public function searchCustomer($shopId, $search)
     {
+        $dbh = $this->connectionPool->getConnection();
         $stmt = "SELECT * FROM `{$this->table}`  WHERE shopId=:shopId AND (full_name LIKE '" . $search . "%' OR code LIKE '" . $search . "%' OR phoneNumber LIKE '" . $search . "%') LIMIT 10";
-        $prepare = $this->dbh->prepare($stmt);
+        $prepare = $dbh->prepare($stmt);
         $prepare->bindParam(':shopId', $shopId, PDO::PARAM_STR);
         //$prepare->bindParam(':search',$search,PDO::PARAM_STR);
         $prepare->execute();
         $result = $prepare->fetchAll(PDO::FETCH_ASSOC);
+        $this->connectionPool->releaseConnection($dbh);
         return $result;
     }
 
     public function addColumn()
     {
+        $dbh = $this->connectionPool->getConnection();
         try {
             $stmt = "ALTER TABLE `{$this->table}` ADD COLUMN IF NOT EXISTS `ref_no` varchar(20) NULL DEFAULT NULL AFTER `supply_date`";
-            $prepare = $this->dbh->prepare($stmt);
+            $prepare = $dbh->prepare($stmt);
             $prepare->execute();
         } catch (PDOException $e) {
             die("Error!: " . $e->getMessage() . "<br/>");
+        } finally {
+            $this->connectionPool->releaseConnection($dbh);
         }
     }
 
@@ -260,6 +265,7 @@ class Supply extends Connection
                 $a[] = $de->makeEntry($entry);
             }
             // $newsletter = new Newsletter();
+            // $dbh = $this->connectionPool->getConnection();
             // try {
             //     $send = $newsletter->send([
             //         'subject' => $makeTransaction['description'],
@@ -277,6 +283,7 @@ class Supply extends Connection
 
     public function ordersReportSummery($shopId, $date, $to, $publisher_id = null, $product_id = [])
     {
+        $dbh = $this->connectionPool->getConnection();
         try {
 
             $toCondition = " AND o.supply_date>='" . $date . "' AND o.supply_date<='" . $to . "'";
@@ -295,18 +302,21 @@ class Supply extends Connection
             }
 
             $stmt = "SELECT count(o.id) AS total, ROUND(SUM(o.price), 2) AS gross, ROUND(SUM(o.discount), 2) AS dist, ROUND(SUM(o.payment_amount), 2) AS paid, ROUND(SUM(o.`price` - o.`discount` - o.`payment_amount`), 2) AS balance FROM `{$this->table}` AS o " . $join . " WHERE o.shopId=:shopId " . $toCondition . ' and o.flag = 1 ORDER BY o.id desc';
-            $prepare = $this->dbh->prepare($stmt);
+            $prepare = $dbh->prepare($stmt);
             $prepare->bindParam(':shopId', $shopId, PDO::PARAM_STR);
             $prepare->execute();
             $result = $prepare->fetch(PDO::FETCH_ASSOC);
             return $result;
         } catch (PDOException $e) {
             die("Error!: " . $e->getMessage() . "<br/>");
+        } finally {
+            $this->connectionPool->releaseConnection($dbh);
         }
     }
 
     public function ordersReportProductWise($shopId, $date, $to, $publisher_id = null, $product_id = [])
     {
+        $dbh = $this->connectionPool->getConnection();
         try {
 
             $summery = $this->ordersReportSummery($shopId, $date, $to, $publisher_id, $product_id);
@@ -323,19 +333,22 @@ class Supply extends Connection
 
 
             $stmt = "SELECT oi.product_id, oi.price AS price, sum(oi.quantity) AS quantity, p.full_name  FROM `{$this->table}` AS o LEFT JOIN `{$this->table_sub}` AS oi ON oi.supply_id=o.id LEFT JOIN `{$this->table_pro}` AS p on p.id=oi.product_id  WHERE o.shopId=:shopId " . $toCondition . ' and o.flag = 1 GROUP BY oi.product_id ORDER BY oi.quantity desc';
-            $prepare = $this->dbh->prepare($stmt);
+            $prepare = $dbh->prepare($stmt);
             $prepare->bindParam(':shopId', $shopId, PDO::PARAM_STR);
             $prepare->execute();
             $result = $prepare->fetchAll(PDO::FETCH_ASSOC);
             return ['summery' => $summery, 'rows' => $result];
         } catch (PDOException $e) {
             die("Error!: " . $e->getMessage() . "<br/>");
+        } finally {
+            $this->connectionPool->releaseConnection($dbh);
         }
     }
 
 
     public function ordersReport($shopId, $date, $to, $ids = [], $publisher_id = null, $account_id = null)
     {
+        $dbh = $this->connectionPool->getConnection();
         try {
 
             $toCondition = " AND o.supply_date>='" . $date . "' AND o.supply_date<='" . $to . "' ";
@@ -358,23 +371,26 @@ class Supply extends Connection
             }
 
 
-            $prepare = $this->dbh->prepare($stmt);
+            $prepare = $dbh->prepare($stmt);
             $prepare->bindParam(':shopId', $shopId, PDO::PARAM_STR);
             $prepare->execute();
             $result = $prepare->fetchAll(PDO::FETCH_ASSOC);
             return $result;
         } catch (PDOException $e) {
             die("Error!: " . $e->getMessage() . "<br/>");
+        } finally {
+            $this->connectionPool->releaseConnection($dbh);
         }
     }
 
     public function createSupply($array)
     {
+        $dbh = $this->connectionPool->getConnection();
         try {
             if (!empty($array['id'])) {
                 // $this->addColumn();
                 $stmt = "UPDATE `{$this->table}` SET `supplier_id`=:supplier_id, supplier_type=:supplier_type, `status`=:status, `price`=:price, `payment_amount`=:payment_amount, `payment_with_credit`=:payment_with_credit, `discount`=:discount, `supply_date`=:supply_date, `ref_no`=:ref_no, `show_bundle`=:show_bundle, `description`=:description WHERE id=:id";
-                $prepare = $this->dbh->prepare($stmt);
+                $prepare = $dbh->prepare($stmt);
                 $prepare->bindParam(':supplier_id', $array['supplier_id'], PDO::PARAM_STR);
                 $prepare->bindParam(':supplier_type', $array['supplier_type'], PDO::PARAM_STR);
                 $prepare->bindParam(':status', $array['status'], PDO::PARAM_STR);
@@ -392,7 +408,7 @@ class Supply extends Connection
             } else {
                 // $this->addColumn();
                 $stmt = "INSERT INTO `{$this->table}` (`user_id`, `supplier_id`, `supplier_type`, `status`, `price`, `payment_amount`, `payment_with_credit`, `discount`, `shopId`, `supply_date`, `ref_no`, `show_bundle`, `description`) VALUES (:user_id, :supplier_id, :supplier_type, :status, :price, :payment_amount, :payment_with_credit, :discount, :shopId, :supply_date, :ref_no, :show_bundle, :description)";
-                $prepare = $this->dbh->prepare($stmt);
+                $prepare = $dbh->prepare($stmt);
                 $prepare->bindParam(':user_id', $array['user_id'], PDO::PARAM_STR);
                 $prepare->bindParam(':supplier_id', $array['supplier_id'], PDO::PARAM_STR);
                 $prepare->bindParam(':supplier_type', $array['supplier_type'], PDO::PARAM_STR);
@@ -407,19 +423,22 @@ class Supply extends Connection
                 $prepare->bindParam(':show_bundle', $array['show_bundle'], PDO::PARAM_STR);
                 $prepare->bindParam(':description', $array['description'], PDO::PARAM_STR);
                 $prepare->execute();
-                $result = $this->dbh->lastInsertId();
+                $result = $dbh->lastInsertId();
                 return $result;
             }
         } catch (PDOException $e) {
             die("Error!: " . $e->getMessage() . "<br/>");
+        } finally {
+            $this->connectionPool->releaseConnection($dbh);
         }
     }
 
     public function createSupplyDetails($array)
     {
+        $dbh = $this->connectionPool->getConnection();
         try {
             $stmt = "INSERT INTO `{$this->table_sub}` (`supply_id`, `product_id`, `product_title`, `quantity`, `price`, `pprice`, `discount`, `pack_size`, `pack_qty`, `unpack_qty`) VALUES (:supply_id, :product_id, :product_title, :quantity, :price, :pprice, :discount, :pack_size, :pack_qty, :unpack_qty)";
-            $prepare = $this->dbh->prepare($stmt);
+            $prepare = $dbh->prepare($stmt);
             $prepare->bindParam(':supply_id', $array['supply_id'], PDO::PARAM_STR);
             $prepare->bindParam(':product_id', $array['product_id'], PDO::PARAM_STR);
             $prepare->bindParam(':product_title', $array['product_title'], PDO::PARAM_STR);
@@ -431,31 +450,37 @@ class Supply extends Connection
             $prepare->bindParam(':pack_qty', $array['pack_qty'], PDO::PARAM_STR);
             $prepare->bindParam(':unpack_qty', $array['unpack_qty'], PDO::PARAM_STR);
             $prepare->execute();
-            $result = $this->dbh->lastInsertId();
+            $result = $dbh->lastInsertId();
             return $result;
         } catch (PDOException $e) {
             die("Error!: " . $e->getMessage() . "<br/>");
+        } finally {
+            $this->connectionPool->releaseConnection($dbh);
         }
     }
     public function deleteSupplyDetails($supply_id)
     {
+        $dbh = $this->connectionPool->getConnection();
         try {
             $stmt = "DELETE FROM `{$this->table_sub}` where supply_id = :supply_id";
-            $prepare = $this->dbh->prepare($stmt);
+            $prepare = $dbh->prepare($stmt);
             $prepare->bindParam(':supply_id', $supply_id, PDO::PARAM_STR);
             $prepare->execute();
             $result = $prepare->rowCount();
             return $result;
         } catch (PDOException $e) {
             die("Error!: " . $e->getMessage() . "<br/>");
+        } finally {
+            $this->connectionPool->releaseConnection($dbh);
         }
     }
 
     public function makeTransaction($array)
     {
+        $dbh = $this->connectionPool->getConnection();
         try {
             $stmt = "INSERT INTO `{$this->table_transaction}` (`user_id`, `supplier_id`, `amount`, `payment_date`, `supply_id`, `transaction_type`, `shopId`) VALUES (:user_id, :supplier_id, :amount, :payment_date, :supply_id, :transaction_type, :shopId)";
-            $prepare = $this->dbh->prepare($stmt);
+            $prepare = $dbh->prepare($stmt);
             $prepare->bindParam(':user_id', $array['user_id'], PDO::PARAM_STR);
             $prepare->bindParam(':supplier_id', $array['supplier_id'], PDO::PARAM_STR);
             $prepare->bindParam(':amount', $array['amount'], PDO::PARAM_STR);
@@ -464,18 +489,21 @@ class Supply extends Connection
             $prepare->bindParam(':transaction_type', $array['transaction_type'], PDO::PARAM_STR);
             $prepare->bindParam(':shopId', $array['shopId'], PDO::PARAM_STR);
             $prepare->execute();
-            $result = $this->dbh->lastInsertId();
+            $result = $dbh->lastInsertId();
             return $result;
         } catch (PDOException $e) {
             die("Error!: " . $e->getMessage() . "<br/>");
+        } finally {
+            $this->connectionPool->releaseConnection($dbh);
         }
     }
 
     public function getOrder($id)
     {
+        $dbh = $this->connectionPool->getConnection();
         try {
             $stmt = "SELECT * FROM `{$this->table}` WHERE id=:id";
-            $prepare = $this->dbh->prepare($stmt);
+            $prepare = $dbh->prepare($stmt);
             $prepare->bindParam(':id', $id, PDO::PARAM_STR);
             $prepare->execute();
             $result['order'] = $prepare->fetch(PDO::FETCH_ASSOC);
@@ -488,7 +516,7 @@ class Supply extends Connection
             }
             if (!empty($result['order'])) {
                 $stmt = "SELECT item.*, p.full_name, p.code, p.barcode, p.id, p.product_type FROM `{$this->table_sub}` as item LEFT JOIN products as p ON item.product_id = p.id WHERE item.supply_id=:id";
-                $prepare = $this->dbh->prepare($stmt);
+                $prepare = $dbh->prepare($stmt);
                 $prepare->bindParam(':id', $id, PDO::PARAM_STR);
                 $prepare->execute();
                 $result['order_items'] = $prepare->fetchAll(PDO::FETCH_ASSOC);
@@ -496,13 +524,16 @@ class Supply extends Connection
             return $result;
         } catch (PDOException $e) {
             die("Error!: " . $e->getMessage() . "<br/>");
+        } finally {
+            $this->connectionPool->releaseConnection($dbh);
         }
     }
     public function getSupplyByRefId($id, $shopId)
     {
+        $dbh = $this->connectionPool->getConnection();
         try {
             $stmt = "SELECT * FROM `{$this->table}` WHERE ref_no=:id and shopId=:shopId";
-            $prepare = $this->dbh->prepare($stmt);
+            $prepare = $dbh->prepare($stmt);
             $prepare->bindParam(':id', $id, PDO::PARAM_STR);
             $prepare->bindParam(':shopId', $shopId, PDO::PARAM_STR);
             $prepare->execute();
@@ -516,7 +547,7 @@ class Supply extends Connection
             }
             if (!empty($result['order'])) {
                 $stmt = "SELECT item.*, p.full_name, p.code, p.barcode, p.id, p.product_type FROM `{$this->table_sub}` as item LEFT JOIN products as p ON item.product_id = p.id WHERE item.supply_id=:id";
-                $prepare = $this->dbh->prepare($stmt);
+                $prepare = $dbh->prepare($stmt);
                 $prepare->bindParam(':id', $result['order']['id'], PDO::PARAM_STR);
                 $prepare->execute();
                 $result['order_items'] = $prepare->fetchAll(PDO::FETCH_ASSOC);
@@ -524,20 +555,23 @@ class Supply extends Connection
             return $result;
         } catch (PDOException $e) {
             die("Error!: " . $e->getMessage() . "<br/>");
+        } finally {
+            $this->connectionPool->releaseConnection($dbh);
         }
     }
 
     public function getOrders($id)
     {
+        $dbh = $this->connectionPool->getConnection();
         try {
             $stmt = "SELECT * FROM `{$this->table}` WHERE supplier_id=:id";
-            $prepare = $this->dbh->prepare($stmt);
+            $prepare = $dbh->prepare($stmt);
             $prepare->bindParam(':id', $id, PDO::PARAM_STR);
             $prepare->execute();
             $result['orders'] = $prepare->fetchAll(PDO::FETCH_ASSOC);
             foreach ($result['orders'] as $key => $order) {
                 $stmt = "SELECT item.*, p.full_name FROM `{$this->table_sub}` as item LEFT JOIN products as p ON item.product_id = p.id WHERE item.supply_id=:id";
-                $prepare = $this->dbh->prepare($stmt);
+                $prepare = $dbh->prepare($stmt);
                 $prepare->bindParam(':id', $order['id'], PDO::PARAM_STR);
                 $prepare->execute();
                 $result['orders'][$key]['order_items'] = $prepare->fetchAll(PDO::FETCH_ASSOC);
@@ -546,25 +580,31 @@ class Supply extends Connection
             return $result;
         } catch (PDOException $e) {
             die("Error!: " . $e->getMessage() . "<br/>");
+        } finally {
+            $this->connectionPool->releaseConnection($dbh);
         }
     }
 
     public function getSupplierById($id)
     {
+        $dbh = $this->connectionPool->getConnection();
         try {
             $stmt = "SELECT * FROM `{$this->table_suppliers}` WHERE id=:id";
-            $prepare = $this->dbh->prepare($stmt);
+            $prepare = $dbh->prepare($stmt);
             $prepare->bindParam(':id', $id, PDO::PARAM_INT);
             $prepare->execute();
             $result = $prepare->fetch(PDO::FETCH_ASSOC);
             return $result;
         } catch (PDOException $e) {
             die("Error!: " . $e->getMessage() . "<br/>");
+        } finally {
+            $this->connectionPool->releaseConnection($dbh);
         }
     }
 
     public function userOrders($shopId, $params)
     {
+        $dbh = $this->connectionPool->getConnection();
         try {
 
             $toCondition = "";
@@ -590,13 +630,15 @@ class Supply extends Connection
             }
 
             $stmt = "SELECT o.*, c.full_name as c_full_name, s.name as s_full_name FROM `{$this->table}` AS o LEFT JOIN customers AS c ON o.supplier_type = 2 and c.id = o.supplier_id LEFT JOIN suppliers AS s ON o.supplier_type = 1 and s.id = o.supplier_id WHERE o.shopId=:shopId " . $toCondition . ' ' . $flagCondition . ' and o.flag = 1 ORDER BY id desc';
-            $prepare = $this->dbh->prepare($stmt);
+            $prepare = $dbh->prepare($stmt);
             $prepare->bindParam(':shopId', $shopId, PDO::PARAM_STR);
             $prepare->execute();
             $result = $prepare->fetchAll(PDO::FETCH_ASSOC);
             return $result;
         } catch (PDOException $e) {
             die("Error!: " . $e->getMessage() . "<br/>");
+        } finally {
+            $this->connectionPool->releaseConnection($dbh);
         }
     }
 
@@ -605,9 +647,10 @@ class Supply extends Connection
 
         $supplier = $this->getSupplierById($array['id']);
         $amount = $supplier['wallet'] + $array['wallet'];
+        $dbh = $this->connectionPool->getConnection();
         try {
             $stmt = "UPDATE `{$this->table_suppliers}` SET `wallet`=:wallet WHERE id=:id";
-            $prepare = $this->dbh->prepare($stmt);
+            $prepare = $dbh->prepare($stmt);
             $prepare->bindParam(':wallet', $amount, PDO::PARAM_INT);
             $prepare->bindParam(':id', $array['id'], PDO::PARAM_INT);
             $prepare->execute();
@@ -615,6 +658,8 @@ class Supply extends Connection
             return $result;
         } catch (PDOException $e) {
             die("Error!: " . $e->getMessage() . "<br/>");
+        } finally {
+            $this->connectionPool->releaseConnection($dbh);
         }
     }
 
@@ -627,9 +672,10 @@ class Supply extends Connection
         $id = $array['id'];
         $reason = $array['reason'];
         $flag = $array['flag'];
+        $dbh = $this->connectionPool->getConnection();
         try {
             $stmt = "UPDATE `{$this->table}` SET `reason`=:reason, `flag`=:flag WHERE id=:id";
-            $prepare = $this->dbh->prepare($stmt);
+            $prepare = $dbh->prepare($stmt);
             $prepare->bindParam(':reason', $reason, PDO::PARAM_STR);
             $prepare->bindParam(':flag', $flag, PDO::PARAM_STR);
             $prepare->bindParam(':id', $id, PDO::PARAM_STR);
@@ -638,15 +684,18 @@ class Supply extends Connection
             return $result;
         } catch (PDOException $e) {
             die("Error!: " . $e->getMessage() . "<br/>");
+        } finally {
+            $this->connectionPool->releaseConnection($dbh);
         }
     }
 
     public function getSupplierTransactions($params)
     {
+        $dbh = $this->connectionPool->getConnection();
         try {
 
             $stmt = "SELECT COUNT(id) as total FROM `{$this->table_transaction}` WHERE supplier_id = :id";
-            $prepare = $this->dbh->prepare($stmt);
+            $prepare = $dbh->prepare($stmt);
             $prepare->bindParam(':id', $params['id'], PDO::PARAM_INT);
             $prepare->execute();
             $result = $prepare->fetch(PDO::FETCH_ASSOC);
@@ -658,7 +707,7 @@ class Supply extends Connection
             $offset = (($currentPage - 1) < 0 ? 0 : ($currentPage - 1)) * $no_of_records_per_page;
             $search = "(id LIKE '%" . $params["search"] . "%' OR amount LIKE '%" . $params["search"] . "%' OR payment_date LIKE '%" . $params["search"] . "%' ) ";
             $stmt = "SELECT * FROM `{$this->table_transaction}` WHERE supplier_id=:id AND $search LIMIT :offset, :perPage";
-            $prepare = $this->dbh->prepare($stmt);
+            $prepare = $dbh->prepare($stmt);
             $prepare->bindParam(':offset', $offset, PDO::PARAM_INT);
             $prepare->bindParam(':id', $params['id'], PDO::PARAM_INT);
             $prepare->bindParam(':perPage', $no_of_records_per_page, PDO::PARAM_INT);
@@ -667,11 +716,14 @@ class Supply extends Connection
             return ['page' => $currentPage, 'totalRecords' => $total_rows, 'perPage' => $no_of_records_per_page, 'records' => $result];
         } catch (PDOException $e) {
             die("Error!: " . $e->getMessage() . "<br/>");
+        } finally {
+            $this->connectionPool->releaseConnection($dbh);
         }
     }
 
     public function getSupplyItemsByProductIds($productIds, $supplier_id)
     {
+        $dbh = $this->connectionPool->getConnection();
         try {
             $products = [];
             $price = [];
@@ -681,21 +733,24 @@ class Supply extends Connection
                 $price[] = $arr[1];
             }
             $stmt = "SELECT sp.supplier_id, s.* FROM `{$this->table_sub}` as s left join `{$this->table}` as sp on sp.id = s.supply_id where s.product_id IN (" . implode(', ', $products) . ") and s.price IN (" . implode(', ', $price) . ") and sp.supplier_id=:supplier_id";
-            $prepare = $this->dbh->prepare($stmt);
+            $prepare = $dbh->prepare($stmt);
             $prepare->bindParam(':supplier_id', $supplier_id, PDO::PARAM_INT);
             $prepare->execute();
             $result = $prepare->fetchAll(PDO::FETCH_ASSOC);
             return $result;
         } catch (PDOException $e) {
             die("Error!: " . $e->getMessage() . "<br/>");
+        } finally {
+            $this->connectionPool->releaseConnection($dbh);
         }
     }
 
     public function orderReturnAll($array, $action, $type = 1)
     {
+        $dbh = $this->connectionPool->getConnection();
         try {
             $stmt = "INSERT INTO `{$this->table_rs}` (`user_id`, `shopId`, `supply_id`, `product_id`, `quantity`, `price`, `type`) VALUES (:user_id, :shopId, :supply_id, :product_id, :quantity, :price, :type)";
-            $prepare = $this->dbh->prepare($stmt);
+            $prepare = $dbh->prepare($stmt);
             $prepare->bindParam(':user_id', $array['user_id'], PDO::PARAM_STR);
             $prepare->bindParam(':shopId', $array['shopId'], PDO::PARAM_STR);
             $prepare->bindParam(':supply_id', $array['supply_id'], PDO::PARAM_STR);
@@ -704,7 +759,7 @@ class Supply extends Connection
             $prepare->bindParam(':price', $array['price'], PDO::PARAM_STR);
             $prepare->bindParam(':type', $array['type'], PDO::PARAM_STR);
             $prepare->execute();
-            $result = $this->dbh->lastInsertId();
+            $result = $dbh->lastInsertId();
             $products = new Products();
             $array['quantity'] = (-1 * $array['quantity']);
             $array['pack_qty'] = (-1 * $array['pack_qty']);
@@ -712,6 +767,8 @@ class Supply extends Connection
             return $result;
         } catch (PDOException $e) {
             die("Error!: " . $e->getMessage() . "<br/>");
+        } finally {
+            $this->connectionPool->releaseConnection($dbh);
         }
     }
 }

@@ -7,6 +7,7 @@ class Expenses extends Connection
 
 	public function getShopExpenses($shop_id, $date, $to = null)
 	{
+		$dbh = $this->connectionPool->getConnection();
 		try {
 
 			$toCondition = "";
@@ -18,17 +19,20 @@ class Expenses extends Connection
 
 
 			$stmt = "SELECT * FROM `{$this->table}` WHERE `shop_id`=:shop_id $toCondition ";
-			$prepare = $this->dbh->prepare($stmt);
+			$prepare = $dbh->prepare($stmt);
 			$prepare->bindParam(':shop_id', $shop_id, PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
 			return $result;
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
 		}
 	}
 	public function getExpensesSummeryReport($groupName, $date, $to = null)
 	{
+		$dbh = $this->connectionPool->getConnection();
 		try {
 
 			$toCondition = "";
@@ -48,16 +52,19 @@ class Expenses extends Connection
 			}
 
 			$stmt = "SELECT c.groupName as details, exp_date, sum(e.price) as price, c.full_name as title FROM `{$this->table}` as e inner join `category` as c on c.id = e.cat_id WHERE $toCondition $final group by DATE(exp_date), cat_id";
-			$prepare = $this->dbh->prepare($stmt);
+			$prepare = $dbh->prepare($stmt);
 			$prepare->execute();
 			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
 			return $result;
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
 		}
 	}
 	public function getExpensesForReport($groupName, $date, $to = null)
 	{
+		$dbh = $this->connectionPool->getConnection();
 		try {
 
 			$toCondition = "";
@@ -74,20 +81,23 @@ class Expenses extends Connection
 
 			$stmt = "SELECT e.* FROM `{$this->table}` as e inner join `category` as c on c.id = e.cat_id WHERE c.groupName IN ($final) $toCondition";
 
-			$prepare = $this->dbh->prepare($stmt);
+			$prepare = $dbh->prepare($stmt);
 			$prepare->execute();
 			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
 			return $result;
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
 		}
 	}
 
 	public function updateCategory($array)
 	{
+		$dbh = $this->connectionPool->getConnection();
 		try {
 			$stmt = "UPDATE `{$this->table}` SET full_name=:full_name WHERE id=:id AND owner_id = :owner_id";
-			$prepare = $this->dbh->prepare($stmt);
+			$prepare = $dbh->prepare($stmt);
 			$prepare->bindParam(':full_name', $array['full_name'], PDO::PARAM_STR);
 			$prepare->bindParam(':id', $array['id'], PDO::PARAM_STR);
 			$prepare->bindParam(':owner_id', $array['owner_id'], PDO::PARAM_STR);
@@ -96,13 +106,16 @@ class Expenses extends Connection
 			return $result;
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
 		}
 	}
 	public function createExpense($array)
 	{
+		$dbh = $this->connectionPool->getConnection();
 		try {
 			$stmt = "INSERT INTO `{$this->table}` (`title`,`cat_id`,`price`,`description`, `details`,`exp_date`,`shop_id`) VALUES (:title,:cat_id,:price,:description, :details, :exp_date, :shop_id)";
-			$prepare = $this->dbh->prepare($stmt);
+			$prepare = $dbh->prepare($stmt);
 			$prepare->bindParam(':title', $array['title'], PDO::PARAM_STR);
 			$prepare->bindParam(':cat_id', $array['cat_id'], PDO::PARAM_INT);
 			$prepare->bindParam(':price', $array['price'], PDO::PARAM_INT);
@@ -111,7 +124,7 @@ class Expenses extends Connection
 			$prepare->bindParam(':exp_date', $array['exp_date'], PDO::PARAM_STR);
 			$prepare->bindParam(':shop_id', $array['shop_id'], PDO::PARAM_INT);
 			$prepare->execute();
-			$result = $this->dbh->lastInsertId();
+			$result = $dbh->lastInsertId();
 
 			$category = new Categories();
 			$c = $category->getCategory($array['cat_id']);
@@ -203,17 +216,22 @@ class Expenses extends Connection
 			return $result;
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
 		}
 	}
 	public function deleteExpense($array)
 	{
+		$dbh = $this->connectionPool->getConnection();
 		try {
 			$stmt = "DELETE FROM `{$this->table}` WHERE id=:id";
-			$prepare = $this->dbh->prepare($stmt);
+			$prepare = $dbh->prepare($stmt);
 			$prepare->bindParam(':id', $array['id'], PDO::PARAM_INT);
 			return $prepare->execute();
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
 		}
 	}
 }

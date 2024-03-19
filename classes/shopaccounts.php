@@ -7,23 +7,27 @@ class ShopAccounts extends Connection
 
     public function getOwnerSA($shop_id)
     {
+        $dbh = $this->connectionPool->getConnection();
         try {
             $stmt = "SELECT * FROM `{$this->table}` WHERE flag=1 and `shop_id`=:shop_id";
-            $prepare = $this->dbh->prepare($stmt);
+            $prepare = $dbh->prepare($stmt);
             $prepare->bindParam(':shop_id', $shop_id, PDO::PARAM_STR);
             $prepare->execute();
             $result = $prepare->fetchAll(PDO::FETCH_ASSOC);
             return $result;
         } catch (PDOException $e) {
             die("Error!: " . $e->getMessage() . "<br/>");
+        } finally {
+            $this->connectionPool->releaseConnection($dbh);
         }
     }
 
     public function updateSA($array)
     {
+        $dbh = $this->connectionPool->getConnection();
         try {
             $stmt = "UPDATE `{$this->table}` SET key_value=:key_value, label_value=:label_value, account_id=:account_id WHERE id=:id";
-            $prepare = $this->dbh->prepare($stmt);
+            $prepare = $dbh->prepare($stmt);
             $prepare->bindParam(':key_value', $array['key_value'], PDO::PARAM_STR);
             $prepare->bindParam(':label_value', $array['label_value'], PDO::PARAM_STR);
             $prepare->bindParam(':account_id', $array['account_id'], PDO::PARAM_STR);
@@ -33,29 +37,35 @@ class ShopAccounts extends Connection
             return $result;
         } catch (PDOException $e) {
             die("Error!: " . $e->getMessage() . "<br/>");
+        } finally {
+            $this->connectionPool->releaseConnection($dbh);
         }
     }
 
     public function deleteSA($array)
     {
+        $dbh = $this->connectionPool->getConnection();
         try {
             $stmt = "UPDATE `{$this->table}` SET flag=0 where id=:id";
-            $prepare = $this->dbh->prepare($stmt);
+            $prepare = $dbh->prepare($stmt);
             $prepare->bindParam(':id', $array['id'], PDO::PARAM_INT);
             $prepare->execute();
             $result = $prepare->rowCount();
             return $result;
         } catch (PDOException $e) {
             die("Error!: " . $e->getMessage() . "<br/>");
+        } finally {
+            $this->connectionPool->releaseConnection($dbh);
         }
     }
 
     public function getSAPagination($params)
     {
+        $dbh = $this->connectionPool->getConnection();
         try {
 
             $stmt = "SELECT COUNT(id) as total FROM `{$this->table}` where flag=1 and `shop_id`=:shop_id";
-            $prepare = $this->dbh->prepare($stmt);
+            $prepare = $dbh->prepare($stmt);
             $prepare->bindParam(':shop_id', $params['shop_id'], PDO::PARAM_INT);
             $prepare->execute();
             $result = $prepare->fetch(PDO::FETCH_ASSOC);
@@ -67,7 +77,7 @@ class ShopAccounts extends Connection
             $offset = (($currentPage - 1) < 0 ? 0 : ($currentPage - 1)) * $no_of_records_per_page;
             $search = "(key_value LIKE '%" . $params["search"] . "%' or label_value LIKE '%" . $params["search"] . "%') ";
             $stmt = "SELECT * FROM `{$this->table}` WHERE flag=1 and $search and `shop_id`=:shop_id LIMIT :offset, :perPage";
-            $prepare = $this->dbh->prepare($stmt);
+            $prepare = $dbh->prepare($stmt);
             $prepare->bindParam(':offset', $offset, PDO::PARAM_INT);
             $prepare->bindParam(':shop_id', $params['shop_id'], PDO::PARAM_INT);
             $prepare->bindParam(':perPage', $no_of_records_per_page, PDO::PARAM_INT);
@@ -76,52 +86,63 @@ class ShopAccounts extends Connection
             return ['page' => $currentPage, 'totalRecords' => $total_rows, 'perPage' => $no_of_records_per_page, 'records' => $result];
         } catch (PDOException $e) {
             die("Error!: " . $e->getMessage() . "<br/>");
+        } finally {
+            $this->connectionPool->releaseConnection($dbh);
         }
     }
 
     public function getSAs($shop_id)
     {
+        $dbh = $this->connectionPool->getConnection();
         try {
             $stmt = "SELECT * FROM `{$this->table}` where shop_id=:shop_id and flag = 1";
-            $prepare = $this->dbh->prepare($stmt);
+            $prepare = $dbh->prepare($stmt);
             $prepare->bindParam(':shop_id', $shop_id, PDO::PARAM_INT);
             $prepare->execute();
             $result = $prepare->fetchAll(PDO::FETCH_ASSOC);
             return $result;
         } catch (PDOException $e) {
             die("Error!: " . $e->getMessage() . "<br/>");
+        } finally {
+            $this->connectionPool->releaseConnection($dbh);
         }
     }
 
     public function getSA($id)
     {
+        $dbh = $this->connectionPool->getConnection();
         try {
 
             $stmt = "SELECT * FROM `{$this->table}` where flag=1 and id = :id";
-            $prepare = $this->dbh->prepare($stmt);
+            $prepare = $dbh->prepare($stmt);
             $prepare->bindParam(':id', $id, PDO::PARAM_STR);
             $prepare->execute();
             $result = $prepare->fetch(PDO::FETCH_ASSOC);
             return $result;
         } catch (PDOException $e) {
             die("Error!: " . $e->getMessage() . "<br/>");
+        } finally {
+            $this->connectionPool->releaseConnection($dbh);
         }
     }
 
     public function createSA($array)
     {
+        $dbh = $this->connectionPool->getConnection();
         try {
             $stmt = "INSERT INTO `{$this->table}` (`key_value`, `label_value`, `account_id`, `shop_id`) VALUES (:key_value, :label_value, :account_id, :shop_id)";
-            $prepare = $this->dbh->prepare($stmt);
+            $prepare = $dbh->prepare($stmt);
             $prepare->bindParam(':key_value', $array['key_value'], PDO::PARAM_STR);
             $prepare->bindParam(':label_value', $array['label_value'], PDO::PARAM_STR);
             $prepare->bindParam(':account_id', $array['account_id'], PDO::PARAM_STR);
             $prepare->bindParam(':shop_id', $array['shop_id'], PDO::PARAM_STR);
             $prepare->execute();
-            $result = $this->dbh->lastInsertId();
+            $result = $dbh->lastInsertId();
             return $result;
         } catch (PDOException $e) {
             die("Error!: " . $e->getMessage() . "<br/>");
+        } finally {
+            $this->connectionPool->releaseConnection($dbh);
         }
     }
 }

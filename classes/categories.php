@@ -8,12 +8,13 @@ class Categories extends Connection
 
 	public function getOwnerCategories($owner_id)
 	{
+		$dbh = $this->connectionPool->getConnection();
 		try {
 			$userInfo = UserInfo();
 			$user = $userInfo['user'];
 
 			$stmt = "SELECT * FROM `{$this->table}` WHERE flag=1 and `owner_id`=:owner_id and shopId=:shopId";
-			$prepare = $this->dbh->prepare($stmt);
+			$prepare = $dbh->prepare($stmt);
 			$prepare->bindParam(':owner_id', $owner_id, PDO::PARAM_STR);
 			$prepare->bindParam(':shopId', $user['shopId'], PDO::PARAM_STR);
 			$prepare->execute();
@@ -21,16 +22,21 @@ class Categories extends Connection
 			return $result;
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
+		} catch (PDOException $e) {
+			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
 		}
 	}
 	public function getGroupNames($owner_id)
 	{
+		$dbh = $this->connectionPool->getConnection();
 		try {
 			$userInfo = UserInfo();
 			$user = $userInfo['user'];
 
 			$stmt = "SELECT DISTINCT groupName FROM `{$this->table}` WHERE flag=1 and `owner_id`=:owner_id and shopId=:shopId";
-			$prepare = $this->dbh->prepare($stmt);
+			$prepare = $dbh->prepare($stmt);
 			$prepare->bindParam(':owner_id', $owner_id, PDO::PARAM_STR);
 			$prepare->bindParam(':shopId', $user['shopId'], PDO::PARAM_STR);
 			$prepare->execute();
@@ -38,10 +44,15 @@ class Categories extends Connection
 			return $result;
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
+		} catch (PDOException $e) {
+			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
 		}
 	}
 	public function updateCategory($array)
 	{
+		$dbh = $this->connectionPool->getConnection();
 		try {
 			$img = "";
 			if (!empty($array['image'])) {
@@ -49,7 +60,7 @@ class Categories extends Connection
 			}
 			print_r($array);
 			$stmt = "UPDATE `{$this->table}` SET full_name=:full_name, groupName=:groupName, cat_type=:cat_type $img WHERE id=:id";
-			$prepare = $this->dbh->prepare($stmt);
+			$prepare = $dbh->prepare($stmt);
 			$prepare->bindParam(':full_name', $array['full_name'], PDO::PARAM_STR);
 			$prepare->bindParam(':id', $array['id'], PDO::PARAM_STR);
 			$prepare->bindParam(':cat_type', $array['cat_type'], PDO::PARAM_STR);
@@ -62,27 +73,37 @@ class Categories extends Connection
 			return $result;
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
+		} catch (PDOException $e) {
+			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
 		}
 	}
 	public function deleteCategory($array)
 	{
+		$dbh = $this->connectionPool->getConnection();
 		try {
 			$stmt = "UPDATE `{$this->table}` SET flag=0 where id=:id";
-			$prepare = $this->dbh->prepare($stmt);
+			$prepare = $dbh->prepare($stmt);
 			$prepare->bindParam(':id', $array['id'], PDO::PARAM_INT);
 			$prepare->execute();
 			$result = $prepare->rowCount();
 			return $result;
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
+		} catch (PDOException $e) {
+			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
 		}
 	}
 
 	public function linkAccount($array)
 	{
+		$dbh = $this->connectionPool->getConnection();
 		try {
 			$stmt = "UPDATE `{$this->table}` SET account_id=:account_id WHERE id=:id";
-			$prepare = $this->dbh->prepare($stmt);
+			$prepare = $dbh->prepare($stmt);
 			$prepare->bindParam(':id', $array['id'], PDO::PARAM_INT);
 			$prepare->bindParam(':account_id', $array['account_id'], PDO::PARAM_INT);
 			$prepare->execute();
@@ -90,16 +111,21 @@ class Categories extends Connection
 			return $result;
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
+		} catch (PDOException $e) {
+			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
 		}
 	}
 
 	public function getCategoriesPagination($params)
 	{
+		$dbh = $this->connectionPool->getConnection();
 		try {
 			$userInfo = UserInfo();
 			$user = $userInfo['user'];
 			$stmt = "SELECT COUNT(id) as total FROM `{$this->table}` where flag=1 and `owner_id`=:owner_id and shopId=:shopId";
-			$prepare = $this->dbh->prepare($stmt);
+			$prepare = $dbh->prepare($stmt);
 			$prepare->bindParam(':owner_id', $params['owner_id'], PDO::PARAM_INT);
 			$prepare->bindParam(':shopId', $user['shopId'], PDO::PARAM_INT);
 			$prepare->execute();
@@ -112,7 +138,7 @@ class Categories extends Connection
 			$offset = (($currentPage - 1) < 0 ? 0 : ($currentPage - 1)) * $no_of_records_per_page;
 			$search = "(c.full_name LIKE '%" . $params["search"] . "%' or c.groupName LIKE '%" . $params["search"] . "%') ";
 			$stmt = "SELECT c.*, a.title, a.code, a.opening_balance FROM `{$this->table}` as c left join `{$this->table_accounts}` as a on c.`account_id`=a.id WHERE flag=1 and $search and `owner_id`=:owner_id and c.shopId=:shopId LIMIT :offset, :perPage";
-			$prepare = $this->dbh->prepare($stmt);
+			$prepare = $dbh->prepare($stmt);
 			$prepare->bindParam(':offset', $offset, PDO::PARAM_INT);
 			$prepare->bindParam(':owner_id', $params['owner_id'], PDO::PARAM_INT);
 			$prepare->bindParam(':shopId', $user['shopId'], PDO::PARAM_INT);
@@ -122,11 +148,16 @@ class Categories extends Connection
 			return ['page' => $currentPage, 'totalRecords' => $total_rows, 'perPage' => $no_of_records_per_page, 'records' => $result];
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
+		} catch (PDOException $e) {
+			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
 		}
 	}
 
 	public function getCategories($type, $owner_id)
 	{
+		$dbh = $this->connectionPool->getConnection();
 		try {
 			$userInfo = UserInfo();
 			$user = $userInfo['user'];
@@ -139,7 +170,7 @@ class Categories extends Connection
 				$where = 'and flag=1 and cat_type = 1';
 			}
 			$stmt = "SELECT * FROM `{$this->table}` where owner_id=:owner_id and shopId=:shopId " . $where;
-			$prepare = $this->dbh->prepare($stmt);
+			$prepare = $dbh->prepare($stmt);
 			$prepare->bindParam(':owner_id', $owner_id, PDO::PARAM_INT);
 			$prepare->bindParam(':shopId', $user['shopId'], PDO::PARAM_INT);
 			$prepare->execute();
@@ -147,31 +178,37 @@ class Categories extends Connection
 			return $result;
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
 		}
 	}
 
 	public function getCategory($id)
 	{
+		$dbh = $this->connectionPool->getConnection();
 		try {
 
 			$stmt = "SELECT * FROM `{$this->table}` where flag=1 and id = :id";
-			$prepare = $this->dbh->prepare($stmt);
+			$prepare = $dbh->prepare($stmt);
 			$prepare->bindParam(':id', $id, PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $prepare->fetch(PDO::FETCH_ASSOC);
 			return $result;
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
 		}
 	}
 	public function expenseByAccount($id)
 	{
+		$dbh = $this->connectionPool->getConnection();
 		try {
 			$userInfo = UserInfo();
 			$user = $userInfo['user'];
 
 			$stmt = "SELECT * FROM `{$this->table}` where flag=1 and account_id=:id and shopId=:shopId";
-			$prepare = $this->dbh->prepare($stmt);
+			$prepare = $dbh->prepare($stmt);
 			$prepare->bindParam(':id', $id, PDO::PARAM_INT);
 			$prepare->bindParam(':shopId', $user['shopId'], PDO::PARAM_INT);
 			$prepare->execute();
@@ -179,16 +216,19 @@ class Categories extends Connection
 			return $result;
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
 		}
 	}
 	public function createCategory($array)
 	{
+		$dbh = $this->connectionPool->getConnection();
 		try {
 			$userInfo = UserInfo();
 			$user = $userInfo['user'];
 
 			$stmt = "INSERT INTO `{$this->table}` (`full_name`, `cat_type`, `groupName`, `owner_id`, `shopId`, `account_id`, `image`) VALUES (:full_name, :cat_type, :groupName, :owner_id, :shopId, :account_id, :image)";
-			$prepare = $this->dbh->prepare($stmt);
+			$prepare = $dbh->prepare($stmt);
 			$prepare->bindParam(':full_name', $array['full_name'], PDO::PARAM_STR);
 			$prepare->bindParam(':cat_type', $array['cat_type'], PDO::PARAM_STR);
 			$prepare->bindParam(':groupName', $array['groupName'], PDO::PARAM_STR);
@@ -197,10 +237,12 @@ class Categories extends Connection
 			$prepare->bindParam(':account_id', $array['account_id'], PDO::PARAM_STR);
 			$prepare->bindParam(':image', $array['image'], PDO::PARAM_STR);
 			$prepare->execute();
-			$result = $this->dbh->lastInsertId();
+			$result = $dbh->lastInsertId();
 			return $result;
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
 		}
 	}
 }

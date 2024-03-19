@@ -9,13 +9,14 @@ class Publishers extends Connection
 
 	public function getPublishersPagination($params)
 	{
+		$dbh = $this->connectionPool->getConnection();
 		try {
 
 			$search = "(pu.full_name LIKE '%" . $params["search"] . "%' ) ";
 
 			$stmt = "select count(total) as count from (SELECT count(p.id) as total, pu.* FROM `{$this->table}` as pu left join `{$this->table_products}` as p on p.publisher_id=pu.id left join `{$this->table_stproducts}` as st on  st.product_id = p.id and st.shopId = :shopId WHERE $search  group by p.publisher_id, pu.full_name, pu.id, pu.discount_type, pu.discount_amount, pu.discount_status) as t";
 			// $stmt = "SELECT count(pu.id) FROM `{$this->table}` as pu left join `{$this->table_products}` as p on p.publisher_id=pu.id left join `{$this->table_stproducts}` as st on  st.product_id = p.id WHERE $search";
-			$prepare = $this->dbh->prepare($stmt);
+			$prepare = $dbh->prepare($stmt);
 			$prepare->bindParam(':shopId', $params['shopId'], PDO::PARAM_INT);
 			$prepare->execute();
 			$total = $prepare->fetch(PDO::FETCH_ASSOC);
@@ -26,7 +27,7 @@ class Publishers extends Connection
 			$currentPage = $total_pages >= $params['page'] ? $params['page'] : $total_pages;
 			$offset =  ((!empty($currentPage) ? $currentPage : 1) - 1) * $no_of_records_per_page;
 			$stmt = "SELECT count(p.id) as total, pu.* FROM `{$this->table}` as pu left join `{$this->table_products}` as p on p.publisher_id=pu.id left join `{$this->table_stproducts}` as st on  st.product_id = p.id  and st.shopId = :shopId  WHERE $search group by p.publisher_id, pu.full_name, pu.id, pu.discount_type, pu.discount_amount, pu.discount_status order by total desc LIMIT :offset, :perPage";
-			$prepare = $this->dbh->prepare($stmt);
+			$prepare = $dbh->prepare($stmt);
 			$prepare->bindParam(':shopId', $params['shopId'], PDO::PARAM_INT);
 			$prepare->bindParam(':offset', $offset, PDO::PARAM_INT);
 			$prepare->bindParam(':perPage', $no_of_records_per_page, PDO::PARAM_INT);
@@ -35,36 +36,43 @@ class Publishers extends Connection
 			return ['page' => $currentPage, 'totalRecords' => $total_rows, 'perPage' => $no_of_records_per_page, 'records' => $result];
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
 		}
 	}
 
 	public function getPublishers($ownerId)
 	{
+		$dbh = $this->connectionPool->getConnection();
 		$stmt = "SELECT * FROM  `{$this->table}` where owner_id=:owner_id";
-		$prepare = $this->dbh->prepare($stmt);
+		$prepare = $dbh->prepare($stmt);
 		$prepare->bindParam(':owner_id', $ownerId, PDO::PARAM_STR);
 		//$prepare->bindParam(':search',$search,PDO::PARAM_STR);
 		$prepare->execute();
 		$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
+		$this->connectionPool->releaseConnection($dbh);
 		return $result;
 	}
 	public function getPublisher($id, $ownerId)
 	{
+		$dbh = $this->connectionPool->getConnection();
 		$stmt = "SELECT * FROM  `{$this->table}` where id=:id and owner_id=:owner_id";
-		$prepare = $this->dbh->prepare($stmt);
+		$prepare = $dbh->prepare($stmt);
 		$prepare->bindParam(':owner_id', $ownerId, PDO::PARAM_STR);
 		$prepare->bindParam(':id', $id, PDO::PARAM_STR);
 		//$prepare->bindParam(':search',$search,PDO::PARAM_STR);
 		$prepare->execute();
 		$result = $prepare->fetch(PDO::FETCH_ASSOC);
+		$this->connectionPool->releaseConnection($dbh);
 		return $result;
 	}
 
 	public function updatePublisher($array)
 	{
+		$dbh = $this->connectionPool->getConnection();
 		try {
 			$stmt = "UPDATE `{$this->table}` SET full_name=:full_name, discount_type=:discount_type, discount_amount=:discount_amount, discount_status=:discount_status, pin=:pin WHERE id=:id";
-			$prepare = $this->dbh->prepare($stmt);
+			$prepare = $dbh->prepare($stmt);
 			$prepare->bindParam(':full_name', $array['full_name'], PDO::PARAM_STR);
 			$prepare->bindParam(':id', $array['id'], PDO::PARAM_STR);
 			$prepare->bindParam(':discount_type', $array['discount_type'], PDO::PARAM_STR);
@@ -76,13 +84,16 @@ class Publishers extends Connection
 			return $result;
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
 		}
 	}
 	public function createPublisher($array)
 	{
+		$dbh = $this->connectionPool->getConnection();
 		try {
 			$stmt = "INSERT INTO `{$this->table}` (`full_name`, `discount_type`, `discount_amount`, `discount_status`, `owner_id`, `pin`) VALUES (:full_name, :discount_type, :discount_amount, :discount_status, :owner_id, :pin)";
-			$prepare = $this->dbh->prepare($stmt);
+			$prepare = $dbh->prepare($stmt);
 			$prepare->bindParam(':full_name', $array['full_name'], PDO::PARAM_STR);
 			$prepare->bindParam(':discount_type', $array['discount_type'], PDO::PARAM_STR);
 			$prepare->bindParam(':discount_amount', $array['discount_amount'], PDO::PARAM_STR);
@@ -90,21 +101,26 @@ class Publishers extends Connection
 			$prepare->bindParam(':pin', $array['pin'], PDO::PARAM_STR);
 			$prepare->bindParam(':owner_id', $array['owner_id'], PDO::PARAM_STR);
 			$prepare->execute();
-			$result = $this->dbh->lastInsertId();
+			$result = $dbh->lastInsertId();
 			return $result;
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
 		}
 	}
 	public function deletePublisher($array)
 	{
+		$dbh = $this->connectionPool->getConnection();
 		try {
 			$stmt = "DELETE FROM `{$this->table}` WHERE id=:id";
-			$prepare = $this->dbh->prepare($stmt);
+			$prepare = $dbh->prepare($stmt);
 			$prepare->bindParam(':id', $array['id'], PDO::PARAM_INT);
 			return $prepare->execute();
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
 		}
 	}
 }

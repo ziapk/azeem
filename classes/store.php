@@ -9,47 +9,57 @@ class Store extends Connection
 
 	public function getStores()
 	{
+		$dbh = $this->connectionPool->getConnection();
 		try {
 			$stmt = "SELECT s.*, st.full_name as storeType FROM `{$this->table}` as s left join `{$this->table_st}` as st on st.id=s.store_type WHERE 1";
-			$prepare = $this->dbh->prepare($stmt);
+			$prepare = $dbh->prepare($stmt);
 			$prepare->execute();
 			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
 			return $result;
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
 		}
 	}
 	public function getOwnerStores($userId)
 	{
+		$dbh = $this->connectionPool->getConnection();
 		try {
 			$stmt = "SELECT s.*, st.full_name as storeType FROM `{$this->table}` as s left join `{$this->table_st}` as st on st.id=s.store_type WHERE `owner_id`=:userId";
-			$prepare = $this->dbh->prepare($stmt);
+			$prepare = $dbh->prepare($stmt);
 			$prepare->bindParam(':userId', $userId, PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
 			return $result;
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
 		}
 	}
 	public function getStore($id)
 	{
+		$dbh = $this->connectionPool->getConnection();
 		try {
 			$stmt = "SELECT * FROM `{$this->table}` WHERE id=:id";
-			$prepare = $this->dbh->prepare($stmt);
+			$prepare = $dbh->prepare($stmt);
 			$prepare->bindParam(':id', $id, PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $prepare->fetch(PDO::FETCH_ASSOC);
 			return $result;
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
 		}
 	}
 	public function getOwnerStore($id, $owner_id)
 	{
+		$dbh = $this->connectionPool->getConnection();
 		try {
 			$stmt = "SELECT * FROM `{$this->table}` WHERE id=:id AND owner_id = :owner_id";
-			$prepare = $this->dbh->prepare($stmt);
+			$prepare = $dbh->prepare($stmt);
 			$prepare->bindParam(':id', $id, PDO::PARAM_STR);
 			$prepare->bindParam(':owner_id', $owner_id, PDO::PARAM_STR);
 			$prepare->execute();
@@ -57,6 +67,8 @@ class Store extends Connection
 			return $result;
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
 		}
 	}
 
@@ -238,13 +250,14 @@ class Store extends Connection
 	}
 	public function updateStore($array)
 	{
+		$dbh = $this->connectionPool->getConnection();
 		try {
 			$imgTxt = "";
 			if (!empty($array['image'])) {
 				$imgTxt = ", image=:image ";
 			}
 			$stmt = "UPDATE `{$this->table}` SET full_name=:full_name, store_type=:store_type,status=:status, location=:location, city=:city, company_email=:company_email, company_ledger_inbox=:company_ledger_inbox, postalCode=:postalCode, phoneNumber1=:phoneNumber1, phoneNumber2=:phoneNumber2, phoneNumber3=:phoneNumber3, gst=:gst, service_charges=:service_charges, sale_terms=:sale_terms, sale_terms_lg=:sale_terms_lg, invoice_prefix=:invoice_prefix $imgTxt WHERE id=:id";
-			$prepare = $this->dbh->prepare($stmt);
+			$prepare = $dbh->prepare($stmt);
 			$prepare->bindParam(':full_name', $array['full_name'], PDO::PARAM_STR);
 			$prepare->bindParam(':store_type', $array['store_type'], PDO::PARAM_STR);
 			$prepare->bindParam(':status', $array['status'], PDO::PARAM_STR);
@@ -270,11 +283,14 @@ class Store extends Connection
 			return $result;
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
 		}
 	}
 
 	public function createStore($array)
 	{
+		$dbh = $this->connectionPool->getConnection();
 		try {
 
 			$owner_id = $array['owner_id'];
@@ -327,7 +343,7 @@ class Store extends Connection
 
 			$client = $clients->getClientByOwnerId($owner_id);
 			$stmt = "INSERT INTO `{$this->table}` (full_name, store_type, status, location, city, company_email, company_ledger_inbox, postalCode, phoneNumber1, phoneNumber2, phoneNumber3, gst, service_charges, image, owner_id, client_id, user_id, last_bill_no, sale_date, invoice_prefix) VALUES (:full_name, :store_type, :status, :location, :city, :company_email, :company_ledger_inbox, :postalCode, :phoneNumber1, :phoneNumber2, :phoneNumber3, :gst, :service_charges, :image, :owner_id, :client_id, :user_id, :last_bill_no, :sale_date, :invoice_prefix)";
-			$prepare = $this->dbh->prepare($stmt);
+			$prepare = $dbh->prepare($stmt);
 			$prepare->bindParam(':full_name', $array['full_name'], PDO::PARAM_STR);
 			$prepare->bindParam(':store_type', $array['store_type'], PDO::PARAM_STR);
 			$prepare->bindParam(':status', $array['status'], PDO::PARAM_STR);
@@ -349,7 +365,7 @@ class Store extends Connection
 			$prepare->bindParam(':sale_date', $array['sale_date'], PDO::PARAM_STR);
 			$prepare->bindParam(':invoice_prefix', $array['invoice_prefix'], PDO::PARAM_STR);
 			$prepare->execute();
-			$result = $this->dbh->lastInsertId();
+			$result = $dbh->lastInsertId();
 			if (!empty($array['shopUsers'])) {
 				foreach ($array['shopUsers'] as $usr) {
 					if ($usr['role'] != 'owner' && !empty($usr['role']) &&  !empty($usr['full_name']) && !empty($usr['password']) && !empty($usr['email'])) {
@@ -388,28 +404,34 @@ class Store extends Connection
 			return $result;
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
 		}
 	}
 
 	public function getStoreSchema()
 	{
+		$dbh = $this->connectionPool->getConnection();
 		try {
 			$stmt = "SELECT * FROM `{$this->table_store_schema}`";
-			$prepare = $this->dbh->prepare($stmt);
+			$prepare = $dbh->prepare($stmt);
 			$prepare->execute();
 			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
 			return $result;
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
 		}
 	}
 
 	public function updateAccounts($id, $array)
 	{
 
+		$dbh = $this->connectionPool->getConnection();
 		try {
 			$stmt = "UPDATE `{$this->table}` SET cash=:cash, payable=:payable, receiving=:receiving, receivable=:receivable, expense=:expense, sale_discount=:sale_discount, purchase_discount=:purchase_discount, sale_returns=:sale_returns, purchase_returns=:purchase_returns, assets=:assets WHERE id=:id";
-			$prepare = $this->dbh->prepare($stmt);
+			$prepare = $dbh->prepare($stmt);
 			$prepare->bindParam(':cash', $array['cash'], PDO::PARAM_STR);
 			$prepare->bindParam(':payable', $array['payable'], PDO::PARAM_STR);
 			$prepare->bindParam(':receiving', $array['receiving'], PDO::PARAM_STR);
@@ -426,14 +448,17 @@ class Store extends Connection
 			return $result;
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
 		}
 	}
 
 	public function closeStoreSale($params)
 	{
+		$dbh = $this->connectionPool->getConnection();
 		try {
 			$stmt = "UPDATE `{$this->table}` SET sale_date=:sale_date WHERE id=:id";
-			$prepare = $this->dbh->prepare($stmt);
+			$prepare = $dbh->prepare($stmt);
 			$prepare->bindParam(':sale_date', $params['sale_date'], PDO::PARAM_STR);
 			$prepare->bindParam(':id', $params['shopId'], PDO::PARAM_STR);
 			$prepare->execute();
@@ -449,14 +474,17 @@ class Store extends Connection
 			return $result;
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
 		}
 	}
 
 	public function enableStoreSale($id, $sale_date_show)
 	{
+		$dbh = $this->connectionPool->getConnection();
 		try {
 			$stmt = "UPDATE `{$this->table}` SET sale_date_show=:sale_date_show WHERE id=:id";
-			$prepare = $this->dbh->prepare($stmt);
+			$prepare = $dbh->prepare($stmt);
 			$prepare->bindParam(':sale_date_show', $sale_date_show, PDO::PARAM_STR);
 			$prepare->bindParam(':id', $id, PDO::PARAM_STR);
 			$prepare->execute();
@@ -464,19 +492,24 @@ class Store extends Connection
 			return $result;
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
 		}
 	}
 
 	public function getStoreTypes()
 	{
+		$dbh = $this->connectionPool->getConnection();
 		try {
 			$stmt = "SELECT * FROM `{$this->table_st}`";
-			$prepare = $this->dbh->prepare($stmt);
+			$prepare = $dbh->prepare($stmt);
 			$prepare->execute();
 			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
 			return $result;
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
 		}
 	}
 }

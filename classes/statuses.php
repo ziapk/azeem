@@ -8,35 +8,42 @@ class Statuses extends Connection
 
     public function getOwnerStatus($shop_id)
     {
+        $dbh = $this->connectionPool->getConnection();
         try {
             $stmt = "SELECT * FROM `{$this->table}` WHERE flag=1 and `shop_id`=:shop_id";
-            $prepare = $this->dbh->prepare($stmt);
+            $prepare = $dbh->prepare($stmt);
             $prepare->bindParam(':shop_id', $shop_id, PDO::PARAM_STR);
             $prepare->execute();
             $result = $prepare->fetchAll(PDO::FETCH_ASSOC);
             return $result;
         } catch (PDOException $e) {
             die("Error!: " . $e->getMessage() . "<br/>");
+        } finally {
+            $this->connectionPool->releaseConnection($dbh);
         }
     }
     public function gettypes($shop_id)
     {
+        $dbh = $this->connectionPool->getConnection();
         try {
             $stmt = "SELECT DISTINCT `type` FROM `{$this->table}` WHERE flag=1 and `shop_id`=:shop_id";
-            $prepare = $this->dbh->prepare($stmt);
+            $prepare = $dbh->prepare($stmt);
             $prepare->bindParam(':shop_id', $shop_id, PDO::PARAM_STR);
             $prepare->execute();
             $result = $prepare->fetchAll(PDO::FETCH_ASSOC);
             return $result;
         } catch (PDOException $e) {
             die("Error!: " . $e->getMessage() . "<br/>");
+        } finally {
+            $this->connectionPool->releaseConnection($dbh);
         }
     }
     public function update($array)
     {
+        $dbh = $this->connectionPool->getConnection();
         try {
             $stmt = "UPDATE `{$this->table}` SET title=:title, type=:type, progress_value=:progress_value WHERE id=:id";
-            $prepare = $this->dbh->prepare($stmt);
+            $prepare = $dbh->prepare($stmt);
             $prepare->bindParam(':title', $array['title'], PDO::PARAM_STR);
             $prepare->bindParam(':id', $array['id'], PDO::PARAM_STR);
             $prepare->bindParam(':progress_value', $array['progress_value'], PDO::PARAM_STR);
@@ -46,27 +53,33 @@ class Statuses extends Connection
             return $result;
         } catch (PDOException $e) {
             die("Error!: " . $e->getMessage() . "<br/>");
+        } finally {
+            $this->connectionPool->releaseConnection($dbh);
         }
     }
     public function delete($array)
     {
+        $dbh = $this->connectionPool->getConnection();
         try {
             $stmt = "UPDATE `{$this->table}` SET flag=0 where id=:id";
-            $prepare = $this->dbh->prepare($stmt);
+            $prepare = $dbh->prepare($stmt);
             $prepare->bindParam(':id', $array['id'], PDO::PARAM_INT);
             $prepare->execute();
             $result = $prepare->rowCount();
             return $result;
         } catch (PDOException $e) {
             die("Error!: " . $e->getMessage() . "<br/>");
+        } finally {
+            $this->connectionPool->releaseConnection($dbh);
         }
     }
 
     public function linkAccount($array)
     {
+        $dbh = $this->connectionPool->getConnection();
         try {
             $stmt = "UPDATE `{$this->table}` SET account_id=:account_id WHERE id=:id";
-            $prepare = $this->dbh->prepare($stmt);
+            $prepare = $dbh->prepare($stmt);
             $prepare->bindParam(':id', $array['id'], PDO::PARAM_INT);
             $prepare->bindParam(':account_id', $array['account_id'], PDO::PARAM_INT);
             $prepare->execute();
@@ -74,15 +87,18 @@ class Statuses extends Connection
             return $result;
         } catch (PDOException $e) {
             die("Error!: " . $e->getMessage() . "<br/>");
+        } finally {
+            $this->connectionPool->releaseConnection($dbh);
         }
     }
 
     public function getStatusPagination($params)
     {
+        $dbh = $this->connectionPool->getConnection();
         try {
 
             $stmt = "SELECT COUNT(id) as total FROM `{$this->table}` where flag=1 and `shop_id`=:shop_id";
-            $prepare = $this->dbh->prepare($stmt);
+            $prepare = $dbh->prepare($stmt);
             $prepare->bindParam(':shop_id', $params['shop_id'], PDO::PARAM_INT);
             $prepare->execute();
             $result = $prepare->fetch(PDO::FETCH_ASSOC);
@@ -94,7 +110,7 @@ class Statuses extends Connection
             $offset = (($currentPage - 1) < 0 ? 0 : ($currentPage - 1)) * $no_of_records_per_page;
             $search = "(c.title LIKE '%" . $params["search"] . "%' or c.type LIKE '%" . $params["search"] . "%') ";
             $stmt = "SELECT c.* FROM `{$this->table}` as c WHERE flag=1 and $search and `shop_id`=:shop_id LIMIT :offset, :perPage";
-            $prepare = $this->dbh->prepare($stmt);
+            $prepare = $dbh->prepare($stmt);
             $prepare->bindParam(':offset', $offset, PDO::PARAM_INT);
             $prepare->bindParam(':shop_id', $params['shop_id'], PDO::PARAM_INT);
             $prepare->bindParam(':perPage', $no_of_records_per_page, PDO::PARAM_INT);
@@ -103,11 +119,14 @@ class Statuses extends Connection
             return ['page' => $currentPage, 'totalRecords' => $total_rows, 'perPage' => $no_of_records_per_page, 'records' => $result];
         } catch (PDOException $e) {
             die("Error!: " . $e->getMessage() . "<br/>");
+        } finally {
+            $this->connectionPool->releaseConnection($dbh);
         }
     }
 
     public function status($type, $shop_id)
     {
+        $dbh = $this->connectionPool->getConnection();
         try {
             $where = "";
             if ($type == 'pro') {
@@ -117,58 +136,69 @@ class Statuses extends Connection
                 $where = 'and flag=1 and cat_type = 1';
             }
             $stmt = "SELECT * FROM `{$this->table}` where shop_id=:shop_id " . $where;
-            $prepare = $this->dbh->prepare($stmt);
+            $prepare = $dbh->prepare($stmt);
             $prepare->bindParam(':shop_id', $shop_id, PDO::PARAM_INT);
             $prepare->execute();
             $result = $prepare->fetchAll(PDO::FETCH_ASSOC);
             return $result;
         } catch (PDOException $e) {
             die("Error!: " . $e->getMessage() . "<br/>");
+        } finally {
+            $this->connectionPool->releaseConnection($dbh);
         }
     }
 
     public function getStatusById($id)
     {
+        $dbh = $this->connectionPool->getConnection();
         try {
 
             $stmt = "SELECT * FROM `{$this->table}` where flag=1 and id = :id";
-            $prepare = $this->dbh->prepare($stmt);
+            $prepare = $dbh->prepare($stmt);
             $prepare->bindParam(':id', $id, PDO::PARAM_STR);
             $prepare->execute();
             $result = $prepare->fetch(PDO::FETCH_ASSOC);
             return $result;
         } catch (PDOException $e) {
             die("Error!: " . $e->getMessage() . "<br/>");
+        } finally {
+            $this->connectionPool->releaseConnection($dbh);
         }
     }
     public function expenseByAccount($id)
     {
+        $dbh = $this->connectionPool->getConnection();
         try {
             $stmt = "SELECT * FROM `{$this->table}` where flag=1 and account_id=:id";
-            $prepare = $this->dbh->prepare($stmt);
+            $prepare = $dbh->prepare($stmt);
             $prepare->bindParam(':id', $id, PDO::PARAM_INT);
             $prepare->execute();
             $result = $prepare->fetch(PDO::FETCH_ASSOC);
             return $result;
         } catch (PDOException $e) {
             die("Error!: " . $e->getMessage() . "<br/>");
+        } finally {
+            $this->connectionPool->releaseConnection($dbh);
         }
     }
     public function create($array)
     {
+        $dbh = $this->connectionPool->getConnection();
         try {
             $stmt = "INSERT INTO `{$this->table}` (`title`, `type`, `progress_value`, `shop_id`, `created_by`) VALUES (:title, :type, :progress_value, :shop_id, :created_by)";
-            $prepare = $this->dbh->prepare($stmt);
+            $prepare = $dbh->prepare($stmt);
             $prepare->bindParam(':title', $array['title'], PDO::PARAM_STR);
             $prepare->bindParam(':type', $array['type'], PDO::PARAM_STR);
             $prepare->bindParam(':progress_value', $array['progress_value'], PDO::PARAM_STR);
             $prepare->bindParam(':shop_id', $array['shop_id'], PDO::PARAM_STR);
             $prepare->bindParam(':created_by', $array['created_by'], PDO::PARAM_STR);
             $prepare->execute();
-            $result = $this->dbh->lastInsertId();
+            $result = $dbh->lastInsertId();
             return $result;
         } catch (PDOException $e) {
             die("Error!: " . $e->getMessage() . "<br/>");
+        } finally {
+            $this->connectionPool->releaseConnection($dbh);
         }
     }
 }

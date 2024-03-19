@@ -7,35 +7,42 @@ class Clients extends Connection
 
 	public function getClient($id)
 	{
+		$dbh = $this->connectionPool->getConnection();
 		try {
 			$stmt = "SELECT * FROM `{$this->table}` WHERE id=:id";
-			$prepare = $this->dbh->prepare($stmt);
+			$prepare = $dbh->prepare($stmt);
 			$prepare->bindParam(':id', $id, PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $prepare->fetch(PDO::FETCH_ASSOC);
 			return $result;
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
 		}
 	}
 	public function getClientByOwnerId($owner_id)
 	{
+		$dbh = $this->connectionPool->getConnection();
 		try {
 			$stmt = "SELECT * FROM `{$this->table}` WHERE owner_id=:owner_id";
-			$prepare = $this->dbh->prepare($stmt);
+			$prepare = $dbh->prepare($stmt);
 			$prepare->bindParam(':owner_id', $owner_id, PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $prepare->fetch(PDO::FETCH_ASSOC);
 			return $result;
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
 		}
 	}
 	public function updateClient($array)
 	{
+		$dbh = $this->connectionPool->getConnection();
 		try {
 			$stmt = "UPDATE `{$this->table}` SET product_title=:product_title, tag_line=:tag_line,address=:address, phone_1=:phone_1, phone_2=:phone_2, phone_3=:phone_3 WHERE id=:id";
-			$prepare = $this->dbh->prepare($stmt);
+			$prepare = $dbh->prepare($stmt);
 			$prepare->bindParam(':product_title', $array['product_title'], PDO::PARAM_STR);
 			$prepare->bindParam(':tag_line', $array['tag_line'], PDO::PARAM_STR);
 			$prepare->bindParam(':address', $array['address'], PDO::PARAM_STR);
@@ -48,14 +55,17 @@ class Clients extends Connection
 			return $result;
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
 		}
 	}
 	public function createClient($array)
 	{
+		$dbh = $this->connectionPool->getConnection();
 		try {
 			$shopId = 0;
 			$stmt = "INSERT INTO `{$this->table}` (product_title, tag_line, start_date, end_date, address, phone_1, phone_2, phone_3, phone_4, image, owner_id, shopId) VALUES (:product_title, :tag_line, :start_date, :end_date, :address, :phone_1, :phone_2, :phone_3, :phone_4, :image, :owner_id, :shopId)";
-			$prepare = $this->dbh->prepare($stmt);
+			$prepare = $dbh->prepare($stmt);
 			$prepare->bindParam(':product_title', $array['product_title'], PDO::PARAM_STR);
 			$prepare->bindParam(':tag_line', $array['tag_line'], PDO::PARAM_STR);
 			$prepare->bindParam(':start_date', $array['start_date'], PDO::PARAM_STR);
@@ -69,22 +79,27 @@ class Clients extends Connection
 			$prepare->bindParam(':owner_id', $array['owner_id'], PDO::PARAM_STR);
 			$prepare->bindParam(':shopId', $shopId, PDO::PARAM_STR);
 			$prepare->execute();
-			$result = $this->dbh->lastInsertId();
+			$result = $dbh->lastInsertId();
 			return $result;
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
 		}
 	}
 	public function getClients()
 	{
+		$dbh = $this->connectionPool->getConnection();
 		try {
 			$stmt = "SELECT * FROM `{$this->table}`";
-			$prepare = $this->dbh->prepare($stmt);
+			$prepare = $dbh->prepare($stmt);
 			$prepare->execute();
 			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
 			return $result;
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
 		}
 	}
 }

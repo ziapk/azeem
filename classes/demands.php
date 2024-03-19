@@ -9,36 +9,43 @@ class Demands extends Connection
 
 	public function getOwnerDemands($owner_id)
 	{
+		$dbh = $this->connectionPool->getConnection();
 		try {
 			$stmt = "SELECT * FROM `{$this->table}` WHERE `owner_id`=:owner_id order by id desc";
-			$prepare = $this->dbh->prepare($stmt);
+			$prepare = $dbh->prepare($stmt);
 			$prepare->bindParam(':owner_id', $owner_id, PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
 			return $result;
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
 		}
 	}
 
 	public function getStoreDemands($shop_id)
 	{
+		$dbh = $this->connectionPool->getConnection();
 		try {
 			$stmt = "SELECT * FROM `{$this->table}` WHERE `shop_id`=:shop_id and flag < 4 order by id desc";
-			$prepare = $this->dbh->prepare($stmt);
+			$prepare = $dbh->prepare($stmt);
 			$prepare->bindParam(':shop_id', $shop_id, PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
 			return $result;
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
 		}
 	}
 	public function getUserDemands($shop_id, $user_id)
 	{
+		$dbh = $this->connectionPool->getConnection();
 		try {
 			$stmt = "SELECT * FROM `{$this->table}` WHERE `shop_id`=:shop_id and created_by=:user_id and flag < 4 order by id desc";
-			$prepare = $this->dbh->prepare($stmt);
+			$prepare = $dbh->prepare($stmt);
 			$prepare->bindParam(':shop_id', $shop_id, PDO::PARAM_STR);
 			$prepare->bindParam(':user_id', $user_id, PDO::PARAM_STR);
 			$prepare->execute();
@@ -46,14 +53,17 @@ class Demands extends Connection
 			return $result;
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
 		}
 	}
 
 	public function getStoreDemand($id, $owner_id)
 	{
+		$dbh = $this->connectionPool->getConnection();
 		try {
 			$stmt = "SELECT * FROM `{$this->table}` WHERE id=:id AND owner_id = :owner_id order by id desc";
-			$prepare = $this->dbh->prepare($stmt);
+			$prepare = $dbh->prepare($stmt);
 			$prepare->bindParam(':id', $id, PDO::PARAM_STR);
 			$prepare->bindParam(':owner_id', $owner_id, PDO::PARAM_STR);
 			$prepare->execute();
@@ -61,14 +71,17 @@ class Demands extends Connection
 			return $result;
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
 		}
 	}
 
 	public function getDemandDetail($id, $owner_id)
 	{
+		$dbh = $this->connectionPool->getConnection();
 		try {
 			$stmt = "SELECT * FROM `{$this->table}` WHERE id=:id AND owner_id = :owner_id";
-			$prepare = $this->dbh->prepare($stmt);
+			$prepare = $dbh->prepare($stmt);
 			$prepare->bindParam(':id', $id, PDO::PARAM_STR);
 			$prepare->bindParam(':owner_id', $owner_id, PDO::PARAM_STR);
 			$prepare->execute();
@@ -77,32 +90,40 @@ class Demands extends Connection
 			return $result;
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
 		}
 	}
 
 	public function getDemandItems($id)
 	{
+		$dbh = $this->connectionPool->getConnection();
 		try {
 			$stmt = "SELECT a.*, b.id, concat(b.id, ' | ', b.full_name) as full_name, b.price FROM `{$this->table_sub}` as a left join {$this->table_pro} as b on a.product_id=b.id WHERE demand_id = :demand_id";
-			$prepare = $this->dbh->prepare($stmt);
+			$prepare = $dbh->prepare($stmt);
 			$prepare->bindParam(':demand_id', $id, PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
 			return $result;
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
 		}
 	}
 	public function getDemandsItems($ids)
 	{
+		$dbh = $this->connectionPool->getConnection();
 		try {
 			$stmt = "SELECT a.*, concat(b.id, ' | ', b.full_name) as full_name FROM `{$this->table_sub}` as a left join {$this->table_pro} as b on a.product_id=b.id WHERE demand_id IN (" . (implode(', ', $ids)) . ")";
-			$prepare = $this->dbh->prepare($stmt);
+			$prepare = $dbh->prepare($stmt);
 			$prepare->execute();
 			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
 			return $result;
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
 		}
 	}
 
@@ -113,9 +134,10 @@ class Demands extends Connection
 		$id = $array['id'];
 		$owner_id = $array['owner_id'];
 
+		$dbh = $this->connectionPool->getConnection();
 		try {
 			$stmt = "SELECT * FROM `{$this->table}` WHERE id=:id AND owner_id = :owner_id";
-			$prepare = $this->dbh->prepare($stmt);
+			$prepare = $dbh->prepare($stmt);
 			$prepare->bindParam(':id', $id, PDO::PARAM_STR);
 			$prepare->bindParam(':owner_id', $owner_id, PDO::PARAM_STR);
 			$prepare->execute();
@@ -123,6 +145,8 @@ class Demands extends Connection
 			return $result;
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
 		}
 	}
 
@@ -156,12 +180,13 @@ class Demands extends Connection
 
 	public function cancelDemand($array)
 	{
+		$dbh = $this->connectionPool->getConnection();
 		try {
 			$assign_date = $array['assign_date'];
 			$flag = $array['flag'];
 			$id = $array['id'];
 			$stmt = "UPDATE `{$this->table}` SET `assign_date`=:assign_date, `flag`=:flag WHERE id=:id";
-			$prepare = $this->dbh->prepare($stmt);
+			$prepare = $dbh->prepare($stmt);
 			$prepare->bindParam(':assign_date', $assign_date, PDO::PARAM_STR);
 			$prepare->bindParam(':flag', $flag, PDO::PARAM_INT);
 			$prepare->bindParam(':id', $id, PDO::PARAM_INT);
@@ -170,18 +195,21 @@ class Demands extends Connection
 			return $result;
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
 		}
 		return 'update';
 	}
 
 	public function assignDemand($array)
 	{
+		$dbh = $this->connectionPool->getConnection();
 		try {
 			$assign_date = $array['assign_date'];
 			$flag = $array['flag'];
 			$id = $array['id'];
 			$stmt = "UPDATE `{$this->table}` SET `assign_date`=:assign_date, `flag`=:flag WHERE id=:id";
-			$prepare = $this->dbh->prepare($stmt);
+			$prepare = $dbh->prepare($stmt);
 			$prepare->bindParam(':assign_date', $assign_date, PDO::PARAM_STR);
 			$prepare->bindParam(':flag', $flag, PDO::PARAM_INT);
 			$prepare->bindParam(':id', $id, PDO::PARAM_INT);
@@ -193,18 +221,21 @@ class Demands extends Connection
 			return $result;
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
 		}
 		return 'update';
 	}
 
 	public function updateDemandItems($array, $shop_id, $owner_id)
 	{
+		$dbh = $this->connectionPool->getConnection();
 		try {
 			$assign_qty = !empty($array['product_assign_qty']) ? $array['product_assign_qty'] : $array['assign_qty'];
 			$id = $array['id'];
 
 			$stmt = "UPDATE `{$this->table_sub}` SET `product_assign_qty`=:assign_qty WHERE id=:id";
-			$prepare = $this->dbh->prepare($stmt);
+			$prepare = $dbh->prepare($stmt);
 			$prepare->bindParam(':assign_qty', $assign_qty, PDO::PARAM_INT);
 			$prepare->bindParam(':id', $id, PDO::PARAM_INT);
 			$prepare->execute();
@@ -213,6 +244,8 @@ class Demands extends Connection
 			return $result;
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
 		}
 		return 'update';
 	}
@@ -221,9 +254,10 @@ class Demands extends Connection
 
 	public function modifyDemand($array)
 	{
+		$dbh = $this->connectionPool->getConnection();
 		try {
 			$stmt = "UPDATE `{$this->table}` SET `title`=:title, `demand_date`=:demand_date, shop_id=:shop_id WHERE id=:id";
-			$prepare = $this->dbh->prepare($stmt);
+			$prepare = $dbh->prepare($stmt);
 			$prepare->bindParam(':title', $array['title'], PDO::PARAM_STR);
 			$prepare->bindParam(':demand_date', $array['demand_date'], PDO::PARAM_STR);
 			$prepare->bindParam(':shop_id', $array['shop_id'], PDO::PARAM_STR);
@@ -242,21 +276,24 @@ class Demands extends Connection
 			return $array['id'];
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
 		}
 	}
 
 	public function createDemand($array, $isOwner, $shopId)
 	{
+		$dbh = $this->connectionPool->getConnection();
 		try {
 			$stmt = "INSERT INTO `{$this->table}` (`title`, `demand_date`, `shop_id`, `owner_id`, `created_by`) VALUES (:demand_title, :demand_date, :shop_id, :owner_id, :created_by)";
-			$prepare = $this->dbh->prepare($stmt);
+			$prepare = $dbh->prepare($stmt);
 			$prepare->bindParam(':demand_title', $array['demand_title'], PDO::PARAM_STR);
 			$prepare->bindParam(':demand_date', $array['demand_date'], PDO::PARAM_STR);
 			$prepare->bindParam(':shop_id', $shopId, PDO::PARAM_STR);
 			$prepare->bindParam(':owner_id', $array['owner_id'], PDO::PARAM_STR);
 			$prepare->bindParam(':created_by', $array['created_by'], PDO::PARAM_STR);
 			$prepare->execute();
-			$array['id'] = $result = $this->dbh->lastInsertId();
+			$array['id'] = $result = $dbh->lastInsertId();
 			if (!empty($result)) {
 				foreach ($array['items'] as $k => $value) {
 					$data = [
@@ -277,34 +314,42 @@ class Demands extends Connection
 			return $array;
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
 		}
 	}
 	public function createDemandItems($array)
 	{
+		$dbh = $this->connectionPool->getConnection();
 		try {
 			$stmt = "INSERT INTO `{$this->table_sub}` (`product_id`, `product_qty`, `demand_id`) VALUES (:product_id, :product_qty, :demand_id)";
-			$prepare = $this->dbh->prepare($stmt);
+			$prepare = $dbh->prepare($stmt);
 			$prepare->bindParam(':product_id', $array['product_id'], PDO::PARAM_STR);
 			$prepare->bindParam(':product_qty', $array['product_qty'], PDO::PARAM_STR);
 			$prepare->bindParam(':demand_id', $array['demand_id'], PDO::PARAM_STR);
 			$prepare->execute();
-			$result = $this->dbh->lastInsertId();
+			$result = $dbh->lastInsertId();
 			return $result;
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
 		}
 	}
 	public function deleteDemandItems($id)
 	{
+		$dbh = $this->connectionPool->getConnection();
 		try {
 			$stmt = "DELETE FROM `{$this->table_sub}` WHERE demand_id=:demand_id";
-			$prepare = $this->dbh->prepare($stmt);
+			$prepare = $dbh->prepare($stmt);
 			$prepare->bindParam(':demand_id', $id, PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $prepare->rowCount();
 			return $result;
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
 		}
 	}
 }

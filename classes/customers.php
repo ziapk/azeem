@@ -9,16 +9,18 @@ class Customers extends Connection
 
 	public function searchCustomer($shopId, $search, $accountsOnly = false)
 	{
+		$dbh = $this->connectionPool->getConnection();
 		$accountCond = '';
 		if ($accountsOnly) {
 			$accountCond = 'and account_id > 0';
 		}
 		$stmt = "SELECT * FROM `{$this->table}`  WHERE flag=1 $accountCond and shopId=:shopId AND (full_name LIKE '%" . $search . "%' OR title LIKE '%" . $search . "%' OR company LIKE '%" . $search . "%' OR code LIKE '" . $search . "%' OR phoneNumber LIKE '%" . $search . "%') LIMIT 10";
-		$prepare = $this->dbh->prepare($stmt);
+		$prepare = $dbh->prepare($stmt);
 		$prepare->bindParam(':shopId', $shopId, PDO::PARAM_STR);
 		//$prepare->bindParam(':search',$search,PDO::PARAM_STR);
 		$prepare->execute();
 		$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
+		$this->connectionPool->releaseConnection($dbh);
 		foreach ($result as $key => $c) {
 			$result[$key]['discount_array'] = $this->getCustomerDiscounts(['customer_id' => $c['id'], 'shopId' => $c['shopId']]);
 		}
@@ -27,11 +29,12 @@ class Customers extends Connection
 
 	public function createCustomer($array)
 	{
+		$dbh = $this->connectionPool->getConnection();
 		try {
 			$is_default = !empty($array['is_default']) ? 1 : 0;
 			$linkedShop = !empty($array['linked_shop']) ? $array['linked_shop'] : null;
 			$stmt = "INSERT INTO `{$this->table}` (`full_name`, `address`,`type`, `company`, `email`, `title`, `phoneNumber`, `shopId`, `account_id`, `code`, `default_discount`, `is_default`, `linked_shop`) VALUES (:full_name, :address, :type, :company, :email, :title, :phoneNumber, :shopId, :account_id, :code, :default_discount, :is_default, :linked_shop)";
-			$prepare = $this->dbh->prepare($stmt);
+			$prepare = $dbh->prepare($stmt);
 			$prepare->bindParam(':full_name', $array['full_name'], PDO::PARAM_STR);
 			$prepare->bindParam(':phoneNumber', $array['phoneNumber'], PDO::PARAM_STR);
 			$prepare->bindParam(':company', $array['company'], PDO::PARAM_STR);
@@ -46,18 +49,21 @@ class Customers extends Connection
 			$prepare->bindParam(':is_default', $is_default, PDO::PARAM_STR);
 			$prepare->bindParam(':linked_shop', $linkedShop, PDO::PARAM_STR);
 			$prepare->execute();
-			$result = $this->dbh->lastInsertId();
+			$result = $dbh->lastInsertId();
 			return $result;
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
 		}
 	}
 
 	public function linkAccountCustomer($array)
 	{
+		$dbh = $this->connectionPool->getConnection();
 		try {
 			$stmt = "UPDATE `{$this->table}` SET account_id=:account_id WHERE id=:id";
-			$prepare = $this->dbh->prepare($stmt);
+			$prepare = $dbh->prepare($stmt);
 			$prepare->bindParam(':id', $array['id'], PDO::PARAM_INT);
 			$prepare->bindParam(':account_id', $array['account_id'], PDO::PARAM_INT);
 			$prepare->execute();
@@ -65,15 +71,18 @@ class Customers extends Connection
 			return $result;
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
 		}
 	}
 
 	public function updateCustomer($array)
 	{
+		$dbh = $this->connectionPool->getConnection();
 		try {
 			$linkedShop = !empty($array['linked_shop']) ? $array['linked_shop'] : null;
 			$stmt = "UPDATE `{$this->table}` SET full_name=:full_name, address=:address, phoneNumber=:phoneNumber, company=:company, email=:email, title=:title, code=:code, type=:type, default_discount=:default_discount, linked_shop=:linked_shop WHERE id=:id";
-			$prepare = $this->dbh->prepare($stmt);
+			$prepare = $dbh->prepare($stmt);
 			$prepare->bindParam(':full_name', $array['full_name'], PDO::PARAM_STR);
 			$prepare->bindParam(':id', $array['id'], PDO::PARAM_STR);
 			$prepare->bindParam(':code', $array['code'], PDO::PARAM_STR);
@@ -90,52 +99,64 @@ class Customers extends Connection
 			return $result;
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
 		}
 	}
 
 	public function deleteCustomer($array)
 	{
+		$dbh = $this->connectionPool->getConnection();
 		try {
 			$stmt = "UPDATE `{$this->table}` SET flag=0 WHERE id=:id";
-			$prepare = $this->dbh->prepare($stmt);
+			$prepare = $dbh->prepare($stmt);
 			$prepare->bindParam(':id', $array['id'], PDO::PARAM_INT);
 			return $prepare->execute();
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
 		}
 	}
 	public function getCustomers($shopId = null)
 	{
+		$dbh = $this->connectionPool->getConnection();
 		try {
 			$stmt = "SELECT *  FROM `{$this->table}` WHERE `shopId`=:shopId and flag=1";
-			$prepare = $this->dbh->prepare($stmt);
+			$prepare = $dbh->prepare($stmt);
 			$prepare->bindParam(':shopId', $shopId, PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
 			return $result;
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
 		}
 	}
 
 	public function deleteCustomerDiscounts($array)
 	{
+		$dbh = $this->connectionPool->getConnection();
 		try {
 			$stmt = "DELETE FROM `{$this->table_discount}` WHERE customer_id=:customer_id and shopId=:shopId";
-			$prepare = $this->dbh->prepare($stmt);
+			$prepare = $dbh->prepare($stmt);
 			$prepare->bindParam(':customer_id', $array['customer_id'], PDO::PARAM_INT);
 			$prepare->bindParam(':shopId', $array['shopId'], PDO::PARAM_INT);
 			return $prepare->execute();
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
 		}
 	}
 
 	public function createCustomerDiscounts($array)
 	{
+		$dbh = $this->connectionPool->getConnection();
 		try {
 			$stmt = "INSERT INTO `{$this->table_discount}` (`user_id`, `shopId`, `customer_id`, `publisher_id`, `discount_type`, `discount_value`) VALUES (:user_id, :shopId, :customer_id, :publisher_id, :discount_type, :discount_value)";
-			$prepare = $this->dbh->prepare($stmt);
+			$prepare = $dbh->prepare($stmt);
 			$prepare->bindParam(':user_id', $array['user_id'], PDO::PARAM_STR);
 			$prepare->bindParam(':shopId', $array['shopId'], PDO::PARAM_STR);
 			$prepare->bindParam(':customer_id', $array['customer_id'], PDO::PARAM_STR);
@@ -143,28 +164,31 @@ class Customers extends Connection
 			$prepare->bindParam(':discount_type', $array['discount_type'], PDO::PARAM_STR);
 			$prepare->bindParam(':discount_value', $array['discount_value'], PDO::PARAM_STR);
 			$prepare->execute();
-			$result = $this->dbh->lastInsertId();
+			$result = $dbh->lastInsertId();
 			return $result;
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
 		}
 	}
 
 	public function getCustomerDiscounts($arr)
 	{
+		$dbh = $this->connectionPool->getConnection();
 		try {
 			$shopId = $arr['shopId'];
 			$ownerId = $arr['ownerId'];
 			$customer_id = $arr['customer_id'];
 			$stmt = "SELECT d.*, d.publisher_id as id, p.full_name  FROM `{$this->table_discount}` as d left join `{$this->table_publisher}` as p on d.publisher_id=p.id WHERE customer_id=:customer_id and `shopId`=:shopId";
-			$prepare = $this->dbh->prepare($stmt);
+			$prepare = $dbh->prepare($stmt);
 			$prepare->bindParam(':shopId', $shopId, PDO::PARAM_STR);
 			$prepare->bindParam(':customer_id', $customer_id, PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
 
 			$stmt = "SELECT * FROM `{$this->table_publisher}` WHERE `owner_id`=:owner_id";
-			$prepare = $this->dbh->prepare($stmt);
+			$prepare = $dbh->prepare($stmt);
 			$prepare->bindParam(':owner_id', $ownerId, PDO::PARAM_STR);
 			$prepare->execute();
 			$result2 = $prepare->fetchAll(PDO::FETCH_ASSOC);
@@ -191,17 +215,20 @@ class Customers extends Connection
 			return array_values($all);
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
 		}
 	}
 
 	public function getUserByAccount($id)
 	{
+		$dbh = $this->connectionPool->getConnection();
 		try {
 			$userInfo = UserInfo();
 			$user = $userInfo['user'];
 
 			$stmt = "SELECT *  FROM `{$this->table}` WHERE `account_id`=:id and flag=1 and shopId=:shopId";
-			$prepare = $this->dbh->prepare($stmt);
+			$prepare = $dbh->prepare($stmt);
 			$prepare->bindParam(':id', $id, PDO::PARAM_STR);
 			$prepare->bindParam(':shopId', $user['shopId'], PDO::PARAM_STR);
 			$prepare->execute();
@@ -213,13 +240,16 @@ class Customers extends Connection
 			return $result;
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
 		}
 	}
 	public function getCustomer($id)
 	{
+		$dbh = $this->connectionPool->getConnection();
 		try {
 			$stmt = "SELECT *  FROM `{$this->table}` WHERE `id`=:id and flag=1";
-			$prepare = $this->dbh->prepare($stmt);
+			$prepare = $dbh->prepare($stmt);
 			$prepare->bindParam(':id', $id, PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $prepare->fetch(PDO::FETCH_ASSOC);
@@ -231,13 +261,16 @@ class Customers extends Connection
 			return $result;
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
 		}
 	}
 	public function getCustomerByLinkedShop($id)
 	{
+		$dbh = $this->connectionPool->getConnection();
 		try {
 			$stmt = "SELECT *  FROM `{$this->table}` WHERE `linked_shop`=:id and flag=1";
-			$prepare = $this->dbh->prepare($stmt);
+			$prepare = $dbh->prepare($stmt);
 			$prepare->bindParam(':id', $id, PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $prepare->fetch(PDO::FETCH_ASSOC);
@@ -249,15 +282,18 @@ class Customers extends Connection
 			return $result;
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
 		}
 	}
 
 	public function getCustomersPagination($params)
 	{
+		$dbh = $this->connectionPool->getConnection();
 		try {
 
 			$stmt2 = "SELECT COUNT(id) as total, GROUP_CONCAT(account_id) as ids FROM `{$this->table}` where shopId=:shopId and flag=1";
-			$prepare2 = $this->dbh->prepare($stmt2);
+			$prepare2 = $dbh->prepare($stmt2);
 			$prepare2->bindParam(':shopId', $params['shopId'], PDO::PARAM_INT);
 			$prepare2->execute();
 			$resultTotal = $prepare2->fetch(PDO::FETCH_ASSOC);
@@ -269,7 +305,7 @@ class Customers extends Connection
 			$offset = (($currentPage - 1) < 0 ? 0 : ($currentPage - 1)) * $no_of_records_per_page;
 			$search = " AND (full_name LIKE '%" . $params["search"] . "%' OR phoneNumber LIKE '%" . $params["search"] . "%' OR address LIKE '%" . $params["search"] . "%' ) ";
 			$stmt = "SELECT * FROM `{$this->table}` WHERE shopId=:shopId and flag=1 $search LIMIT :offset, :perPage";
-			$prepare = $this->dbh->prepare($stmt);
+			$prepare = $dbh->prepare($stmt);
 			$prepare->bindParam(':offset', $offset, PDO::PARAM_INT);
 			$prepare->bindParam(':perPage', $no_of_records_per_page, PDO::PARAM_INT);
 			$prepare->bindParam(':shopId', $params['shopId'], PDO::PARAM_INT);
@@ -305,6 +341,8 @@ class Customers extends Connection
 			return ['page' => $currentPage, 'closing_total' => $closingTotal, 'totalRecords' => $total_rows, 'perPage' => $no_of_records_per_page, 'records' => $result];
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
 		}
 	}
 }

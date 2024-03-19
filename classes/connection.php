@@ -3,34 +3,67 @@
 
 class Connection
 {
-	private $host = 'localhost';
-	private $dbname = 'reclydmy_azeem';
-	private $user = 'reclydmy_pos';
-	private $pass = ';4B)pQC=K0&v';
+	private static $instance = null;
+	public $connectionPool;
 
-
-	// private $host = 'localhost';
-	// private $dbname = 'reclydmy_azeem';
-	// private $user = 'root';
-	// private $pass = 'root';
-	// private $sql_mode = 'STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION';
-
-	public $dbh;
-
-	function __construct()
+	public function __construct()
 	{
-		$this->connection();
+		// Initialize the connection pool
+		$this->connectionPool = ConnectionPool::getInstance();
 	}
-	private function connection()
+
+	public static function getInstance()
 	{
+		if (self::$instance == null) {
+			self::$instance = new Connection();
+		}
+		return self::$instance;
+	}
+
+	public function executeQuery($query, $params = [], $rows = 'many', $debug = false)
+	{
+		// Acquire a connection from the pool
+		$connection = $this->connectionPool->getConnection();
+
 		try {
-			// , PDO::MYSQL_ATTR_INIT_COMMAND => 'SET sql_mode="' . $this->sql_mode . '"'
-			$this->dbh = new PDO('mysql:host=' . $this->host . ';dbname=' . $this->dbname, $this->user, $this->pass, array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::MYSQL_ATTR_INIT_COMMAND => 'SET sql_mode="' . $this->sql_mode . '"'));
+			if ($debug) {
+				print_r($query);
+				print_r($params);
+			}
+			$statement = $connection->prepare($query);
+			foreach ($params as $key => &$value) {
+				$statement->bindParam($key, $value, PDO::PARAM_STR);
+			}
+			$statement->execute();
+			return $rows == 'many' ? $statement->fetchAll(PDO::FETCH_ASSOC) : $statement->fetchAll(PDO::FETCH_ASSOC);
 		} catch (PDOException $e) {
-			print "Error!: " . $e->getMessage() . "<br/>";
-			die();
+			die("Error executing query: " . $e->getMessage());
+		} finally {
+			// Release the connection back to the pool
+			$this->connectionPool->releaseConnection($connection);
 		}
 	}
+
+	public function executeUpdate($query, $params = [])
+	{
+		// Acquire a connection from the pool
+		$connection = $this->connectionPool->getConnection();
+
+		try {
+			$statement = $connection->prepare($query);
+			foreach ($params as $row) {
+				$statement->bindParam($row[0], $row[1], $row[2]);
+			}
+			$statement->execute();
+			return $statement->rowCount(); // Return the number of rows affected by the update
+		} catch (PDOException $e) {
+			die("Error executing update query: " . $e->getMessage());
+		} finally {
+			// Release the connection back to the pool
+			$this->connectionPool->releaseConnection($connection);
+		}
+	}
+
 	public function drawInvoice($id)
 	{
 		ob_start();
