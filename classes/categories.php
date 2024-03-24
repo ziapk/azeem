@@ -22,8 +22,6 @@ class Categories extends Connection
 			return $result;
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
-		} catch (PDOException $e) {
-			die("Error!: " . $e->getMessage() . "<br/>");
 		} finally {
 			$this->connectionPool->releaseConnection($dbh);
 		}
@@ -42,8 +40,6 @@ class Categories extends Connection
 			$prepare->execute();
 			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
 			return $result;
-		} catch (PDOException $e) {
-			die("Error!: " . $e->getMessage() . "<br/>");
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
 		} finally {
@@ -73,8 +69,6 @@ class Categories extends Connection
 			return $result;
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
-		} catch (PDOException $e) {
-			die("Error!: " . $e->getMessage() . "<br/>");
 		} finally {
 			$this->connectionPool->releaseConnection($dbh);
 		}
@@ -89,8 +83,6 @@ class Categories extends Connection
 			$prepare->execute();
 			$result = $prepare->rowCount();
 			return $result;
-		} catch (PDOException $e) {
-			die("Error!: " . $e->getMessage() . "<br/>");
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
 		} finally {
@@ -109,8 +101,6 @@ class Categories extends Connection
 			$prepare->execute();
 			$result = $prepare->rowCount();
 			return $result;
-		} catch (PDOException $e) {
-			die("Error!: " . $e->getMessage() . "<br/>");
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
 		} finally {
@@ -146,8 +136,6 @@ class Categories extends Connection
 			$prepare->execute();
 			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
 			return ['page' => $currentPage, 'totalRecords' => $total_rows, 'perPage' => $no_of_records_per_page, 'records' => $result];
-		} catch (PDOException $e) {
-			die("Error!: " . $e->getMessage() . "<br/>");
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
 		} finally {

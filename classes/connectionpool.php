@@ -5,7 +5,7 @@ class ConnectionPool
 	private static $instance = null;
 	private $pool = [];
 
-	private $maxConnections = 10; // Maximum number of connections in the pool
+	// private $maxConnections = 10; // Maximum number of connections in the pool
 
 	private $host = 'localhost';
 	private $dbname = 'reclydmy_azeem';
@@ -23,9 +23,7 @@ class ConnectionPool
 	private function __construct()
 	{
 		// Initialize the connection pool
-		for ($i = 0; $i < $this->maxConnections; $i++) {
-			$this->pool[] = $this->createConnection();
-		}
+		$this->pool = $this->createConnection();
 	}
 
 	public static function getInstance()
@@ -38,18 +36,13 @@ class ConnectionPool
 
 	public function getConnection()
 	{
-		if (count($this->pool) > 0) {
-			return array_pop($this->pool);
-		} else {
-			// If the pool is empty, create a new connection
-			return $this->createConnection();
-		}
+		return $this->pool;
 	}
 
 	public function releaseConnection($connection)
 	{
 		// Release the connection back to the pool
-		$this->pool[] = $connection;
+		// $this->pool[] = $connection;
 	}
 
 	private function createConnection()
