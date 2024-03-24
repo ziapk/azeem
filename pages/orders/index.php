@@ -36,7 +36,7 @@ if ($userData['role'] == 'owner' || $userData['role'] == 'manager') {
             </div>
         </form>
 
-        <uib-tabset active="activePill">
+        <uib-tabset active="activePill" class="orders-tabs">
             <uib-tab select="getReport($event)" index="0" data-tab="all" heading="All Orders"></uib-tab>
             <uib-tab select="getReport($event)" index="1" data-tab="cash" heading="Paid"></uib-tab>
             <uib-tab select="getReport($event)" index="2" data-tab="credit" heading="Un-Paid"></uib-tab>
@@ -51,11 +51,10 @@ if ($userData['role'] == 'owner' || $userData['role'] == 'manager') {
                 <thead style="font-size: .7em;">
                     <tr>
                         <th>Sr.#</th>
-                        <th>Order. #</th>
+                        <th></th>
                         <th>Customer</th>
-                        <th>Summery</th>
                         <th>Price</th>
-                        <th ng-repeat="mode in modes">{{mode.title}}</th>
+                        <th>MODE</th>
                         <th>Running</th>
                         <th>Status</th>
                         <th>Date/time</th>
@@ -73,13 +72,20 @@ if ($userData['role'] == 'owner' || $userData['role'] == 'manager') {
                                 <a ng-if="row.recon == 0" class="btn btn-xs btn-danger" href="javascript:void(0)"><span class="fa fa-check"></span></a>
                                 <a ng-if="row.recon == 1" class="btn btn-xs btn-success" href="javascript:void(0)"><span class="fa fa-check"></span></a>
                             <?php } ?>
-                            <span>{{row.order_custom_id}}</span>
+
                         </td>
-                        <td>{{row.customer_name || row.full_name}}</td>
-                        <td width="200" style="font-size: .7em;">{{row.summery}}</td>
-                        <td>{{row.price - row.discount | number: 0}}</td>
-                        <td ng-repeat="mode in modes">{{row.prices[mode.id] | number: 0}}</td>
-                        <td>{{row.runningTotal | number: 0}}</td>
+                        <td>
+                            <span>{{row.order_custom_id}}</span> | {{row.customer_name || row.full_name}}<br />
+                            <span style="opacity: 0.8; font-size: 0.8em">{{row.summery}}</span>
+                        </td>
+                        <td align="right">
+                            {{row.price - row.discount | currency:'':0}}
+                        </td>
+                        <td>
+                            <code ng-repeat="mode in modes" ng-if="row.prices[mode.id]">{{mode.title}}</code>
+                            <code ng-if="!row.prices">Cash</code>
+                        </td>
+                        <td align="right">{{row.runningTotal | number: 0}}</td>
                         <td><span class="label" ng-class="{'label-success': row.status == 2, 'label-primary': row.status == 1, 'label-danger': row.status == 9}">{{statusArr[row.status].full_name | uppercase}}</span></td>
                         <td>{{row.order_date | date: 'dd MMM'}}</td>
                         <td align="right" class="dropdown">
