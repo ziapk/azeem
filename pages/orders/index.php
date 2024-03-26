@@ -54,7 +54,7 @@ if ($userData['role'] == 'owner' || $userData['role'] == 'manager') {
                         <th></th>
                         <th>Customer</th>
                         <th>Price</th>
-                        <th>MODE</th>
+                        <th ng-repeat="mode in modes">{{mode.title}}</th>
                         <th>Running</th>
                         <th>Status</th>
                         <th>Date/time</th>
@@ -81,10 +81,7 @@ if ($userData['role'] == 'owner' || $userData['role'] == 'manager') {
                         <td align="right">
                             {{row.price - row.discount | currency:'':0}}
                         </td>
-                        <td>
-                            <code ng-repeat="mode in modes" ng-if="row.prices[mode.id]">{{mode.title}}</code>
-                            <code ng-if="!row.prices">Cash</code>
-                        </td>
+                        <td ng-repeat="mode in modes">{{row.prices[mode.id]}}</td>
                         <td align="right">{{row.runningTotal | number: 0}}</td>
                         <td><span class="label" ng-class="{'label-success': row.status == 2, 'label-primary': row.status == 1, 'label-danger': row.status == 9}">{{statusArr[row.status].full_name | uppercase}}</span></td>
                         <td>{{row.order_date | date: 'dd MMM'}}</td>
