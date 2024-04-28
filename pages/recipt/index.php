@@ -86,8 +86,6 @@ $publishers = $publisherObj->getPublishers($userId);
                 </div>
             <?php } ?>
         </span>
-        <div class="clearfix" id="dummyHeight"></div>
-
         <table class="table visible-xs">
             <tr>
                 <td>
@@ -108,7 +106,7 @@ $publishers = $publisherObj->getPublishers($userId);
                 <td>
                     <div>
                         <div class="input-group">
-                            <input type="text" autocomplete="off" class="form-control" id="searchProduct" ng-model="product" placeholder="Search Products" uib-typeahead="address as address.full_name for address in searchProduct($viewValue)" typeahead-on-select="selectProduct($item)" ng-model-options="{debounce: 100}" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="productCode ? 0 : 1">
+                            <input type="text" autocomplete="off" class="form-control" id="searchProduct-1" ng-model="product" placeholder="Search Products" uib-typeahead="address as address.full_name for address in searchProduct($viewValue)" typeahead-on-select="selectProduct($item)" ng-model-options="{debounce: 100}" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="productCode ? 0 : 1">
                             <span class="input-group-btn" style="width: 40%">
                                 <input type="text" ng-model="productCode" class="form-control" id="exampleInputAmount" placeholder="CODE">
                             </span>
@@ -122,9 +120,9 @@ $publishers = $publisherObj->getPublishers($userId);
         </table>
         <table class="table table-striped visible-xs">
             <thead>
-                <?php echo include_once dirname(__FILE__) . '/table-sm.php'; ?>
+                <?php include_once dirname(__FILE__) . '/table-sm.php'; ?>
                 <table class="table table-striped recipt-table hidden-xs">
-                    <thead id="fixme">
+                    <thead class="sticky">
                         <th colspan="8" style="padding: 0">
                             <table class="table" style="box-shadow: none; margin: 0">
                                 <thead>
@@ -150,7 +148,7 @@ $publishers = $publisherObj->getPublishers($userId);
                                         <th width="100">
                                             <div class="dropdown-wrapper align-right dropdown-height">
                                                 <div class="input-group">
-                                                    <input type="text" autocomplete="off" class="form-control" id="searchProduct" ng-model="product" placeholder="Search Products" uib-typeahead="address as address.full_name for address in searchProduct($viewValue)" typeahead-on-select="selectProduct($item)" ng-model-options="{debounce: 100}" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="productCode ? 0 : 1">
+                                                    <input type="text" autocomplete="off" class="form-control" id="searchProduct-2" ng-model="product" placeholder="Search Products" uib-typeahead="address as address.full_name for address in searchProduct($viewValue)" typeahead-on-select="selectProduct($item)" ng-model-options="{debounce: 100}" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="productCode ? 0 : 1">
                                                     <span class="input-group-btn" style="width: 90px">
                                                         <input type="text" ng-model="productCode" class="form-control" id="exampleInputAmount" placeholder="CODE">
                                                     </span>
@@ -166,7 +164,7 @@ $publishers = $publisherObj->getPublishers($userId);
                         </th>
 
 
-                        <?php echo include_once dirname(__FILE__) . '/table.php'; ?>
+                        <?php include_once dirname(__FILE__) . '/table.php'; ?>
 
     </div>
 
@@ -176,31 +174,30 @@ echo mainFooter();
 ?>
 
 <script type="text/javascript">
-    var element = $('#fixme');
-    var fixmeTop = element.offset().top;
-    var dummyHeight = $('#dummyHeight');
-    var offset = $('.navbar').height();
-    $(window).on('load scroll', function() { // assign scroll event listener
-        var fixedHeight = element.height()
+    // var element = $('#fixme');
+    // var fixmeTop = element.offset().top;
+    // var dummyHeight = $('#dummyHeight');
+    // var offset = $('.navbar').height();
+    // $(window).on('load scroll', function() { // assign scroll event listener
+    //     var fixedHeight = element.height()
 
 
-        var currentScroll = $(window).scrollTop(); // get current position
+    //     var currentScroll = $(window).scrollTop(); // get current position
 
-        if ((currentScroll + offset) >= fixmeTop) { // apply position: fixed if you
-            element.css({ // scroll to that element or below it
-                top: offset,
-            });
-            element.addClass('navbar-fixed-top')
-            dummyHeight.height(fixedHeight)
-        } else { // apply position: static
-            element.removeClass('navbar-fixed-top');
-            dummyHeight.height(0)
-        }
+    //     if ((currentScroll + offset) >= fixmeTop) { // apply position: fixed if you
+    //         element.css({ // scroll to that element or below it
+    //             top: offset,
+    //         });
+    //         element.addClass('navbar-fixed-top')
+    //         dummyHeight.height(fixedHeight)
+    //     } else { // apply position: static
+    //         element.removeClass('navbar-fixed-top');
+    //         dummyHeight.height(0)
+    //     }
 
-    });
+    // });
     app.run(['$anchorScroll', function($anchorScroll) {
         $anchorScroll.yOffset = 200; // always scroll by 50 extra pixels
-
     }])
     app.directive('onEnterPress', function() {
         return function(scope, element, attrs) {
@@ -602,11 +599,17 @@ echo mainFooter();
                         $anchorScroll.yOffset = 200;
 
                         $location.hash('product-' + currentIndex);
+                        $location.hash('sm-product-' + currentIndex);
                         $anchorScroll();
                         if ($('#product-' + currentIndex).find('.input-add-dist').length) {
                             $('#product-' + currentIndex).find('.input-add-dist').focus();
                         } else {
                             $('#product-' + currentIndex).find('.quantity__input').focus();
+                        }
+                        if ($('#sm-product-' + currentIndex).find('.input-add-dist').length) {
+                            $('#sm-product-' + currentIndex).find('.input-add-dist').focus();
+                        } else {
+                            $('#sm-product-' + currentIndex).find('.quantity__input').focus();
                         }
                     }
                 }, 200);
@@ -888,8 +891,12 @@ echo mainFooter();
         $scope.initCheckKeypress = (evt) => {
             var e = evt; // for trans-browser compatibility
             var charCode = e.which || e.keyCode;
+            console.log('evt', charCode)
+
             if (charCode === 9 || charCode === 13) {
-                $('#searchProduct').focus();
+                console.log('searchProduct', $('#searchProduct'));
+                $('#searchProduct-1:visible').focus();
+                $('#searchProduct-2:visible').focus();
                 e.preventDefault();
             }
         }

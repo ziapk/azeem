@@ -941,9 +941,7 @@ class Orders extends Connection
                 $flagCondition .= " AND o.status=$flag ";
             }
 
-            if (!empty($params['orderId'])) {
-                $toCondition = " AND o.order_custom_id='" . $params['orderId'] . "' ";
-            }
+            
             if ($params['orderType'] == 'cash') {
                 $toCondition .= " AND o.paid_amount > 0 and o.status = 2 ";
             }
@@ -962,6 +960,13 @@ class Orders extends Connection
                 $toCondition .= " AND o.linked_shop = :shopId ";
             } else {
                 $toCondition .= " AND o.shopId=:shopId ";
+            }
+
+            if (!empty($params['orderId'])) {
+                $toCondition = " AND o.order_custom_id='" . $params['orderId'] . "' ";
+            }
+            if (!empty($params['customer_name'])) {
+                $toCondition = " AND o.customer_name != '' AND o.customer_name like '%" . $params['customer_name'] . "%' ";
             }
 
             $stmt = "SELECT o.*, full_name, account_id, is_default FROM `{$this->table}` AS o LEFT JOIN customers AS c ON c.id = o.customer_id WHERE ((o.flag = 1) or (o.flag = 2 and o.status IN (5,6,7))) " . $toCondition . ' ' . $flagCondition . ' ORDER BY id desc';

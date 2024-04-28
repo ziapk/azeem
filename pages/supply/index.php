@@ -65,6 +65,44 @@ echo mainHeader(['page' => 'suppliers']);
 echo mainFooter();
 ?>
 <script type="text/javascript">
+// var element = $('#fixme');
+    // var fixmeTop = element.offset().top;
+    // var dummyHeight = $('#dummyHeight');
+    // var offset = $('.navbar').height();
+    // $(window).on('load scroll', function() { // assign scroll event listener
+    //     var fixedHeight = element.height()
+
+
+    //     var currentScroll = $(window).scrollTop(); // get current position
+
+    //     if ((currentScroll + offset) >= fixmeTop) { // apply position: fixed if you
+    //         element.css({ // scroll to that element or below it
+    //             top: offset,
+    //         });
+    //         element.addClass('sticky')
+    //         dummyHeight.height(fixedHeight)
+    //     } else { // apply position: static
+    //         element.removeClass('navbar-fixed-top');
+    //         dummyHeight.height(0)
+    //     }
+
+    // });
+    app.run(['$anchorScroll', function($anchorScroll) {
+        $anchorScroll.yOffset = 200; // always scroll by 50 extra pixels
+    }])
+    app.directive('onEnterPress', function() {
+        return function(scope, element, attrs) {
+            element.bind("keydown keypress", function(event) {
+                if (event.which === 13) {
+                    scope.$apply(function() {
+                        scope.$eval(attrs.onEnterPress);
+                    });
+                    event.preventDefault();
+                    $(element).val('')
+                }
+            });
+        };
+    });
     app.controller('reportController', function($scope, $http, $window, $httpParamSerializerJQLike, $anchorScroll, $timeout, $location) {
         $scope.shopId = '<?php echo $userData['shopId']; ?>';
         $scope.supplierName = "";

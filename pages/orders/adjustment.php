@@ -44,10 +44,10 @@ echo mainHeader(['page' => 'sale_returns']);
             </select>
         </div>
     </div>
-    <div class="table-responsive">
+    <div>
         <table class="table">
-            <thead>
-                <tr>
+            <thead class="sticky">
+                <tr style="background: #fff">
                     <th>Sr.#</th>
                     <th width="100">Product Id</th>
                     <th>Product Name</th>
@@ -58,7 +58,7 @@ echo mainHeader(['page' => 'sale_returns']);
                     <th>Total</th>
                     <th></th>
                 </tr>
-                <tr>
+                <tr style="background: #fff">
                     <td colspan="7"><input type="text" class="form-control" id="searchProduct" ng-model="product" placeholder="Search Product to add" typeahead-on-select="selectProduct($item, row)" uib-typeahead="address as address.full_name for address in searchProduct($viewValue)" typeahead-template-url="product-format.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="1" ng-model-options="{debounce: 500}" class="form-control" ng-model="row.product_name" /></td>
                     <td><input type="checkbox" ng-model="sep"> SEP</td>
                     <td><input type="checkbox" ng-model="qf"> Qty</td>

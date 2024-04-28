@@ -1,6 +1,7 @@
+<div class="clearfix" id="dummyHeight"></div>
 <table class="table">
-    <thead>
-        <tr>
+    <thead class="sticky">
+        <tr style="background: #fff;">
             <th width="50">Pin</th>
             <th width="60">M.Qty</th>
             <th width="80">P.ID</th>
@@ -12,7 +13,7 @@
             <th width="50">Total</th>
             <th width="70"></th>
         </tr>
-        <tr>
+        <tr style="background: #fff;">
             <td colspan="6">
                 <div class="input-group" style="width: 100%">
                     <input type="text" id="searchProduct" class="form-control" ng-model="product" placeholder="Search Product to add" typeahead-on-select="selectProduct($item, row)" uib-typeahead="address as address.full_name for address in searchProduct($viewValue)" typeahead-template-url="product-format.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="1" class="form-control" ng-model="row.product_name" ng-model-options="{debounce: 100}" />

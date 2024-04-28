@@ -119,7 +119,7 @@ foreach ($statuses as  $value) {
             </td>
             <td colspan="6"></td>
         </tr>
-        <tr ng-if="cart.product_type == 2" ng-repeat-end="cart in items track by $index" id="product-{{$index + 1}}" class="row-expected">
+        <tr ng-if="cart.product_type == 2" ng-repeat-end="cart in items track by $index" class="row-expected">
             <td>
                 Delivery
             </td>

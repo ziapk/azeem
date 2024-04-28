@@ -30,6 +30,9 @@ if ($userData['role'] == 'owner' || $userData['role'] == 'manager') {
                     <input class="form-control" type="text" ng-model="orderId" placeholder="Order.#" />
                 </div>
                 <input date-range-picker class="form-control date-picker" type="text" ng-model="datePicker.date" options="{ locale: {format: 'DD/MM/YYYY'}}" />
+                <div class="input-group-btn" style="width: 20%">
+                    <input class="form-control" type="text" ng-model="customer_name" placeholder="Customer Name" />
+                </div>
                 <div class="input-group-btn">
                     <input type="submit" value="Submit" name="report" class="btn btn-primary" />
                 </div>
@@ -200,6 +203,7 @@ if ($userData['role'] == 'owner' || $userData['role'] == 'manager') {
                 }
             };
             $scope.orderId = '';
+            $scope.customer_name = '';
             $scope.statusArr = <?php echo json_encode($orderStatusArr); ?>;
             $scope.activePill = 0;
             $scope.activeValue = 'all';
@@ -211,6 +215,7 @@ if ($userData['role'] == 'owner' || $userData['role'] == 'manager') {
                             from: moment($scope.datePicker.date.startDate).format('YYYY-MM-DD'),
                             to: moment($scope.datePicker.date.endDate).format('YYYY-MM-DD'),
                             orderId: $scope.orderId,
+                            customer_name: $scope.customer_name,
                             orderType
                         }
                     })

@@ -204,7 +204,7 @@ foreach ($statuses as  $value) {
         </td>
         <td colspan="6"></td>
     </tr> -->
-    <!-- <tr ng-if="cart.product_type == 2" ng-repeat-end="cart in items track by $index" id="product-{{$index + 1}}" class="row-expected">
+    <!-- <tr ng-if="cart.product_type == 2" ng-repeat-end="cart in items track by $index" class="row-expected">
         <td>
             Delivery
         </td>
@@ -326,8 +326,6 @@ foreach ($statuses as  $value) {
     </tr>
 </tbody>
 </table>
-
-
 <script type="text/ng-template" id="row.html">
     <a style="display: flex; align-items: center">
         <span style="margin-right: auto; flex: 1" class="{{match.model.code ? 'text-danger' : ''}}" ng-bind-html="(match.model.is_active == 0 ? '****': '') + match.model.full_name | uibTypeaheadHighlight:query"></span>

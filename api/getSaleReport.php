@@ -4,10 +4,12 @@ $ordersObj = new Orders();
 $from = $_GET['from'];
 $to = $_GET['to'];
 $orderId = $_GET['orderId'];
+$customer_name = $_GET['customer_name'];
 $data = [
     'from' => $_GET['from'],
     'to' => $_GET['to'],
-    'orderId' => $_GET['orderId'],
+    'orderId' => $orderId,
+    'customer_name' => $customer_name,
     'orderType' => !empty($_GET['orderType']) ? $_GET['orderType'] : 'all'
 ];
 $orders = $ordersObj->userOrders($userData['shopId'], $data);

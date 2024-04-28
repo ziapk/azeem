@@ -953,6 +953,13 @@ thead.navbar-fixed-top {
 .fontsizer {
     padding: 0 10px;
 }
+
+.sticky {
+    position: sticky;
+    top: 56px;
+    z-index: 99;
+}
+
 @media (max-width: 767px) {
     .sidebar:not(.showSidebar) {
         left: -220px;

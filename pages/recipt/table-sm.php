@@ -25,7 +25,7 @@ foreach ($statuses as  $value) {
 </tr>
 </thead>
 <tbody>
-    <tr ng-repeat="cart in items track by $index" id="product-{{cart.srno}}" ng-if="cart.product_type != 5">
+    <tr ng-repeat="cart in items track by $index" id="sm-product-{{cart.srno}}" ng-if="cart.product_type != 5">
         <td colspan="2">
             <div class="clearfix form-group">
                 <label><input ng-change="setList(selectedList)" type="checkbox" ng-model="selectedList[cart.srno]"></label>
@@ -181,17 +181,3 @@ foreach ($statuses as  $value) {
     </tr>
 </tbody>
 </table>
-
-
-<script type="text/ng-template" id="row.html">
-    <a style="display: flex; align-items: center">
-        <span style="margin-right: auto; flex: 1" class="{{match.model.code ? 'text-danger' : ''}}" ng-bind-html="match.model.full_name | uibTypeaheadHighlight:query"></span>
-        <span ng-if="match.model.wh_price" class="label" style="font-size: 14px">{{match.model.wh_price}}</span><span ng-if="match.model.wh_price">|</span><span ng-if="match.model.pprice" class="label" style="font-size: 14px">{{match.model.pprice}}</span><span ng-if="match.model.pprice">|</span><span ng-if="match.model.pack_size" class="label label-primary" style="font-size: 14px">{{match.model.pack_size}}B</span><span ng-if="match.model.pack_size">|</span><span class="label label-success" style="margin-left: auto; font-size: 14px">{{match.model.qty}}</span> | <span class="label label-danger" style="font-size: 14px">{{match.model.price}}</span>
-    </a>
-</script>
-<script type="text/ng-template" id="customer.html">
-    <a class="clearfix" style="border-bottom: 1px solid #ccc; display: block">
-      <span ng-bind-html="match.model.full_name | uibTypeaheadHighlight:query"></span><br />
-      <small><em>{{match.model.company}}</em></small>
-  </a>
-</script>
