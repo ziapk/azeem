@@ -262,6 +262,30 @@ class DoubleEntry extends Connection
 			$this->connectionPool->releaseConnection($dbh);
 		}
 	}
+	
+	public function getAdjustsByAccounts($arr = [], $type="")
+	{
+		$dbh = $this->connectionPool->getConnection();
+		$arr['ttype'] = !empty($type) ? 'ADJUSTMENT' : '%%';
+		try {
+			$userInfo = UserInfo();
+			$user = $userInfo['user'];
+			$stmt = "SELECT a.title, m.title as mode, t.description as v_description, t.transsaction_type, t.transaction_date, e.* FROM `{$this->table_ledger_entries}` as e left join `{$this->table}` as a on a.id=e.account_id left join `{$this->table_transactions}` as t on t.id=e.transaction_id left join `{$this->table_modes}` as m on m.id=e.payment_mode WHERE e.account_id=a.id and a.parent_id=:account_id and transsaction_type like :ttype and e.entry_type='D' and t.shopId=:shopId and t.flag=1 and date(transaction_date) between :fromDate and :toDate";
+			$prepare = $dbh->prepare($stmt);
+			$prepare->bindParam(':shopId', $user['shopId'], PDO::PARAM_STR);
+			$prepare->bindParam(':account_id', $arr['account_id'], PDO::PARAM_STR);
+			$prepare->bindParam(':fromDate', $arr['from'], PDO::PARAM_STR);
+			$prepare->bindParam(':toDate', $arr['to'], PDO::PARAM_STR);
+			$prepare->bindParam(':ttype', $arr['ttype'], PDO::PARAM_STR);
+			$prepare->execute();
+			$summery = $prepare->fetchAll(PDO::FETCH_ASSOC);
+			return $summery;
+		} catch (PDOException $e) {
+			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
+		}
+	}
 	public function getLedgerByAccount($arr = [])
 	{
 		$dbh = $this->connectionPool->getConnection();

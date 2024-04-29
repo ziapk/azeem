@@ -8,10 +8,26 @@ $from = $_POST['from'];
 $to = $_POST['to'];
 $account_id = $_POST['account_id'];
 
+if($reportType == '23') {
+$shopAccounts = new ShopAccounts();
+$accountsData = $shopAccounts->getSAs($shop['id']);
+$storeAccounts = [];
+foreach ($accountsData as $a) {
+    $storeAccounts[$a['key_value']] = $a['account_id'];
+}
+$ttype = $reportType == '23' ? 'Adjustment' : '';
+$_POST['account_id'] = $storeAccounts['expense'];
+$entries = $doubleEntry->getAdjustsByAccounts($_POST, $ttype);
+} else {
 $entries = $doubleEntry->getPaymentsByAccounts($_POST);
+}
+
 $reportTitle = $shop['full_name'] . ' - ' . $shop['city'];
 
-$subtitle = "Payment Details for " . $entries[0]['title'] . '<br />Between ' . date('d-m-Y', strtotime($from)) . ' to ' . date('d-m-Y', strtotime($to));
+$subtitle = $reportType == '23' ? 'Adjustment' : 'Payment';
+
+$subtitle = $subtitle." Details for " . $entries[0]['title'] . '<br />Between ' . date('d-m-Y', strtotime($from)) . ' to ' . date('d-m-Y', strtotime($to));
+
 
 //$time = new datetime('Y');
 $d = new DateTime('Y');
