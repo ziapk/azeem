@@ -68,7 +68,7 @@ $total = 0;
     </tbody>
     <tfoot>
         <tr>
-            <th colspan="4">TOTAL</th>
+            <th colspan="6">TOTAL</th>
             <th style="text-align: right;"><?php echo number_format($total); ?></th>
         </tr>
     </tfoot>
