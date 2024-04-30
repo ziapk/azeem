@@ -250,8 +250,6 @@ switch ($reportType) {
 		exit;
 		break;
 	case '22':
-		include_once dirname(__FILE__) . '/payments.php';
-		exit;
 	case '23':
 		include_once dirname(__FILE__) . '/payments.php';
 		exit;

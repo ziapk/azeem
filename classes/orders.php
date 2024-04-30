@@ -961,7 +961,6 @@ class Orders extends Connection
             } else {
                 $toCondition .= " AND o.shopId=:shopId ";
             }
-
             if (!empty($params['orderId'])) {
                 $toCondition = " AND o.order_custom_id='" . $params['orderId'] . "' ";
             }

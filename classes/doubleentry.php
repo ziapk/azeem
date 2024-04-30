@@ -263,14 +263,21 @@ class DoubleEntry extends Connection
 		}
 	}
 	
-	public function getAdjustsByAccounts($arr = [], $type="")
+	public function getAdjustsByAccounts($arr = [], $type="", $account_id = "")
 	{
 		$dbh = $this->connectionPool->getConnection();
 		$arr['ttype'] = !empty($type) ? 'ADJUSTMENT' : '%%';
+		$condition = "";
+		if(!empty($account_id)) {
+			$condition = " and a.id=:account_id";
+		}
+		else {
+			$condition = " and a.parent_id=:account_id";
+		}
 		try {
 			$userInfo = UserInfo();
 			$user = $userInfo['user'];
-			$stmt = "SELECT a.title, m.title as mode, t.description as v_description, t.transsaction_type, t.transaction_date, e.* FROM `{$this->table_ledger_entries}` as e left join `{$this->table}` as a on a.id=e.account_id left join `{$this->table_transactions}` as t on t.id=e.transaction_id left join `{$this->table_modes}` as m on m.id=e.payment_mode WHERE e.account_id=a.id and a.parent_id=:account_id and transsaction_type like :ttype and e.entry_type='D' and t.shopId=:shopId and t.flag=1 and date(transaction_date) between :fromDate and :toDate";
+			$stmt = "SELECT a.title, m.title as mode, t.description as v_description, t.transsaction_type, t.transaction_date, e.* FROM `{$this->table_ledger_entries}` as e left join `{$this->table}` as a on a.id=e.account_id left join `{$this->table_transactions}` as t on t.id=e.transaction_id left join `{$this->table_modes}` as m on m.id=e.payment_mode WHERE e.account_id=a.id $condition and transsaction_type like :ttype and e.entry_type='D' and t.shopId=:shopId and t.flag=1 and date(transaction_date) between :fromDate and :toDate";
 			$prepare = $dbh->prepare($stmt);
 			$prepare->bindParam(':shopId', $user['shopId'], PDO::PARAM_STR);
 			$prepare->bindParam(':account_id', $arr['account_id'], PDO::PARAM_STR);

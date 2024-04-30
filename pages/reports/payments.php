@@ -16,8 +16,8 @@ foreach ($accountsData as $a) {
     $storeAccounts[$a['key_value']] = $a['account_id'];
 }
 $ttype = $reportType == '23' ? 'Adjustment' : '';
-$_POST['account_id'] = $storeAccounts['expense'];
-$entries = $doubleEntry->getAdjustsByAccounts($_POST, $ttype);
+$_POST['account_id'] = !empty($account_id) ? $account_id : $storeAccounts['expense'];
+$entries = $doubleEntry->getAdjustsByAccounts($_POST, $ttype, $account_id);
 } else {
 $entries = $doubleEntry->getPaymentsByAccounts($_POST);
 }
