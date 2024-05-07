@@ -3,6 +3,10 @@ include_once dirname(__FILE__) . '/../include/settings.php';
 try {
     $supply = new Supply();
     $orders = new Orders();
+    if($_GET['debug']) {
+        print_r($_POST);
+        exit;
+    }
 
     $response = $orders->prepareOrder($_POST);
 
