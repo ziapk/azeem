@@ -932,12 +932,12 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                             if (status == 1) {
                                 alert(response.data.message);
                             } else {
-                                // window.open("<?php echo SITE_URL; ?>print?id=" + response.data.order.id, "", "width=300,height=300");
+                                window.open("<?php echo SITE_URL; ?>print?id=" + response.data.order.id, "", "width=300,height=300");
                                 $scope.items = $scope.list = [];
                                 $scope.subTotal = $scope.discount = $scope.grandTotal = $scope.payment_amount = 0;
                                 // $window.sessionStorage.setItem('shopping', JSON.stringify($scope.items))
-                                // $window.location.assign('<?php echo SITE_URL ?>')
-                                $scope.customersList?.length && $scope.selectCustomer($scope.customersList[0]);
+                                $window.location.assign('<?php echo SITE_URL ?>')
+                                $scope.customersList.length && $scope.selectCustomer($scope.customersList[0]);
                                 $scope.summery = '';
                                 $scope.ref_no = '';
                             }
