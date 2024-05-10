@@ -28,6 +28,7 @@ try {
         ];
 
         if (empty($_POST['adjustment']) && $amount < 0) {
+            $amount *= -1;
             $settings = [
                 'summery' => 'DIRECT RECEIVING',
                 'title' => 'DIRECT_RECEIVING',
