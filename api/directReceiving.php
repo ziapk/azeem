@@ -27,6 +27,16 @@ try {
             'type' => 'D'
         ];
 
+        if (empty($_POST['adjustment']) && $amount < 0) {
+            $settings = [
+                'summery' => 'DIRECT RECEIVING',
+                'title' => 'DIRECT_RECEIVING',
+                'receivable' => 'D',
+                'shop_account' => $storeAccounts['cash'],
+                'type' => 'C'
+            ];
+        }
+
         if (!empty($_POST['adjustment']) && $amount < 0) {
 
             $amount *= -1;
