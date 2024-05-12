@@ -34,6 +34,9 @@ if (empty($_POST['full_name'])) {
         'default_discount' => !empty($_POST['default_discount']) ? $_POST['default_discount'] : 0,
     ];
 
+    print_r($data);
+    exit;
+
     $de = new DoubleEntry();
 
     if($data['account_type'] == 1) {
