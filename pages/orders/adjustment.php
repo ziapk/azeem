@@ -43,6 +43,10 @@ echo mainHeader(['page' => 'sale_returns']);
                 <?php } ?>
             </select>
         </div>
+        <div class="col-sm-12 form-group">
+            <label>Description</label>
+            <textarea type="text" rows="3" class="form-control" ng-model="summery" placeholder="Summery"></textarea>
+        </div>
     </div>
     <div>
         <table class="table">
@@ -205,6 +209,7 @@ echo mainFooter();
         $scope.currentShopId = '<?php echo $shop['id']; ?>';
         $scope.ref_no = "";
         $scope.supplierId = "";
+        $scope.summery = "";
         $scope.product = "";
         $scope.sep = false;
         $scope.order = <?php echo json_encode($order) ?>;
@@ -501,6 +506,7 @@ echo mainFooter();
             $scope.form = {
                 supplierId: $scope.supplierId,
                 supplierName: $scope.supplierName,
+                summery: $scope.summery,
                 ref_no: $scope.ref_no,
                 subTotal: $scope.subTotal,
                 discount: $scope.discount,

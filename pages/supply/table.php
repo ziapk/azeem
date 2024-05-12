@@ -3,6 +3,7 @@
     <thead class="sticky">
         <tr style="background: #fff;">
             <th width="50">Pin</th>
+            <th width="80">Code</th>
             <th width="60">M.Qty</th>
             <th width="80">P.ID</th>
             <th>Product Name</th>
@@ -14,7 +15,7 @@
             <th width="70"></th>
         </tr>
         <tr style="background: #fff;">
-            <td colspan="6">
+            <td colspan="7">
                 <div class="input-group" style="width: 100%">
                     <input type="text" id="searchProduct" class="form-control" ng-model="product" placeholder="Search Product to add" typeahead-on-select="selectProduct($item, row)" uib-typeahead="address as address.full_name for address in searchProduct($viewValue)" typeahead-template-url="product-format.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="1" class="form-control" ng-model="row.product_name" ng-model-options="{debounce: 100}" />
                     <span class="input-group-addon" style="width: 40px">
@@ -36,6 +37,7 @@
         <tr ng-repeat-start="row in items track by $index" id="product-{{row.srno}}" ng-if="row.product_type != 5">
             <td style="text-align: center"><input type="checkbox" ng-model="row.pin" /> {{row.srno}}</td>
             <td><input type="text" class="form-control" ng-model="row.minQty" /></td>
+            <td><input type="text" class="form-control" ng-model="row.code" /></td>
             <td><input type="text" class="form-control" ng-model="row.id" />
             </td>
             <td>
@@ -51,7 +53,7 @@
             <td><a href="#" class="btn btn-xs btn-danger pull-right" ng-click="remove($index)">Delete</a></td>
         </tr>
         <tr ng-repeat-end="row in items track by $index" ng-if="show_bundle && row.product_type != 5">
-            <td colspan="10">
+            <td colspan="11">
                 <table style="margin-left: auto;" cellpadding="0" cellspacing="0">
                     <tr>
                         <td width="100px" style="padding: 8px" class="text-right">Bundles</td>
@@ -75,14 +77,14 @@
     </tbody>
     <tbody>
         <tr ng-repeat="row in items track by $index" ng-if="row.product_type == 5">
-            <td colspan="6">
+            <td colspan="7">
                 <a href="#" class="btn btn-xs btn-danger pull-right" ng-click="remove($index)">Delete</a>
             </td>
             <td width="150" colspan="2" class="text-right">{{row.full_name}}</td>
             <td width="150" colspan="2"><input type="text" ng-model="row.pprice" class="form-control" ng-change="calculateSum()"></td>
         </tr>
         <tr>
-            <th rowspan="6" colspan="6"></th>
+            <th rowspan="6" colspan="7"></th>
             <th class="text-right" colspan="2">Sub Total</th>
             <th colspan="2">{{subTotal}}</th>
         </tr>
@@ -109,7 +111,7 @@
     </tbody>
     <tbody>
         <tr>
-            <th colspan="4" class="text-left">
+            <th colspan="5" class="text-left">
                 <a href="#" class="btn btn-success" style="vertical-align: middle" ng-click="park()">Park For Now</a>
                 <label class="text-danger" style="padding-inline: 10px; vertical-align: middle"><input type="checkbox" ng-model="createDemand"> Create Demand as well</label>
             </th>

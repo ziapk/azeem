@@ -122,6 +122,11 @@ if (sizeof($_POST['items'])) {
                 'shopId' => $_POST['shopId'],
                 'owner_id' => $ownerId,
             ];
+            if(!empty($_POST['code'])) {
+                $arr['code'] = $_POST['code'];
+                $arr['product_id'] = $item['id'];
+                $products->createProductCode($arr);
+            }
         }
     }
 }
