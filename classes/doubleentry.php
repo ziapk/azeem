@@ -709,6 +709,7 @@ class DoubleEntry extends Connection
 						if ($cashModeId == $value['payment_mode']) {
 							$deposit += $value['amount'];
 						}
+						$consider = false;
 					}
 					if (in_array($value['transsaction_type'], ['EXCHANGE'])) {
 						$exchange += $value['amount'];
