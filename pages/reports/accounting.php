@@ -368,6 +368,12 @@ ob_start();
 			<th align="left">Purchase Returns</th>
 			<th align="right"><?php echo number_format($reportDataOther['purchase_returns'], 0); ?></th>
 		</tr>
+		<tr>
+			<th align="left">Pay via locker or Cash out</th>
+			<th align="right"><?php echo number_format($reportDataOther['withdrawal'], 0); ?></th>
+			<th align="left">Deposit In Locker</td>
+			<th align="right"><?php echo number_format($reportDataOther['deposit'], 0); ?></td>
+		</tr>
 
 		<tr>
 			<th align="left">Total</th>

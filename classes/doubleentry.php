@@ -585,6 +585,7 @@ class DoubleEntry extends Connection
 
 		$storeInfo = new Store();
 		$storeData = $storeInfo->getStore($array['shopId']);
+		$array['parent_ids'][] = $store['locker'];
 		$array['parent_ids'][] = $store['receivable'];
 		$array['parent_ids'][] = $store['payable'];
 		$array['account_ids'][] = $store['sale_discount'];
@@ -632,6 +633,8 @@ class DoubleEntry extends Connection
 			$purchaseReturnsList = [];
 			$exchange = 0;
 			$payments = 0;
+			$deposit = 0;
+			$withdrawal = 0;
 			$receivings = 0;
 			$cashSale = 0;
 			$sale_returns = 0;
@@ -692,12 +695,19 @@ class DoubleEntry extends Connection
 							$receivings += $value['amount'];
 						}
 					}
+				} elseif (in_array($value['transsaction_type'], ['CASH_WITHDRAWAL'])) {
+					$withdrawal += $value['amount'];
 				} else {
 					$consider = true;
 
 					if (in_array($value['transsaction_type'], ['ROYALTY PAYMENT', 'PURCHASE_PAYMENT', 'DIRECT_PAYMENT'])) {
 						if ($cashModeId == $value['payment_mode']) {
 							$payments += $value['amount'];
+						}
+					}
+					if (in_array($value['transsaction_type'], ['CASH_DEPOSIT'])) {
+						if ($cashModeId == $value['payment_mode']) {
+							$deposit += $value['amount'];
 						}
 					}
 					if (in_array($value['transsaction_type'], ['EXCHANGE'])) {
@@ -820,14 +830,16 @@ class DoubleEntry extends Connection
 			$reportData['other']['purchase_returns'] = $purchase_returns;
 			$reportData['other']['sale_returns'] = $sale_returns;
 			$reportData['other']['payments'] = $payments;
+			$reportData['other']['deposit'] = $deposit;
+			$reportData['other']['withdrawal'] = $withdrawal;
 			$reportData['other']['opening_balance'] = $result['opening_balance'];
 
 
 			$tsale = $reportData['other']['cashSale'];
 			$creditsale = empty($footer['netCreditSales']) ? 0 : $footer['netCreditSales'];
 			$texpense = $reportData['other']['cashTotals']["exp"];
-			$cash = ($tsale + $receivings + $purchase_returns);
-			$deduction = ($sale_returns + $texpense + $payments);
+			$cash = ($tsale + $receivings + $purchase_returns + $withdrawal);
+			$deduction = ($sale_returns + $texpense + $payments + $deposit);
 			$netCash = ($tsale + $receivings + $purchase_returns) - $deduction;
 
 			$reportData['other']['cash'] = $cash;
