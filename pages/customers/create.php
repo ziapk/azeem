@@ -27,6 +27,7 @@ if (empty($_POST['full_name'])) {
         'full_name' => $_POST['full_name'],
         'company' => $_POST['company'],
         'email' => $_POST['email'],
+        'account_type' => !empty($_POST['account_type']) ? $_POST['account_type'] : 1,
         'type' => !empty($_POST['type']) ? 2 : 1,
         'address' => !empty($_POST['address']) ? $_POST['address'] : "",
         'phoneNumber' => !empty($_POST['phoneNumber']) ? $_POST['phoneNumber'] : "",
@@ -34,6 +35,8 @@ if (empty($_POST['full_name'])) {
     ];
 
     $de = new DoubleEntry();
+
+    if($data['account_type'] == 1) {
 
     $receivableAccount = $de->getAccount($storeAccounts['receivable']);
 
@@ -48,6 +51,22 @@ if (empty($_POST['full_name'])) {
         'opening_balance' => $_POST['opening_balance'],
         'created_by' => $userId
     ];
+    } else if($data['account_type'] == 2) {
+
+        $receivableAccount = $de->getAccount($storeAccounts['locker']);
+
+        $accountData = [
+            'title' => 'Locker - ' . $_POST['full_name'],
+            'code' => $receivableAccount['code'],
+            'account_type' => $receivableAccount['account_type'],
+            'group_id' => $receivableAccount['group_id'],
+            'status' => $receivableAccount['status'],
+            'parent_id' => $receivableAccount['id'],
+            'shopId' => $shop['id'],
+            'opening_balance' => $_POST['opening_balance'],
+            'created_by' => $userId
+        ];
+    }
 
 
     $accountId = $de->insertAccount($accountData);

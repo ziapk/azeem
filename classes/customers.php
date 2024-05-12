@@ -7,17 +7,17 @@ class Customers extends Connection
 	private $table_discount = 'customer_discount';
 	private $table_publisher = 'publishers';
 
-	public function searchCustomer($shopId, $search, $accountsOnly = false)
+	public function searchCustomer($shopId, $search, $accountsOnly = false, $account_type=1)
 	{
 		$dbh = $this->connectionPool->getConnection();
 		$accountCond = '';
 		if ($accountsOnly) {
 			$accountCond = 'and account_id > 0';
 		}
-		$stmt = "SELECT * FROM `{$this->table}`  WHERE flag=1 $accountCond and shopId=:shopId AND (full_name LIKE '%" . $search . "%' OR title LIKE '%" . $search . "%' OR company LIKE '%" . $search . "%' OR code LIKE '" . $search . "%' OR phoneNumber LIKE '%" . $search . "%') LIMIT 10";
+		$stmt = "SELECT * FROM `{$this->table}`  WHERE flag=1 $accountCond and shopId=:shopId and account_type=:account_type AND (full_name LIKE '%" . $search . "%' OR title LIKE '%" . $search . "%' OR company LIKE '%" . $search . "%' OR code LIKE '" . $search . "%' OR phoneNumber LIKE '%" . $search . "%') LIMIT 10";
 		$prepare = $dbh->prepare($stmt);
 		$prepare->bindParam(':shopId', $shopId, PDO::PARAM_STR);
-		//$prepare->bindParam(':search',$search,PDO::PARAM_STR);
+		$prepare->bindParam(':account_type',$account_type,PDO::PARAM_STR);
 		$prepare->execute();
 		$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
 		$this->connectionPool->releaseConnection($dbh);
@@ -33,7 +33,8 @@ class Customers extends Connection
 		try {
 			$is_default = !empty($array['is_default']) ? 1 : 0;
 			$linkedShop = !empty($array['linked_shop']) ? $array['linked_shop'] : null;
-			$stmt = "INSERT INTO `{$this->table}` (`full_name`, `address`,`type`, `company`, `email`, `title`, `phoneNumber`, `shopId`, `account_id`, `code`, `default_discount`, `is_default`, `linked_shop`) VALUES (:full_name, :address, :type, :company, :email, :title, :phoneNumber, :shopId, :account_id, :code, :default_discount, :is_default, :linked_shop)";
+			$account_type = !empty($array['account_type']) ? $array['account_type'] : 1;
+			$stmt = "INSERT INTO `{$this->table}` (`full_name`, `address`,`type`, `company`, `email`, `title`, `phoneNumber`, `shopId`, `account_id`, `code`, `default_discount`, `is_default`, `linked_shop`, `account_type`) VALUES (:full_name, :address, :type, :company, :email, :title, :phoneNumber, :shopId, :account_id, :code, :default_discount, :is_default, :linked_shop, :account_type)";
 			$prepare = $dbh->prepare($stmt);
 			$prepare->bindParam(':full_name', $array['full_name'], PDO::PARAM_STR);
 			$prepare->bindParam(':phoneNumber', $array['phoneNumber'], PDO::PARAM_STR);
@@ -44,6 +45,7 @@ class Customers extends Connection
 			$prepare->bindParam(':type', $array['type'], PDO::PARAM_INT);
 			$prepare->bindParam(':shopId', $array['shopId'], PDO::PARAM_INT);
 			$prepare->bindParam(':account_id', $array['account_id'], PDO::PARAM_INT);
+			$prepare->bindParam(':account_type', $account_type, PDO::PARAM_INT);
 			$prepare->bindParam(':code', $array['code'], PDO::PARAM_STR);
 			$prepare->bindParam(':default_discount', $array['default_discount'], PDO::PARAM_STR);
 			$prepare->bindParam(':is_default', $is_default, PDO::PARAM_STR);
@@ -94,6 +96,7 @@ class Customers extends Connection
 			$prepare->bindParam(':address', $array['address'], PDO::PARAM_STR);
 			$prepare->bindParam(':default_discount', $array['default_discount'], PDO::PARAM_STR);
 			$prepare->bindParam(':linked_shop', $linkedShop, PDO::PARAM_STR);
+			$prepare->bindParam(':account_type', $array['account_type'], PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $prepare->rowCount();
 			return $result;
@@ -118,13 +121,14 @@ class Customers extends Connection
 			$this->connectionPool->releaseConnection($dbh);
 		}
 	}
-	public function getCustomers($shopId = null)
+	public function getCustomers($shopId = null, $account_type = 1)
 	{
 		$dbh = $this->connectionPool->getConnection();
 		try {
-			$stmt = "SELECT *  FROM `{$this->table}` WHERE `shopId`=:shopId and flag=1";
+			$stmt = "SELECT *  FROM `{$this->table}` WHERE `shopId`=:shopId and account_type=:account_type and flag=1";
 			$prepare = $dbh->prepare($stmt);
 			$prepare->bindParam(':shopId', $shopId, PDO::PARAM_STR);
+			$prepare->bindParam(':account_type', $account_type, PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
 			return $result;
@@ -292,9 +296,12 @@ class Customers extends Connection
 		$dbh = $this->connectionPool->getConnection();
 		try {
 
-			$stmt2 = "SELECT COUNT(id) as total, GROUP_CONCAT(account_id) as ids FROM `{$this->table}` where shopId=:shopId and flag=1";
+			$account_type = !empty($params['account_type']) ? $params['account_type'] : 1;
+
+			$stmt2 = "SELECT COUNT(id) as total, GROUP_CONCAT(account_id) as ids FROM `{$this->table}` where account_type=:account_type and shopId=:shopId and flag=1";
 			$prepare2 = $dbh->prepare($stmt2);
 			$prepare2->bindParam(':shopId', $params['shopId'], PDO::PARAM_INT);
+			$prepare2->bindParam(':account_type', $account_type, PDO::PARAM_INT);
 			$prepare2->execute();
 			$resultTotal = $prepare2->fetch(PDO::FETCH_ASSOC);
 
@@ -304,8 +311,9 @@ class Customers extends Connection
 			$currentPage = $total_pages >= $params['page'] ? $params['page'] : $total_pages;
 			$offset = (($currentPage - 1) < 0 ? 0 : ($currentPage - 1)) * $no_of_records_per_page;
 			$search = " AND (full_name LIKE '%" . $params["search"] . "%' OR phoneNumber LIKE '%" . $params["search"] . "%' OR address LIKE '%" . $params["search"] . "%' ) ";
-			$stmt = "SELECT * FROM `{$this->table}` WHERE shopId=:shopId and flag=1 $search LIMIT :offset, :perPage";
+			$stmt = "SELECT * FROM `{$this->table}` WHERE shopId=:shopId and flag=1 and account_type=:account_type $search LIMIT :offset, :perPage";
 			$prepare = $dbh->prepare($stmt);
+			$prepare->bindParam(':account_type', $account_type, PDO::PARAM_INT);
 			$prepare->bindParam(':offset', $offset, PDO::PARAM_INT);
 			$prepare->bindParam(':perPage', $no_of_records_per_page, PDO::PARAM_INT);
 			$prepare->bindParam(':shopId', $params['shopId'], PDO::PARAM_INT);

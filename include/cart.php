@@ -68,6 +68,7 @@
       id: null
     }
     $scope.customersList = <?php echo json_encode($customersList); ?>;
+    $scope.lockersList = <?php echo json_encode($lockersList); ?>;
     $scope.ocustomersList = <?php echo json_encode($customersList); ?>;
     $scope.expensesList = <?php echo json_encode($categories); ?>;
     $scope.oexpensesList = <?php echo json_encode($categories); ?>;
@@ -145,6 +146,39 @@
               $scope.payment.mode[k] = '';
             }
             $scope.printRecipt(response.data.supply.id);
+          }
+        })
+      }
+    }
+    $scope.directLocker = () => {
+      const id = $scope.payment.customer.account_id;
+      let cashIn = 0;
+      for (let k in $scope.payment.cashIn) {
+        cashIn += $scope.payment.cashIn[k] || 0;
+      }
+      let cashOut = 0;
+      for (let k in $scope.payment.cashOut) {
+        cashOut += $scope.payment.cashOut[k] || 0;
+      }
+      if (id && (cashOut || cashIn)) {
+        $http.post('<?php echo SITE_URL; ?>api/directLocker.php', $httpParamSerializerJQLike({
+          ...$scope.payment,
+          id
+        }), {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }).then((response) => {
+          toaster.success({
+            body: response.data.message
+          });
+          if (response.data.status == 200) {
+            $scope.printRecipt(response.data.supply.id);
+            $scope.payment.customer = '';
+            $scope.payment.summery = '';
+            for (let k in $scope.payment.mode) {
+              $scope.payment.mode[k] = '';
+            }
           }
         })
       }

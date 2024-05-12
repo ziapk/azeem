@@ -16,18 +16,18 @@ class Orders extends Connection
     private $table_ro = 'return_orders';
     private $table_publisher = 'publishers';
 
-    public function searchCustomer($shopId, $search)
-    {
-        $dbh = $this->connectionPool->getConnection();
-        $stmt = "SELECT * FROM `{$this->table}`  WHERE shopId=:shopId AND (full_name LIKE '" . $search . "%' OR code LIKE '" . $search . "%' OR phoneNumber LIKE '" . $search . "%') LIMIT 10";
-        $prepare = $dbh->prepare($stmt);
-        $prepare->bindParam(':shopId', $shopId, PDO::PARAM_STR);
-        //$prepare->bindParam(':search',$search,PDO::PARAM_STR);
-        $prepare->execute();
-        $result = $prepare->fetchAll(PDO::FETCH_ASSOC);
-        $dbh = $this->connectionPool->releaseConnection($dbh);
-        return $result;
-    }
+    // public function searchCustomer($shopId, $search)
+    // {
+    //     $dbh = $this->connectionPool->getConnection();
+    //     $stmt = "SELECT * FROM `{$this->table}`  WHERE shopId=:shopId AND (full_name LIKE '" . $search . "%' OR code LIKE '" . $search . "%' OR phoneNumber LIKE '" . $search . "%') LIMIT 10";
+    //     $prepare = $dbh->prepare($stmt);
+    //     $prepare->bindParam(':shopId', $shopId, PDO::PARAM_STR);
+    //     //$prepare->bindParam(':search',$search,PDO::PARAM_STR);
+    //     $prepare->execute();
+    //     $result = $prepare->fetchAll(PDO::FETCH_ASSOC);
+    //     $dbh = $this->connectionPool->releaseConnection($dbh);
+    //     return $result;
+    // }
     public function getNextId($shopId)
     {
         $dbh = $this->connectionPool->getConnection();

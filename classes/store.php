@@ -166,6 +166,7 @@ class Store extends Connection
 									"email" => "",
 									"title" => "",
 									"address" => "",
+									"account_type" => 1,
 									"type" => 2,
 									"shopId" => $shopId,
 									"account_id" => $accountId,

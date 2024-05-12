@@ -52,7 +52,8 @@ switch ($reportType) {
 		$page = !empty($_GET['page']) ? $_GET['page'] : 1;
 		$perPage = !empty($_GET['perPage']) ? $_GET['perPage'] : 1000;
 		$search = !empty($_GET['search']) ? $_GET['search'] : "";
-		$balances = $customers->getCustomersPagination(['page' => $page, 'perPage' => $perPage, 'search' => $search, 'shopId' => $shop['id']]);
+		$account_type = !empty($_GET['account_type']) ? $_GET['account_type'] : 1;
+		$balances = $customers->getCustomersPagination(['page' => $page, 'perPage' => $perPage, 'search' => $search, 'account_type' => $account_type, 'shopId' => $shop['id']]);
 
 		$reportData = $doubleEntry->getClosingBalanceReport($params);
 		$reportDataOther = $reportData['other'];
