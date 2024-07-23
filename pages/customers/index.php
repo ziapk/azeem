@@ -460,7 +460,7 @@ echo mainFooter();
                                 <option ng-value="'1'">Percent</option>
                             </select>
                         </td>
-                        <td><input type="number" min="0" max="100" onKeyPress="if(this.value.length==2) return false;" ng-model="row.discount_value" /> {{row.discount_type == 1 ? 'Percent': 'Fixed'}} </td>
+                        <td><input type="number" min="0" ng-model="row.discount_value" ng-change="row.discount_value = row.discount_type == '1' && row.discount_value > 100 ? 100 : row.discount_value" /> {{row.discount_type == 1 ? 'Percent': 'Fixed'}} </td>
                         <td class="text-danger"><a href="javascript:void(0)" ng-click="remove(row)" class="btn btn-xs btn-danger"><span class="fa fa-remove"></span></a></td>
                     </tr>
                 </tbody>
