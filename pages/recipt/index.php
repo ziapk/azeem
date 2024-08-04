@@ -58,7 +58,7 @@ $publishers = $publisherObj->getPublishers($userId);
             <a class="btn btn-default" ng-repeat="l in pinList" href="javascript:void(0)" ng-click="selectProduct(l, 's')">{{l.full_name}}</a>
         </span>
         <h5 class="text-danger"><strong>Today's Parked Bills</strong></h5>
-        <span class="btn-group btn-group-sm form-group">
+        <div style="display: flex; gap: 10px; flex-wrap: wrap">
             <?php foreach ($orders as $key => $value) { ?>
                 <div class="dropdown">
                     <div class="btn-group btn-group-sm">
@@ -85,7 +85,7 @@ $publishers = $publisherObj->getPublishers($userId);
                     </div>
                 </div>
             <?php } ?>
-        </span>
+        </div>
         <table class="table visible-xs">
             <tr>
                 <td>
