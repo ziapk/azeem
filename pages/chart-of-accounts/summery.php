@@ -71,9 +71,9 @@ mainHeader();
         </div>
     </div>
     <!-- <form method="GET" action=""> -->
-    <div class="table-responsive">
+    <div class="table-responsive" style="height: calc(100vh - 320px); overflow: auto">
         <table width="100%" class="table table-striped">
-            <thead>
+            <thead style="position: sticky; top: 0">
                 <tr>
                     <th>T.ID</th>
                     <th>Date</th>
@@ -86,24 +86,6 @@ mainHeader();
                     <th>Running Balance</th>
                     <th></th>
                 </tr>
-                <!-- <tr>
-                    <th>
-                        <input type="hidden" name="from" value="{{startDate}}">
-                        <input type="hidden" name="to" value="{{endDate}}">
-                        <?php foreach ($_GET as $key => $value) { ?>
-                            <input type="hidden" name="<?php echo $key; ?>" value="<?php echo $value; ?>">
-                        <?php } ?>
-                    </th>
-                    <th>
-                        <input date-range-picker class="form-control date-picker" type="text" ng-model="form.betweenDate" options="{ autoApply: true, locale: {format: 'DD/MM/YYYY'}, changeCallback: setRange(form.betweenDate)}">
-                    </th>
-                    <th><input class="form-control" name="order_id" />
-                    </th>
-                    <th><input class="form-control" name="reference" /></th>
-                    <th><input class="form-control" name="description" /></th>
-                    <th><input class="form-control" name="entry_type" /></th>
-                    <th colspan="3"><button type="submit" class="btn btn-default">Go</button></th>
-                </tr> -->
             </thead>
             <tbody>
                 <tr ng-repeat="row in rows">
