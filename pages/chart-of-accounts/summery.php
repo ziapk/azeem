@@ -95,7 +95,8 @@ mainHeader();
                         <a ng-if="row.order_ref" href="javascript:void(0)" ng-click="openRecipt(row.order_ref)">{{row.order_custom_id}}</a>
                         <a ng-if="row.supply_ref" href="javascript:void(0)" ng-click="openRecipt2(row.supply_ref)">{{row.supply_ref}}</a>
                         <a ng-if="row.return_ref" href="javascript:void(0)" ng-click="openRecipt3(row.return_ref)">{{row.return_ref}}</a>
-                        <a ng-if="!row.order_ref && !row.supply_ref && !row.return_ref && row.transaction_id" href="javascript:void(0)" ng-click="openRecipt5(row.transaction_id)">{{row.transaction_id}}</a>
+                        <a ng-if="!row.order_ref && !row.supply_ref && !row.return_ref && row.transaction_id && 'DIRECT_RECEIVING' == row.transsaction_type" href="javascript:void(0)" ng-click="openRecipt4(row.transaction_id)">{{row.transaction_id}}</a>
+                        <a ng-if="!row.order_ref && !row.supply_ref && !row.return_ref && row.transaction_id && ['CASH_DEPOSIT', 'CASH_WITHDRAWAL'].includes(row.transsaction_type)" href="javascript:void(0)" ng-click="openRecipt5(row.transaction_id)">{{row.transaction_id}}</a>
                     </td>
                     <td>{{row.reference}}</td>
                     <td>{{row.v_description}}</td>
