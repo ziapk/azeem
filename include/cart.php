@@ -275,11 +275,13 @@
         if (!found) {
           $window.sessionStorage.setItem('shopping', JSON.stringify([...shopCart, ...(type && type == 'list' ? item.map(r => ({
             ...r,
-            qty: 1
+            qty: 1,
+            sizes: [{}],
           })) : [{
             ...item,
             id: item.id,
-            qty: 1
+            qty: 1,
+            sizes: [{}],
           }])]));
         } else {
           $window.sessionStorage.setItem('shopping', JSON.stringify([...shopCart]))

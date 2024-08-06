@@ -113,6 +113,7 @@ mainHeader();
                         <a ng-if="row.order_ref" href="javascript:void(0)" ng-click="openRecipt(row.order_ref)">{{row.order_custom_id}}</a>
                         <a ng-if="row.supply_ref" href="javascript:void(0)" ng-click="openRecipt2(row.supply_ref)">{{row.supply_ref}}</a>
                         <a ng-if="row.return_ref" href="javascript:void(0)" ng-click="openRecipt3(row.return_ref)">{{row.return_ref}}</a>
+                        <a ng-if="!row.order_ref && !row.supply_ref && !row.return_ref && row.transaction_id" href="javascript:void(0)" ng-click="openRecipt4(row.transaction_id)">{{row.transaction_id}}</a>
                     </td>
                     <td>{{row.reference}}</td>
                     <td>{{row.v_description}}</td>
@@ -217,6 +218,9 @@ mainHeader();
 
         $scope.openRecipt3 = (id) => {
             $window.open("<?php echo SITE_URL; ?>print/return.php?id=" + id + "&detail=true&largeView=large", "", "width=800,height=600");
+        }
+        $scope.openRecipt4 = (id) => {
+            $window.open("<?php echo SITE_URL; ?>print/receiving.php?id=" + id + "&detail=true'&largeView=large", "width=600,height=900");
         }
     });
 
