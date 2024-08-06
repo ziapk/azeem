@@ -96,6 +96,7 @@ $publishers = $publisherObj->getPublishers($userId);
                 <td>
                     <label><span style="vertical-align: middle"><input type="checkbox" ng-model="show_discount"></span> <span style="vertical-align: middle">Disc</span></label>
                     <label style="margin-left: 10px"><span style="vertical-align: middle;"><input type="checkbox" ng-model="sep"></span> <span style="vertical-align: middle">SEP</span></label>
+                    <label style="margin-left: 10px"><span style="vertical-align: middle"><input type="checkbox" ng-model="showDescription"></span> <span style="vertical-align: middle">DESC</span></label>
                     <?php if ($isOwner) { ?>
                         <label style="margin-left: 10px"><span style="vertical-align: middle"><input type="checkbox" ng-model="wsp"></span> <span style="vertical-align: middle">WSP</span></label>
                     <?php } ?>
@@ -136,6 +137,7 @@ $publishers = $publisherObj->getPublishers($userId);
                                         <th style="vertical-align: middle">
                                             <label class="pull-left"><span style="vertical-align: middle"><input type="checkbox" ng-model="show_discount"></span> <span style="vertical-align: middle">Add Discount</span></label>
                                             <label class="pull-left"><span style="vertical-align: middle; margin-left: 10px"><input type="checkbox" ng-model="show_bundle"></span> <span style="vertical-align: middle">Bundles</span></label>
+                                            <label style="margin-left: 10px"><span style="vertical-align: middle"><input type="checkbox" ng-model="showDescription"></span> <span style="vertical-align: middle">DESC</span></label>
                                             <label class="pull-left"><span style="vertical-align: middle; margin-left: 10px"><input type="checkbox" ng-model="sep"></span> <span style="vertical-align: middle">SEP</span></label>
                                             <?php if ($isOwner) { ?>
                                                 <label class="pull-left"><span style="vertical-align: middle; margin-left: 10px"><input type="checkbox" ng-model="wsp"></span> <span style="vertical-align: middle">WSP</span></label>
@@ -218,6 +220,7 @@ echo mainFooter();
         $scope.pinList = [];
         $scope.list = [];
         $scope.focus = false;
+        $scope.showDescription = false;
         $scope.qf = false;
         $scope.sep = false;
         $scope.wsp = false;
@@ -524,6 +527,7 @@ echo mainFooter();
                     unpack_qty: parseFloat(row.unpack_qty || 0),
                     discount: row.discount?.toString(),
                     discount_value: row.discount_value?.toString(),
+                    sizes: row.sizes?.length ? row.sizes: [{}],
                     publisher: row.publisherName ? ({
                         full_name: row.publisherName,
                         id: row.publisher_id,
@@ -574,6 +578,15 @@ echo mainFooter();
                 $scope.items.splice(index, 1);
                 $scope.calculateSum();
             }
+        }
+        $scope.addSize = function(items) {
+            console.log(items);
+            items.push({});
+            $scope.calculateSum();
+        }
+        $scope.removeSize = function(items, index) {
+            items.splice(index, 1);
+            $scope.calculateSum();
         }
 
         $(document).on("ProdcutAdded", function(e) {
@@ -641,6 +654,7 @@ echo mainFooter();
                     pack_size: parseFloat(p.pack_size || 0),
                     qty: 1,
                     show: true,
+                    sizes: [{}],
                     publisher: p.publisherName ? ({
                         full_name: p.publisherName,
                         id: p.publisher_id,
@@ -664,6 +678,7 @@ echo mainFooter();
                         ...p,
                         pack_size: parseFloat(p.pack_size || 0),
                         qty: 1,
+                        sizes: [{}],
                         publisher: p.publisherName ? ({
                             full_name: p.publisherName,
                             id: p.publisher_id,
@@ -826,9 +841,21 @@ echo mainFooter();
                         services,
                         raw_items,
                         product_type,
-                    }) => ({
+                        sizes
+                    }) => {
+                        let des = "";
+                        if(sizes?.filter(r => r.qty && r.size)?.length) {
+                            sizes?.map((r, i) => {
+                                if(i === 0) {
+                                    des += " SIZES: ";
+                                }
+                                des += ' ' + r.size + '"/'+ r.qty +", ";
+                            })
+
+                        }
+                        return ({
                         id,
-                        description,
+                        description: (description || "") + des,
                         pack_size,
                         pack_qty,
                         unpack_qty,
@@ -843,7 +870,7 @@ echo mainFooter();
                         product_type,
                         services,
                         raw_items,
-                    })),
+                    })}),
                     shopId: $scope.shopId,
                     payment_amount: $scope.payment_total,
                     payment_with: $scope.payWith,
@@ -920,7 +947,17 @@ echo mainFooter();
                     product.qty = (product.pack_size || 1) * product.pack_qty;
                 }
 
-                const qty = $scope.show_bundle ? (product.qty + (product.unpack_qty || 0)) : product.qty;
+                let qty = $scope.show_bundle ? (product.qty + (product.unpack_qty || 0)) : product.qty;
+                if(product.sizes?.length) {
+                    let sizesQty = 0;
+                    product.sizes.map(r => {
+                        sizesQty += parseInt(r.qty || 0);
+                    });
+
+                    if(sizesQty) {
+                        product.qty = parseInt(sizesQty);
+                    }
+                }
                 if (!$scope.show_bundle) {
                     product.unpack_qty = 0;
                     product.pack_qty = 0;

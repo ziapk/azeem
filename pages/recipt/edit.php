@@ -94,6 +94,7 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                     <td>
                         <label><span style="vertical-align: middle"><input type="checkbox" ng-model="show_discount"></span> <span style="vertical-align: middle">Disc</span></label>
                         <label style="margin-left: 10px"><span style="vertical-align: middle;"><input type="checkbox" ng-model="sep"></span> <span style="vertical-align: middle">SEP</span></label>
+                        <label style="margin-left: 10px"><span style="vertical-align: middle"><input type="checkbox" ng-model="showDescription"></span> <span style="vertical-align: middle">DESC</span></label>
                         <?php if ($isOwner) { ?>
                             <label style="margin-left: 10px"><span style="vertical-align: middle"><input type="checkbox" ng-model="wsp"></span> <span style="vertical-align: middle">WSP</span></label>
                         <?php } ?>
@@ -140,6 +141,7 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                                         <label class="pull-left"><span style="vertical-align: middle"><input type="checkbox" ng-model="show_discount"></span> <span style="vertical-align: middle">Add Discount</span></label>
                                         <label class="pull-left"><span style="vertical-align: middle; margin-left: 10px"><input type="checkbox" ng-model="show_bundle" ng-change="calculateSum()"></span> <span style="vertical-align: middle">Bundles</span></label>
                                         <label class="pull-left"><span style="vertical-align: middle; margin-left: 10px"><input type="checkbox" ng-model="sep" ng-change="calculateSum()"></span> <span style="vertical-align: middle">SEP</span></label>
+                                        <label class="pull-left"><span style="vertical-align: middle; margin-left: 10px"><input type="checkbox" ng-model="showDescription"></span> <span style="vertical-align: middle">DESC</span></label>
                                         <?php if ($isOwner) { ?>
                                             <label class="pull-left"><span style="vertical-align: middle; margin-left: 10px"><input type="checkbox" ng-model="wsp"></span> <span style="vertical-align: middle">WSP</span></label>
                                         <?php } ?>
@@ -314,6 +316,7 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
             $scope.show_discount = parseInt($scope.data.order.show_discount) ? true : false;
             $scope.show_bundle = parseInt($scope.data.order.show_bundle) ? true : false;
             $scope.is_active = false;
+            $scope.showDescription = false;
             $scope.gst = $scope.data.order.gst;
             $scope.service_charges = $scope.data.order.service_charges;
             $scope.subTotal = $scope.data.order.price;
@@ -430,7 +433,19 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                         product.qty = (product.pack_size || 1) * product.pack_qty;
                     }
 
-                    const qty = $scope.show_bundle ? (product.qty + (product.unpack_qty || 0)) : product.qty;
+                    let qty = $scope.show_bundle ? (product.qty + (product.unpack_qty || 0)) : product.qty;
+                    if(product.sizes?.length) {
+                        let sizesQty = 0;
+                        product.sizes.map(r => {
+                            sizesQty += parseInt(r.qty || 0);
+                        });
+
+                        if(sizesQty) {
+                            product.qty = parseInt(sizesQty);
+                        }
+
+                    }
+                    
                     if (!$scope.show_bundle) {
                         product.unpack_qty = 0;
                         product.pack_qty = 0;
@@ -539,6 +554,35 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                 $scope.calculateSum();
             }
 
+            $scope.convertToSizes = (str) => {
+                const inputString = str;
+
+                // Remove the 'SIZES: ' part and trim the string
+                const sizesString = inputString.replace('SIZES: ', '').trim();
+
+                // Regex pattern to match size and quantity pairs
+                const regex = /(\d+)"?\/(\d+)/g;
+
+                const arr = [];
+                
+                // Use matchAll to find all matches
+                for (const match of sizesString.matchAll(regex)) {
+                    arr.push({
+                        size: parseInt(match[1].trim()),
+                        qty: parseInt(match[2].trim()),
+                    });
+                }
+                return arr;
+            }
+
+            $scope.replaceSizesText = (text) => {
+                // Regex pattern to match "SIZES:" and everything after it
+                const regex = /SIZES:.*$/;
+
+                // Replace the matched text with an empty string
+                return text.replace(regex, '');
+            }
+
             shopCart.map(function(row) {
                 const obj = $scope.mainList.find(function(e) {
                     return e.id == row.product_id
@@ -548,6 +592,8 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                 items.push({
                     ...obj,
                     ...row,
+                    sizes: row.description?.includes('SIZES:') ? $scope.convertToSizes(row.description): [{}],
+                    description: row.description?.includes('SIZES:') ? $scope.replaceSizesText(row.description): row.description,
                     id: obj?.id || row.product_id,
                     full_name: obj?.full_name || row.product_title,
                     discount: row.discount?.toString(),
@@ -687,6 +733,15 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                     $scope.calculateSum();
                 }
             }
+            $scope.addSize = function(items) {
+                console.log(items);
+                items.push({});
+                $scope.calculateSum();
+            }
+            $scope.removeSize = function(items, index) {
+                items.splice(index, 1);
+                $scope.calculateSum();
+            }
             $scope.selectProduct = function(p, sep, disableCalc, event) {
                 event && event.stopPropagation();
                 let currentIndex = 1
@@ -709,6 +764,7 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                         qty: 1,
                         pack_size: parseFloat(p.pack_size || 0),
                         show: true,
+                        sizes: [{}],
                         publisher: p.publisherName ? ({
                             full_name: p.publisherName,
                             id: p.publisher_id,
@@ -735,6 +791,7 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                             ...p,
                             pack_size: parseFloat(p.pack_size || 0),
                             qty: 1,
+                            sizes: [{}],
                             publisher: p.publisherName ? ({
                                 full_name: p.publisherName,
                                 id: p.publisher_id,
@@ -891,9 +948,21 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                             services,
                             raw_items,
                             product_type,
-                        }) => ({
+                            sizes,
+                        }) => {
+                            let des = "";
+                            if(sizes?.filter(r => r.qty && r.size)?.length) {
+                                sizes?.map((r, i) => {
+                                    if(i === 0) {
+                                        des += " SIZES: ";
+                                    }
+                                    des += ' ' + r.size + '"/'+ r.qty +", ";
+                                })
+
+                            }
+                            return ({
                             id,
-                            description,
+                            description: (description || "") + des,
                             qty,
                             pack_size,
                             pack_qty,
@@ -908,7 +977,7 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                             product_type,
                             services,
                             raw_items,
-                        })),
+                        })}),
                         shopId: $scope.shopId,
                         payment_amount: $scope.payment_total,
                         payment_with: $scope.payWith,

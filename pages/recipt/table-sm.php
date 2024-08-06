@@ -29,66 +29,83 @@ foreach ($statuses as  $value) {
         <td colspan="2">
             <div class="clearfix form-group">
                 <label><input ng-change="setList(selectedList)" type="checkbox" ng-model="selectedList[cart.srno]"></label>
-                <?php if ($userData['role'] === 'owner') { ?>
-                    <span class="dropdown pull-right">
-                        <button class="dropdown-toggle btn btn-xs btn-default" data-toggle="dropdown" style="padding-inline: 8px; padding-block: 2px"><span class="fa fa-caret-down"></span></button>
-                        <form ng-submit="submitCode(cart)" class="dropdown-menu " style="padding: 10px; width: 300px">
-                            <div class="input-group" style="width: 100%">
-                                <input type="text" placeholder="Title" ng-model="cart.newTitle" type="text" class="form-control">
-                                <span class="input-group-btn" style="width: 50%">
-                                    <ui-select custom-dropdown ng-model="cart.publisher" theme="bootstrap" ng-disabled="disabled" reset-search-input="false" title="Choose a publisher">
-                                        <ui-select-match placeholder="Enter a publisher...">{{$select.selected.full_name}}</ui-select-match>
-                                        <ui-select-choices repeat="address in publishers track by $index" refresh="refreshPublishers($select.search)" refresh-delay="0">
-                                            <div style="white-space: wrap;" ng-bind-html="address.full_name | highlight: $select.search"></div>
-                                        </ui-select-choices>
-                                    </ui-select>
-                                </span>
-                            </div>
-                            <div class="input-group">
-                                <span class="input-group-btn" style="width: 50%">
-                                    <input type="text" placeholder="Rack No" ng-model="cart.rackNo" type="text" class="form-control">
-                                </span>
-                                <span class="input-group-btn" style="width: 50%">
-                                    <input type="text" placeholder="Author" ng-model="cart.author" type="text" class="form-control">
-                                </span>
-                            </div>
-                            <div class="input-group">
-                                <input type="text" placeholder="Bar Code" ng-model="cart.newBarCode" type="text" class="form-control">
-                                <span class="input-group-btn" style="width: 50%">
-                                    <input type="text" placeholder="WH Price" ng-model="cart.wh_price" ng-value="cart.wh_price" type="text" class="form-control">
-                                </span>
-                            </div>
-                            <div class="input-group">
-                                <span class="input-group-btn" style="width: 50%">
-                                    <input type="text" placeholder="Price" ng-model="cart.newPrice" ng-value="cart.price" type="text" class="form-control">
-                                </span>
-                                <span class="input-group-btn">
-                                    <button type="submit" class="btn btn-primary">Submit</button>
-                                </span>
-                            </div>
-                        </form>
-                    </span>
-                <?php } ?>
-                <?php if ($userData['role'] === 'manager') { ?>
-                    <span class="dropdown pull-right">
-                        <button class="dropdown-toggle btn btn-xs btn-default" data-toggle="dropdown" style="padding-inline: 8px; padding-block: 2px"><span class="fa fa-caret-down"></span></button>
-                        <form ng-submit="submitCode(cart)" class="dropdown-menu " style="padding: 10px; width: 300px">
-                            <div class="input-group">
-                                <input type="text" placeholder="Bar Code" ng-model="cart.newBarCode" type="text" class="form-control">
-                                <span class="input-group-btn" style="width: 40%">
-                                    <input type="text" placeholder="Rack No" ng-model="cart.rackNo" type="text" class="form-control">
-                                </span>
-                                <span class="input-group-btn">
-                                    <button type="submit" class="btn btn-primary">Submit</button>
-                                </span>
-                            </div>
-                        </form>
-                    </span>
-                <?php } ?>
-                <a href="#" class="btn btn-xs btn-danger pull-right" style="margin-right: 4px" ng-click="remove(cart)"><span class="fa fa-remove"></span></a>
                 {{cart.full_name}} | <strong class="text-danger">{{cart.rackNumbers}}</strong> | <strong class="text-success">{{cart.pack_size}}B</strong>
+                    <div class="pull-right">
+                        <a href="#" class="btn btn-xs btn-danger" style="margin-right: 4px" ng-click="remove(cart)"><span class="fa fa-remove"></span></a>
+                            <?php if ($userData['role'] === 'owner') { ?>
+                            <span class="dropdown">
+                                <button class="dropdown-toggle btn btn-default" data-toggle="dropdown" style="padding-inline: 8px; padding-block: 2px"><span class="fa fa-caret-down"></span></button>
+                                <form ng-submit="submitCode(cart)" class="dropdown-menu pull-right" style="padding: 10px; width: 300px">
+                                    <div class="input-group" style="width: 100%">
+                                        <input type="text" placeholder="Title" ng-model="cart.newTitle" type="text" class="form-control">
+                                        <span class="input-group-btn" style="width: 50%">
+                                            <ui-select custom-dropdown ng-model="cart.publisher" theme="bootstrap" ng-disabled="disabled" reset-search-input="false" title="Choose a publisher">
+                                                <ui-select-match placeholder="Enter a publisher...">{{$select.selected.full_name}}</ui-select-match>
+                                                <ui-select-choices repeat="address in publishers track by $index" refresh="refreshPublishers($select.search)" refresh-delay="0">
+                                                    <div style="white-space: wrap;" ng-bind-html="address.full_name | highlight: $select.search"></div>
+                                                </ui-select-choices>
+                                            </ui-select>
+                                        </span>
+                                    </div>
+                                    <div class="input-group">
+                                        <span class="input-group-btn" style="width: 50%">
+                                            <input type="text" placeholder="Rack No" ng-model="cart.rackNo" type="text" class="form-control">
+                                        </span>
+                                        <span class="input-group-btn" style="width: 50%">
+                                            <input type="text" placeholder="Author" ng-model="cart.author" type="text" class="form-control">
+                                        </span>
+                                    </div>
+                                    <div class="input-group">
+                                        <input type="text" placeholder="Bar Code" ng-model="cart.newBarCode" type="text" class="form-control">
+                                        <span class="input-group-btn" style="width: 50%">
+                                            <input type="text" placeholder="WH Price" ng-model="cart.wh_price" ng-value="cart.wh_price" type="text" class="form-control">
+                                        </span>
+                                    </div>
+                                    <div class="input-group">
+                                        <span class="input-group-btn" style="width: 50%">
+                                            <input type="text" placeholder="Price" ng-model="cart.newPrice" ng-value="cart.price" type="text" class="form-control">
+                                        </span>
+                                        <span class="input-group-btn">
+                                            <button type="submit" class="btn btn-primary">Submit</button>
+                                        </span>
+                                    </div>
+                                </form>
+                            </span>
+                        <?php } ?>
+                        <?php if ($userData['role'] === 'manager') { ?>
+                            <span class="dropdown">
+                                <button class="dropdown-toggle btn btn-default" data-toggle="dropdown" style="padding-inline: 8px; padding-block: 2px"><span class="fa fa-caret-down"></span></button>
+                                <form ng-submit="submitCode(cart)" class="dropdown-menu pull-rigth" style="padding: 10px; width: 300px">
+                                    <div class="input-group">
+                                        <input type="text" placeholder="Bar Code" ng-model="cart.newBarCode" type="text" class="form-control">
+                                        <span class="input-group-btn" style="width: 40%">
+                                            <input type="text" placeholder="Rack No" ng-model="cart.rackNo" type="text" class="form-control">
+                                        </span>
+                                        <span class="input-group-btn">
+                                            <button type="submit" class="btn btn-primary">Submit</button>
+                                        </span>
+                                    </div>
+                                </form>
+                            </span>
+                        <?php } ?>
+                    <span class="dropdown">
+                        <button class="dropdown-toggle btn btn-primary" data-toggle="dropdown" style="padding-inline: 8px"><span class="fa fa-list"></span></button>
+                        <form ng-submit="" class="dropdown-menu pull-right" style="padding: 10px; width: 300px">
+                            <div class="input-group" style="width: 100%; margin-bottom: 4px" ng-repeat="it in cart.sizes track by $index">
+                                <input type="number" placeholder="Size" ng-change="calculateSum()" ng-model="it.size" type="text" class="form-control">
+                                <span class="input-group-btn" style="width: 104px;">
+                                    <input type="number" placeholder="Qty" ng-change="calculateSum()" ng-model="it.qty" type="text" class="form-control" style="margin-left: -1px">
+                                </span>
+                                <span class="input-group-btn">
+                                    <button ng-if="$index > 0" ng-click="removeSize(cart.sizes, $index)" type="submit" class="btn btn-danger"><span class="fa fa-remove"></span></button>
+                                    <button ng-if="$index == 0" ng-click="addSize(cart.sizes)" type="submit" class="btn btn-primary"><span class="fa fa-plus"></span></button>
+                                </span>
+                            </div>
+                        </form>
+                    </span>
+                </div>
             </div>
-            <input type="text" ng-change="calculateSum()" ng-model="cart.description" placeholder="Description" ng-if="cart.show" class="form-control form-group">
+            <input type="text" ng-change="calculateSum()" ng-model="cart.description" placeholder="Description" ng-if="showDescription" class="form-control form-group">
             <div class="quantity form-group" style="align-items: center; justify-content: flex-end;">
                 <div class="input-group" ng-if="show_discount" style="margin-right: 16px">
                     <input type="number" class="form-control input-add-dist" ng-model="cart.discount_value" ng-change="calculateSum()" style="padding-right: 6px">

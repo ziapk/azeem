@@ -41,7 +41,7 @@ foreach ($statuses as  $value) {
             {{cart.is_active == 0 ? '****' : ''}}{{cart.full_name}} | <strong class="text-danger">{{cart.rackNumbers}}</strong> | <strong class="text-success">{{cart.pack_size}}B</strong>
             <?php if ($userData['role'] === 'owner') { ?>
                 <span class="dropdown">
-                    <button class="dropdown-toggle btn btn-default" data-toggle="dropdown" style="padding-inline: 8px"><span class="fa fa-caret-down"></span></button>
+                    <button class="dropdown-toggle btn btn-default" data-toggle="dropdown" style="padding-inline: 8px"><span class="fa fa-edit"></span></button>
                     <form ng-submit="submitCode(cart)" class="dropdown-menu" style="padding: 10px; width: 450px">
                         <div class="input-group" style="width: 100%">
                             <input type="text" placeholder="Title" ng-model="cart.newTitle" type="text" class="form-control">
@@ -77,7 +77,7 @@ foreach ($statuses as  $value) {
             <?php } ?>
             <?php if ($userData['role'] === 'manager') { ?>
                 <span class="dropdown">
-                    <button class="dropdown-toggle btn btn-default" data-toggle="dropdown" style="padding-inline: 8px"><span class="fa fa-caret-down"></span></button>
+                    <button class="dropdown-toggle btn btn-default" data-toggle="dropdown" style="padding-inline: 8px"><span class="fa fa-edit"></span></button>
                     <form ng-submit="submitCode(cart)" class="dropdown-menu" style="padding: 10px; width: 300px">
                         <div class="input-group" style="width: 100%">
                             <input type="text" placeholder="Rack No" ng-model="cart.rackNo" type="text" class="form-control">
@@ -91,7 +91,22 @@ foreach ($statuses as  $value) {
                     </form>
                 </span>
             <?php } ?>
-            <input type="text" ng-change="calculateSum()" ng-model="cart.description" placeholder="Description" ng-if="cart.show" class="form-control">
+            <span class="dropdown">
+                <button class="dropdown-toggle btn btn-primary" data-toggle="dropdown" style="padding-inline: 8px"><span class="fa fa-list"></span></button>
+                <form ng-submit="" class="dropdown-menu" style="padding: 10px; width: 300px">
+                    <div class="input-group" style="width: 100%; margin-bottom: 4px" ng-repeat="it in cart.sizes track by $index">
+                        <input type="number" placeholder="Size" ng-change="calculateSum()" ng-model="it.size" type="text" class="form-control">
+                        <span class="input-group-btn" style="width: 104px;">
+                            <input type="number" placeholder="Qty" ng-change="calculateSum()" ng-model="it.qty" type="text" class="form-control" style="margin-left: -1px">
+                        </span>
+                        <span class="input-group-btn">
+                            <button ng-if="$index > 0" ng-click="removeSize(cart.sizes, $index)" type="submit" class="btn btn-danger"><span class="fa fa-remove"></span></button>
+                            <button ng-if="$index == 0" ng-click="addSize(cart.sizes)" type="submit" class="btn btn-primary"><span class="fa fa-plus"></span></button>
+                        </span>
+                    </div>
+                </form>
+            </span>
+            <input type="text" ng-change="calculateSum()" ng-model="cart.description" placeholder="Description" ng-if="showDescription" class="form-control">
         </td>
         <td width="120" ng-if="show_discount">
             <div class="input-group">
