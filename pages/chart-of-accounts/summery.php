@@ -220,7 +220,7 @@ mainHeader();
             $window.open("<?php echo SITE_URL; ?>print/return.php?id=" + id + "&detail=true&largeView=large", "", "width=800,height=600");
         }
         $scope.openRecipt4 = (id) => {
-            $window.open("<?php echo SITE_URL; ?>print/receiving.php?id=" + id + "&detail=true'&largeView=large", "width=600,height=900");
+            $window.open("<?php echo SITE_URL; ?>print/receiving.php?id=" + id + "&detail=true'&largeView=large", "", "width=600,height=900");
         }
     });
 
