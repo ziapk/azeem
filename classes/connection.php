@@ -54,6 +54,17 @@ class Connection extends ConnectionPool
 		ob_clean();
 		return $html;
 	}
+	public function drawLocker($id)
+	{
+		ob_start();
+		$_GET['id'] = $id;
+		$_GET['detail'] = 'true';
+		$_GET['largeView'] = 'large';
+		include dirname(__FILE__) . '/../print/deposit.php';
+		$html = ob_get_clean();
+		ob_clean();
+		return $html;
+	}
 	public function drawReturn($id)
 	{
 		ob_start();
