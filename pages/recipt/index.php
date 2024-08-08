@@ -62,7 +62,7 @@ $publishers = $publisherObj->getPublishers($userId);
             <?php foreach ($orders as $key => $value) { ?>
                 <div class="dropdown">
                     <div class="btn-group btn-group-sm">
-                        <a class="btn btn-default" href="./edit.php?id=<?php echo $value['id']; ?>"><?php echo $value['full_name'] . ' - ' . $value['id']; ?></a>
+                        <a class="btn btn-default" href="./edit.php?id=<?php echo $value['id']; ?>"><?php echo $value['full_name'] . ' - ' . $value['order_custom_id']; ?></a>
                         <button type="button" class="btn btn-default" class="dropdown-toggle" data-toggle="dropdown" ng-click="loadOrder(<?php echo $value['id']; ?>)"><span class="fa fa-arrow-down"></span></button>
                         <div class="dropdown-menu" style="width: 90vw; max-width: 400px; padding: 16px">
                             <form role="search" ng-submit="saveOrder(<?php echo $value['id']; ?>)">
