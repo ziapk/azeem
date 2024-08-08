@@ -106,6 +106,9 @@ if (sizeof($_POST['items'])) {
                 $productsValue += ($item['price'] * $item['qty']);
                 $purchaseValue += ($item['pprice'] * $item['qty']);
             }
+            if(!empty($item['update'])) {
+                $products->updateProductPPrice(['product_id' => $item['id'], 'pprice' => $item['pprice']]);
+            }
             $items[] = [
                 'pprice' => $item['pprice'],
                 'price' => $item['price'],

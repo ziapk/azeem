@@ -897,6 +897,23 @@ class Products extends Connection
 			$this->connectionPool->releaseConnection($dbh);
 		}
 	}
+	public function updateProductPPrice($array)
+	{
+		$dbh = $this->connectionPool->getConnection();
+		try {
+			$stmt = "UPDATE `{$this->table}` SET  `pprice`=:pprice WHERE id=:id";
+			$prepare = $dbh->prepare($stmt);
+			$prepare->bindParam(':pprice', $array['pprice'], PDO::PARAM_STR);
+			$prepare->bindParam(':id', $array['product_id'], PDO::PARAM_STR);
+			$prepare->execute();
+			$prepare->rowCount();
+			return $array['product_id'];
+		} catch (PDOException $e) {
+			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
+		}
+	}
 	public function updateProductAuthor($array)
 	{
 		$dbh = $this->connectionPool->getConnection();
