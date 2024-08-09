@@ -171,7 +171,7 @@ $publishers = $publisherObj->getPublishers($userId);
                                 <?php include_once dirname(__FILE__) . '/table.php'; ?>
             </div>
             <div ng-if="productPurchases.length" class="col-xs-12 col-md-3">
-                <table class="table">
+                <table class="table table-striped">
                     <tr ng-repeat="item in productPurchases">
                         <td>
                             {{item.full_name}}<br />
