@@ -176,6 +176,7 @@ $publishers = $publisherObj->getPublishers($userId);
                         <td>
                             {{item.full_name}}<br />
                             <strong>{{item.customerName || item.supplierName}}</strong><br />
+                            {{item.supply_date|date:'DD/MM/YYYY'}}<br />
                         </td>
                         <td style="width: 1%; white-space: nowrap">
                             <span class="text-light">{{item.quantity}}</span> x <strong style="font-size: 20px">{{item.price}}</strong> Rs<br />
