@@ -119,55 +119,76 @@ $publishers = $publisherObj->getPublishers($userId);
                 </td>
             </tr>
         </table>
-        <table class="table table-striped visible-xs">
-            <thead>
-                <?php include_once dirname(__FILE__) . '/table-sm.php'; ?>
-                <table class="table table-striped recipt-table hidden-xs">
-                    <thead class="sticky">
-                        <th colspan="8" style="padding: 0">
-                            <table class="table" style="box-shadow: none; margin: 0">
-                                <thead>
-                                    <tr>
-                                        <th style="vertical-align: middle">Customer Name</th>
-                                        <th style="width: 200px">
-                                            <div class="dropdown-wrapper" style="position: relative;">
-                                                <input type="text" class="form-control" ng-model="customerName" placeholder="Search Customer" uib-typeahead="address as address.full_name for address in searchCustomer($viewValue)" typeahead-on-select="selectCustomer($item)" ng-model-options="{debounce: 100}" typeahead-template-url="customer.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="1">
-                                            </div>
-                                        </th>
-                                        <th style="vertical-align: middle">
-                                            <label class="pull-left"><span style="vertical-align: middle"><input type="checkbox" ng-model="show_discount"></span> <span style="vertical-align: middle">Add Discount</span></label>
-                                            <label class="pull-left"><span style="vertical-align: middle; margin-left: 10px"><input type="checkbox" ng-model="show_bundle"></span> <span style="vertical-align: middle">Bundles</span></label>
-                                            <label style="margin-left: 10px"><span style="vertical-align: middle"><input type="checkbox" ng-model="showDescription"></span> <span style="vertical-align: middle">DESC</span></label>
-                                            <label class="pull-left"><span style="vertical-align: middle; margin-left: 10px"><input type="checkbox" ng-model="sep"></span> <span style="vertical-align: middle">SEP</span></label>
-                                            <?php if ($isOwner) { ?>
-                                                <label class="pull-left"><span style="vertical-align: middle; margin-left: 10px"><input type="checkbox" ng-model="wsp"></span> <span style="vertical-align: middle">WSP</span></label>
-                                            <?php } ?>
-                                            <div class="pull-right">
-                                                <label><span style="vertical-align: middle">QF</span> <span style="vertical-align: middle; margin-left: 4px;"><input type="checkbox" name="qf" ng-model="qf"><span></label>
-                                                <label><span style="vertical-align: middle">Search Product</span> <span style="vertical-align: middle; margin-left: 4px"><input type="checkbox" name="focus" ng-model="focus"><span></label>
-                                            </div>
-                                        </th>
-                                        <th width="100">
-                                            <div class="dropdown-wrapper align-right dropdown-height">
-                                                <div class="input-group">
-                                                    <input type="text" autocomplete="off" class="form-control" id="searchProduct-2" ng-model="product" placeholder="Search Products" uib-typeahead="address as address.full_name for address in searchProduct($viewValue)" typeahead-on-select="selectProduct($item)" ng-model-options="{debounce: 100}" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="productCode ? 0 : 1">
-                                                    <span class="input-group-btn" style="width: 90px">
-                                                        <input type="text" ng-model="productCode" class="form-control" id="exampleInputAmount" placeholder="CODE">
-                                                    </span>
-                                                    <span class="input-group-addon" style="width: 40px">
-                                                        <label><span style="vertical-align: middle">I-A</span> <span style="vertical-align: middle; margin-left: 4px;"><input type="checkbox" name="is_active" ng-model="is_active"></span></label>
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </th>
-                                    </tr>
-                                </thead>
-                            </table>
-                        </th>
+        <div class="row">
+            <div class="col-xs-12" ng-class="{'col-md-9': productPurchases.length}">
+                <table class="table table-striped visible-xs">
+                    <thead>
+                        <?php include_once dirname(__FILE__) . '/table-sm.php'; ?>
+                        <table class="table table-striped recipt-table hidden-xs">
+                            <thead class="sticky">
+                                <th colspan="8" style="padding: 0">
+                                    <table class="table" style="box-shadow: none; margin: 0">
+                                        <thead>
+                                            <tr>
+                                                <th style="vertical-align: middle">Customer Name</th>
+                                                <th style="width: 200px">
+                                                    <div class="dropdown-wrapper" style="position: relative;">
+                                                        <input type="text" class="form-control" ng-model="customerName" placeholder="Search Customer" uib-typeahead="address as address.full_name for address in searchCustomer($viewValue)" typeahead-on-select="selectCustomer($item)" ng-model-options="{debounce: 100}" typeahead-template-url="customer.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="1">
+                                                    </div>
+                                                </th>
+                                                <th style="vertical-align: middle">
+                                                    <label class="pull-left"><span style="vertical-align: middle"><input type="checkbox" ng-model="show_discount"></span> <span style="vertical-align: middle">Add Discount</span></label>
+                                                    <label class="pull-left"><span style="vertical-align: middle; margin-left: 10px"><input type="checkbox" ng-model="show_bundle"></span> <span style="vertical-align: middle">Bundles</span></label>
+                                                    <label style="margin-left: 10px"><span style="vertical-align: middle"><input type="checkbox" ng-model="showDescription"></span> <span style="vertical-align: middle">DESC</span></label>
+                                                    <label class="pull-left"><span style="vertical-align: middle; margin-left: 10px"><input type="checkbox" ng-model="sep"></span> <span style="vertical-align: middle">SEP</span></label>
+                                                    <?php if ($isOwner) { ?>
+                                                        <label class="pull-left"><span style="vertical-align: middle; margin-left: 10px"><input type="checkbox" ng-model="wsp"></span> <span style="vertical-align: middle">WSP</span></label>
+                                                    <?php } ?>
+                                                    <div class="pull-right">
+                                                        <label><span style="vertical-align: middle">QF</span> <span style="vertical-align: middle; margin-left: 4px;"><input type="checkbox" name="qf" ng-model="qf"><span></label>
+                                                        <label><span style="vertical-align: middle">Search Product</span> <span style="vertical-align: middle; margin-left: 4px"><input type="checkbox" name="focus" ng-model="focus"><span></label>
+                                                    </div>
+                                                </th>
+                                                <th width="100">
+                                                    <div class="dropdown-wrapper align-right dropdown-height">
+                                                        <div class="input-group">
+                                                            <input type="text" autocomplete="off" class="form-control" id="searchProduct-2" ng-model="product" placeholder="Search Products" uib-typeahead="address as address.full_name for address in searchProduct($viewValue)" typeahead-on-select="selectProduct($item)" ng-model-options="{debounce: 100}" typeahead-template-url="row.html" class="form-control" typeahead-show-hint="true" typeahead-min-length="productCode ? 0 : 1">
+                                                            <span class="input-group-btn" style="width: 90px">
+                                                                <input type="text" ng-model="productCode" class="form-control" id="exampleInputAmount" placeholder="CODE">
+                                                            </span>
+                                                            <span class="input-group-addon" style="width: 40px">
+                                                                <label><span style="vertical-align: middle">I-A</span> <span style="vertical-align: middle; margin-left: 4px;"><input type="checkbox" name="is_active" ng-model="is_active"></span></label>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                </th>
 
 
-                        <?php include_once dirname(__FILE__) . '/table.php'; ?>
+                                <?php include_once dirname(__FILE__) . '/table.php'; ?>
+            </div>
+            <div ng-if="productPurchases.length" class="col-xs-12 col-md-3">
+                <table class="table">
+                    <tr ng-repeat="item in productPurchases">
+                        <td>
+                            {{item.full_name}}<br />
+                            <strong>{{item.customerName || item.supplierName}}</strong><br />
+                        </td>
+                        <td style="width: 1%; white-space: nowrap">
+                            <span class="text-light">{{item.quantity}}</span> x <strong style="font-size: 20px">{{item.price}}</strong> Rs<br />
+                        </td>
 
+                    </tr>
+                </table>
+
+            </div>
+        </div>
+      
+
+    
     </div>
 
 </div>
@@ -632,6 +653,8 @@ echo mainFooter();
             }
         });
 
+        $scope.productPurchases = [];
+
 
         $scope.selectProduct = function(p, sep, disableCalc, event) {
             event && event.stopPropagation();
@@ -709,6 +732,15 @@ echo mainFooter();
                 }, 200);
             }
 
+            $scope.getProductPurchases(p);
+
+        }
+
+         $scope.getProductPurchases = function(product) {
+            $http.get("<?php echo SITE_URL ?>api/getProductPurchases.php?product_id=" + product.id)
+            .then(function(response) {
+                $scope.productPurchases = response.data;
+            });
         }
         $scope.addMoreQty = function(obj, val, e) {
             if (val > 0) {
