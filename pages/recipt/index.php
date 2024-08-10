@@ -180,7 +180,7 @@ $publishers = $publisherObj->getPublishers($userId);
                             {{item.supply_date|date:'DD/MM/YYYY'}}<br />
                         </td>
                         <td style="width: 1%; white-space: nowrap">
-                            <span class="text-light">{{item.quantity}}</span> x <strong style="font-size: 20px">{{item.pprice * ((100 - item.discount)/100) | number:2}} -</strong> Rs<br />
+                            <span class="text-light">{{item.quantity}}</span> x <strong style="font-size: 20px">{{item.price * ((100 - item.discount)/100) | number:2}} -</strong> Rs<br />
                         </td>
 
                     </tr>
