@@ -86,3 +86,8 @@
 [26-Jul-2022 15:46:02 UTC] PHP Warning:  Illegal string offset 'page' in /home/reclydmy/public_html/pos/include/manager.php on line 47
 [26-Jul-2022 15:46:02 UTC] PHP Warning:  Illegal string offset 'page' in /home/reclydmy/public_html/pos/include/manager.php on line 48
 [26-Jul-2022 15:46:02 UTC] PHP Warning:  Illegal string offset 'page' in /home/reclydmy/public_html/pos/include/manager.php on line 49
+[19-Mar-2024 13:41:46 Asia/Karachi] PHP Fatal error:  Uncaught Error: Class 'ConnectionPool' not found in /home/reclydmy/public_html/azeem/classes/connection.php:12
+Stack trace:
+#0 /home/reclydmy/public_html/azeem/pages/orders/index.php(4): Connection->__construct()
+#1 {main}
+  thrown in /home/reclydmy/public_html/azeem/classes/connection.php on line 12
