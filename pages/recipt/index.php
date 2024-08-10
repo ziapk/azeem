@@ -175,7 +175,7 @@ $publishers = $publisherObj->getPublishers($userId);
                 <table class="table table-striped">
                     <tr ng-repeat="item in productPurchases">
                         <td>
-                            {{item.full_name}}<br />
+                            <strong class="text-danger">{{item.id}}</strong> | {{item.full_name}}<br />
                             <strong>{{item.customerName || item.supplierName}}</strong><br />
                             {{item.supply_date|date:'DD/MM/YYYY'}}<br />
                         </td>
