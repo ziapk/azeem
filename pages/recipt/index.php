@@ -171,6 +171,7 @@ $publishers = $publisherObj->getPublishers($userId);
                                 <?php include_once dirname(__FILE__) . '/table.php'; ?>
             </div>
             <div ng-if="productPurchases.length" class="col-xs-12 col-md-3">
+                <button type="button" ng-click="productPurchases = []" class="btn btn-danger btn-xs"><span class="fa fa-remove"></span> Hide</button>
                 <table class="table table-striped">
                     <tr ng-repeat="item in productPurchases">
                         <td>
@@ -179,7 +180,7 @@ $publishers = $publisherObj->getPublishers($userId);
                             {{item.supply_date|date:'DD/MM/YYYY'}}<br />
                         </td>
                         <td style="width: 1%; white-space: nowrap">
-                            <span class="text-light">{{item.quantity}}</span> x <strong style="font-size: 20px">{{item.price}}</strong> Rs<br />
+                            <span class="text-light">{{item.quantity}}</span> x <strong style="font-size: 20px">{{item.pprice}} -</strong> Rs<br />
                         </td>
 
                     </tr>
