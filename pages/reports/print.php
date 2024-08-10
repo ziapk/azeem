@@ -45,6 +45,9 @@ $srNo = true;
 	}
 </style>
 <?php
+
+// print_r($_POST);exit;
+
 switch ($reportType) {
 	case '0':
 		$ownerId = $userData['role'] == 'owner' ? $userData['id'] : $userData['created_by'];
