@@ -171,7 +171,7 @@ $publishers = $publisherObj->getPublishers($userId);
                                 <?php include_once dirname(__FILE__) . '/table.php'; ?>
             </div>
             <div ng-if="productPurchases.length" class="col-xs-12 col-md-3">
-                <button type="button" class="btn btn-danger btn-xs"><span class="fa fa-remove"></span> Hide</button>
+                <button type="button" ng-click="productPurchases = []" class="btn btn-danger btn-xs"><span class="fa fa-remove"></span> Hide</button>
                 <table class="table table-striped">
                     <tr ng-repeat="item in productPurchases">
                         <td>
