@@ -357,7 +357,7 @@ class Supply extends Connection
             if (!empty($product_id)) {
                 $toCondition .= " and p.id IN( $product_id ) ";
             }
-            $stmt = "SELECT oi.product_id, o.supply_date, oi.price AS price, oi.pprice, oi.discount, oi.quantity AS quantity, p.full_name, c.full_name as customerName, s.name as supplierName  FROM `{$this->table}` AS o LEFT JOIN `{$this->table_sub}` AS oi ON oi.supply_id=o.id LEFT JOIN `{$this->table_pro}` AS p on p.id=oi.product_id LEFT JOIN customers AS c ON c.id = o.supplier_id and o.supplier_type = 2 LEFT JOIN `{$this->table_suppliers}` AS s ON s.id = o.supplier_id and o.supplier_type = 1  WHERE o.shopId=:shopId " . $toCondition . " and o.flag = 1 ORDER BY oi.quantity desc";
+            $stmt = "SELECT o.id, oi.product_id, o.supply_date, oi.price AS price, oi.pprice, oi.discount, oi.quantity AS quantity, p.full_name, c.full_name as customerName, s.name as supplierName  FROM `{$this->table}` AS o LEFT JOIN `{$this->table_sub}` AS oi ON oi.supply_id=o.id LEFT JOIN `{$this->table_pro}` AS p on p.id=oi.product_id LEFT JOIN customers AS c ON c.id = o.supplier_id and o.supplier_type = 2 LEFT JOIN `{$this->table_suppliers}` AS s ON s.id = o.supplier_id and o.supplier_type = 1  WHERE o.shopId=:shopId " . $toCondition . " and o.flag = 1 ORDER BY oi.quantity desc";
             $prepare = $dbh->prepare($stmt);
             $prepare->bindParam(':shopId', $shopId, PDO::PARAM_STR);
             $prepare->execute();
