@@ -171,7 +171,7 @@ $publishers = $publisherObj->getPublishers($userId);
                                 <?php include_once dirname(__FILE__) . '/table.php'; ?>
             </div>
             <div ng-if="productPurchases.length" class="col-xs-12 col-md-3">
-                <button type="button" ng-click="productPurchases = []" class="btn btn-danger btn-xs"><span class="fa fa-remove"></span> Hide</button>
+                <button type="button" ng-click="hideList()" class="btn btn-danger btn-xs"><span class="fa fa-remove"></span> Hide</button>
                 <table class="table table-striped">
                     <tr ng-repeat="item in productPurchases">
                         <td>
@@ -180,7 +180,7 @@ $publishers = $publisherObj->getPublishers($userId);
                             {{item.supply_date|date:'DD/MM/YYYY'}}<br />
                         </td>
                         <td style="width: 1%; white-space: nowrap">
-                            <span class="text-light">{{item.quantity}}</span> x <strong style="font-size: 20px">{{item.price * ((100 - item.discount)/100) | number:2}} -</strong> Rs<br />
+                            <span class="text-light">{{item.quantity}}</span> x <strong style="font-size: 20px">{{item.price * ((100 - item.discount)/100) | number:2}} </strong> Rs<br />
                         </td>
 
                     </tr>
@@ -737,6 +737,11 @@ echo mainFooter();
             $scope.getProductPurchases(p);
 
         }
+
+        $scope.hideList = () => {
+            $scope.productPurchases = [];
+        }
+
 
          $scope.getProductPurchases = function(product) {
             $http.get("<?php echo SITE_URL ?>api/getProductPurchases.php?product_id=" + product.id)
