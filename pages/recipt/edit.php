@@ -315,6 +315,7 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
             $scope.ref_no = $scope.data.order.ref_no;
             $scope.show_discount = parseInt($scope.data.order.show_discount) ? true : false;
             $scope.show_bundle = parseInt($scope.data.order.show_bundle) ? true : false;
+            $scope.total_discount_type = 2;
             $scope.is_active = false;
             $scope.showDescription = false;
             $scope.gst = $scope.data.order.gst;
@@ -506,6 +507,19 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                         $scope.payWith[p.id].amount = 0;
                     }
                 });
+
+                $scope.total_discount_value = $scope.discountAmount;
+
+                if($scope.total_discount_type === 1 && $scope.subTotal) {
+                    if($scope.discountAmount <= 100) {
+
+                        $scope.total_discount_value = $scope.subTotal * (parseFloat($scope.discountAmount) / 100);
+
+                    }
+                }
+                else {
+                    $scope.total_discount_value = $scope.discountAmount;
+                }
 
             }
 
@@ -703,6 +717,7 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                 }
                 $scope.calculateSum();
                 $scope.discountAmount = '';
+                $scope.total_discount_value = '';
             }
             $scope.addMoreQty = function(obj, val, e) {
                 if (val > 0) {
