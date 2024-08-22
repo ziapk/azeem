@@ -259,7 +259,7 @@ foreach ($statuses as  $value) {
         <td width="150"><input type="text" ng-model="cart.price" class="form-control" ng-change="calculateSum()"></td>
     </tr>
     <tr>
-        <td colspan="{{show_discount ?  (4) : (3)}}" rowspan="{{6 + modes.length}}">
+        <td colspan="{{show_discount ?  (4) : (3)}}" rowspan="{{8 + modes.length}}">
             <div class="row">
                 <div class="col-md-4">
                     <p>
@@ -289,7 +289,16 @@ foreach ($statuses as  $value) {
     </tr>
     <tr>
         <td width="150" class="text-right">Add Discount</td>
-        <td width="150"><input type="search" ng-model="discountAmount" class="form-control" on-enter-press="addDiscount(discountAmount)"></td>
+        <td width="150">
+        
+            <div class="input-group">
+                <input type="number" class="form-control input-add-dist" ng-model="discountAmount" ng-change="calculateSum()" on-enter-press="addDiscount(total_discount_value)" style="padding-right: 6px">
+                <span class="input-group-btn"><!-- class="dropdown input-group-btn" -->
+                    <button class="btn btn-default" style="padding-inline: 8px" ng-click="total_discount_type = (total_discount_type == 1 ? 2 : 1); calculateSum();">{{total_discount_type == 2 ? 'FIX' : '%'}}</button>
+                </span>
+            </div>
+            <strong class="text-success">{{total_discount_value | number}}</strong>
+        </td>
     </tr>
     <tr>
         <td class="text-right" style="color: red; font-weight: bold;">Additional Discount</td>

@@ -430,6 +430,7 @@ echo mainFooter();
         $scope.service_charges = parseFloat('<?php echo $shop['service_charges']; ?>' || 0);
         $scope.discountPercentValue = 0;
         $scope.show_discount = false;
+        $scope.total_discount_type = 2;
         $scope.subTotal = 0;
         $scope.grandTotal = 0;
         $scope.discount = 0;
@@ -578,6 +579,7 @@ echo mainFooter();
                 alert('Negative Discount value must be less than equal to -' + $scope.discount);
             }
             $scope.calculateSum();
+            $scope.total_discount_value = '';
             $scope.discountAmount = '';
         }
         $scope.directlyAdd = function(val, obj) {
@@ -1054,6 +1056,22 @@ echo mainFooter();
             $scope.payment_amount = $scope.subTotal - $scope.discount;
             $scope.grandTotal = $scope.payment_amount = $scope.payment_amount + Math.round($scope.payment_amount * ($scope.gst / 100)) + Math.round($scope.payment_amount * ($scope.service_charges / 100));
             $window.sessionStorage.setItem('shopping', JSON.stringify($scope.items));
+
+            $scope.total_discount_value = $scope.discountAmount;
+
+            if($scope.total_discount_type === 1 && $scope.subTotal) {
+                if($scope.discountAmount <= 100) {
+
+                    $scope.total_discount_value = $scope.subTotal * (parseFloat($scope.discountAmount) / 100);
+
+                }
+            }
+            else {
+                $scope.total_discount_value = $scope.discountAmount;
+            }
+
+            
+
             <?php
             if (empty($credit)) { ?>
                 const pay = Object.values($scope.payWith);
