@@ -581,6 +581,7 @@ echo mainFooter();
             $scope.calculateSum();
             $scope.total_discount_value = '';
             $scope.discountAmount = '';
+            $scope.total_discount_type = 2;
         }
         $scope.directlyAdd = function(val, obj) {
             if (val > 0) {

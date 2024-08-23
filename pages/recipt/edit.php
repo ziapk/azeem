@@ -718,6 +718,7 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                 $scope.calculateSum();
                 $scope.discountAmount = '';
                 $scope.total_discount_value = '';
+                $scope.total_discount_type = 2;
             }
             $scope.addMoreQty = function(obj, val, e) {
                 if (val > 0) {
