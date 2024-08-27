@@ -115,8 +115,14 @@ class Users extends Connection
 	public function updateProfile($array)
 	{
 		$dbh = $this->connectionPool->getConnection();
+		
+		$passwordCond = "";
+		if(!empty($array['password'])) {
+			$passwordCond .= ", `password`=:password ";
+		}
+
 		try {
-			$stmt = "UPDATE `{$this->table}` SET `full_name`=:full_name, `city`=:city, `cnic`=:cnic, `phoneNumber1`=:phoneNumber1, `phoneNumber2`=:phoneNumber2, `phoneNumber3`=:phoneNumber3, `photo`=:photo, `shopId`=:shopId, `role`=:role WHERE id=:id";
+			$stmt = "UPDATE `{$this->table}` SET `full_name`=:full_name, `city`=:city, `cnic`=:cnic, `phoneNumber1`=:phoneNumber1, `phoneNumber2`=:phoneNumber2, `phoneNumber3`=:phoneNumber3, `photo`=:photo $passwordCond, `shopId`=:shopId, `role`=:role WHERE id=:id";
 			$prepare = $dbh->prepare($stmt);
 			$prepare->bindParam(':id', $array['id'], PDO::PARAM_INT);
 			$prepare->bindParam(':full_name', $array['full_name'], PDO::PARAM_STR);
@@ -126,6 +132,12 @@ class Users extends Connection
 			$prepare->bindParam(':phoneNumber2', $array['phoneNumber2'], PDO::PARAM_STR);
 			$prepare->bindParam(':phoneNumber3', $array['phoneNumber3'], PDO::PARAM_STR);
 			$prepare->bindParam(':photo', $array['photo'], PDO::PARAM_STR);
+			
+			if(!empty($array['password'])) {
+				$pass = $this->normalToPassword($array['password']);
+				$prepare->bindParam(':password', $pass, PDO::PARAM_STR);
+			}
+
 			$prepare->bindParam(':shopId', $array['shopId'], PDO::PARAM_STR);
 			$prepare->bindParam(':role', $array['role'], PDO::PARAM_STR);
 			$prepare->execute();

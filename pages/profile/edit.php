@@ -42,6 +42,12 @@ $ownerStores = $stores->getStores();
                         <label for="cnic" class="control-label" style="font-size: 0.7em; font-weight: bold; letter-spacing: 1px">CNIC</label>
                         <input type="text" class="form-control" id="cnic" placeholder="CNIC" ng-model="form.cnic">
                     </div>
+                    <?php if (!empty($_SESSION['user_credentials']) && $_SESSION['user_credentials']['role'] == 'superadmin') {?>
+                        <div class="form-group">
+                            <label for="password" class="control-label" style="font-size: 0.7em; font-weight: bold; letter-spacing: 1px">Password</label>
+                            <input type="text" class="form-control" id="password" placeholder="password" ng-model="form.password">
+                        </div>
+                    <?php } ?>
                     <div class="form-group">
                         <label for="role" class="control-label" style="font-size: 0.7em; font-weight: bold; letter-spacing: 1px">Role</label>
                         <input type="text" class="form-control" id="role" placeholder="role" ng-model="form.role">
