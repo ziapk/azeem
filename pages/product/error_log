@@ -2,3 +2,7 @@
 [25-Nov-2021 09:47:56 UTC] PHP Notice:  Undefined variable: loginPage in /home/reclydmy/public_html/pos/include/settings.php on line 9
 [30-Jun-2022 12:01:49 UTC] PHP Notice:  Undefined variable: loginPage in /home/reclydmy/public_html/pos/include/settings.php on line 9
 [04-Jul-2022 08:27:46 UTC] PHP Notice:  Undefined variable: loginPage in /home/reclydmy/public_html/pos/include/settings.php on line 9
+[15-Jul-2023 12:24:48 UTC] PHP Warning:  Use of undefined constant SITE_URL - assumed 'SITE_URL' (this will throw an Error in a future version of PHP) in /home/reclydmy/public_html/azeem/pages/product/autoPay.php on line 41
+[15-Jul-2023 12:27:44 UTC] PHP Warning:  Use of undefined constant SITE_URL - assumed 'SITE_URL' (this will throw an Error in a future version of PHP) in /home/reclydmy/public_html/azeem/pages/product/autoPay.php on line 41
+[15-Jul-2023 12:27:55 UTC] PHP Warning:  Use of undefined constant SITE_URL - assumed 'SITE_URL' (this will throw an Error in a future version of PHP) in /home/reclydmy/public_html/azeem/pages/product/autoPay.php on line 41
+[15-Jul-2023 12:28:11 UTC] PHP Warning:  Use of undefined constant SITE_URL - assumed 'SITE_URL' (this will throw an Error in a future version of PHP) in /home/reclydmy/public_html/azeem/pages/product/autoPay.php on line 41

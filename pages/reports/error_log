@@ -1,0 +1,718 @@
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 473
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 476
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalPaid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 477
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 478
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 478
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: accounts in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 499
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 64 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 499
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: RECEIVING in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 499
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 499
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totals in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 500
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: RECEIVING in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 500
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 500
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 72 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 499
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: RECEIVING in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 499
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 499
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 240 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 499
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: RECEIVING in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 499
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 499
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 66 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 499
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: RECEIVING in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 499
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 499
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 65 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 499
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: RECEIVING in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 499
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 499
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 138 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 499
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: RECEIVING in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 499
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 499
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 68 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 499
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: RECEIVING in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 499
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 499
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 473
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 164 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 544
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: DIRECT_PAYMENT in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 544
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 544
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: DIRECT_PAYMENT in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 545
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 545
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 185 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 499
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: RECEIVING in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 499
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 499
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 186 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 499
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: RECEIVING in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 499
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 499
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 178 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 499
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: RECEIVING in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 499
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 499
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 473
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 473
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalPaid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 477
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 478
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 478
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 473
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: exp in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 482
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: total in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 489
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 489
+[09-Aug-2023 09:25:28 UTC] PHP Warning:  Cannot use a scalar value as an array in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 490
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 473
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 473
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 29 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 544
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: SALE_RETURN in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 544
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 544
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: SALE_RETURN in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 545
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 545
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 473
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 473
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalPaid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 477
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 478
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 478
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 473
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalPaid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 477
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 478
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 478
+[09-Aug-2023 09:25:28 UTC] PHP Warning:  Cannot use a scalar value as an array in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 490
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 473
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 473
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 2 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 476
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 2 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 478
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 473
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalPaid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 477
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 478
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 478
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 473
+[09-Aug-2023 09:25:28 UTC] PHP Warning:  Cannot use a scalar value as an array in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 490
+[09-Aug-2023 09:25:28 UTC] PHP Warning:  Cannot use a scalar value as an array in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 490
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 233 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 544
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: DIRECT_PAYMENT in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 544
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 544
+[09-Aug-2023 09:25:28 UTC] PHP Warning:  Cannot use a scalar value as an array in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 490
+[09-Aug-2023 09:25:28 UTC] PHP Warning:  Cannot use a scalar value as an array in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 490
+[09-Aug-2023 09:25:28 UTC] PHP Warning:  Cannot use a scalar value as an array in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 490
+[09-Aug-2023 09:25:28 UTC] PHP Warning:  Cannot use a scalar value as an array in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 490
+[09-Aug-2023 09:25:28 UTC] PHP Warning:  Cannot use a scalar value as an array in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 490
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 63 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 544
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: ADJUSTMENT in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 544
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 544
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: ADJUSTMENT in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 545
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 545
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 473
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 473
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalPaid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 477
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 478
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 478
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: grossCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 567
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 568
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 2 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 3 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 3 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalPaid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 577
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: discount in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 578
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalDiscount in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 578
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: grossCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 567
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 568
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 571
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 571
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 2 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 3 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalPaid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 577
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalPaid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 577
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: discount in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 578
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalDiscount in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 578
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: grossCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 567
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 568
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 571
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 571
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 2 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 3 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalPaid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 577
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalPaid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 577
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: discount in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 578
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalDiscount in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 578
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: grossCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 567
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 568
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 2 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 2 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 3 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 3 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalPaid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 577
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: discount in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 578
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalDiscount in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 578
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: grossCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 567
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 568
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 571
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 571
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 2 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 3 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalPaid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 577
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalPaid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 577
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: discount in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 578
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalDiscount in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 578
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: grossCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 567
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 568
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 571
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 571
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 2 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 3 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalPaid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 577
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalPaid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 577
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: discount in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 578
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalDiscount in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 578
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: grossCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 567
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 568
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 571
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 571
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 2 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 3 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalPaid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 577
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalPaid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 577
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: discount in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 578
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalDiscount in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 578
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: grossCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 567
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 568
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 571
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 571
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 2 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 3 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalPaid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 577
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalPaid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 577
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: discount in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 578
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalDiscount in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 578
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: grossCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 567
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 568
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 2 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 2 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 3 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 3 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalPaid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 577
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: discount in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 578
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalDiscount in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 578
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: grossCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 567
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 568
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 2 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 2 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 3 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 3 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalPaid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 577
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: discount in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 578
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalDiscount in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 578
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: grossCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 567
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 568
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 571
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 571
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 2 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 3 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalPaid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 577
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalPaid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 577
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: discount in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 578
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalDiscount in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 578
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: grossCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 567
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 568
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 571
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 571
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 2 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 3 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalPaid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 577
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalPaid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 577
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: discount in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 578
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalDiscount in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 578
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: grossCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 567
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 568
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 2 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 2 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 3 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 3 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalPaid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 577
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: discount in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 578
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalDiscount in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 578
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: grossCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 567
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 568
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 571
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 571
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 2 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 3 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalPaid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 577
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalPaid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 577
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: discount in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 578
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalDiscount in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 578
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: grossCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 567
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 568
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 571
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 571
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 2 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 3 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalPaid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 577
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalPaid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 577
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: discount in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 578
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalDiscount in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 578
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: grossCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 567
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 568
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 2 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 2 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 3 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 3 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalPaid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 577
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: discount in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 578
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: totalDiscount in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 578
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 604
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 2 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 604
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined offset: 3 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 604
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: grossCreditSales in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 607
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: grossCashSales in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 608
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: discount in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 609
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: netCreditSales in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 610
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: netCashSales in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 611
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: finalCashSales in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 612
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: transaction_date in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 614
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index:  in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 614
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: transaction_date in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 614
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: transaction_date in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 614
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: transaction_date in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 614
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: transaction_date in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 614
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: transaction_date in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 614
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: transaction_date in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 614
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: transaction_date in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 614
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: transaction_date in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 614
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: transaction_date in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 614
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: transaction_date in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 614
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: transaction_date in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 614
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: transaction_date in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 614
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: transaction_date in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 614
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: transaction_date in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 614
+[09-Aug-2023 09:25:28 UTC] PHP Notice:  Undefined index: transaction_date in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 614
+[09-Aug-2023 09:25:28 UTC] PHP Fatal error:  Uncaught Error: Unsupported operand types in /home/reclydmy/public_html/azeem/classes/doubleentry.php:643
+Stack trace:
+#0 /home/reclydmy/public_html/azeem/pages/reports/accounting.php(60): DoubleEntry->getClosingBalanceReport(Array)
+#1 /home/reclydmy/public_html/azeem/pages/reports/print.php(121): include_once('/home/reclydmy/...')
+#2 {main}
+  thrown in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 643
+[09-Aug-2023 09:31:04 UTC] PHP Notice:  Undefined index: totalCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 473
+[09-Aug-2023 09:31:04 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 476
+[09-Aug-2023 09:31:04 UTC] PHP Notice:  Undefined index: totalPaid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 477
+[09-Aug-2023 09:31:04 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 478
+[09-Aug-2023 09:31:04 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 478
+[09-Aug-2023 09:31:04 UTC] PHP Notice:  Undefined index: accounts in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 499
+[09-Aug-2023 09:31:04 UTC] PHP Notice:  Undefined offset: 64 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 499
+[09-Aug-2023 09:31:04 UTC] PHP Notice:  Undefined index: RECEIVING in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 499
+[09-Aug-2023 09:31:04 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 499
+[09-Aug-2023 09:31:04 UTC] PHP Notice:  Undefined index: totals in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 500
+[09-Aug-2023 09:31:04 UTC] PHP Notice:  Undefined index: RECEIVING in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 500
+[09-Aug-2023 09:31:04 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 500
+[09-Aug-2023 09:31:04 UTC] PHP Notice:  Undefined offset: 72 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 499
+[09-Aug-2023 09:31:04 UTC] PHP Notice:  Undefined index: RECEIVING in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 499
+[09-Aug-2023 09:31:04 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 499
+[09-Aug-2023 09:31:04 UTC] PHP Notice:  Undefined offset: 240 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 499
+[09-Aug-2023 09:31:04 UTC] PHP Notice:  Undefined index: RECEIVING in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 499
+[09-Aug-2023 09:31:04 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 499
+[09-Aug-2023 09:31:04 UTC] PHP Notice:  Undefined offset: 66 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 499
+[09-Aug-2023 09:31:04 UTC] PHP Notice:  Undefined index: RECEIVING in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 499
+[09-Aug-2023 09:31:04 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 499
+[09-Aug-2023 09:31:04 UTC] PHP Notice:  Undefined offset: 65 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 499
+[09-Aug-2023 09:31:04 UTC] PHP Notice:  Undefined index: RECEIVING in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 499
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 499
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 138 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 499
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: RECEIVING in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 499
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 499
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 68 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 499
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: RECEIVING in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 499
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 499
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: totalCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 473
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 164 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 544
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: DIRECT_PAYMENT in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 544
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 544
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: DIRECT_PAYMENT in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 545
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 545
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 185 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 499
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: RECEIVING in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 499
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 499
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 186 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 499
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: RECEIVING in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 499
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 499
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 178 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 499
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: RECEIVING in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 499
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 499
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: totalCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 473
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: totalCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 473
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: totalPaid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 477
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 478
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 478
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: totalCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 473
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: exp in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 482
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: total in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 489
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 489
+[09-Aug-2023 09:31:05 UTC] PHP Warning:  Cannot use a scalar value as an array in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 490
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: totalCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 473
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: totalCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 473
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 29 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 544
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: SALE_RETURN in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 544
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 544
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: SALE_RETURN in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 545
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 545
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: totalCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 473
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: totalCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 473
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: totalPaid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 477
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 478
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 478
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: totalCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 473
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: totalPaid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 477
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 478
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 478
+[09-Aug-2023 09:31:05 UTC] PHP Warning:  Cannot use a scalar value as an array in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 490
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: totalCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 473
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: totalCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 473
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 2 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 476
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 2 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 478
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: totalCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 473
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: totalPaid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 477
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 478
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 478
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: totalCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 473
+[09-Aug-2023 09:31:05 UTC] PHP Warning:  Cannot use a scalar value as an array in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 490
+[09-Aug-2023 09:31:05 UTC] PHP Warning:  Cannot use a scalar value as an array in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 490
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 233 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 544
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: DIRECT_PAYMENT in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 544
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 544
+[09-Aug-2023 09:31:05 UTC] PHP Warning:  Cannot use a scalar value as an array in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 490
+[09-Aug-2023 09:31:05 UTC] PHP Warning:  Cannot use a scalar value as an array in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 490
+[09-Aug-2023 09:31:05 UTC] PHP Warning:  Cannot use a scalar value as an array in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 490
+[09-Aug-2023 09:31:05 UTC] PHP Warning:  Cannot use a scalar value as an array in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 490
+[09-Aug-2023 09:31:05 UTC] PHP Warning:  Cannot use a scalar value as an array in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 490
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 63 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 544
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: ADJUSTMENT in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 544
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 544
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: ADJUSTMENT in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 545
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 545
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: totalCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 473
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: totalCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 473
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: totalPaid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 477
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 478
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 478
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: grossCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 567
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: totalCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 568
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 2 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 3 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 3 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: totalPaid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 577
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: discount in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 578
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: totalDiscount in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 578
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: grossCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 567
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: totalCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 568
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 571
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 571
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 2 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 3 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: totalPaid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 577
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: totalPaid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 577
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: discount in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 578
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: totalDiscount in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 578
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: grossCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 567
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: totalCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 568
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 571
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 571
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 2 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 3 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: totalPaid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 577
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: totalPaid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 577
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: discount in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 578
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: totalDiscount in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 578
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: grossCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 567
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: totalCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 568
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 2 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 2 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 3 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 3 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: totalPaid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 577
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: discount in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 578
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: totalDiscount in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 578
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: grossCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 567
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: totalCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 568
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 571
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 571
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 2 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 3 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: totalPaid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 577
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: totalPaid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 577
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: discount in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 578
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: totalDiscount in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 578
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: grossCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 567
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: totalCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 568
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 571
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 571
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 2 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 3 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: totalPaid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 577
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: totalPaid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 577
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: discount in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 578
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: totalDiscount in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 578
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: grossCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 567
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: totalCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 568
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 571
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 571
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 2 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 3 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: totalPaid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 577
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: totalPaid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 577
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: discount in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 578
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: totalDiscount in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 578
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: grossCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 567
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: totalCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 568
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 571
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 571
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 2 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 3 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: totalPaid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 577
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: totalPaid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 577
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: discount in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 578
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: totalDiscount in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 578
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: grossCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 567
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: totalCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 568
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 2 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 2 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 3 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 3 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: totalPaid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 577
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: discount in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 578
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: totalDiscount in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 578
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: grossCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 567
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: totalCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 568
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 2 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 2 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 3 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 3 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: totalPaid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 577
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: discount in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 578
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: totalDiscount in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 578
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: grossCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 567
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: totalCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 568
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 571
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 571
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 2 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 3 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: totalPaid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 577
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: totalPaid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 577
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: discount in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 578
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: totalDiscount in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 578
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: grossCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 567
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: totalCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 568
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 571
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 571
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 2 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 3 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: totalPaid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 577
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: totalPaid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 577
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: discount in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 578
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: totalDiscount in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 578
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: grossCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 567
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: totalCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 568
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 2 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 2 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 3 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 3 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: totalPaid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 577
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: discount in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 578
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: totalDiscount in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 578
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: grossCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 567
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: totalCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 568
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 571
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 571
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 2 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 3 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: totalPaid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 577
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: totalPaid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 577
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: discount in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 578
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: totalDiscount in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 578
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: grossCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 567
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: totalCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 568
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 571
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 571
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 2 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: paid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 3 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: totalPaid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 577
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: totalPaid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 577
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: discount in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 578
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: totalDiscount in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 578
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: grossCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 567
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: totalCredit in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 568
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 2 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 2 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 3 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 3 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 573
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: totalPaid in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 577
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: discount in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 578
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: totalDiscount in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 578
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 1 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 604
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 2 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 604
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined offset: 3 in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 604
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: grossCreditSales in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 607
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: grossCashSales in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 608
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: discount in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 609
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: netCreditSales in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 610
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: netCashSales in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 611
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: finalCashSales in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 612
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: transaction_date in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 614
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index:  in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 614
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: transaction_date in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 614
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: transaction_date in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 614
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: transaction_date in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 614
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: transaction_date in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 614
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: transaction_date in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 614
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: transaction_date in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 614
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: transaction_date in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 614
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: transaction_date in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 614
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: transaction_date in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 614
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: transaction_date in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 614
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: transaction_date in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 614
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: transaction_date in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 614
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: transaction_date in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 614
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: transaction_date in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 614
+[09-Aug-2023 09:31:05 UTC] PHP Notice:  Undefined index: transaction_date in /home/reclydmy/public_html/azeem/classes/doubleentry.php on line 614

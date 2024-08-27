@@ -1,0 +1,102 @@
+[12-Oct-2022 13:39:10 UTC] PHP Notice:  Undefined variable: loginPage in /home/reclydmy/public_html/azeem/include/settings.php on line 11
+[19-Mar-2024 13:21:59 Asia/Karachi] PHP Fatal error:  Uncaught Error: Class 'ConnectionPool' not found in /home/reclydmy/public_html/azeem/classes/connection.php:12
+Stack trace:
+#0 /home/reclydmy/public_html/azeem/login.php(27): Connection->__construct()
+#1 {main}
+  thrown in /home/reclydmy/public_html/azeem/classes/connection.php on line 12
+[19-Mar-2024 13:41:24 Asia/Karachi] PHP Notice:  Undefined index: title in /home/reclydmy/public_html/azeem/include/header.php on line 29
+[19-Mar-2024 13:41:24 Asia/Karachi] PHP Fatal error:  Uncaught Error: Class 'ConnectionPool' not found in /home/reclydmy/public_html/azeem/classes/connection.php:12
+Stack trace:
+#0 /home/reclydmy/public_html/azeem/include/owner.php(5): Connection->__construct()
+#1 /home/reclydmy/public_html/azeem/include/header.php(84): include_once('/home/reclydmy/...')
+#2 /home/reclydmy/public_html/azeem/index.php(6): mainHeader(Array)
+#3 {main}
+  thrown in /home/reclydmy/public_html/azeem/classes/connection.php on line 12
+[19-Mar-2024 13:41:44 Asia/Karachi] PHP Notice:  Undefined index: title in /home/reclydmy/public_html/azeem/include/header.php on line 29
+[19-Mar-2024 13:41:44 Asia/Karachi] PHP Fatal error:  Uncaught Error: Class 'ConnectionPool' not found in /home/reclydmy/public_html/azeem/classes/connection.php:12
+Stack trace:
+#0 /home/reclydmy/public_html/azeem/include/owner.php(5): Connection->__construct()
+#1 /home/reclydmy/public_html/azeem/include/header.php(84): include_once('/home/reclydmy/...')
+#2 /home/reclydmy/public_html/azeem/index.php(6): mainHeader(Array)
+#3 {main}
+  thrown in /home/reclydmy/public_html/azeem/classes/connection.php on line 12
+[19-Mar-2024 13:48:06 Asia/Karachi] PHP Fatal error:  Uncaught Error: Class 'ConnectionPool' not found in /home/reclydmy/public_html/azeem/classes/connection.php:4
+Stack trace:
+#0 /home/reclydmy/public_html/azeem/include/settings.php(112): require_once()
+#1 [internal function]: {closure}('Connection')
+#2 /home/reclydmy/public_html/azeem/classes/users.php(3): spl_autoload_call('Connection')
+#3 /home/reclydmy/public_html/azeem/include/settings.php(112): require_once('/home/reclydmy/...')
+#4 [internal function]: {closure}('Users')
+#5 /home/reclydmy/public_html/azeem/login.php(27): spl_autoload_call('Users')
+#6 {main}
+  thrown in /home/reclydmy/public_html/azeem/classes/connection.php on line 4
+[19-Mar-2024 13:51:00 Asia/Karachi] PHP Notice:  Undefined index: title in /home/reclydmy/public_html/azeem/include/header.php on line 29
+[19-Mar-2024 13:51:00 Asia/Karachi] PHP Notice:  Undefined index: page in /home/reclydmy/public_html/azeem/include/header.php on line 29
+[19-Mar-2024 13:51:00 Asia/Karachi] PHP Notice:  Undefined index:  in /home/reclydmy/public_html/azeem/include/header.php on line 29
+[19-Mar-2024 13:51:00 Asia/Karachi] PHP Notice:  Undefined index: role in /home/reclydmy/public_html/azeem/include/owner.php on line 6
+[19-Mar-2024 13:51:00 Asia/Karachi] PHP Notice:  Undefined index: created_by in /home/reclydmy/public_html/azeem/include/owner.php on line 6
+[19-Mar-2024 13:51:00 Asia/Karachi] PHP Notice:  Undefined index: owner_id in /home/reclydmy/public_html/azeem/include/owner.php on line 19
+[19-Mar-2024 13:51:00 Asia/Karachi] PHP Notice:  Undefined index: id in /home/reclydmy/public_html/azeem/include/owner.php on line 19
+[19-Mar-2024 13:51:00 Asia/Karachi] PHP Notice:  Undefined index: searchBy in /home/reclydmy/public_html/azeem/classes/products.php on line 208
+[19-Mar-2024 13:51:00 Asia/Karachi] PHP Notice:  Undefined index: searchBy in /home/reclydmy/public_html/azeem/classes/products.php on line 210
+[19-Mar-2024 13:51:00 Asia/Karachi] PHP Notice:  Undefined index: search in /home/reclydmy/public_html/azeem/classes/products.php on line 241
+[19-Mar-2024 13:51:00 Asia/Karachi] PHP Notice:  Undefined index: search in /home/reclydmy/public_html/azeem/classes/products.php on line 241
+[19-Mar-2024 13:51:00 Asia/Karachi] PHP Notice:  Undefined index: search in /home/reclydmy/public_html/azeem/classes/products.php on line 241
+[19-Mar-2024 13:51:00 Asia/Karachi] PHP Notice:  Undefined index: search in /home/reclydmy/public_html/azeem/classes/products.php on line 241
+[19-Mar-2024 13:51:00 Asia/Karachi] PHP Notice:  Undefined index: search in /home/reclydmy/public_html/azeem/classes/products.php on line 241
+[19-Mar-2024 13:51:00 Asia/Karachi] PHP Notice:  Undefined index: search in /home/reclydmy/public_html/azeem/classes/products.php on line 241
+[19-Mar-2024 13:51:00 Asia/Karachi] PHP Notice:  Undefined index: search in /home/reclydmy/public_html/azeem/classes/products.php on line 241
+[19-Mar-2024 13:51:00 Asia/Karachi] PHP Notice:  Undefined index: search in /home/reclydmy/public_html/azeem/classes/products.php on line 241
+[19-Mar-2024 13:51:00 Asia/Karachi] PHP Notice:  Undefined index: search in /home/reclydmy/public_html/azeem/classes/products.php on line 241
+[19-Mar-2024 13:51:00 Asia/Karachi] PHP Notice:  Undefined variable: minQry in /home/reclydmy/public_html/azeem/classes/products.php on line 292
+[19-Mar-2024 13:51:00 Asia/Karachi] PHP Notice:  Undefined variable: minQry in /home/reclydmy/public_html/azeem/classes/products.php on line 304
+[19-Mar-2024 13:51:00 Asia/Karachi] PHP Notice:  Undefined index: id in /home/reclydmy/public_html/azeem/include/owner.php on line 22
+[19-Mar-2024 13:51:00 Asia/Karachi] PHP Notice:  Undefined index: id in /home/reclydmy/public_html/azeem/include/owner.php on line 23
+[19-Mar-2024 13:51:00 Asia/Karachi] PHP Notice:  Undefined index: id in /home/reclydmy/public_html/azeem/include/owner.php on line 27
+[19-Mar-2024 13:51:00 Asia/Karachi] PHP Notice:  Undefined index: full_name in /home/reclydmy/public_html/azeem/include/owner.php on line 49
+[19-Mar-2024 13:51:00 Asia/Karachi] PHP Notice:  Undefined index: full_name in /home/reclydmy/public_html/azeem/include/owner.php on line 49
+[19-Mar-2024 13:51:00 Asia/Karachi] PHP Notice:  Undefined variable: list in /home/reclydmy/public_html/azeem/include/cart.php on line 62
+[19-Mar-2024 13:51:00 Asia/Karachi] PHP Notice:  Undefined index: page in /home/reclydmy/public_html/azeem/include/owner.php on line 215
+[19-Mar-2024 13:51:00 Asia/Karachi] PHP Notice:  Undefined index: page in /home/reclydmy/public_html/azeem/include/owner.php on line 218
+[19-Mar-2024 13:51:00 Asia/Karachi] PHP Notice:  Undefined index: page in /home/reclydmy/public_html/azeem/include/owner.php on line 221
+[19-Mar-2024 13:51:00 Asia/Karachi] PHP Notice:  Undefined index: page in /home/reclydmy/public_html/azeem/include/owner.php on line 224
+[19-Mar-2024 13:51:00 Asia/Karachi] PHP Notice:  Undefined index: page in /home/reclydmy/public_html/azeem/include/owner.php on line 227
+[19-Mar-2024 13:51:00 Asia/Karachi] PHP Notice:  Undefined index: page in /home/reclydmy/public_html/azeem/include/owner.php on line 231
+[19-Mar-2024 13:51:00 Asia/Karachi] PHP Notice:  Undefined index: page in /home/reclydmy/public_html/azeem/include/owner.php on line 235
+[19-Mar-2024 13:51:00 Asia/Karachi] PHP Notice:  Undefined index: page in /home/reclydmy/public_html/azeem/include/owner.php on line 238
+[19-Mar-2024 13:51:00 Asia/Karachi] PHP Notice:  Undefined index: page in /home/reclydmy/public_html/azeem/include/owner.php on line 243
+[19-Mar-2024 13:51:00 Asia/Karachi] PHP Notice:  Undefined index: page in /home/reclydmy/public_html/azeem/include/owner.php on line 246
+[19-Mar-2024 13:51:00 Asia/Karachi] PHP Notice:  Undefined index: page in /home/reclydmy/public_html/azeem/include/owner.php on line 249
+[19-Mar-2024 13:51:00 Asia/Karachi] PHP Notice:  Undefined index: page in /home/reclydmy/public_html/azeem/include/owner.php on line 252
+[19-Mar-2024 13:51:00 Asia/Karachi] PHP Notice:  Undefined index: page in /home/reclydmy/public_html/azeem/include/owner.php on line 255
+[19-Mar-2024 13:51:00 Asia/Karachi] PHP Notice:  Undefined index: page in /home/reclydmy/public_html/azeem/include/owner.php on line 258
+[19-Mar-2024 13:51:00 Asia/Karachi] PHP Notice:  Undefined index: page in /home/reclydmy/public_html/azeem/include/owner.php on line 262
+[19-Mar-2024 13:51:00 Asia/Karachi] PHP Notice:  Undefined index: page in /home/reclydmy/public_html/azeem/include/owner.php on line 265
+[19-Mar-2024 13:51:00 Asia/Karachi] PHP Notice:  Undefined index: page in /home/reclydmy/public_html/azeem/include/owner.php on line 268
+[19-Mar-2024 13:51:00 Asia/Karachi] PHP Notice:  Undefined index: page in /home/reclydmy/public_html/azeem/include/owner.php on line 271
+[19-Mar-2024 13:51:00 Asia/Karachi] PHP Notice:  Undefined index: page in /home/reclydmy/public_html/azeem/include/owner.php on line 274
+[19-Mar-2024 13:51:00 Asia/Karachi] PHP Notice:  Undefined index: page in /home/reclydmy/public_html/azeem/include/owner.php on line 277
+[19-Mar-2024 13:51:00 Asia/Karachi] PHP Notice:  Undefined index: page in /home/reclydmy/public_html/azeem/include/owner.php on line 280
+[19-Mar-2024 13:51:00 Asia/Karachi] PHP Notice:  Undefined index: page in /home/reclydmy/public_html/azeem/include/owner.php on line 283
+[19-Mar-2024 13:51:00 Asia/Karachi] PHP Notice:  Undefined index: page in /home/reclydmy/public_html/azeem/include/owner.php on line 286
+[19-Mar-2024 13:51:00 Asia/Karachi] PHP Notice:  Undefined index: page in /home/reclydmy/public_html/azeem/include/owner.php on line 289
+[19-Mar-2024 13:51:00 Asia/Karachi] PHP Notice:  Undefined index: page in /home/reclydmy/public_html/azeem/include/owner.php on line 292
+[19-Mar-2024 13:51:00 Asia/Karachi] PHP Notice:  Undefined index: page in /home/reclydmy/public_html/azeem/include/owner.php on line 295
+[19-Mar-2024 13:51:00 Asia/Karachi] PHP Notice:  Undefined index: page in /home/reclydmy/public_html/azeem/include/owner.php on line 298
+[19-Mar-2024 13:51:00 Asia/Karachi] PHP Notice:  Undefined index: page in /home/reclydmy/public_html/azeem/include/owner.php on line 301
+[19-Mar-2024 13:51:00 Asia/Karachi] PHP Notice:  Undefined index: title in /home/reclydmy/public_html/azeem/include/header.php on line 29
+[19-Mar-2024 13:51:00 Asia/Karachi] PHP Notice:  Undefined index: searchBy in /home/reclydmy/public_html/azeem/classes/products.php on line 208
+[19-Mar-2024 13:51:00 Asia/Karachi] PHP Notice:  Undefined index: searchBy in /home/reclydmy/public_html/azeem/classes/products.php on line 210
+[19-Mar-2024 13:51:00 Asia/Karachi] PHP Notice:  Undefined index: search in /home/reclydmy/public_html/azeem/classes/products.php on line 241
+[19-Mar-2024 13:51:00 Asia/Karachi] PHP Notice:  Undefined index: search in /home/reclydmy/public_html/azeem/classes/products.php on line 241
+[19-Mar-2024 13:51:00 Asia/Karachi] PHP Notice:  Undefined index: search in /home/reclydmy/public_html/azeem/classes/products.php on line 241
+[19-Mar-2024 13:51:00 Asia/Karachi] PHP Notice:  Undefined index: search in /home/reclydmy/public_html/azeem/classes/products.php on line 241
+[19-Mar-2024 13:51:00 Asia/Karachi] PHP Notice:  Undefined index: search in /home/reclydmy/public_html/azeem/classes/products.php on line 241
+[19-Mar-2024 13:51:00 Asia/Karachi] PHP Notice:  Undefined index: search in /home/reclydmy/public_html/azeem/classes/products.php on line 241
+[19-Mar-2024 13:51:00 Asia/Karachi] PHP Notice:  Undefined index: search in /home/reclydmy/public_html/azeem/classes/products.php on line 241
+[19-Mar-2024 13:51:00 Asia/Karachi] PHP Notice:  Undefined index: search in /home/reclydmy/public_html/azeem/classes/products.php on line 241
+[19-Mar-2024 13:51:00 Asia/Karachi] PHP Notice:  Undefined index: search in /home/reclydmy/public_html/azeem/classes/products.php on line 241
+[19-Mar-2024 13:51:00 Asia/Karachi] PHP Notice:  Undefined variable: minQry in /home/reclydmy/public_html/azeem/classes/products.php on line 292
+[19-Mar-2024 13:51:00 Asia/Karachi] PHP Notice:  Undefined variable: minQry in /home/reclydmy/public_html/azeem/classes/products.php on line 304
+[19-Mar-2024 13:51:01 Asia/Karachi] PHP Notice:  Undefined variable: list in /home/reclydmy/public_html/azeem/include/cart.php on line 62
+[19-Mar-2024 13:51:01 Asia/Karachi] PHP Notice:  Trying to access array offset on value of type null in /home/reclydmy/public_html/azeem/include/footer.php on line 33
