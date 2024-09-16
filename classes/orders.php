@@ -999,7 +999,7 @@ class Orders extends Connection
             }
 
             if(!empty($orderIds)) {
-                $stmt2 = "SELECT concat(p.id, ' | ', p.full_name, ' x ', sub.quantity) as product_title, o.id FROM `{$this->table}` AS o LEFT JOIN `{$this->table_sub}` as sub ON sub.order_id = o.id left join `{$this->table_pro}` as p on p.id=sub.product_id WHERE o.id IN (" . implode(',', $orderIds) . ") ORDER BY o.id desc";
+                $stmt2 = "SELECT concat(p.id, ' x ', sub.quantity) as product_title, o.id FROM `{$this->table}` AS o LEFT JOIN `{$this->table_sub}` as sub ON sub.order_id = o.id left join `{$this->table_pro}` as p on p.id=sub.product_id WHERE o.id IN (" . implode(',', $orderIds) . ") ORDER BY o.id desc";
                 $prepare2 = $dbh->prepare($stmt2);
                 $prepare2->execute();
                 $result2 = $prepare2->fetchAll(PDO::FETCH_ASSOC);
