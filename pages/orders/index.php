@@ -78,7 +78,9 @@ if ($userData['role'] == 'owner' || $userData['role'] == 'manager') {
 
                         </td>
                         <td>
-                            <span>{{row.order_custom_id}}</span> | {{row.customer_name || row.full_name}} | <span class="label label-default" style="margin-right: 4px; display: inline-block; font-weight: normal; font-size: 12px" ng-repeat="itm in row.items track by $index">{{itm}}</span><br />
+                            <span>{{row.order_custom_id}}</span> | {{row.customer_name || row.full_name}}
+                            <!-- <span class="label label-default" style="margin-right: 4px; display: inline-block; font-weight: normal; font-size: 12px" ng-repeat="itm in row.items track by $index">{{itm}}</span> -->
+                            <br />
                             <span ng-if="row.summery" style="opacity: 0.8; font-size: 0.8em">{{row.summery}}</span>
                         </td>
                         <td align="right">
