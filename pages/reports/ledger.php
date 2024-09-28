@@ -1,5 +1,4 @@
 <?php
-
 include_once dirname(__FILE__) . '/../../include/settings.php';
 include_once dirname(__FILE__) . '/../../../portal/mpdf/mpdf.php';
 $doubleEntry = new DoubleEntry();
@@ -10,10 +9,13 @@ $to = $_POST['to'];
 $account_id = $_POST['account_id'];
 $entries = $doubleEntry->getLedgerByAccount($_POST);
 // $entiresFinal = $entries['rows'];
+$totals = ['credit' => 0, 'debit' => 0];
 foreach ($entries['rows'] as $key => $value) {
     $entiresFinal[date('F-Y', strtotime($value['transaction_date']))]['rows'][] = $value;
     $entiresFinal[date('F-Y', strtotime($value['transaction_date']))]['totals']['credit'] += $value['creditAmount'];
     $entiresFinal[date('F-Y', strtotime($value['transaction_date']))]['totals']['debit'] += $value['debitAmount'];
+    $totals['credit'] += $value['creditAmount'];
+    $totals['debit'] += $value['debitAmount'];
 }
 
 $headers         = array();
@@ -24,10 +26,11 @@ $srNo             = true;
 $mediumFont        = false;
 
 $store = [];
+$shopAccounts = new ShopAccounts();
+$accountsData = $shopAccounts->getSAs($shop['id']);
 foreach ($accountsData as $a) {
     $store[$a['key_value']] = $a['account_id'];
 }
-
 $reportTitle = $shop['full_name'] . ' - ' . $shop['city'];
 
 $subtitle = "Payment Details for " . $entries['first']['title'];
@@ -96,6 +99,18 @@ ob_start();
             <th style="border: 1px solid">Opening Balance</th>
             <th style="border: 1px solid"><?php echo number_format($entries['first']['previousBalance']); ?></th>
         </tr>
+        <tr>
+            <th style="border: 1px solid">Closing Balance</th>
+            <th style="border: 1px solid"><?php echo number_format($entries['last']['balance']); ?></th>
+        </tr>
+        <tr>
+            <th style="border: 1px solid">Total Debit</th>
+            <th style="border: 1px solid"><?php echo number_format($totals['debit']); ?></th>
+        </tr>
+        <tr>
+            <th style="border: 1px solid">Total Credit</th>
+            <th style="border: 1px solid"><?php echo number_format($totals['credit']); ?></th>
+        </tr>
     </thead>
 </table>
 
@@ -129,6 +144,14 @@ foreach ($entiresFinal as $key => $rows) {
                 </tr>
             <?php } ?>
         </tbody>
+        <tfoot>
+            <tr>
+                <th colspan="3" align="right">Totals</th>
+                <th align="right"><?php echo number_format($rows['totals']['debit']);?></th>
+                <th align="right"><?php echo number_format($rows['totals']['credit']);?></th>
+                <th></th>
+            </tr>
+        </tfoot>
     </table>
 <?php
 }
