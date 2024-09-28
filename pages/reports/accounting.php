@@ -4,7 +4,7 @@ include_once dirname(__FILE__) . '/../../include/settings.php';
 
 $doubleEntry = new DoubleEntry();
 
-$params = array();
+$params = [];
 $from = $_POST['from'];
 $to = $_POST['to'];
 $params['shopId'] = isset($_POST['shopId']) && !empty(trim($_POST['shopId'])) ? $_POST['shopId'] : $shop['id'];

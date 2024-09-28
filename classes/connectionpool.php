@@ -13,10 +13,9 @@ class ConnectionPool
 	private $pass = ';4B)pQC=K0&v';
 
 	// private $host = 'localhost';
-	// private $dbname = 'reclydmy_azeem';
-	// private $user = 'root';
-	// private $pass = 'root';
-
+	// private $dbname = 'reclydmy_shops';
+	// private $user = 'reclydmy_shops';
+	// private $pass = 'RpASZkt4KiTX';
 
 
 

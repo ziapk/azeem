@@ -145,9 +145,11 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                                         <?php if ($isOwner) { ?>
                                             <label class="pull-left"><span style="vertical-align: middle; margin-left: 10px"><input type="checkbox" ng-model="wsp"></span> <span style="vertical-align: middle">WSP</span></label>
                                         <?php } ?>
+                                        
                                         <div class="pull-right">
-                                            <label><span style="vertical-align: middle">QF</span> <span style="vertical-align: middle; margin-left: 4px;"><input type="checkbox" name="qf" ng-model="qf"><span></label>
-                                            <label><span style="vertical-align: middle">Search Product</span> <span style="vertical-align: middle; margin-left: 4px"><input type="checkbox" name="focus" ng-model="focus"><span></label>
+                                            <label><span style="vertical-align: middle; margin-right: 4px;"><input type="checkbox" name="qf" ng-model="qf"></span> <span style="vertical-align: middle; display: inline-block">QF</span></label>
+                                            <label><span style="vertical-align: middle; margin-right: 4px"><input type="checkbox" name="focus" ng-model="focus"></span> <span style="vertical-align: middle; display: inline-block">SM</span></label>
+                                            <label><span style="vertical-align: middle; margin-right: 4px"><input type="checkbox" name="serverSide" ng-model="serverSide" ng-change="loadProduct()"></span> <span style="vertical-align: middle; display: inline-block">Search Product</span></label>
                                         </div>
                                     </th>
                                     <th width="100">
@@ -217,7 +219,7 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                 });
             };
         });
-        app.controller('cartController', function($scope, $http, $httpParamSerializerJQLike, $filter, $window, $timeout, $location, $anchorScroll) {
+        app.controller('cartController', function($scope, $http, $httpParamSerializerJQLike, $filter, $window, $timeout, $location, $anchorScroll, toaster) {
             $scope.mainList = $window.mainList?.records || [];
             $scope.shopId = '<?php echo $userData['shopId']; ?>';
             $scope.list = [];
@@ -521,6 +523,26 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                     $scope.total_discount_value = $scope.discountAmount;
                 }
 
+            }
+
+            $scope.loadProduct = function() {
+                $http.get("<?php echo SITE_URL ?>api/getProducts.php?perPage=10000&status=&racks=1&session=1")
+                    .then(function(response) {
+                        const records = response.data.records.map(({
+                            min_qty,
+                            other_codes,
+                            discount_amount,
+                            discount_type,
+                            board,
+                            cat_id,
+                            ...product
+                        }) =>
+                        product)
+                        $scope.mainList = response.data;
+                        toaster.success({
+                        body: 'Items Updated!'
+                        });
+                    });
             }
 
             $scope.initCheckKeypress = (evt) => {
@@ -868,7 +890,23 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
 
             $scope.searchProduct = function(term) {
                 const params = {};
-                if ($scope.focus === true) {
+                if ($scope.serverSide === true) {
+                    if ($scope.productCode) {
+                        const filteredArray = $scope.mainList?.filter(r => $scope.is_active ? r.is_active == 0 : r.is_active == 1).filter(r => {
+                            const txt = r.searchString.split('|').pop()?.toLowerCase();
+                            const exits = txt?.split(',')?.filter(tt => tt?.toLowerCase()?.startsWith($scope.productCode?.toLowerCase()));
+                            return exits.length;
+                        });
+                        const secondfilteredArray = term ? filteredArray.filter(obj => obj.searchString.toLowerCase().includes(term?.toLowerCase() || term)) : filteredArray;
+                        return secondfilteredArray;
+                    } else {
+                        const filteredArray = $scope.mainList?.records.filter(r => $scope.is_active ? r.is_active == 0 : r.is_active == 1).filter(r => r.id == term || r.code?.toLowerCase() == term?.toLowerCase() || r.searchString.split('|').pop()?.toLowerCase().includes(term?.toLowerCase()))
+                        const secondfilteredArray = !filteredArray.length ? $scope.mainList?.records.filter(r => $scope.is_active ? r.is_active == 0 : r.is_active == 1).filter(obj => obj.searchString.toLowerCase().includes(term?.toLowerCase() || term)) : filteredArray;
+                        return secondfilteredArray.slice(0, 30);
+
+                    }
+                }
+                else if ($scope.focus === true) {
                     params.term = parseFloat(term.split('-')[0]);
                     const item = window.mainList.records.filter(r => $scope.is_active ? r.is_active == 0 : r.is_active == 1).find(r => r.id == params.term || r.code == params.term || r.barcode == params.term || r.searchString?.split('|')?.pop()?.toLowerCase()?.includes(params?.term?.toString()?.toLowerCase()));
                     $scope.product = '';
