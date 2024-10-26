@@ -25,22 +25,27 @@ if(!empty($_FILES["file"]) && !empty($_FILES["file"]['name']))
 
 
         $final = [];
-        foreach ($worksheet as $key => $value) {
-            $final[$key] = [];  
-            foreach ($headerRow as $index => $heading) {
-                foreach ($_POST['row'] as $base => $baseValue) {
-                    if($baseValue == $heading) {
-                        $k = $base;
-                    }
-                }
-                $k = (!empty($k) ? $k : $heading);
-                $val = $value[$index];
-
-                if(!empty($k)) {
-                    $final[$key][$k] = $val;
+    foreach ($worksheet as $key => $value) {
+        $final[$key] = [];  
+        foreach ($headerRow as $index => $heading) {
+            foreach ($_POST['row'] as $base => $baseValue) {
+                if($baseValue == $heading) {
+                    $k = $base;
                 }
             }
+            if ($_POST['product_id'] == $heading) {
+                $k = 'product_id';
+            } elseif ($_POST['qty'] == $heading) {
+                $k = 'qty';
+            }
+            $k = (!empty($k) ? $k : $heading);
+            $val = $value[$index];
+
+            if(!empty($k)) {
+                $final[$key][$k] = $val;
+            }
         }
+    }
 
         $products = new Products();
         $shop_id = $shop['id'];
