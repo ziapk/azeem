@@ -10,13 +10,13 @@ echo mainHeader(['page' => 'inventory']);
         <form novalidate="" id="uploadForm">
             <div class="row">
                 <div class="col-sm-3 form-group">
-                    <input name="SheetName" class="form-control" required placeholder="Sheet Name" value="Sheet1">
+                    <input name="SheetName" ng-model="SheetName" class="form-control" required placeholder="Sheet Name" value="Sheet1">
                 </div>
                 <div class="col-sm-3 form-group">
-                    <input name="product_id" class="form-control" required placeholder="Enter Product ID Column" value="Product Id">
+                    <input name="product_id" ng-model="product_id" class="form-control" required placeholder="Enter Product ID Column" value="Product Id">
                 </div>
                 <div class="col-sm-3 form-group">
-                    <input name="qty" class="form-control" required placeholder="Enter Qty Column" value="Qty">
+                    <input name="qty" ng-model="qty" class="form-control" required placeholder="Enter Qty Column" value="Qty">
                 </div>
                 <div class="col-sm-12 form-group">
                     <input type="file" file-model="files" />
@@ -54,6 +54,9 @@ echo mainFooter([]);
             angular.forEach($scope.files, function(file) {
                 fd.append('file', file);
             });
+            fd.append('SheetName', $scope.SheetName);
+            fd.append('product_id', $scope.product_id);
+            fd.append('qty', $scope.qty);
             $http.post(site_url + 'api/importInventory.php', fd, {
                 transformRequest: angular.identity,
                 headers: {

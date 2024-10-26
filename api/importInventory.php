@@ -1,6 +1,7 @@
 <?php
 include_once dirname(__FILE__) . '/../../portal/vendor/autoload.php';
 include_once dirname(__FILE__) . '/../include/settings.php';
+error_reporting(1);
 include_once dirname(__FILE__) . '/../classes/products.php';
 
 use PhpOffice\PhpSpreadsheet\IOFactory;
