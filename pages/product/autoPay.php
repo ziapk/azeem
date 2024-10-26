@@ -64,6 +64,7 @@ echo mainFooter([]);
                 }
             }).then(function successCallback(d) {
                 console.log(d);
+                alert(d.data?.message)
             })
         }
     }]);
