@@ -1,41 +1,42 @@
-<?php
-include_once dirname(__FILE__) . '/../../portal/vendor/autoload.php';
-include_once dirname(__FILE__) . '/../include/settings.php';
-error_reporting(1);
-include_once dirname(__FILE__) . '/../classes/products.php';
-
-use PhpOffice\PhpSpreadsheet\IOFactory;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-
+<?php 
+try {
+include_once dirname(__FILE__).'/../../vendor/autoload.php';
+include_once dirname(__FILE__).'/../include/settings.php';
 $reader = new \PhpOffice\PhpSpreadsheet\Reader\Xlsx();
-
 header("Content-Type: application/json");
-if (!empty($_FILES["file"]) && !empty($_FILES["file"]['name'])) {
+if(!empty($_FILES["file"]) && !empty($_FILES["file"]['name']))
+{
     $allowed_extension = array('xls', 'xlsx');
     $file_array = explode(".", $_FILES['file']['name']);
     $file_extension = end($file_array);
     $data = [];
+    
 
     if (in_array($file_extension, $allowed_extension)) {
+
         $reader->setLoadSheetsOnly($_POST['SheetName']);
         $reader->setReadDataOnly(true);
         $spreadsheet = $reader->load($_FILES['file']['tmp_name']);
         $worksheet = $spreadsheet->getActiveSheet()->toArray();
 
-        if (sizeof($worksheet) > 1) {
+        if(sizeof($worksheet) > 1) {
             $headerRow = array_shift($worksheet);
         }
 
+
         $final = [];
         foreach ($worksheet as $key => $value) {
-            $final[$key] = [];
+            $final[$key] = [];  
             foreach ($headerRow as $index => $heading) {
-
-                $k = $heading;
+                foreach ($_POST['row'] as $base => $baseValue) {
+                    if($baseValue == $heading) {
+                        $k = $base;
+                    }
+                }
+                $k = (!empty($k) ? $k : $heading);
                 $val = $value[$index];
 
-                if (!empty($k)) {
-
+                if(!empty($k)) {
                     $final[$key][$k] = $val;
                 }
             }
@@ -65,4 +66,7 @@ if (!empty($_FILES["file"]) && !empty($_FILES["file"]['name'])) {
     }
 } else {
     echo json_encode(['status' => 400, 'message' => 'Please Select File']);
+}
+} catch (Exception $e) {
+    print_r($e);
 }
