@@ -1,6 +1,6 @@
 <?php 
 try {
-include_once dirname(__FILE__).'/../../vendor/autoload.php';
+include_once dirname(__FILE__).'/../../../vendor/autoload.php';
 include_once dirname(__FILE__).'/../include/settings.php';
 $reader = new \PhpOffice\PhpSpreadsheet\Reader\Xlsx();
 header("Content-Type: application/json");
