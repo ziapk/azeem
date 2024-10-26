@@ -62,10 +62,10 @@ if(!empty($_FILES["file"]) && !empty($_FILES["file"]['name']))
 
             $res[] = $row['product_id'];
             $test[] = $data;
-            // $products->maintainProductQty($data);
+            $products->maintainProductQty($data);
         }
         
-        echo json_encode(['status' => 200, 'message' => 'Successfully Import all data!', 'data' => $res, 'final' => $final, '$worksheet' => $worksheet, 'test' => $test]);
+        echo json_encode(['status' => 200, 'message' => 'Successfully Import all data!', 'data' => $res]);
     } else {
         echo json_encode(['status' => 400, 'message' => 'Only .xls or .xlsx file allowed']);
     }
