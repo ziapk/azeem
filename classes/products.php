@@ -1198,6 +1198,26 @@ class Products extends Connection
 		}
 	}
 
+	public function maintainProductQty($array = [])
+	{
+		$dbh = $this->connectionPool->getConnection();
+		try {
+			
+			$stmt = "UPDATE `{$this->table_st}` SET `qty`=:qty + stock_out WHERE product_id=:product_id and shopId = :shopId";
+
+			$prepare = $dbh->prepare($stmt);
+			$prepare->bindParam(':product_id', $array['product_id'], PDO::PARAM_INT);
+			$prepare->bindParam(':qty', $array['qty'], PDO::PARAM_INT);
+			$prepare->bindParam(':shopId', $array['shop_id'], PDO::PARAM_INT);
+			$prepare->execute();
+			$result = $prepare->rowCount();
+			return $result;
+		} catch (PDOException $e) {
+			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
+		}
+	}
 	public function addProductQty($id, $array, $shopId, $type = 1)
 	{
 		$dbh = $this->connectionPool->getConnection();
