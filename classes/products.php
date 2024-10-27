@@ -263,7 +263,7 @@ class Products extends Connection
 					$sortByQry = " ORDER BY p.price " . $order;
 				}
 				if ($name == 'stock') {
-					$sortByQry = " ORDER BY p.in_hand " . $order;
+					$sortByQry = " ORDER BY in_hand " . $order;
 				}
 			}
 
