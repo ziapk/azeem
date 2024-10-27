@@ -52,7 +52,7 @@ switch ($reportType) {
 	case '0':
 		$ownerId = $userData['role'] == 'owner' ? $userData['id'] : $userData['created_by'];
 		$publisher_id = !empty($_POST['publisher_id']) ? $_POST['publisher_id'] : "";
-		$search = $productObj->getOwnerProductsPagination($ownerId, ['page' => 1, 'perPage' => 100000, 'publisher_id' => $publisher_id, 'status' => [1]], $shopId);
+		$search = $productObj->getOwnerProductsPagination($ownerId, ['page' => 1, 'perPage' => 100000, 'publisher_id' => $publisher_id, 'status' => [1], 'sortByField' =>'stock', 'sortByOrder' => 'desc'], $shopId);
 		$orders = $search['records'];
 		$stores = new Store();
 		$selectShop = $stores->getStore($shopId);
