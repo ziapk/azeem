@@ -264,6 +264,9 @@ class Products extends Connection
 				}
 				if ($name == 'stock') {
 					$sortByQry = " ORDER BY p.in_hand " . $order;
+
+					print_r($params);
+					exit;
 				}
 			}
 
