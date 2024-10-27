@@ -263,7 +263,7 @@ class Products extends Connection
 					$sortByQry = " ORDER BY p.price " . $order;
 				}
 				if ($name == 'stock') {
-					$sortByQry = " ORDER BY qty " . $order;
+					$sortByQry = " ORDER BY p.publisher_id asc, qty " . $order;
 				}
 			}
 
