@@ -251,19 +251,19 @@ class Products extends Connection
 				$name = $params['sortByField'];
 				$order = $params['sortByOrder'];
 				if ($name == 'title') {
-					$sortByQry = " ORDER BY p.full_name " . $params['sortByOrder'];
+					$sortByQry = " ORDER BY p.full_name " . $order;
 				}
 				if ($name == 'group') {
-					$sortByQry = " ORDER BY p.group " . $params['sortByOrder'];
+					$sortByQry = " ORDER BY p.group " . $order;
 				}
 				if ($name == 'author') {
-					$sortByQry = " ORDER BY p.author " . $params['sortByOrder'];
+					$sortByQry = " ORDER BY p.author " . $order;
 				}
 				if ($name == 'price') {
-					$sortByQry = " ORDER BY p.price " . $params['sortByOrder'];
+					$sortByQry = " ORDER BY p.price " . $order;
 				}
 				if ($name == 'stock') {
-					$sortByQry = " ORDER BY p.in_hand " . $params['sortByOrder'];
+					$sortByQry = " ORDER BY p.in_hand " . $order;
 				}
 			}
 
