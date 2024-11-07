@@ -251,19 +251,19 @@ class Products extends Connection
 				$name = $params['sortByField'];
 				$order = $params['sortByOrder'];
 				if ($name == 'title') {
-					$sortByQry = " ORDER BY p.full_name " . $params['sortByOrder'];
+					$sortByQry = " ORDER BY p.full_name " . $order;
 				}
 				if ($name == 'group') {
-					$sortByQry = " ORDER BY p.group " . $params['sortByOrder'];
+					$sortByQry = " ORDER BY p.group " . $order;
 				}
 				if ($name == 'author') {
-					$sortByQry = " ORDER BY p.author " . $params['sortByOrder'];
+					$sortByQry = " ORDER BY p.author " . $order;
 				}
 				if ($name == 'price') {
-					$sortByQry = " ORDER BY p.price " . $params['sortByOrder'];
+					$sortByQry = " ORDER BY p.price " . $order;
 				}
 				if ($name == 'stock') {
-					$sortByQry = " ORDER BY p.in_hand " . $params['sortByOrder'];
+					$sortByQry = " ORDER BY p.publisher_id asc, qty " . $order;
 				}
 			}
 
@@ -290,6 +290,7 @@ class Products extends Connection
 			}
 
 			$stmt = "SELECT count(b.id) as count FROM (SELECT $mainCols FROM `{$this->table_st}` as sp $innerJoin LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id LEFT JOIN {$this->table_rack_products} as rp ON rp.product_id = p.id LEFT JOIN `{$this->table_rack}` as r on r.id = rp.rack_id LEFT JOIN program_books as c ON c.product_id = p.id LEFT JOIN publishers as pub on p.publisher_id = pub.id  WHERE p.`owner_id`=:owner_id $status_query $publisher_query $dup $type $pin $searchQry $catQry GROUP BY p.id $sortByQry $minQry) AS b";
+			
 			$prepare = $dbh->prepare($stmt);
 			$prepare->bindParam(':owner_id', $owner_id, PDO::PARAM_STR);
 			$prepare->execute();
@@ -302,6 +303,10 @@ class Products extends Connection
 			$offset =  ((!empty($currentPage) ? $currentPage : 1) - 1) * $no_of_records_per_page;
 
 			$stmt = "SELECT *, price, concat(`id`, '|', `price`, '|', `full_name`, '|', COALESCE(`publisherName`, ''), '|', COALESCE(`author`, ''), '|', COALESCE(`board`, ''), '|', COALESCE(`code`, ''), '|', COALESCE(`barcode`, ''), '|', COALESCE(`other_codes`, '')) as searchString FROM (SELECT $mainCols  FROM `{$this->table_st}` as sp $innerJoin LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id LEFT JOIN {$this->table_rack_products} as rp ON rp.product_id = p.id LEFT JOIN `{$this->table_rack}` as r on r.id = rp.rack_id LEFT JOIN program_books as c ON c.product_id = p.id LEFT JOIN publishers as pub on p.publisher_id = pub.id  WHERE p.`owner_id`=:owner_id $status_query $publisher_query $dup $type $pin $searchQry $catQry GROUP BY p.id $sortByQry $minQry LIMIT :offset, :perPage) AS b";
+			// if ($name == 'stock') {
+			// 	echo $stmt;
+			// 	exit;
+			// }
 			$prepare = $dbh->prepare($stmt);
 			$prepare->bindParam(':owner_id', $owner_id, PDO::PARAM_STR);
 			$prepare->bindParam(':offset', $offset, PDO::PARAM_INT);
@@ -1198,6 +1203,26 @@ class Products extends Connection
 		}
 	}
 
+	public function maintainProductQty($array = [])
+	{
+		$dbh = $this->connectionPool->getConnection();
+		try {
+			
+			$stmt = "UPDATE `{$this->table_st}` SET `qty`=:qty + stock_out WHERE product_id=:product_id and shopId = :shopId";
+
+			$prepare = $dbh->prepare($stmt);
+			$prepare->bindParam(':product_id', $array['product_id'], PDO::PARAM_INT);
+			$prepare->bindParam(':qty', $array['qty'], PDO::PARAM_INT);
+			$prepare->bindParam(':shopId', $array['shop_id'], PDO::PARAM_INT);
+			$prepare->execute();
+			$result = $prepare->rowCount();
+			return $result;
+		} catch (PDOException $e) {
+			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
+		}
+	}
 	public function addProductQty($id, $array, $shopId, $type = 1)
 	{
 		$dbh = $this->connectionPool->getConnection();

@@ -1,7 +1,7 @@
 <?php
 include_once dirname(__FILE__) . '/../../include/settings.php';
 
-echo mainHeader(['page' => 'assign']);
+echo mainHeader(['page' => 'inventory']);
 
 ?>
 <div class="main" ng-controller="myCtrl">
@@ -10,16 +10,13 @@ echo mainHeader(['page' => 'assign']);
         <form novalidate="" id="uploadForm">
             <div class="row">
                 <div class="col-sm-3 form-group">
-                    <input name="form.AmountColumn" class="form-control" required placeholder="Enter Total Fee Column" value="Amount">
+                    <input name="SheetName" ng-model="SheetName" class="form-control" required placeholder="Sheet Name" value="Sheet1">
                 </div>
                 <div class="col-sm-3 form-group">
-                    <input name="form.StudentIdColumn" class="form-control" required placeholder="Enter Student ID Column" value="Student Id">
+                    <input name="product_id" ng-model="product_id" class="form-control" required placeholder="Enter Product ID Column" value="Product Id">
                 </div>
                 <div class="col-sm-3 form-group">
-                    <input name="form.ReciptId" class="form-control" required placeholder="Enter Invoice ID Column" value="Recipt No">
-                </div>
-                <div class="col-sm-3 form-group">
-                    <input name="form.SheetName" class="form-control" required placeholder="Enter Excel Sheet Name" value="Sheet1">
+                    <input name="qty" ng-model="qty" class="form-control" required placeholder="Enter Qty Column" value="Qty">
                 </div>
                 <div class="col-sm-12 form-group">
                     <input type="file" file-model="files" />
@@ -57,13 +54,17 @@ echo mainFooter([]);
             angular.forEach($scope.files, function(file) {
                 fd.append('file', file);
             });
-            $http.post(site_url + 'api/importRacks.php', fd, {
+            fd.append('SheetName', $scope.SheetName);
+            fd.append('product_id', $scope.product_id);
+            fd.append('qty', $scope.qty);
+            $http.post(site_url + 'api/importInventory.php', fd, {
                 transformRequest: angular.identity,
                 headers: {
                     'Content-Type': undefined
                 }
             }).then(function successCallback(d) {
                 console.log(d);
+                alert(d.data?.message)
             })
         }
     }]);
