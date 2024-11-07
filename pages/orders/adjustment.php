@@ -166,6 +166,9 @@ echo mainHeader(['page' => 'sale_returns']);
                     <th colspan="2">
                         <?php if (!empty($order['order']['main_shop_rid']) && $order['order']['main_shop_rid'] == $userData['shopId'] && $userData['role'] === 'owner') { ?>
                             <a href="#" class="btn btn-danger" ng-click="checkout(2)"> Approve Return </a>
+                        <?php } 
+                        if ($userData['role'] === 'owner') { ?>
+                        <a href="#" class="btn btn-success pull-left" ng-click="checkout()">Park for Now</a>
                         <?php } ?>
                     </th>
                     <th colspan="7" class="text-right">
@@ -175,9 +178,11 @@ echo mainHeader(['page' => 'sale_returns']);
                                 {{li.title}}
                             </label>
                         </div>
-                        <?php if (!empty($order['order']['main_shop_rid']) && $order['order']['main_shop_rid'] == $userData['shopId'] && $userData['role'] === 'owner') { ?>
+                        <?php 
+                        if (!empty($order['order']['main_shop_rid']) && $order['order']['main_shop_rid'] == $userData['shopId'] && $userData['role'] === 'owner') { ?>
                             <a href="#" class="btn btn-success" ng-click="checkout()"> Save</a>
                         <?php } elseif ($userData['role'] === 'owner') { ?>
+                            
                             <a href="#" class="btn btn-primary" ng-click="checkout(2)"> Return Submit</a>
                         <?php } else { ?>
                             <a href="#" class="btn btn-success" ng-click="checkout()"> Save</a>
