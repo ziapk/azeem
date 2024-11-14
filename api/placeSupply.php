@@ -136,9 +136,15 @@ if (sizeof($_POST['items'])) {
 
 $supply = new Supply();
 
+$overide = $_POST['overide'];
+$saleDate = $shop['sale_date'];
+
 if (!empty($_POST['id'])) {
     $orderDetail = $supply->getOrder($_POST['id']);
     $currentStatus = $orderDetail['order']['status'];
+
+    $saleDate = !empty($overide) ? $orderDetail['order']['supply_date'] : $storeDATA['sale_date'];
+
     if (in_array($orderDetail['order']['status'], [2, 8, 9])) {
         // rollback products first
         foreach ($orderDetail['order_items'] as $prod) {
@@ -174,7 +180,7 @@ $data = [
     'supplier_type' => $_POST['supplier_type'],
     'id' => $_POST['id'],
     'shopId' => $userData['shopId'],
-    'supply_date' => $shop['sale_date']
+    'supply_date' => $saleDate
 ];
 
 $supply_id = $supply->createSupply($data);
@@ -220,7 +226,7 @@ if ($supply_id) {
 
         $makeTransaction = [
             'description' => !empty($data['description']) ? $data['description'] : "Supply Invoice: " . $supply_id . " PLACED",
-            'transaction_date' => $storeDATA['sale_date'],
+            'transaction_date' => $saleDate,
             'reference' => $data['ref_no'],
             'transaction_type' => !empty($credit_amount) ? 'EXCHANGE' : 'PURCHASE',
             'shopId' => $shop['id'],

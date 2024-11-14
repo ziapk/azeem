@@ -227,6 +227,7 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
             $scope.qf = false;
             $scope.sep = false;
             $scope.wsp = false;
+            $scope.overide = false;
             $scope.productCode = "";
 
             $scope.selectedList = {};
@@ -1042,7 +1043,8 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                         ref_no: $scope.ref_no,
                         id: $scope.data.order.id,
                         payment_mode: $scope.payment_mode,
-                        status: status || 2
+                        status: status || 2,
+                        overide: $scope.overide
                     }
 
                     $http.post("<?php echo SITE_URL ?>api/placeOrder.php", $httpParamSerializerJQLike($scope.form), {

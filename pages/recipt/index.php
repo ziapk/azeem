@@ -477,6 +477,9 @@ echo mainFooter();
         $scope.discount = 0;
         $scope.payment_mode = '1';
         $scope.payment_total = 0;
+        $scope.overide = false;
+
+
 
         $scope.addAllBooks = (books, key) => {
             books?.forEach(book => {
@@ -981,7 +984,8 @@ echo mainFooter();
                     id: $scope.id,
                     payment_mode: $scope.payment_mode,
                     status: status || 2,
-                    shopId: $scope.shopId
+                    shopId: $scope.shopId,
+                    overide: $scope.overide
                 }
 
 

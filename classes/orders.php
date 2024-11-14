@@ -206,6 +206,9 @@ class Orders extends Connection
                     $saleDiscount = $totalDiscount + $additionalDiscount;
                     $receivable = ($assetPrice - $saleDiscount) + $gst + $service_charges;
                     $defaultId = 0;
+                    
+                    $overide = $array['overide'];
+                    $saleDate = !empty($overide) ? $orderDetail['order']['order_date'] : $storeDATA['sale_date'];
 
                     foreach ($array['payment_with'] as $value) {
                         if (!empty($value['is_default'])) {
@@ -215,7 +218,7 @@ class Orders extends Connection
 
                     $makeTransaction = [
                         'description' => !empty($array['summery']) ? $array['summery'] : "ORDER ID: " . $orderDetail['order']['order_custom_id'] . " PLACED",
-                        'transaction_date' => $storeDATA['sale_date'],
+                        'transaction_date' => $saleDate,
                         'reference' => !empty($array['ref_no']) ? $array['ref_no'] : '',
                         'transaction_type' => 'SALE',
                         'shopId' => $shop['id'],
@@ -352,7 +355,7 @@ class Orders extends Connection
         $dbh = $this->connectionPool->getConnection();
         try {
             if (!empty($array['id'])) {
-                $stmt = "UPDATE `{$this->table}` SET `user_id`=:user_id, `customer_id`=:customer_id, `customer_name`=:customer_name, `status`=:status, `price`=:price, `paid_amount`=:paid_amount, `discount`=:discount, `shopId`=:shopId, `linked_shop`=:linked_shop, `order_date`=:order_date, `gst`=:gst, `service_charges`=:service_charges, `summery`=:summery, `ref_no`=:ref_no, `show_discount`=:show_discount, `show_bundle`=:show_bundle, status_id=:status_id, expected_delivery_date=:expected_delivery_date WHERE id=:id";
+                $stmt = "UPDATE `{$this->table}` SET `user_id`=:user_id, `customer_id`=:customer_id, `customer_name`=:customer_name, `status`=:status, `price`=:price, `paid_amount`=:paid_amount, `discount`=:discount, `shopId`=:shopId, `linked_shop`=:linked_shop, `gst`=:gst, `service_charges`=:service_charges, `summery`=:summery, `ref_no`=:ref_no, `show_discount`=:show_discount, `show_bundle`=:show_bundle, status_id=:status_id, expected_delivery_date=:expected_delivery_date WHERE id=:id";
                 $prepare = $dbh->prepare($stmt);
                 $prepare->bindParam(':user_id', $array['user_id'], PDO::PARAM_STR);
                 $prepare->bindParam(':customer_id', $array['customer_id'], PDO::PARAM_STR);
@@ -363,7 +366,7 @@ class Orders extends Connection
                 $prepare->bindParam(':discount', $array['discount'], PDO::PARAM_STR);
                 $prepare->bindParam(':shopId', $array['shopId'], PDO::PARAM_STR);
                 $prepare->bindParam(':linked_shop', $array['linked_shop'], PDO::PARAM_STR);
-                $prepare->bindParam(':order_date', $array['order_date'], PDO::PARAM_STR);
+                // $prepare->bindParam(':order_date', $array['order_date'], PDO::PARAM_STR);
                 $prepare->bindParam(':gst', $array['gst'], PDO::PARAM_STR);
                 $prepare->bindParam(':service_charges', $array['service_charges'], PDO::PARAM_STR);
                 $prepare->bindParam(':summery', $array['summery'], PDO::PARAM_STR);
@@ -1719,7 +1722,7 @@ class Orders extends Connection
         $ownerShopId = !empty($LinkedCustomer) ? $LinkedCustomer['shopId'] : (!empty($array['shopId']) ? $array['shopId'] : $user['shopId']);
 
         $array['supplierId'] = !empty($LinkedCustomer) ? $LinkedCustomer['id'] : $array['supplierId'];
-        $array['supplierName'] = !empty($LinkedCustomer) ? $LinkedCustomer['full_name'] : $array['supplierName'];
+        $array['supplierName'] = empty($array['supplierName']) && !empty($LinkedCustomer) ? $LinkedCustomer['full_name'] : $array['supplierName'];
 
         $selectedStoreDATA = $storeObj->getStore($shopId);
         $storeDATA = $storeObj->getStore($ownerShopId);
