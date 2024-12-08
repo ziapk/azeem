@@ -7,9 +7,11 @@ $qty = 0;
 foreach ($orders as $key => $value) {
     $array[$value['product_id']][$value['type']] = $value;
     $types[$value['type']] = !empty($types[$value['type']]) ? $types[$value['type']] : [];
+    $types[$value['type']]['discount'] = !empty($types[$value['type']]['discount']) ? $types[$value['type']]['discount'] : 0;
     $types[$value['type']]['qty'] = !empty($types[$value['type']]['qty']) ? $types[$value['type']]['qty'] : 0;
     $types[$value['type']]['total'] = !empty($types[$value['type']]['total']) ? $types[$value['type']]['total'] : 0;
     $types[$value['type']]['qty'] += $value['quantity'];
+    $types[$value['type']]['discount'] += $value['discount'];
     $types[$value['type']]['total'] += $value['quantity'] * $value['price'];
     $qty += $value['quantity'];
     $total += ($value['quantity'] * $value['price']);
@@ -25,28 +27,22 @@ foreach ($orders as $key => $value) {
             <th width="60">Sr.#</th>
             <th width="190">Product ID</th>
             <th>Product Title</th>
-            <?php foreach ($types as $row => $quantity) { ?>
-                <th><?php echo $returnArray[$row]['title']; ?></th>
-            <?php } ?>
             <th>Price</th>
+            <th>Qty</th>
+            <th>Disc.</th>
+            <th>Total</th>
         </tr>
     </thead>
     <tbody>
-        <?php $count = 1;
-        foreach ($array as $id => $rows) {
-            $keys = array_keys($rows); ?>
+        <?php $count = 1; foreach ($orders as $id => $row) { ?>
             <tr>
                 <td><?php echo $count; ?></td>
-                <td><?php echo $rows[$keys[0]]['product_id']; ?></td>
-                <td><?php echo $rows[$keys[0]]['full_name']; ?></td>
-                <?php foreach ($types as $type => $quantity) { ?>
-                    <th><?php if (!empty($rows[$type])) {
-                            echo $rows[$type]['quantity'];
-                        } else {
-                            echo '--';
-                        } ?></th>
-                <?php } ?>
-                <th><?php echo $rows[$keys[0]]['price']; ?></th>
+                <td><?php echo $row['product_id']; ?></td>
+                <td><?php echo $row['full_name']; ?></td>
+                <th><?php echo $row['price']; ?></th>
+                <td><?php echo $row['quantity']; ?></td>
+                <td><?php echo $row['discount']; ?></td>
+                <th><?php echo $row['quantity'] * $row['price'] - $row['discount']; ?></th>
             </tr>
         <?php $count++;
         } ?>
