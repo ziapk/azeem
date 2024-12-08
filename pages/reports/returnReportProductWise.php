@@ -25,6 +25,7 @@ foreach ($orders as $key => $value) {
     <thead>
         <tr>
             <th width="60">Sr.#</th>
+            <th width="190">R.Order ID</th>
             <th width="190">Product ID</th>
             <th>Product Title</th>
             <th>Price</th>
@@ -37,6 +38,7 @@ foreach ($orders as $key => $value) {
         <?php $count = 1; foreach ($orders as $id => $row) { ?>
             <tr>
                 <td><?php echo $count; ?></td>
+                <td><?php echo $row['return_id']; ?></td>
                 <td><?php echo $row['product_id']; ?></td>
                 <td><?php echo $row['full_name']; ?></td>
                 <th><?php echo $row['price']; ?></th>
