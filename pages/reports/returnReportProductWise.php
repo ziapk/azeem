@@ -38,7 +38,7 @@ foreach ($orders as $key => $value) {
         <?php $count = 1; foreach ($orders as $id => $row) { ?>
             <tr>
                 <td><?php echo $count; ?></td>
-                <td><?php echo $row['return_id']; ?></td>
+                <td><?php echo $row['order_id']; ?></td>
                 <td><?php echo $row['product_id']; ?></td>
                 <td><?php echo $row['full_name']; ?></td>
                 <th><?php echo $row['price']; ?></th>
