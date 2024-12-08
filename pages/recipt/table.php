@@ -95,7 +95,7 @@ foreach ($statuses as  $value) {
                 <button class="dropdown-toggle btn btn-primary" data-toggle="dropdown" style="padding-inline: 8px"><span class="fa fa-list"></span></button>
                 <form ng-submit="" class="dropdown-menu" style="padding: 10px; width: 300px">
                     <div class="input-group" style="width: 100%; margin-bottom: 4px" ng-repeat="it in cart.sizes track by $index">
-                        <input type="number" placeholder="Size" ng-change="calculateSum()" ng-model="it.size" type="text" class="form-control">
+                        <input type="text" placeholder="Size" ng-change="calculateSum()" ng-model="it.size" type="text" class="form-control">
                         <span class="input-group-btn" style="width: 104px;">
                             <input type="number" placeholder="Qty" ng-change="calculateSum()" ng-model="it.qty" type="text" class="form-control" style="margin-left: -1px">
                         </span>

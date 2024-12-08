@@ -951,7 +951,7 @@ echo mainFooter();
                                 if(i === 0) {
                                     des += " SIZES: ";
                                 }
-                                des += ' ' + r.size + '"/'+ r.qty +", ";
+                                des += ' ' + (isNaN(r.size) ? r.size : r.size +'"') + '/'+ r.qty +", ";
                             })
 
                         }
