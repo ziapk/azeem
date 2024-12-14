@@ -1,5 +1,12 @@
 <?php
 $totals = ['price' => 0, 'samples_qty' => 0, 'samples' => 0, 'discount' => 0, 'paid' => 0, 'balance' => 0];
+
+$groupOrders = [];
+foreach($orders['rows'] as $row) {
+    $c = !empty($s['customerName']) ? $s['customerName'] : $s['supplierName'];
+    $groupOrders[$c][] = $row;
+}
+
 ?>
 <center>
     <h2><?php echo !empty($reportTitle) ? $reportTitle : "Sales Orders"; ?></h2>
@@ -10,7 +17,6 @@ $totals = ['price' => 0, 'samples_qty' => 0, 'samples' => 0, 'discount' => 0, 'p
         <tr>
             <th>Sr.#</th>
             <th>Product ID</th>
-            <th>Customer</th>
             <th>Item</th>
             <th>Qty</th>
             <th>Price</th>
@@ -20,25 +26,32 @@ $totals = ['price' => 0, 'samples_qty' => 0, 'samples' => 0, 'discount' => 0, 'p
     </thead>
     <tbody>
         <?php $count = 1;
-        foreach ($orders['rows'] as $s) {
-                
-            $totals['discount'] += $s['discount'];
-            $totals['price'] += $s['price'];
-            $totals['pprice'] += $s['pprice'];
-            $totals['qty'] += $s['quantity'];
-
-        ?>
+        foreach ($groupOrders as $name => $rows) {
+            ?>
             <tr>
-                <td><?php echo $count; ?></td>
-                <td><?php echo $s['product_id']; ?></td>
-                <td><?php echo !empty($s['customerName']) ? $s['customerName'] : $s['supplierName']; ?></td>
-                <td><?php echo $s['full_name']; ?></td>
-                <td><?php echo $s['quantity']; ?></td>
-                <td><?php echo $s['price']; ?></td>
-                <td><?php echo $s['discount']; ?></td>
-                <td><?php echo $s['pprice']; ?></td>
+                <th colspan="7"><?php echo $name; ?></th>
             </tr>
-        <?php $count++;
+            <?php
+            foreach ($rows as $s) {
+                    
+                $totals['discount'] += $s['discount'];
+                $totals['price'] += $s['price'];
+                $totals['pprice'] += $s['pprice'];
+                $totals['qty'] += $s['quantity'];
+
+            ?>
+                <tr>
+                    <td><?php echo $count; ?></td>
+                    <td><?php echo $s['product_id']; ?></td>
+                    <td><?php echo !empty($s['customerName']) ? $s['customerName'] : $s['supplierName']; ?></td>
+                    <td><?php echo $s['full_name']; ?></td>
+                    <td><?php echo $s['quantity']; ?></td>
+                    <td><?php echo $s['price']; ?></td>
+                    <td><?php echo $s['discount']; ?></td>
+                    <td><?php echo $s['pprice']; ?></td>
+                </tr>
+            <?php $count++;
+            }
         } ?>
     </tbody>
 </table>
