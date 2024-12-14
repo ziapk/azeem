@@ -3,7 +3,7 @@ $totals = ['price' => 0, 'samples_qty' => 0, 'samples' => 0, 'discount' => 0, 'p
 
 $groupOrders = [];
 foreach($orders['rows'] as $row) {
-    $c = !empty($s['customerName']) ? $s['customerName'] : $s['supplierName'];
+    $c = !empty($row['customerName']) ? $row['customerName'] : $row['supplierName'];
     $groupOrders[$c][] = $row;
 }
 
