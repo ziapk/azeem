@@ -49,11 +49,15 @@ $totals = ['price' => 0, 'samples_qty' => 0, 'samples' => 0, 'discount' => 0, 'p
     <table class="table">
         <tr>
             <th align="left">Total Orders</th>
-            <td align="right"><?php echo sizeof($orders['summery']['total']); ?></td>
+            <td align="right"><?php echo $orders['summery']['total']; ?></td>
         </tr>
         <tr>
             <th align="left">Total Price</th>
             <td align="right"><?php echo number_format($totals['price']); ?></td>
+        </tr>
+        <tr>
+            <th align="left">Products</th>
+            <td align="right"><?php echo $count; ?></td>
         </tr>
         <tr>
             <th align="left">Total Products</th>
