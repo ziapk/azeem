@@ -15,6 +15,7 @@ $totals = ['price' => 0, 'samples_qty' => 0, 'samples' => 0, 'discount' => 0, 'p
             <th>Qty</th>
             <th>Price</th>
             <th>Discount</th>
+            <th>P.Price</th>
         </tr>
     </thead>
     <tbody>
@@ -39,8 +40,8 @@ $totals = ['price' => 0, 'samples_qty' => 0, 'samples' => 0, 'discount' => 0, 'p
                 <td><?php echo $s['full_name']; ?></td>
                 <td><?php echo $s['quantity']; ?></td>
                 <td><?php echo $s['price']; ?></td>
-                <td><?php echo $s['pprice']; ?></td>
                 <td><?php echo $s['discount']; ?></td>
+                <td><?php echo $s['pprice']; ?></td>
             </tr>
         <?php $count++;
         } ?>
