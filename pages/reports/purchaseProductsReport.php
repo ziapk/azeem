@@ -20,6 +20,7 @@ $totals = ['price' => 0, 'samples_qty' => 0, 'samples' => 0, 'discount' => 0, 'p
     </thead>
     <tbody>
         <?php $count = 1;
+        print_r($orders['summery']);
         foreach ($orders['rows'] as $s) {
             $tt = $s['pprice'];
 
