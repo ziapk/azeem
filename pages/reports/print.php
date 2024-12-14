@@ -86,15 +86,11 @@ switch ($reportType) {
 		}
 		$publisher_id = !empty($_POST['publisher_id']) ? $_POST['publisher_id'] : "";
 		$account_id = !empty($_POST['account_id']) ? $_POST['account_id'] : "";
-		if (!empty($product_ids)) {
-			$orders = $ordersObj->ordersReport($shopId, $from, $to, $product_ids, $publisher_id, $account_id);
-			$reportTitle = "Purchase Orders";
-			include_once dirname(__FILE__) . '/salesReport.php';
-		} else {
-			$orders = $ordersObj->ordersReport($shopId, $from, $to, $product_ids, $publisher_id, $account_id);
-			$reportTitle = "Purchase Orders";
-			include_once dirname(__FILE__) . '/salesReport.php';
-		}
+
+		$orders = $ordersObj->ordersReport($shopId, $from, $to, $product_ids, $publisher_id, $account_id);
+		$reportTitle = "Purchase Orders";
+		include_once dirname(__FILE__) . '/salesReport.php';
+
 		exit;
 		// $headers = ['Order #', 'Date', 'Customer Name', 'Price', 'Discount.', 'Paid', 'Status'];
 		// $columns = ['id', 'order_date', 'full_name', 'price', 'discount','paid_amount', 'status'];
