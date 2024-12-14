@@ -343,9 +343,9 @@ class Supply extends Connection
 
             $stmt = "SELECT oi.product_id, 
             sum(oi.quantity) AS quantity,
-            sum((oi.pprice * qty) - (oi.pprice * oi.quantity * oi.discount / 100)) AS pprice,
-            sum((oi.price * qty) - (oi.price * oi.quantity * oi.discount / 100)) AS price,
-            sum(oi.pprice * qty * oi.discount / 100) AS discount,
+            sum((oi.pprice * oi.quantity) - (oi.pprice * oi.quantity * oi.discount / 100)) AS pprice,
+            sum((oi.price * oi.quantity) - (oi.price * oi.quantity * oi.discount / 100)) AS price,
+            sum(oi.pprice * oi.quantity * oi.discount / 100) AS discount,
             p.full_name, c.full_name as customerName, s.name as supplierName  FROM `{$this->table}` AS o LEFT JOIN customers AS c ON c.id = o.supplier_id and o.supplier_type = 2 LEFT JOIN `{$this->table_suppliers}` AS s ON s.id = o.supplier_id and o.supplier_type = 1 LEFT JOIN `{$this->table_sub}` AS oi ON oi.supply_id=o.id LEFT JOIN `{$this->table_pro}` AS p on p.id=oi.product_id  WHERE o.shopId=:shopId " . $toCondition . ' and o.flag = 1 GROUP BY oi.product_id ORDER BY oi.quantity desc';
             $prepare = $dbh->prepare($stmt);
             $prepare->bindParam(':shopId', $shopId, PDO::PARAM_STR);
