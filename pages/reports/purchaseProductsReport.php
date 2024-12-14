@@ -57,7 +57,7 @@ $totals = ['price' => 0, 'samples_qty' => 0, 'samples' => 0, 'discount' => 0, 'p
         </tr>
         <tr>
             <th align="left">Products</th>
-            <td align="right"><?php echo $count; ?></td>
+            <td align="right"><?php echo sizeof($orders['rows']); ?></td>
         </tr>
         <tr>
             <th align="left">Total Products</th>
