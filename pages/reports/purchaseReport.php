@@ -17,6 +17,7 @@ $totals = ['price' => 0, 'discount' => 0, 'paid' => 0, 'balance' => 0];
             <th>Product Name</th>
             <th>Qty</th>
             <th>Price</th>
+            <th>P.Price</th>
             <th>Discount</th>
             <th>Total</th>
         </tr>
@@ -39,6 +40,7 @@ $totals = ['price' => 0, 'discount' => 0, 'paid' => 0, 'balance' => 0];
                 <td><?php echo !empty($s['productName']) ? $s['productName'] : (!empty($s['full_name']) ? $s['full_name'] : $s['productName']); ?></td>
                 <td><?php echo $s['quantity']; ?></td>
                 <td><?php echo $s['price']; ?></td>
+                <td><?php echo $s['pprice']; ?></td>
                 <td><?php echo $s['discount']; ?></td>
                 <td><?php echo $s['quantity'] * $s['price'] - $s['discount']; ?></td>
             </tr>
