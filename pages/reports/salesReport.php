@@ -12,6 +12,7 @@ $totals = ['price' => 0, 'discount' => 0, 'paid' => 0, 'balance' => 0];
             <th>Date</th>
             <th>Order #</th>
             <th>Product ID</th>
+            <th>Product Name</th>
             <th>Customer</th>
             <th>Price</th>
             <th>Discount</th>
@@ -34,6 +35,7 @@ $totals = ['price' => 0, 'discount' => 0, 'paid' => 0, 'balance' => 0];
                 <td><?php echo $s['order_custom_id']; ?></td>
                 <td><?php echo $s['product_id']; ?></td>
                 <td><?php echo !empty($s['customer_name']) ? $s['customer_name'] : (!empty($s['full_name']) ? $s['full_name'] : $s['name']); ?></td>
+                <td><?php echo !empty($s['productName']) ? $s['productName'] : (!empty($s['full_name']) ? $s['full_name'] : $s['productName']); ?></td>
                 <td><?php echo $s['price']; ?></td>
                 <td><?php echo $s['discount']; ?></td>
                 <td><?php echo $s['paid_amount']; ?></td>

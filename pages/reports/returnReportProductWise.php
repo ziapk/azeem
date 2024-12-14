@@ -4,7 +4,25 @@ $array = [];
 $types = [];
 $total = 0;
 $qty = 0;
+
+$customerDateWise = [];
+
+$initialValue = [
+    "total_amount" => 0,
+    "total_paid" => 0,
+    "total_discount" => 0,
+    "total_balance" => 0,
+    "orders" => []
+];
+
 foreach ($orders as $key => $value) {
+    $customerDateWise[$value['customer_id']] = empty($customerDateWise[$value['customer_id']]) ? $initialValue : $customerDateWise[$value['customer_id']];
+    $customerDateWise[$value['customer_id']][$value['return_date']] = empty($customerDateWise[$value['customer_id']][$value['return_date']]) ? [] : $customerDateWise[$value['customer_id']][$value['return_date']];
+
+
+    $customerDateWise[$value['customer_id']][$value['return_date']][] = $value;
+    
+    
     $array[$value['product_id']][$value['type']] = $value;
     $types[$value['type']] = !empty($types[$value['type']]) ? $types[$value['type']] : [];
     $types[$value['type']]['discount'] = !empty($types[$value['type']]['discount']) ? $types[$value['type']]['discount'] : 0;
