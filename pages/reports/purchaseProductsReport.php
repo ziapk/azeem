@@ -21,13 +21,11 @@ $totals = ['price' => 0, 'samples_qty' => 0, 'samples' => 0, 'discount' => 0, 'p
     <tbody>
         <?php $count = 1;
         foreach ($orders['rows'] as $s) {
-            $tt = $s['pprice'];
-
-                $totals['discount'] += $s['discount'];
-                $totals['price'] += $s['price'];
-                $totals['pprice'] += $s['pprice'];
-                $totals['qty'] += $s['quantity'];
-            }
+                
+            $totals['discount'] += $s['discount'];
+            $totals['price'] += $s['price'];
+            $totals['pprice'] += $s['pprice'];
+            $totals['qty'] += $s['quantity'];
 
         ?>
             <tr>
@@ -44,6 +42,8 @@ $totals = ['price' => 0, 'samples_qty' => 0, 'samples' => 0, 'discount' => 0, 'p
         } ?>
     </tbody>
 </table>
+
+
 <div style="width: 40%">
     <h3>Summery</h3>
     <table class="table">
