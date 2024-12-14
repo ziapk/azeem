@@ -1,7 +1,6 @@
 <?php
 $totals = ['price' => 0, 'discount' => 0, 'paid' => 0, 'balance' => 0];
 
-print_r($orders[0]);exit;
 ?>
 <center>
     <h2><?php echo !empty($reportTitle) ? $reportTitle : "Sales Orders"; ?></h2>
@@ -18,8 +17,7 @@ print_r($orders[0]);exit;
             <th>Product Name</th>
             <th>Price</th>
             <th>Discount</th>
-            <th>Paid</th>
-            <th>Balance</th>
+            <th>Total</th>
         </tr>
     </thead>
     <tbody>
@@ -40,8 +38,7 @@ print_r($orders[0]);exit;
                 <td><?php echo !empty($s['productName']) ? $s['productName'] : (!empty($s['full_name']) ? $s['full_name'] : $s['productName']); ?></td>
                 <td><?php echo $s['price']; ?></td>
                 <td><?php echo $s['discount']; ?></td>
-                <td><?php echo $s['paid_amount']; ?></td>
-                <td><?php echo $s['price'] - $s['discount'] - $s['paid_amount']; ?></td>
+                <td><?php echo $s['quantity'] * $s['price'] - $s['discount']; ?></td>
             </tr>
         <?php $count++;
         } ?>
