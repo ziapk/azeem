@@ -21,6 +21,7 @@ $totals = ['price' => 0, 'samples_qty' => 0, 'samples' => 0, 'discount' => 0, 'p
     </thead>
     <tbody>
         <?php $count = 1;
+        print_r($orders);exit;
         foreach ($orders as $s) {
             $tt = $s['price'] - $s['discount'];
 
