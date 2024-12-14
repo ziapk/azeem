@@ -89,7 +89,7 @@ switch ($reportType) {
 
 		$orders = $ordersObj->ordersReport($shopId, $from, $to, $product_ids, $publisher_id, $account_id);
 		$reportTitle = "Purchase Orders";
-		include_once dirname(__FILE__) . '/salesReport.php';
+		include_once dirname(__FILE__) . '/purchaseReport.php';
 
 		exit;
 		// $headers = ['Order #', 'Date', 'Customer Name', 'Price', 'Discount.', 'Paid', 'Status'];
