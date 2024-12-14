@@ -41,7 +41,7 @@ $totals = ['price' => 0, 'discount' => 0, 'paid' => 0, 'balance' => 0];
                 <td><?php echo $s['quantity']; ?></td>
                 <td><?php echo $s['price']; ?></td>
                 <td><?php echo $s['pprice']; ?></td>
-                <td><?php echo $s['price'] - $s['pprice']; ?></td>
+                <td><?php echo $s['tdiscount']; ?></td>
                 <td><?php echo $s['tprice']; ?></td>
             </tr>
         <?php $count++;
