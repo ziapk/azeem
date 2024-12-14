@@ -22,18 +22,16 @@ $totals = ['price' => 0, 'samples_qty' => 0, 'samples' => 0, 'discount' => 0, 'p
     <tbody>
         <?php $count = 1;
         foreach ($orders['rows'] as $s) {
-            $tt = $s['price'] - $s['discount'];
+            $tt = $s['pprice'];
 
             if ($tt == 0) {
-                $totals['samples'] += $s['price'] * $s['quantity'];
+                $totals['samples'] += $s['pprice'] * $s['quantity'];
                 $totals['samples_qty'] += $s['quantity'];
             } else {
-                $totals['discount'] += $s['discount'] * $s['quantity'];
-                $totals['price'] += $s['price'] * $s['quantity'];
+                $totals['discount'] += $s['discount'];
+                $totals['price'] += $s['pprice'];
                 $totals['qty'] += $s['quantity'];
             }
-
-            $distPrice = $s['price'] - ($s['price'] * ($s['discount'] / 100));
 
         ?>
             <tr>
@@ -41,12 +39,12 @@ $totals = ['price' => 0, 'samples_qty' => 0, 'samples' => 0, 'discount' => 0, 'p
                 <td><?php echo dateToSimple(date('Y-m-d', strtotime($s['order_date']))); ?></td>
                 <td><?php echo $s['order_custom_id']; ?></td>
                 <td><?php echo $s['product_id']; ?></td>
-                <td><?php echo !empty($s['full_name']) ? $s['full_name'] : $s['name']; ?></td>
-                <td><?php echo $s['productName']; ?></td>
+                <td><?php echo !empty($s['customerName']) ? $s['customerName'] : $s['supplierName']; ?></td>
+                <td><?php echo $s['full_name']; ?></td>
                 <td><?php echo $s['quantity']; ?></td>
-                <td><?php echo $distPrice; ?></td>
+                <td><?php echo $s['pprice']; ?></td>
                 <td><?php echo $s['discount']; ?></td>
-                <td><?php echo $distPrice * $s['quantity']; ?></td>
+                <td><?php echo $s['pprice']; ?></td>
             </tr>
         <?php $count++;
         } ?>
