@@ -281,13 +281,17 @@ class Supply extends Connection
         }
     }
 
-    public function ordersReportSummery($shopId, $date, $to, $publisher_id = null, $product_id = [])
+    public function ordersReportSummery($shopId, $date, $to, $publisher_id = null, $product_id = [], $account_id = null)
     {
         $dbh = $this->connectionPool->getConnection();
         try {
 
             $toCondition = " AND o.supply_date>='" . $date . "' AND o.supply_date<='" . $to . "'";
 
+
+            if (!empty($account_id)) {
+                $toCondition .= " AND (s.account_id=$account_id OR c.account_id=$account_id) ";
+            }
 
             $join = "";
             if (!empty($publisher_id) || !empty($product_id)) {
@@ -301,7 +305,7 @@ class Supply extends Connection
                 $toCondition .= " and p.id IN( $ids ) ";
             }
 
-            $stmt = "SELECT count(o.id) AS total, ROUND(SUM(o.price), 2) AS gross, ROUND(SUM(o.discount), 2) AS dist, ROUND(SUM(o.payment_amount), 2) AS paid, ROUND(SUM(o.`price` - o.`discount` - o.`payment_amount`), 2) AS balance FROM `{$this->table}` AS o " . $join . " WHERE o.shopId=:shopId " . $toCondition . ' and o.flag = 1 ORDER BY o.id desc';
+            $stmt = "SELECT count(o.id) AS total, ROUND(SUM(o.price), 2) AS gross, ROUND(SUM(o.discount), 2) AS dist, ROUND(SUM(o.payment_amount), 2) AS paid, ROUND(SUM(o.`price` - o.`discount` - o.`payment_amount`), 2) AS balance FROM `{$this->table}` AS o LEFT JOIN customers AS c ON c.id = o.supplier_id and o.supplier_type = 2 LEFT JOIN `{$this->table_suppliers}` AS s ON s.id = o.supplier_id and o.supplier_type = 1 " . $join . " WHERE o.shopId=:shopId " . $toCondition . ' and o.flag = 1 ORDER BY o.id desc';
             $prepare = $dbh->prepare($stmt);
             $prepare->bindParam(':shopId', $shopId, PDO::PARAM_STR);
             $prepare->execute();
@@ -314,12 +318,12 @@ class Supply extends Connection
         }
     }
 
-    public function ordersReportProductWise($shopId, $date, $to, $publisher_id = null, $product_id = [])
+    public function ordersReportProductWise($shopId, $date, $to, $publisher_id = null, $product_id = [], $account_id = null)
     {
         $dbh = $this->connectionPool->getConnection();
         try {
 
-            $summery = $this->ordersReportSummery($shopId, $date, $to, $publisher_id, $product_id);
+            $summery = $this->ordersReportSummery($shopId, $date, $to, $publisher_id, $product_id, $account_id);
 
             $toCondition = " AND o.supply_date>='" . $date . "' AND o.supply_date<='" . $to . "'";
 
@@ -331,8 +335,13 @@ class Supply extends Connection
                 $toCondition .= " and p.id IN( $ids ) ";
             }
 
+            if (!empty($account_id)) {
+                $toCondition .= " AND (s.account_id=$account_id OR c.account_id=$account_id) ";
+            }
 
-            $stmt = "SELECT oi.product_id, oi.price AS price, sum(oi.quantity) AS quantity, p.full_name  FROM `{$this->table}` AS o LEFT JOIN `{$this->table_sub}` AS oi ON oi.supply_id=o.id LEFT JOIN `{$this->table_pro}` AS p on p.id=oi.product_id  WHERE o.shopId=:shopId " . $toCondition . ' and o.flag = 1 GROUP BY oi.product_id ORDER BY oi.quantity desc';
+
+
+            $stmt = "SELECT oi.product_id, oi.price AS price, sum(oi.quantity) AS quantity, p.full_name, c.full_name as customerName, s.name as supplierName  FROM `{$this->table}` AS o LEFT JOIN customers AS c ON c.id = o.supplier_id and o.supplier_type = 2 LEFT JOIN `{$this->table_suppliers}` AS s ON s.id = o.supplier_id and o.supplier_type = 1 LEFT JOIN `{$this->table_sub}` AS oi ON oi.supply_id=o.id LEFT JOIN `{$this->table_pro}` AS p on p.id=oi.product_id  WHERE o.shopId=:shopId " . $toCondition . ' and o.flag = 1 GROUP BY oi.product_id ORDER BY oi.quantity desc';
             $prepare = $dbh->prepare($stmt);
             $prepare->bindParam(':shopId', $shopId, PDO::PARAM_STR);
             $prepare->execute();
