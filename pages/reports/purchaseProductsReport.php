@@ -25,8 +25,9 @@ foreach($orders['rows'] as $row) {
         </tr>
     </thead>
     <tbody>
-        <?php $count = 1;
+        <?php 
         foreach ($groupOrders as $name => $rows) {
+            $count = 1;
             ?>
             <tr>
                 <th colspan="7"><?php echo $name; ?></th>
