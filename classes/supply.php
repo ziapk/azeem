@@ -339,14 +339,7 @@ class Supply extends Connection
                 $toCondition .= " AND (s.account_id=$account_id OR c.account_id=$account_id) ";
             }
 
-
-
-            $stmt = "SELECT oi.product_id, 
-            sum(oi.quantity) AS quantity,
-            round(sum((oi.pprice * oi.quantity) - (oi.pprice * oi.quantity * oi.discount / 100)), 2) AS pprice,
-            round(sum((oi.price * oi.quantity) - (oi.price * oi.quantity * oi.discount / 100)), 2) AS price,
-            round(sum(oi.pprice * oi.quantity * oi.discount / 100), 2) AS discount,
-            p.full_name, c.full_name as customerName, s.name as supplierName  FROM `{$this->table}` AS o LEFT JOIN customers AS c ON c.id = o.supplier_id and o.supplier_type = 2 LEFT JOIN `{$this->table_suppliers}` AS s ON s.id = o.supplier_id and o.supplier_type = 1 LEFT JOIN `{$this->table_sub}` AS oi ON oi.supply_id=o.id LEFT JOIN `{$this->table_pro}` AS p on p.id=oi.product_id  WHERE o.shopId=:shopId " . $toCondition . ' and o.flag = 1 GROUP BY oi.product_id ORDER BY oi.quantity desc';
+            $stmt = "SELECT oi.product_id, sum(oi.quantity) AS quantity, round(sum((oi.pprice * oi.quantity) - (oi.pprice * oi.quantity * oi.discount / 100)), 2) AS pprice, round(sum((oi.price * oi.quantity) - (oi.price * oi.quantity * oi.discount / 100)), 2) AS price, round(sum(oi.pprice * oi.quantity * oi.discount / 100), 2) AS discount, p.full_name, c.full_name as customerName, s.name as supplierName  FROM `{$this->table}` AS o LEFT JOIN customers AS c ON c.id = o.supplier_id and o.supplier_type = 2 LEFT JOIN `{$this->table_suppliers}` AS s ON s.id = o.supplier_id and o.supplier_type = 1 LEFT JOIN `{$this->table_sub}` AS oi ON oi.supply_id=o.id LEFT JOIN `{$this->table_pro}` AS p on p.id=oi.product_id  WHERE o.shopId=:shopId " . $toCondition . ' and o.flag = 1 GROUP BY oi.product_id ORDER BY p.full_name asc';
             $prepare = $dbh->prepare($stmt);
             $prepare->bindParam(':shopId', $shopId, PDO::PARAM_STR);
             $prepare->execute();
