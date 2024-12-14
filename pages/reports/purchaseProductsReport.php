@@ -43,7 +43,6 @@ foreach($orders['rows'] as $row) {
                 <tr>
                     <td><?php echo $count; ?></td>
                     <td><?php echo $s['product_id']; ?></td>
-                    <td><?php echo !empty($s['customerName']) ? $s['customerName'] : $s['supplierName']; ?></td>
                     <td><?php echo $s['full_name']; ?></td>
                     <td><?php echo $s['quantity']; ?></td>
                     <td><?php echo $s['price']; ?></td>
