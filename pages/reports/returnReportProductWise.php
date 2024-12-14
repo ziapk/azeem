@@ -15,6 +15,8 @@ $initialValue = [
     "orders" => []
 ];
 
+print_r($orders['summery']);
+
 foreach ($orders as $key => $value) {
     $customerDateWise[$value['customer_id']] = empty($customerDateWise[$value['customer_id']]) ? $initialValue : $customerDateWise[$value['customer_id']];
     $customerDateWise[$value['customer_id']][$value['return_date']] = empty($customerDateWise[$value['customer_id']][$value['return_date']]) ? [] : $customerDateWise[$value['customer_id']][$value['return_date']];
@@ -61,7 +63,7 @@ foreach ($orders as $key => $value) {
                 <td><?php echo $row['product_id']; ?></td>
                 <td><?php echo $row['full_name']; ?></td>
                 <td><?php echo $row['customer_name']; ?></td>
-                <th><?php echo $row['price']; ?></th>
+                <th><?php echo $row['pprice']; ?></th>
                 <td><?php echo $row['quantity']; ?></td>
                 <td><?php echo $row['discount']; ?></td>
                 <th><?php echo $row['quantity'] * $row['price'] - $row['discount']; ?></th>
