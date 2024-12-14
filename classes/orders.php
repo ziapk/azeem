@@ -1544,7 +1544,7 @@ class Orders extends Connection
         try {
 
             $toCondition = " AND o.return_date>='" . $date . "' AND o.return_date<='" . $to . "'";
-            $stmt = "SELECT o.discount as discount_on_return, rp.*, p.full_name, customer_name  FROM `{$this->table_ro}` AS o LEFT JOIN `{$this->table_rp}` AS rp ON rp.order_id = o.id LEFT JOIN `{$this->table_pro}` AS p on p.id=rp.product_id  WHERE o.shopId=:shopId " . $toCondition . ' and o.flag = 2';
+            $stmt = "SELECT o.discount as discount_on_return, rp.*, p.full_name, return_date, customer_id, customer_name  FROM `{$this->table_ro}` AS o LEFT JOIN `{$this->table_rp}` AS rp ON rp.order_id = o.id LEFT JOIN `{$this->table_pro}` AS p on p.id=rp.product_id  WHERE o.shopId=:shopId " . $toCondition . ' and o.flag = 2';
             $prepare = $dbh->prepare($stmt);
             $prepare->bindParam(':shopId', $shopId, PDO::PARAM_STR);
             $prepare->execute();

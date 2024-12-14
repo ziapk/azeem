@@ -94,11 +94,17 @@ echo mainHeader(['page' => 'reports']);
                 <label>Select Report</label>
                 <select class="form-control" name="reportType" ng-change="checkReport(reportType)" ng-model="reportType">
                     <option value="">Select a Report</option>
-                    <?php foreach ($reportsArray as $value) {
-                        if (in_array($userData['role'], $value['access'])) { ?>
-                            <option value="<?php echo $value['id']; ?>"><?php echo $value['title']; ?></option>
-                    <?php }
-                    } ?>
+                    <?php 
+                    
+                    foreach ($groupedReports as $category => $reports) {
+                        echo '<optgroup label="' . htmlspecialchars($category) . '">';
+                        foreach ($reports as $key => $report) {
+                            echo '<option value="' . $report['id'] . '">' . htmlspecialchars($report['title']) . '</option>';
+                        }
+                        echo '</optgroup>';
+                    }
+                    
+                    ?>
                 </select>
             </div>
         </div>

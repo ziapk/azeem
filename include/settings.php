@@ -184,8 +184,8 @@ $reportsArray = [
     8 => ['id' => 8, 'title' => 'Expense Report', 'access' => ['shopkeeper', 'owner', 'manager']],
     9 => ['id' => 9, 'title' => 'Expense Summery Report', 'access' => ['shopkeeper', 'owner', 'manager']],
     10 => ['id' => 10, 'title' => 'Closing Balance Report', 'access' => ['shopkeeper', 'owner', 'manager']],
-    11 => array('id' => 11, 'access' => ['owner', 'manager'], 'title' => 'Trial Balance'),
-    12 => array('id' => 12, 'access' => ['owner', 'manager'], 'title' => 'Profit and Loss'),
+    11 => ['id' => 11, 'title' => 'Trial Balance', 'access' => ['owner', 'manager'] ],
+    12 => ['id' => 12, 'title' => 'Profit and Loss', 'access' => ['owner', 'manager'] ],
     13 => ['id' => 13, 'title' => 'Account Ledger', 'access' => ['owner', 'manager']],
     14 => ['id' => 14, 'title' => 'EasyPaisa &amp; Bank Report', 'access' => ['owner', 'manager']],
     15 => ['id' => 15, 'title' => 'EasyPaisa &amp; Bank Report (Summery)', 'access' => ['owner', 'manager']],
@@ -198,6 +198,27 @@ $reportsArray = [
     22 => ['id' => 22, 'title' => 'Payments Records', 'access' => ['owner', 'manager']],
     23 => ['id' => 23, 'title' => 'Adjustment Records', 'access' => ['owner', 'manager']],
 ];
+
+$categories = [
+    'Inventory' => [0, 16],       // Report IDs belonging to Sales
+    'Sales' => [1, 2, 3],       // Report IDs belonging to Sales
+    'Purchase' => [17,18,],         // Report IDs belonging to Purchase
+    'Expense' => [8,9],           // Report IDs belonging to Expense
+    'Returns' => [4, 5, 6, 7],       // Report IDs belonging to Sales
+    'Sample' => [19,20],            // Report IDs belonging to Audit
+    'Audit' => [10, 21],            // Report IDs belonging to Audit
+    'Accounting' => [11, 12, 13, 14, 15, 22, 23],            // Report IDs belonging to Audit
+];
+
+$groupedReports = [];
+foreach ($categories as $category => $reportIds) {
+    foreach ($reportIds as $id) {
+        if (isset($reportsArray[$id])) {
+            $groupedReports[$category][$id] = $reportsArray[$id];
+        }
+    }
+}
+
 
 $returnArray = [
     1 => ['id' => 1, 'title' => 'Return to Inventory'],
