@@ -9,8 +9,6 @@ $totals = ['price' => 0, 'samples_qty' => 0, 'samples' => 0, 'discount' => 0, 'p
     <thead>
         <tr>
             <th>Sr.#</th>
-            <th>Date</th>
-            <th>Order #</th>
             <th>Product ID</th>
             <th>Customer</th>
             <th>Item</th>
@@ -36,8 +34,6 @@ $totals = ['price' => 0, 'samples_qty' => 0, 'samples' => 0, 'discount' => 0, 'p
         ?>
             <tr>
                 <td><?php echo $count; ?></td>
-                <td><?php echo dateToSimple(date('Y-m-d', strtotime($s['order_date']))); ?></td>
-                <td><?php echo $s['order_custom_id']; ?></td>
                 <td><?php echo $s['product_id']; ?></td>
                 <td><?php echo !empty($s['customerName']) ? $s['customerName'] : $s['supplierName']; ?></td>
                 <td><?php echo $s['full_name']; ?></td>
