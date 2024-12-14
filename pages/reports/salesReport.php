@@ -12,8 +12,8 @@ $totals = ['price' => 0, 'discount' => 0, 'paid' => 0, 'balance' => 0];
             <th>Date</th>
             <th>Order #</th>
             <th>Product ID</th>
-            <th>Product Name</th>
             <th>Customer</th>
+            <th>Product Name</th>
             <th>Price</th>
             <th>Discount</th>
             <th>Paid</th>
