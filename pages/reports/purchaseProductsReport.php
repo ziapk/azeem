@@ -30,7 +30,7 @@ foreach($orders['rows'] as $row) {
             $count = 1;
             ?>
             <tr>
-                <th colspan="7"><?php echo $name; ?></th>
+                <th colspan="7" style="text-align: left"><?php echo $name; ?></th>
             </tr>
             <?php
             foreach ($rows as $s) {
