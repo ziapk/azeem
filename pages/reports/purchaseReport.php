@@ -38,7 +38,8 @@ foreach($orders as $row) {
             <?php
             foreach ($rows as $s) {
 
-            $totals['price'] += $s['tpprice'];
+            $totals['price'] += $s['tprice'];
+            $totals['pprice'] += $s['tpprice'];
             $totals['discount'] += $s['tdiscount'];
         ?>
             <tr>
@@ -67,6 +68,10 @@ foreach($orders as $row) {
         <tr>
             <th align="left">Total Price</th>
             <td><?php echo $totals['price']; ?></td>
+        </tr>
+        <tr>
+            <th align="left">Total PPrice</th>
+            <td><?php echo $totals['pprice']; ?></td>
         </tr>
         <tr>
             <th align="left">Total Discount</th>
