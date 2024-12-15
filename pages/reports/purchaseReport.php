@@ -38,10 +38,8 @@ foreach($orders as $row) {
             <?php
             foreach ($rows as $s) {
 
-            $totals['price'] += $s['price'];
-            $totals['discount'] += $s['discount'];
-            $totals['paid'] += $s['paid_amount'];
-            $totals['balance'] += ($s['price'] - $s['discount'] - $s['paid_amount']);
+            $totals['price'] += $s['tpprice'];
+            $totals['discount'] += $s['tdiscount'];
         ?>
             <tr>
                 <td><?php echo $count; ?></td>
@@ -73,14 +71,6 @@ foreach($orders as $row) {
         <tr>
             <th align="left">Total Discount</th>
             <td><?php echo $totals['discount']; ?></td>
-        </tr>
-        <tr>
-            <th align="left">Total Paid</th>
-            <td><?php echo $totals['paid']; ?></td>
-        </tr>
-        <tr>
-            <th align="left">Total Balance</th>
-            <td><?php echo $totals['balance']; ?></td>
         </tr>
     </table>
 </div>
