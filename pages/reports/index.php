@@ -131,7 +131,7 @@ echo mainHeader(['page' => 'reports']);
 <script type="text/javascript">
     app.controller('reportController', function($scope, $http, $httpParamSerializerJQLike, $filter) {
         const a = $('.datepicker').daterangepicker({
-            minDate: moment().subtract(1, 'year'),
+            minDate: moment().subtract(2, 'year'),
             maxDate: moment().add(1, 'week'),
             parentEl: '.datepicker-parent',
         }, function(start, end, label) {
