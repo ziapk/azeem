@@ -1,5 +1,10 @@
 <?php
 $totals = ['price' => 0, 'samples_qty' => 0, 'samples' => 0, 'discount' => 0, 'paid' => 0, 'balance' => 0];
+
+foreach($orders as $row) {
+    $c = !empty($row['full_name']) ? $row['full_name'] : $row['name'];
+    $groupOrders[$c][] = $row;
+}
 ?>
 <center>
     <h2><?php echo !empty($reportTitle) ? $reportTitle : "Sales Orders"; ?></h2>
@@ -12,7 +17,6 @@ $totals = ['price' => 0, 'samples_qty' => 0, 'samples' => 0, 'discount' => 0, 'p
             <th>Date</th>
             <th>Order #</th>
             <th>Product ID</th>
-            <th>Customer</th>
             <th>Item</th>
             <th>Qty</th>
             <th>Price</th>
@@ -20,8 +24,15 @@ $totals = ['price' => 0, 'samples_qty' => 0, 'samples' => 0, 'discount' => 0, 'p
         </tr>
     </thead>
     <tbody>
-        <?php $count = 1;
-        foreach ($orders as $s) {
+       <?php 
+        foreach ($groupOrders as $name => $rows) {
+            $count = 1;
+            ?>
+            <tr>
+                <th colspan="8" style="text-align: left"><?php echo $name; ?></th>
+            </tr>
+            <?php
+            foreach ($rows as $s) {
             $tt = $s['price'] - $s['discount'];
 
             if ($tt == 0) {
@@ -39,7 +50,6 @@ $totals = ['price' => 0, 'samples_qty' => 0, 'samples' => 0, 'discount' => 0, 'p
                 <td><?php echo dateToSimple(date('Y-m-d', strtotime($s['order_date']))); ?></td>
                 <td><?php echo $s['order_custom_id']; ?></td>
                 <td><?php echo $s['product_id']; ?></td>
-                <td><?php echo !empty($s['full_name']) ? $s['full_name'] : $s['name']; ?></td>
                 <td><?php echo $s['productName']; ?></td>
                 <td><?php echo $s['quantity']; ?></td>
                 <td><?php echo $s['price']; ?></td>
@@ -47,7 +57,7 @@ $totals = ['price' => 0, 'samples_qty' => 0, 'samples' => 0, 'discount' => 0, 'p
                 <td><?php echo ($s['price'] - $s['discount']) * $s['quantity']; ?></td>
             </tr>
         <?php $count++;
-        } ?>
+        }} ?>
     </tbody>
 </table>
 <div style="width: 40%">

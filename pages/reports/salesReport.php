@@ -1,5 +1,11 @@
 <?php
 $totals = ['price' => 0, 'discount' => 0, 'paid' => 0, 'balance' => 0];
+$groupOrders = [];
+foreach($orders as $row) {
+    $c = !empty($row['customer_name']) ? $row['customer_name'] : (!empty($row['full_name']) ? $row['full_name'] : $row['name']);
+    $groupOrders[$c][] = $row;
+}
+
 ?>
 <center>
     <h2><?php echo !empty($reportTitle) ? $reportTitle : "Sales Orders"; ?></h2>
@@ -12,7 +18,6 @@ $totals = ['price' => 0, 'discount' => 0, 'paid' => 0, 'balance' => 0];
             <th>Date</th>
             <th>Order #</th>
             <th>Product ID</th>
-            <th>Customer</th>
             <th>Product Name</th>
             <th>Price</th>
             <th>Discount</th>
@@ -21,8 +26,15 @@ $totals = ['price' => 0, 'discount' => 0, 'paid' => 0, 'balance' => 0];
         </tr>
     </thead>
     <tbody>
-        <?php $count = 1;
-        foreach ($orders as $s) {
+         <?php 
+        foreach ($groupOrders as $name => $rows) {
+            $count = 1;
+            ?>
+            <tr>
+                <th colspan="9" style="text-align: left"><?php echo $name; ?></th>
+            </tr>
+            <?php
+            foreach ($rows as $s) {
 
             $totals['price'] += $s['price'];
             $totals['discount'] += $s['discount'];
@@ -34,7 +46,6 @@ $totals = ['price' => 0, 'discount' => 0, 'paid' => 0, 'balance' => 0];
                 <td><?php echo dateToSimple(date('Y-m-d', strtotime($s['order_date']))); ?></td>
                 <td><?php echo $s['order_custom_id']; ?></td>
                 <td><?php echo $s['product_id']; ?></td>
-                <td><?php echo !empty($s['customer_name']) ? $s['customer_name'] : (!empty($s['full_name']) ? $s['full_name'] : $s['name']); ?></td>
                 <td><?php echo !empty($s['productName']) ? $s['productName'] : (!empty($s['full_name']) ? $s['full_name'] : $s['productName']); ?></td>
                 <td><?php echo $s['price']; ?></td>
                 <td><?php echo $s['discount']; ?></td>
@@ -42,7 +53,7 @@ $totals = ['price' => 0, 'discount' => 0, 'paid' => 0, 'balance' => 0];
                 <td><?php echo $s['price'] - $s['discount'] - $s['paid_amount']; ?></td>
             </tr>
         <?php $count++;
-        } ?>
+        }} ?>
     </tbody>
 </table>
 <div style="width: 40%">
