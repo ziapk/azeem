@@ -1086,6 +1086,7 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                         publisher_id: form?.publisher?.id || '',
                         code: form.newBarCode,
                         wh_price: form.wh_price,
+                        pprice: form.pprice,
                         price: form.newPrice,
                         rackNo: form.rackNo,
                         createCode: true,

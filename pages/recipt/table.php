@@ -53,8 +53,11 @@ foreach ($statuses as  $value) {
                                     </ui-select-choices>
                                 </ui-select>
                             </span>
-                            <span class="input-group-btn" style="width: 104px">
+                            <span class="input-group-btn" style="width: 80px">
                                 <input type="text" placeholder="Rack No" ng-model="cart.rackNo" type="text" class="form-control">
+                            </span>
+                            <span class="input-group-btn" style="width: 80px">
+                                <input type="text" placeholder="WH Price" ng-model="cart.pprice" ng-value="cart.pprice" type="text" class="form-control">
                             </span>
                         </div>
                         <div class="input-group">

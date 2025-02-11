@@ -1165,6 +1165,7 @@ echo mainFooter();
                     publisher_id: form?.publisher?.id || '',
                     price: form.newPrice,
                     wh_price: form.wh_price,
+                    pprice: form.pprice,
                     rackNo: form.rackNo,
                     createCode: true,
                     json_response: true,

@@ -58,7 +58,7 @@ foreach ($publishersArr as $key => $value) {
                 </tr>
             </thead>
             <tbody>
-                <tr ng-repeat="store in shopData track by $index">
+                <tr ng-repeat="store in shopData track by $index" ng-class="{'text-primary': currentStore == store.id}">
                     <td>{{ $index + 1 }}</td>
                     <td>{{ store.full_name }}</td>
                     <td>{{ store.storeType }}</td>
@@ -164,6 +164,7 @@ foreach ($publishersArr as $key => $value) {
     app.controller('productController', function($scope, $timeout, $log, $http, $httpParamSerializerJQLike, $filter, $window, toaster, $uibModal) {
         $scope.currentPage = 1;
         $scope.shopData = <?php echo safe_json_encode($storeList); ?>;
+        $scope.currentStore = '<?php echo $currentStore['id']; ?>';
         $scope.data = {
             perPage: 12
         };
