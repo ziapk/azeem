@@ -106,6 +106,7 @@ if(!empty($_FILES["file"]) && !empty($_FILES["file"]['name']))
         $res = [];
         $test = [];
 
+        print_r($headerRow);
         print_r($final);
         print_r($worksheet);
         print_r($_POST);
