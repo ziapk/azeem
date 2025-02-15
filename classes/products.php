@@ -1209,7 +1209,7 @@ class Products extends Connection
 		$dbh = $this->connectionPool->getConnection();
 		try {
 			
-			$stmt = "UPDATE `{$this->table_st}` SET `qty`=:qty + COALESCE(stock_out, 0)) WHERE product_id=:product_id and shopId = :shopId";
+			$stmt = "UPDATE `{$this->table_st}` SET `qty`=(:qty + COALESCE(stock_out, 0)) WHERE product_id=:product_id and shopId = :shopId";
 
 			$prepare = $dbh->prepare($stmt);
 			$prepare->bindParam(':product_id', $array['product_id'], PDO::PARAM_INT);
