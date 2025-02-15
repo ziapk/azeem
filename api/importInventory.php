@@ -27,6 +27,7 @@ if(!empty($_FILES["file"]) && !empty($_FILES["file"]['name']))
         $final = [];
     foreach ($worksheet as $key => $value) {
         $final[$key] = [];  
+        print_r($headerRow);
         foreach ($headerRow as $index => $heading) {
             foreach ($_POST['row'] as $base => $baseValue) {
                 if($baseValue == $heading) {
@@ -35,9 +36,62 @@ if(!empty($_FILES["file"]) && !empty($_FILES["file"]['name']))
             }
             if ($_POST['product_id'] == $heading) {
                 $k = 'product_id';
-            } elseif ($_POST['qty'] == $heading) {
-                $k = 'qty';
             }
+            // elseif ($_POST['qty'] == $heading) {
+            //     $k = 'qty';
+            // }
+            // elseif ($_POST['full_name'] == $heading) {
+            //     $k = 'full_name';
+            // }
+            // elseif ($_POST['barcode'] == $heading) {
+            //     $k = 'barcode';
+            // }
+            // elseif ($_POST['code'] == $heading) {
+            //     $k = 'code';
+            // }
+            // elseif ($_POST['group'] == $heading) {
+            //     $k = 'group';
+            // }
+            // elseif ($_POST['description'] == $heading) {
+            //     $k = 'description';
+            // }
+            // elseif ($_POST['note'] == $heading) {
+            //     $k = 'note';
+            // }
+            // elseif ($_POST['wh_price'] == $heading) {
+            //     $k = 'wh_price';
+            // }
+            // elseif ($_POST['price'] == $heading) {
+            //     $k = 'price';
+            // }
+            // elseif ($_POST['pprice'] == $heading) {
+            //     $k = 'pprice';
+            // }
+            // elseif ($_POST['min_qty'] == $heading) {
+            //     $k = 'min_qty';
+            // }
+            // elseif ($_POST['pack_size'] == $heading) {
+            //     $k = 'pack_size';
+            // }
+            // elseif ($_POST['pack_price'] == $heading) {
+            //     $k = 'pack_price';
+            // }
+            // elseif ($_POST['pack_qty'] == $heading) {
+            //     $k = 'pack_qty';
+            // }
+            // elseif ($_POST['board'] == $heading) {
+            //     $k = 'board';
+            // }
+            // elseif ($_POST['author'] == $heading) {
+            //     $k = 'author';
+            // }
+            // elseif ($_POST['publisher_id'] == $heading) {
+            //     $k = 'publisher_id';
+            // }
+            // elseif ($_POST['cat_id'] == $heading) {
+            //     $k = 'cat_id';
+            // }
+           
             $k = (!empty($k) ? $k : $heading);
             $val = $value[$index];
 
@@ -54,15 +108,12 @@ if(!empty($_FILES["file"]) && !empty($_FILES["file"]['name']))
         $test = [];
 
         foreach ($final as $row) {
-            $data = [
-                'product_id' => $row['product_id'],
-                'qty' => $row['qty'],
-                'shop_id'=>$shop_id
-            ];
-
+            $row["shop_id"] = $shop_id;
+            $data = $row;
             $res[] = $row['product_id'];
             $test[] = $data;
             $products->maintainProductQty($data);
+            // $products->updateProductGivenFields($data);
         }
         
         echo json_encode(['status' => 200, 'message' => 'Successfully Import all data!', 'data' => $res]);
