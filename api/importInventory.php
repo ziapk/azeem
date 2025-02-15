@@ -33,7 +33,14 @@ if(!empty($_FILES["file"]) && !empty($_FILES["file"]['name']))
         
         foreach ($value as $index => $val) {
             if(!empty($val)) {
-                $dd[$headerRow[$index]] = $val;
+                $head = $headerRow[$index];
+                if ($_POST['product_id'] == $head) {
+                    $head = 'product_id';
+                }
+                if ($_POST['qty'] == $head) {
+                    $head = 'qty';
+                }
+                $dd[$head] = $val;
             }
         }
         $worksheet[$key] = $dd;
