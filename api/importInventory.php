@@ -36,9 +36,9 @@ if(!empty($_FILES["file"]) && !empty($_FILES["file"]['name']))
             if ($_POST['product_id'] == $heading) {
                 $k = 'product_id';
             }
-            // elseif ($_POST['qty'] == $heading) {
-            //     $k = 'qty';
-            // }
+            elseif ($_POST['qty'] == $heading) {
+                $k = 'qty';
+            }
             // elseif ($_POST['full_name'] == $heading) {
             //     $k = 'full_name';
             // }
