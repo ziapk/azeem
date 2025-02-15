@@ -39,6 +39,8 @@ if(!empty($_FILES["file"]) && !empty($_FILES["file"]['name']))
             }
             elseif ($_POST['qty'] == $heading) {
                 $k = 'qty';
+                echo $value[$index];
+                exit;
             }
             // elseif ($_POST['full_name'] == $heading) {
             //     $k = 'full_name';
