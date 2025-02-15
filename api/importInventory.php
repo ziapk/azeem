@@ -39,8 +39,6 @@ if(!empty($_FILES["file"]) && !empty($_FILES["file"]['name']))
             }
             elseif ($_POST['qty'] == $heading) {
                 $k = 'qty';
-                echo $value[$index];
-                exit;
             }
             // elseif ($_POST['full_name'] == $heading) {
             //     $k = 'full_name';
@@ -95,15 +93,17 @@ if(!empty($_FILES["file"]) && !empty($_FILES["file"]['name']))
             // }
 
 
-            print_r("INDEX: " . $index);
-            print_r($value);
-           
+            
             $k = (!empty($k) ? $k : $heading);
-            $dd[$k] = $value[$index];
+            if(!empty($k)) {
+                $dd[$k] = $value[$index];
+            }
 
         }
+
+        print_r($dd);
         if(!empty($dd)) {
-            $final[$key][] = $dd;
+            $final[$key] = $dd;
         }
     }
 
