@@ -24,10 +24,9 @@ if(!empty($_FILES["file"]) && !empty($_FILES["file"]['name']))
         }
 
 
-        $final = [];
+    $final = [];
     foreach ($worksheet as $key => $value) {
         $final[$key] = [];  
-        print_r($headerRow);
         foreach ($headerRow as $index => $heading) {
             foreach ($_POST['row'] as $base => $baseValue) {
                 if($baseValue == $heading) {
@@ -106,6 +105,9 @@ if(!empty($_FILES["file"]) && !empty($_FILES["file"]['name']))
 
         $res = [];
         $test = [];
+
+        print_r($final);
+        exit;
 
         foreach ($final as $row) {
             $row["shop_id"] = $shop_id;
