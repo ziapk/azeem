@@ -26,11 +26,7 @@ if(!empty($_FILES["file"]) && !empty($_FILES["file"]['name']))
 
     $final = [];
     foreach ($worksheet as $key => $value) {
-        // $final[$key] = []; 
         $dd = [];
-
-
-        
         foreach ($value as $index => $val) {
             if(!empty($val)) {
                 $head = $headerRow[$index];
@@ -43,7 +39,7 @@ if(!empty($_FILES["file"]) && !empty($_FILES["file"]['name']))
                 $dd[$head] = $val;
             }
         }
-        $worksheet[$key] = $dd;
+        $final[$key] = $dd;
         // foreach ($headerRow as $index => $heading) {
             // if ($_POST['product_id'] == $heading) {
             //     $k = 'product_id';
@@ -126,10 +122,7 @@ if(!empty($_FILES["file"]) && !empty($_FILES["file"]['name']))
         $res = [];
         $test = [];
 
-        print_r($headerRow);
-        // print_r($final);
-        print_r($worksheet);
-        print_r($_POST);
+        print_r($final);
         exit;
 
         foreach ($final as $row) {
