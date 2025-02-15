@@ -26,9 +26,17 @@ if(!empty($_FILES["file"]) && !empty($_FILES["file"]['name']))
 
     $final = [];
     foreach ($worksheet as $key => $value) {
-        $final[$key] = []; 
-        $dd = [];
-        foreach ($headerRow as $index => $heading) {
+        // $final[$key] = []; 
+        // $dd = [];
+
+
+        
+        foreach ($value as $index => $val) {
+            $value[$headerRow[$index]] = $val;
+
+        }
+        $worksheet[$key] = $value;
+        // foreach ($headerRow as $index => $heading) {
             // if ($_POST['product_id'] == $heading) {
             //     $k = 'product_id';
             // }
@@ -89,18 +97,18 @@ if(!empty($_FILES["file"]) && !empty($_FILES["file"]['name']))
 
 
             
-            $k = (!empty($k) ? $k : $heading);
-            if(!empty($k)) {
-                $dd[$k] = $value[$index];
-            }
+        //     $k = (!empty($k) ? $k : $heading);
+        //     if(!empty($k)) {
+        //         $dd[$k] = $value[$index];
+        //     }
 
-        }
+        // }
 
-        if(!empty($dd)) {
-            $final[$key] = $dd;
-        }
+        // if(!empty($dd)) {
+        //     $final[$key] = $dd;
+        // }
 
-        print_r($dd);
+        // print_r($dd);
 
     }
 
@@ -111,7 +119,7 @@ if(!empty($_FILES["file"]) && !empty($_FILES["file"]['name']))
         $test = [];
 
         print_r($headerRow);
-        print_r($final);
+        // print_r($final);
         print_r($worksheet);
         print_r($_POST);
         exit;
