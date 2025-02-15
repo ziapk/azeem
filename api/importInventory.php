@@ -122,9 +122,6 @@ if(!empty($_FILES["file"]) && !empty($_FILES["file"]['name']))
         $res = [];
         $test = [];
 
-        print_r($final);
-        exit;
-
         foreach ($final as $row) {
             $row["shop_id"] = $shop_id;
             $data = $row;
