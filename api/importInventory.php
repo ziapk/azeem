@@ -101,11 +101,11 @@ if(!empty($_FILES["file"]) && !empty($_FILES["file"]['name']))
 
         }
 
-        print_r($dd);
         if(!empty($dd)) {
             $final[$key] = $dd;
         }
     }
+    print_r($headerRow);
 
         $products = new Products();
         $shop_id = $shop['id'];
