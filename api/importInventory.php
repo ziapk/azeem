@@ -92,6 +92,7 @@ if(!empty($_FILES["file"]) && !empty($_FILES["file"]['name']))
             // }
 
 
+            print_r("INDEX: " . $index);
             print_r($value);
            
             $k = (!empty($k) ? $k : $heading);
