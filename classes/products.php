@@ -1209,7 +1209,6 @@ class Products extends Connection
 		$dbh = $this->connectionPool->getConnection();
 		try {
 			
-			print_r($array);
 			$stmt = "UPDATE `{$this->table_st}` SET `qty`=(COALESCE(:qty, 0) + COALESCE(stock_out, 0)) WHERE product_id=:product_id and shopId = :shopId";
 
 			$prepare = $dbh->prepare($stmt);
