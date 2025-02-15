@@ -229,6 +229,7 @@ switch ($reportType) {
 		include_once dirname(__FILE__) . '/shop_products.php';
 		exit;
 	case '21':
+
 		$publisher_id = !empty($_POST['publisher_id']) ? $_POST['publisher_id'] : "";
 		$product_ids = [];
 		if (!empty($_POST['product_id'])) {

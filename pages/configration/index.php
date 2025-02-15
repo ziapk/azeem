@@ -53,7 +53,7 @@ echo mainHeader();
                 <input name="product_title" value="<?php echo $shopData['product_title']; ?>" class="form-control" placeholder="Shop Name" />
             </div>
             <div class="col-sm-3 form-group">
-                <input name="tag_line" value="" class="form-control" placeholder="Tagline" />
+                <input name="tag_line"  value="<?php echo $shopData['tag_line']; ?>" class="form-control" placeholder="Tagline" />
             </div>
             <div class="col-sm-3 form-group">
                 <input name="image" type="file">
@@ -71,6 +71,9 @@ echo mainHeader();
             <div class="col-sm-6 col-md-3 form-group">
                 <input name="phone_4" value="<?php echo $shopData['phone_4']; ?>" class="form-control" placeholder="Phone 4" />
             </div>
+            <div class="col-sm-6 col-md-3 form-group">
+                <input name="end_date" value="<?php echo $shopData['end_date']; ?>" class="form-control" placeholder="Expiry" />
+            </div>
             <div class="col-sm-12 col-md-12 form-group">
                 <textarea name="address" rows="5" class="form-control" placeholder="Address"><?php echo $shopData['address']; ?></textarea>
             </div>
@@ -80,4 +83,4 @@ echo mainHeader();
         </div>
     </form>
 </div>
-<?php echo mainHeader();
+<?php echo mainFooter();

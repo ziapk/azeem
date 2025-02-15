@@ -353,8 +353,6 @@ class Supply extends Connection
     }
 
     public function getProductPurchases($params = [])
-        
-        // $shopId, $date, $to, $publisher_id = null, $product_id = [])
     {
         $shopId = $params['shopId'];
         $product_id = $params['product_id'];

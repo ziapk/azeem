@@ -13,6 +13,7 @@ class Orders extends Connection
     private $table_rp = 'product_returns';
     private $table_transaction = 'transaction';
     private $table_customers = 'customers';
+    private $table_suppliers = 'suppliers';
     private $table_ro = 'return_orders';
     private $table_publisher = 'publishers';
 
@@ -1947,5 +1948,51 @@ class Orders extends Connection
         }
 
         return ['status' => 200, 'message' => 'successfully done', 'order' => ['id' => $returnId, 'linked_shop' => $supplier['linked_shop'], 'shopId' => $LinkedCustomer]];
+    }
+
+    public function getProductSales($params = [])
+    {
+        $shopId = $params['shopId'];
+        $product_id = $params['product_id'];
+        $dbh = $this->connectionPool->getConnection();
+        try {
+            $toCondition = "";
+            if (!empty($product_id)) {
+                $toCondition .= " and p.id IN( $product_id ) ";
+            }
+            $stmt = "SELECT o.id, oi.product_id, o.order_date, oi.price AS price, oi.discount, oi.quantity AS quantity, p.full_name, c.full_name as customerName  FROM `{$this->table}` AS o LEFT JOIN `{$this->table_sub}` AS oi ON oi.order_id=o.id LEFT JOIN `{$this->table_pro}` AS p on p.id=oi.product_id LEFT JOIN customers AS c ON c.id = o.customer_id WHERE o.shopId=:shopId " . $toCondition . " and o.flag = 1 ORDER BY oi.quantity desc";
+            $prepare = $dbh->prepare($stmt);
+            $prepare->bindParam(':shopId', $shopId, PDO::PARAM_STR);
+            $prepare->execute();
+            $result = $prepare->fetchAll(PDO::FETCH_ASSOC);
+            return $result;
+        } catch (PDOException $e) {
+            die("Error!: " . $e->getMessage() . "<br/>");
+        } finally {
+            $this->connectionPool->releaseConnection($dbh);
+        }
+    }
+
+    public function getProductReturns($params = [])
+    {
+        $shopId = $params['shopId'];
+        $product_id = $params['product_id'];
+        $dbh = $this->connectionPool->getConnection();
+        try {
+            $toCondition = "";
+            if (!empty($product_id)) {
+                $toCondition .= " and p.id IN( $product_id ) ";
+            }
+            $stmt = "SELECT o.id, oi.product_id, o.return_date, oi.price AS price, oi.discount, oi.quantity AS quantity, p.full_name, c.full_name as customerName, s.name as supplierName  FROM `{$this->table_ro}` AS o LEFT JOIN `{$this->table_rp}` AS oi ON oi.order_id=o.id LEFT JOIN `{$this->table_pro}` AS p on p.id=oi.product_id LEFT JOIN customers AS c ON c.id = o.customer_id and o.is_supplier = 1 LEFT JOIN `{$this->table_suppliers}` AS s ON s.id = o.customer_id and o.is_supplier = 2  WHERE o.shopId=:shopId " . $toCondition . " and o.flag = 1 ORDER BY oi.quantity desc";
+            $prepare = $dbh->prepare($stmt);
+            $prepare->bindParam(':shopId', $shopId, PDO::PARAM_STR);
+            $prepare->execute();
+            $result = $prepare->fetchAll(PDO::FETCH_ASSOC);
+            return $result;
+        } catch (PDOException $e) {
+            die("Error!: " . $e->getMessage() . "<br/>");
+        } finally {
+            $this->connectionPool->releaseConnection($dbh);
+        }
     }
 }

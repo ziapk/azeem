@@ -171,22 +171,61 @@ $publishers = $publisherObj->getPublishers($userId);
 
                                 <?php include_once dirname(__FILE__) . '/table.php'; ?>
             </div>
-            <div ng-if="productPurchases.length" class="col-xs-12 col-md-3">
+            
+            <div ng-if="productPurchases.length || productSales.length || productReturns.length" class="col-xs-12 col-md-3">
                 <button type="button" ng-click="hideList()" class="btn btn-danger btn-xs"><span class="fa fa-remove"></span> Hide</button>
-                <table class="table table-striped">
-                    <tr ng-repeat="item in productPurchases">
-                        <td>
-                            <strong class="text-danger">{{item.id}}</strong> | {{item.full_name}}<br />
-                            <strong>{{item.customerName || item.supplierName}}</strong><br />
-                            {{item.supply_date|date:'DD/MM/YYYY'}}<br />
-                        </td>
-                        <td style="width: 1%; white-space: nowrap">
-                            <span class="text-light">{{item.quantity}}</span> x <strong style="font-size: 20px">{{item.price * ((100 - item.discount)/100) | number:2}} </strong> Rs<br />
-                        </td>
+                <uib-tabset active="activePill" class="orders-tabs">
+                    <uib-tab index="0" data-tab="purchase" heading="PO ({{productPurchases.length}})"></uib-tab>
+                    <uib-tab index="1" data-tab="sale" heading="SO ({{productSales.length}})"></uib-tab>
+                    <uib-tab index="2" data-tab="return" heading="RO ({{productReturns.length}})"></uib-tab>
+                </uib-tabset>
+                <div>
+                    <input placeholder="ORDER ID" ng-model="searchId" />
+                    <input placeholder="CUSTOMER" ng-model="searchName" />
+                    <input placeholder="QTY" ng-model="searchQty" />
+                    <input placeholder="PRICE" ng-model="searchPrice" />
+                </div>
+                <div style="height: 450px; overflow: auto">
+                    <table ng-if="activePill == 0" class="table table-striped">
+                        <tr ng-repeat="item in productPurchases | filter: { customerName : searchName, id : searchId,  pprice : searchPrice, quantity : searchQty }">
+                            <td>
+                                <strong class="text-danger">{{item.id}}</strong> | {{item.full_name}}<br />
+                                <strong>{{item.customerName || item.supplierName}}</strong><br />
+                                {{item.supply_date|date:'DD/MM/YYYY'}}<br />
+                            </td>
+                            <td style="width: 1%; white-space: nowrap">
+                                <span class="text-light">{{item.quantity}}</span> x <strong style="font-size: 20px">{{item.price * ((100 - item.discount)/100) | number:2}} </strong> Rs<br />
+                            </td>
 
-                    </tr>
-                </table>
+                        </tr>
+                    </table>
+                    <table ng-if="activePill == 1" class="table table-striped">
+                        <tr ng-repeat="item in productSales | filter: { customerName : searchName, id : searchId,  price : searchPrice, quantity : searchQty } ">
+                            <td>
+                                <strong class="text-danger">{{item.id}}</strong> | {{item.full_name}}<br />
+                                <strong>{{item.customerName || item.supplierName}}</strong><br />
+                                {{item.order_date|date:'DD/MM/YYYY'}}<br />
+                            </td>
+                            <td style="width: 1%; white-space: nowrap">
+                                <span class="text-light">{{item.quantity}}</span> x <strong style="font-size: 20px">{{item.price * ((100 - item.discount)/100) | number:2}} </strong> Rs<br />
+                            </td>
 
+                        </tr>
+                    </table>
+                    <table ng-if="activePill == 2" class="table table-striped">
+                        <tr ng-repeat="item in productReturns | filter: { customerName : searchName, id : searchId,  price : searchPrice, quantity : searchQty } ">
+                            <td>
+                                <strong class="text-danger">{{item.id}}</strong> | {{item.full_name}}<br />
+                                <strong>{{item.customerName || item.supplierName}}</strong><br />
+                                {{item.return_date|date:'DD/MM/YYYY'}}<br />
+                            </td>
+                            <td style="width: 1%; white-space: nowrap">
+                                <span class="text-light">{{item.quantity}}</span> x <strong style="font-size: 20px">{{item.price * ((100 - item.discount)/100) | number:2}} </strong> Rs<br />
+                            </td>
+
+                        </tr>
+                    </table>
+                </div>
             </div>
         </div>
       
@@ -241,6 +280,7 @@ echo mainFooter();
     app.controller('cartController', function($scope, $http, $httpParamSerializerJQLike, $filter, $window, $timeout, $location, $anchorScroll, toaster) {
         
         $scope.mainList = $window.mainList?.records || [];
+        $scope.activePill = 0;
         $scope.pinList = [];
         $scope.list = [];
         $scope.focus = false;
@@ -703,6 +743,8 @@ echo mainFooter();
         });
 
         $scope.productPurchases = [];
+        $scope.productSales = [];
+        $scope.productReturns = [];
 
 
         $scope.selectProduct = function(p, sep, disableCalc, event) {
@@ -782,18 +824,34 @@ echo mainFooter();
             }
 
             $scope.getProductPurchases(p);
+            $scope.getProductSales(p);
+            $scope.getProductReturns(p);
 
         }
 
         $scope.hideList = () => {
             $scope.productPurchases = [];
+            $scope.productSales = [];
+            $scope.productReturns = [];
         }
 
 
-         $scope.getProductPurchases = function(product) {
+        $scope.getProductPurchases = function(product) {
             $http.get("<?php echo SITE_URL ?>api/getProductPurchases.php?product_id=" + product.id)
             .then(function(response) {
                 $scope.productPurchases = response.data;
+            });
+        }
+        $scope.getProductSales = function(product) {
+            $http.get("<?php echo SITE_URL ?>api/getProductSales.php?product_id=" + product.id)
+            .then(function(response) {
+                $scope.productSales = response.data;
+            });
+        }
+        $scope.getProductReturns = function(product) {
+            $http.get("<?php echo SITE_URL ?>api/getProductReturns.php?product_id=" + product.id)
+            .then(function(response) {
+                $scope.productReturns = response.data;
             });
         }
         $scope.addMoreQty = function(obj, val, e) {

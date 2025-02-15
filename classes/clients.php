@@ -41,7 +41,7 @@ class Clients extends Connection
 	{
 		$dbh = $this->connectionPool->getConnection();
 		try {
-			$stmt = "UPDATE `{$this->table}` SET product_title=:product_title, tag_line=:tag_line,address=:address, phone_1=:phone_1, phone_2=:phone_2, phone_3=:phone_3 WHERE id=:id";
+			$stmt = "UPDATE `{$this->table}` SET product_title=:product_title, tag_line=:tag_line,address=:address, phone_1=:phone_1, phone_2=:phone_2, phone_3=:phone_3, end_date=:end_date WHERE id=:id";
 			$prepare = $dbh->prepare($stmt);
 			$prepare->bindParam(':product_title', $array['product_title'], PDO::PARAM_STR);
 			$prepare->bindParam(':tag_line', $array['tag_line'], PDO::PARAM_STR);
@@ -49,6 +49,7 @@ class Clients extends Connection
 			$prepare->bindParam(':phone_1', $array['phone_1'], PDO::PARAM_STR);
 			$prepare->bindParam(':phone_2', $array['phone_2'], PDO::PARAM_STR);
 			$prepare->bindParam(':phone_3', $array['phone_3'], PDO::PARAM_STR);
+			$prepare->bindParam(':end_date', $array['end_date'], PDO::PARAM_STR);
 			$prepare->bindParam(':id', $array['id'], PDO::PARAM_STR);
 			$prepare->execute();
 			$result = $prepare->rowCount();
