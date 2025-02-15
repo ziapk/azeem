@@ -90,6 +90,9 @@ if(!empty($_FILES["file"]) && !empty($_FILES["file"]['name']))
             // elseif ($_POST['cat_id'] == $heading) {
             //     $k = 'cat_id';
             // }
+
+
+            print_r($value);
            
             $k = (!empty($k) ? $k : $heading);
             $val = $value[$index];
