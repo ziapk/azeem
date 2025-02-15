@@ -6,6 +6,8 @@ class Products extends Connection
 	private $table = 'products';
 	private $table_st = 'store_products';
 	private $pc_table = 'products_code';
+	// private $table_ex = 'products_exchange_logs';
+	// private $users = 'users';
 	private $table_rack = 'racks';
 	private $table_rack_products = 'rack_products';
 
@@ -290,7 +292,6 @@ class Products extends Connection
 			}
 
 			$stmt = "SELECT count(b.id) as count FROM (SELECT $mainCols FROM `{$this->table_st}` as sp $innerJoin LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id LEFT JOIN {$this->table_rack_products} as rp ON rp.product_id = p.id LEFT JOIN `{$this->table_rack}` as r on r.id = rp.rack_id LEFT JOIN program_books as c ON c.product_id = p.id LEFT JOIN publishers as pub on p.publisher_id = pub.id  WHERE p.`owner_id`=:owner_id $status_query $publisher_query $dup $type $pin $searchQry $catQry GROUP BY p.id $sortByQry $minQry) AS b";
-			
 			$prepare = $dbh->prepare($stmt);
 			$prepare->bindParam(':owner_id', $owner_id, PDO::PARAM_STR);
 			$prepare->execute();
@@ -1208,7 +1209,7 @@ class Products extends Connection
 		$dbh = $this->connectionPool->getConnection();
 		try {
 			
-			$stmt = "UPDATE `{$this->table_st}` SET `qty`=:qty + stock_out WHERE product_id=:product_id and shopId = :shopId";
+			$stmt = "UPDATE `{$this->table_st}` SET `qty`=COALESCE(:qty, 0) + COALESCE(stock_out, 0) WHERE product_id=:product_id and shopId = :shopId";
 
 			$prepare = $dbh->prepare($stmt);
 			$prepare->bindParam(':product_id', $array['product_id'], PDO::PARAM_INT);
@@ -1223,6 +1224,68 @@ class Products extends Connection
 			$this->connectionPool->releaseConnection($dbh);
 		}
 	}
+	// public function createExchange($array)
+	// {
+	// 	$dbh = $this->connectionPool->getConnection();
+	// 	try {
+
+	// 		$stmt = "INSERT INTO `{$this->table_ex}` (from_id, from_ex_qty, from_qty, to_id, to_ex_qty, to_qty, shop_id, owner_id, created_by) VALUES (:from_id, :from_ex_qty, :from_qty, :to_id, :to_ex_qty, :to_qty, :shop_id, :owner_id, :created_by)";
+	// 		$prepare = $dbh->prepare($stmt);
+	// 		$prepare->bindParam(':from_id', $array['fromId'], PDO::PARAM_INT);
+	// 		$prepare->bindParam(':from_ex_qty', $array['existFromQty'], PDO::PARAM_INT);
+	// 		$prepare->bindParam(':from_qty', $array['qty'], PDO::PARAM_INT);
+	// 		$prepare->bindParam(':to_id', $array['toId'], PDO::PARAM_INT);
+	// 		$prepare->bindParam(':to_ex_qty', $array['existToQty'], PDO::PARAM_INT);
+	// 		$prepare->bindParam(':to_qty', $array['qty'], PDO::PARAM_INT);
+	// 		$prepare->bindParam(':shop_id', $array['shopId'], PDO::PARAM_INT);
+	// 		$prepare->bindParam(':owner_id', $array['owner_id'], PDO::PARAM_INT);
+	// 		$prepare->bindParam(':created_by', $array['created_by'], PDO::PARAM_INT);
+	// 		$prepare->execute();
+	// 		$result = $dbh->lastInsertId();
+	// 		return $result;
+	// 	} catch (PDOException $e) {
+	// 		die("Error!: " . $e->getMessage() . "<br/>");
+	// 	} finally {
+	// 		$this->connectionPool->releaseConnection($dbh);
+	// 	}
+	// }
+
+	// public function getStockHistoryPagination($params)
+	// {
+	// 	$dbh = $this->connectionPool->getConnection();
+	// 	try {
+
+	// 		$stmt = "SELECT COUNT(id) as total FROM `{$this->table_ex}` where shop_id=:shopId and owner_id=:owner_id";
+	// 		$prepare = $dbh->prepare($stmt);
+	// 		$prepare->bindParam(':shopId', $params['shopId'], PDO::PARAM_INT);
+	// 		$prepare->bindParam(':owner_id', $params['owner_id'], PDO::PARAM_INT);
+	// 		$prepare->execute();
+	// 		$result = $prepare->fetch(PDO::FETCH_ASSOC);
+
+	// 		$no_of_records_per_page = !empty($params['perPage']) ? $params['perPage'] : 10;
+	// 		$total_rows = $result['total'];
+	// 		$total_pages = ceil($total_rows / $no_of_records_per_page);
+	// 		$currentPage = $total_pages >= $params['page'] ? $params['page'] : $total_pages;
+	// 		$offset = (($currentPage - 1) < 0 ? 0 : ($currentPage - 1)) * $no_of_records_per_page;
+	// 		$search = "(from_id LIKE '%" . $params["search"] . "%' OR to_id LIKE '%" . $params["search"] . "%' OR p1.full_name LIKE '%" . $params["search"] . "%' OR p2.full_name LIKE '%" . $params["search"] . "%') ";
+			
+	// 		$stmt = "SELECT p1.full_name as fromProduct, p2.full_name as toProduct, u.full_name as createdBy, ex.*, from_ex_qty - from_qty as from_after_qty, to_ex_qty - to_qty as to_after_qty FROM `{$this->table_ex}` as ex left join `{$this->users}` as u on u.id=ex.created_by left join `{$this->table}` as p1 on p1.id=ex.from_id left join `{$this->table}` as p2 on p2.id=ex.to_id WHERE $search and ex.shop_id=:shopId and ex.owner_id=:owner_id LIMIT :offset, :perPage";
+	// 		$prepare = $dbh->prepare($stmt);
+	// 		$prepare->bindParam(':shopId', $params['shopId'], PDO::PARAM_INT);
+	// 		$prepare->bindParam(':offset', $offset, PDO::PARAM_INT);
+	// 		$prepare->bindParam(':owner_id', $params['owner_id'], PDO::PARAM_INT);
+	// 		$prepare->bindParam(':perPage', $no_of_records_per_page, PDO::PARAM_INT);
+	// 		$prepare->execute();
+	// 		$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
+	// 		return ['page' => $currentPage, 'closing_total' => 0, 'totalRecords' => $total_rows, 'perPage' => $no_of_records_per_page, 'records' => $result];
+	// 	} catch (PDOException $e) {
+	// 		die("Error!: " . $e->getMessage() . "<br/>");
+	// 	} finally {
+	// 		$this->connectionPool->releaseConnection($dbh);
+	// 	}
+	// }
+
+
 	public function addProductQty($id, $array, $shopId, $type = 1)
 	{
 		$dbh = $this->connectionPool->getConnection();
@@ -1441,6 +1504,140 @@ class Products extends Connection
 			$prepare->execute();
 			$result = $prepare->rowCount();
 			return $result;
+		} catch (PDOException $e) {
+			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
+		}
+	}
+
+
+	public function updateProductGivenFields($array)
+	{
+		$dbh = $this->connectionPool->getConnection();
+			
+			$updateQuery = [];
+
+			if(!empty($array['qty'])) {
+				$updateQuery[] = "`in_hand` = :in_hand";
+			}
+			if(!empty($array['full_name'])) {
+				$updateQuery[] = "`full_name` = :full_name";
+			}
+			if(!empty($array['barcode'])) {
+				$updateQuery[] = "`barcode` = :barcode";
+			}
+			if(!empty($array['code'])) {
+				$updateQuery[] = "`code` = :code";
+			}
+			if(!empty($array['group'])) {
+				$updateQuery[] = "`group` = :group";
+			}
+			if(!empty($array['description'])) {
+				$updateQuery[] = "`description` = :description";
+			}
+			if(!empty($array['note'])) {
+				$updateQuery[] = "`note` = :note";
+			}
+			if(!empty($array['wh_price'])) {
+				$updateQuery[] = "`wh_price` = :wh_price";
+			}
+			if(!empty($array['price'])) {
+				$updateQuery[] = "`price` = :price";
+			}
+			if(!empty($array['pprice'])) {
+				$updateQuery[] = "`pprice` = :pprice";
+			}
+			if(!empty($array['min_qty'])) {
+				$updateQuery[] = "`min_qty` = :min_qty";
+			}
+			if(!empty($array['pack_size'])) {
+				$updateQuery[] = "`pack_size` = :pack_size";
+			}
+			if(!empty($array['pack_price'])) {
+				$updateQuery[] = "`pack_price` = :pack_price";
+			}
+			if(!empty($array['pack_qty'])) {
+				$updateQuery[] = "`pack_qty` = :pack_qty";
+			}
+			if(!empty($array['board'])) {
+				$updateQuery[] = "`board` = '".$array['board']."'";
+			}
+			if(!empty($array['author'])) {
+				$updateQuery[] = "`author` = :author";
+			}
+			if(!empty($array['publisher_id'])) {
+				$updateQuery[] = "`publisher_id` = :publisher_id";
+			}
+			if(!empty($array['cat_id'])) {
+				$updateQuery[] = "`cat_id` = :cat_id";
+			}
+			
+
+		try {
+			if(!empty($updateQuery)) {
+				$stmt = "UPDATE `{$this->table}` SET  " . join(", ", $updateQuery) . " WHERE id=:id";
+				$prepare = $dbh->prepare($stmt);
+
+				if(!empty($array['qty'])) {
+					$prepare->bindParam(':in_hand', $array['qty'], PDO::PARAM_STR);
+				}
+				if(!empty($array['full_name'])) {
+					$prepare->bindParam(':full_name', $array['full_name'], PDO::PARAM_STR);
+				}
+				if(!empty($array['barcode'])) {
+					$prepare->bindParam(':barcode', $array['barcode'], PDO::PARAM_STR);
+				}
+				if(!empty($array['code'])) {
+					$prepare->bindParam(':code', $array['code'], PDO::PARAM_STR);
+				}
+				if(!empty($array['group'])) {
+					$prepare->bindParam(':group', $array['group'], PDO::PARAM_STR);
+				}
+				if(!empty($array['description'])) {
+					$prepare->bindParam(':description', $array['description'], PDO::PARAM_STR);
+				}
+				if(!empty($array['note'])) {
+					$prepare->bindParam(':note', $array['note'], PDO::PARAM_STR);
+				}
+				if(!empty($array['wh_price'])) {
+					$prepare->bindParam(':wh_price', $array['wh_price'], PDO::PARAM_STR);
+				}
+				if(!empty($array['price'])) {
+					$prepare->bindParam(':price', $array['price'], PDO::PARAM_STR);
+				}
+				if(!empty($array['pprice'])) {
+					$prepare->bindParam(':pprice', $array['pprice'], PDO::PARAM_STR);
+				}
+				if(!empty($array['min_qty'])) {
+					$prepare->bindParam(':min_qty', $array['min_qty'], PDO::PARAM_STR);
+				}
+				if(!empty($array['pack_size'])) {
+					$prepare->bindParam(':pack_size', $array['pack_size'], PDO::PARAM_STR);
+				}
+				if(!empty($array['pack_price'])) {
+					$prepare->bindParam(':pack_price', $array['pack_price'], PDO::PARAM_STR);
+				}
+				if(!empty($array['pack_qty'])) {
+					$prepare->bindParam(':pack_qty', $array['pack_qty'], PDO::PARAM_STR);
+				}
+				if(!empty($array['board'])) {
+					$prepare->bindParam(':board', $array['board'], PDO::PARAM_STR);
+				}
+				if(!empty($array['author'])) {
+					$prepare->bindParam(':author', $array['author'], PDO::PARAM_STR);
+				}
+				if(!empty($array['publisher_id'])) {
+					$prepare->bindParam(':publisher_id', $array['publisher_id'], PDO::PARAM_STR);
+				}
+				if(!empty($array['cat_id'])) {
+					$prepare->bindParam(':cat_id', $array['cat_id'], PDO::PARAM_STR);
+				}
+				$prepare->bindParam(':id', $array['product_id'], PDO::PARAM_STR);
+				$prepare->execute();
+				$prepare->rowCount();
+			}
+			return $array['product_id'];
 		} catch (PDOException $e) {
 			die("Error!: " . $e->getMessage() . "<br/>");
 		} finally {
