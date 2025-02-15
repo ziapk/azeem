@@ -839,7 +839,7 @@ echo mainFooter();
         $scope.getProductPurchases = function(product) {
             $http.get("<?php echo SITE_URL ?>api/getProductPurchases.php?product_id=" + product.id)
             .then(function(response) {
-                $scope.productPurchases = response.data;
+                $scope.productPurchases = response.data.map(row => ({...row, supply_date: new Date(row.supply_date).toISOString()}));
             });
         }
         $scope.getProductSales = function(product) {
