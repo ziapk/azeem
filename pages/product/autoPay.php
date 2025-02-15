@@ -56,7 +56,7 @@ echo mainFooter([]);
             });
             fd.append('SheetName', $scope.SheetName);
             fd.append('product_id', $scope.product_id);
-            fd.append('qty', $scope.qty);
+            fd.append('qty', parseFloat($scope.qty));
             $http.post(site_url + 'api/importInventory.php', fd, {
                 transformRequest: angular.identity,
                 headers: {
