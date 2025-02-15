@@ -26,7 +26,8 @@ if(!empty($_FILES["file"]) && !empty($_FILES["file"]['name']))
 
     $final = [];
     foreach ($worksheet as $key => $value) {
-        $final[$key] = [];  
+        $final[$key] = []; 
+        $dd = [];
         foreach ($headerRow as $index => $heading) {
             foreach ($_POST['row'] as $base => $baseValue) {
                 if($baseValue == $heading) {
@@ -96,11 +97,11 @@ if(!empty($_FILES["file"]) && !empty($_FILES["file"]['name']))
             print_r($value);
            
             $k = (!empty($k) ? $k : $heading);
-            $val = $value[$index];
+            $dd[$k] = $value[$index];
 
-            if(!empty($k)) {
-                $final[$key][$k] = $val;
-            }
+        }
+        if(!empty($dd)) {
+            $final[$key][] = $dd;
         }
     }
 
