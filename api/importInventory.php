@@ -27,15 +27,16 @@ if(!empty($_FILES["file"]) && !empty($_FILES["file"]['name']))
     $final = [];
     foreach ($worksheet as $key => $value) {
         // $final[$key] = []; 
-        // $dd = [];
+        $dd = [];
 
 
         
         foreach ($value as $index => $val) {
-            $value[$headerRow[$index]] = $val;
-
+            if(!empty($val)) {
+                $dd[$headerRow[$index]] = $val;
+            }
         }
-        $worksheet[$key] = $value;
+        $worksheet[$key] = $dd;
         // foreach ($headerRow as $index => $heading) {
             // if ($_POST['product_id'] == $heading) {
             //     $k = 'product_id';
