@@ -29,15 +29,10 @@ if(!empty($_FILES["file"]) && !empty($_FILES["file"]['name']))
         $final[$key] = []; 
         $dd = [];
         foreach ($headerRow as $index => $heading) {
-            foreach ($_POST['row'] as $base => $baseValue) {
-                if($baseValue == $heading) {
-                    $k = $base;
-                }
-            }
             if ($_POST['product_id'] == $heading) {
                 $k = 'product_id';
             }
-            elseif ($_POST['qty'] == $heading) {
+            if ($_POST['qty'] == $heading) {
                 $k = 'qty';
             }
             // elseif ($_POST['full_name'] == $heading) {
@@ -104,8 +99,10 @@ if(!empty($_FILES["file"]) && !empty($_FILES["file"]['name']))
         if(!empty($dd)) {
             $final[$key] = $dd;
         }
+
+        print_r($dd);
+
     }
-    print_r($headerRow);
 
         $products = new Products();
         $shop_id = $shop['id'];
