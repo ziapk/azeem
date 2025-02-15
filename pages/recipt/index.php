@@ -191,7 +191,7 @@ $publishers = $publisherObj->getPublishers($userId);
                             <td>
                                 <strong class="text-danger">{{item.id}}</strong> | {{item.full_name}}<br />
                                 <strong>{{item.customerName || item.supplierName}}</strong><br />
-                                {{item.supply_date|date:'DD/MM/YYYY'}}<br />
+                                {{item.supply_date|date:'dd/MM/yyy HH:mm:ss Z'}}<br />
                             </td>
                             <td style="width: 1%; white-space: nowrap">
                                 <span class="text-light">{{item.quantity}}</span> x <strong style="font-size: 20px">{{item.price * ((100 - item.discount)/100) | number:2}} </strong> Rs<br />
@@ -204,7 +204,7 @@ $publishers = $publisherObj->getPublishers($userId);
                             <td>
                                 <strong class="text-danger">{{item.id}}</strong> | {{item.full_name}}<br />
                                 <strong>{{item.customerName || item.supplierName}}</strong><br />
-                                {{item.order_date|date:'DD/MM/YYYY'}}<br />
+                                {{item.order_date|date:'dd/MM/yyy HH:mm:ss Z'}}<br />
                             </td>
                             <td style="width: 1%; white-space: nowrap">
                                 <span class="text-light">{{item.quantity}}</span> x <strong style="font-size: 20px">{{item.price * ((100 - item.discount)/100) | number:2}} </strong> Rs<br />
@@ -217,7 +217,7 @@ $publishers = $publisherObj->getPublishers($userId);
                             <td>
                                 <strong class="text-danger">{{item.id}}</strong> | {{item.full_name}}<br />
                                 <strong>{{item.customerName || item.supplierName}}</strong><br />
-                                {{item.return_date|date:'DD/MM/YYYY'}}<br />
+                                {{item.return_date|date:'dd/MM/yyy HH:mm:ss Z'}}<br />
                             </td>
                             <td style="width: 1%; white-space: nowrap">
                                 <span class="text-light">{{item.quantity}}</span> x <strong style="font-size: 20px">{{item.price * ((100 - item.discount)/100) | number:2}} </strong> Rs<br />
