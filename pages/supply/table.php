@@ -2,8 +2,8 @@
 <table class="table">
     <thead class="sticky">
         <tr style="background: #fff;">
-            <th width="50">Pin</th>
-            <th width="50">Update</th>
+            <th width="50"><input type="checkbox" ng-model="pinAll" ng-change="changePinAll(pinAll)" /> Pin</th>
+            <th width="50"><input type="checkbox" ng-model="updateAll" ng-change="changeUpdateAll(updateAll)" /> Update</th>
             <th width="80">Code</th>
             <th width="60">M.Qty</th>
             <th width="80">P.ID</th>

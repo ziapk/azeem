@@ -113,6 +113,23 @@ echo mainFooter();
         $scope.createDemand = false;
         $scope.is_active = false;
         $scope.qf = false;
+        $scope.pinAll = false;
+        $scope.updateAll = false;
+
+        $scope.changePinAll = (pin) => {
+            console.log('pin', pin)
+
+            $scope.items.map(row => {
+                row.pin  = pin;
+            })
+            
+        }
+        $scope.changeUpdateAll = (update) => {
+            console.log('update', update)
+            $scope.items.map(row => {
+                row.update  = update;
+            })
+        }
 
         $scope.selectSupplier = function(p) {
             $http.get("<?php echo SITE_URL ?>api/getOpeningBalance.php", {
@@ -171,6 +188,7 @@ echo mainFooter();
         $scope.newData = {
             barcode: "",
             full_name: "",
+            update: true,
             pprice: 0,
             price: 0,
             qty: 1,
@@ -306,7 +324,8 @@ echo mainFooter();
                     pack_size: parseFloat(p.pack_size),
                     price: parseInt(p.price || 0),
                     pprice: parseInt(p.pprice || 0),
-                    qty: 1
+                    qty: 1,
+                    update: true
                 });
             }
 
