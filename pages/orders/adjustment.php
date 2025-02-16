@@ -49,10 +49,14 @@ echo mainHeader(['page' => 'sale_returns']);
         </div>
     </div>
     <div>
+        <button type="button" class="btn btn-danger btn-xs" ng-click="removeSelected(true)">Remove Selected Only</button>
+        <button type="button" class="btn btn-primary btn-xs" ng-click="removeSelected(false)">Remove Un-Selected Only</button>
+    </div>
+    <div>
         <table class="table">
             <thead class="sticky">
                 <tr style="background: #fff">
-                    <th>Sr.#</th>
+                    <th>Sr.# <input type="checkbox" ng-model="selectAll" ng-change="changeSelectAll(selectAll)" /></th>
                     <th width="100">Product Id</th>
                     <th>Product Name</th>
                     <th width="100">Discount</th>
@@ -70,7 +74,7 @@ echo mainHeader(['page' => 'sale_returns']);
             </thead>
             <tbody>
                 <tr ng-repeat-start="row in items track by $index" id="product-{{$index + 1}}">
-                    <td>{{$index + 1}}</td>
+                    <td><input type="checkbox" ng-model="row.select" />  {{$index + 1}}</td>
                     <td><input type="text" class="form-control" ng-model="row.product_id" /></td>
                     <td>
                         <input type="text" class="form-control" ng-model="row.full_name" placeholder="Product title" />
@@ -217,6 +221,7 @@ echo mainFooter();
         $scope.summery = "";
         $scope.product = "";
         $scope.sep = false;
+        $scope.selectAll = false;
         $scope.order = <?php echo json_encode($order) ?>;
         $scope.returnOrder = <?php echo json_encode($return) ?>;
         $scope.is_supplier = parseInt($scope.order?.order?.is_supplier || 1);
@@ -226,6 +231,26 @@ echo mainFooter();
         $scope.supplierId = $scope.order?.order?.customer_id || '';
         $scope.shopId = $scope.order?.order?.shopId ? parseInt($scope.order.order.shopId) : 0;
         $scope.LinkForMainShop = '<?php echo $_GET['LinkForMainShop']; ?>';
+
+         $scope.changeSelectAll = (select) => {
+            
+            $scope.items.map(row => {
+                row.select  = select;
+            })
+
+        }
+
+        
+         $scope.removeSelected = (selected) => {
+            $scope.items = $scope.items.filter(row => {
+                return row.select != selected;
+            });
+
+            $scope.calculateSum();
+
+        }
+
+
 
         $scope.items = $scope.order?.order_items?.map(r => ({
             ...r,
@@ -239,6 +264,7 @@ echo mainFooter();
             discount_value: parseInt(r.discount_value || r.discount),
             discount_type: parseInt(r.discount_type) || 2,
             full_name: r.product_title,
+            select: false,
         })) || [];
 
         $scope.list = [];
@@ -267,6 +293,7 @@ echo mainFooter();
             pprice: 0,
             price: 0,
             qty: 1,
+            select: false,
         }
 
         $scope.resetUsers = (return_type) => {
@@ -422,7 +449,8 @@ echo mainFooter();
                     product_id: p.id,
                     price: parseInt(p.price || 0),
                     pprice: parseInt(p.pprice || 0),
-                    qty: parseFloat(p.maxQty) || 1
+                    qty: parseFloat(p.maxQty) || 1,
+                    select: false
                 });
                 currentIndex = $scope.items.length;
             }
