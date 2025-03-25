@@ -868,12 +868,15 @@ class Orders extends Connection
     {
         $dbh = $this->connectionPool->getConnection();
         try {
+            $result = [];
             // $this->runQuery();
             $stmt = "SELECT * FROM `{$this->table}` WHERE id=:id ";
             $prepare = $dbh->prepare($stmt);
             $prepare->bindParam(':id', $id, PDO::PARAM_STR);
             $prepare->execute();
-            $result['order'] = $prepare->fetch(PDO::FETCH_ASSOC);
+            $res = $prepare->fetch(PDO::FETCH_ASSOC);
+            $result['order'] = $res;
+            print_r($res);
             if (!empty($result['order'])) {
                 $full_name = '';
                 if ($disableConcat) {
