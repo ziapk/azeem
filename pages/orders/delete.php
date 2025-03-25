@@ -7,7 +7,7 @@ $id = !empty($_GET['id']) ? $_GET['id'] : null;
 $reason = !empty($_GET['reason']) ? $_GET['reason'] : null;
 
 
-print_r($_GET);
+var_dump($_GET);exit;
 
 if (empty($id) || empty($reason)) {
     echo json_encode(['success' => false, 'error' => 'Invalid order']);
