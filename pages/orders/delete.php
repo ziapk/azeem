@@ -3,20 +3,20 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-$id = !empty($_GET['id']) ? $_GET['id'] : null;
+$order_to_delete = !empty($_GET['id']) ? $_GET['id'] : null;
 $reason = !empty($_GET['reason']) ? $_GET['reason'] : null;
 
 
-if (empty($id) || empty($reason)) {
+if (empty($order_to_delete) || empty($reason)) {
     echo json_encode(['success' => false, 'error' => 'Invalid order']);
 }
 
 include_once dirname(__FILE__) . '/../../include/settings.php';
 
-if (!empty($id) && !empty($reason)) {
+if (!empty($order_to_delete) && !empty($reason)) {
     $orders = new Orders();
-    $orderDetail = $orders->getOrder($id);
-    print_r($id);
+    $orderDetail = $orders->getOrder($order_to_delete);
+    print_r($order_to_delete);
     echo '-------';
     print_r($orderDetail);
     $currentStatus = $orderDetail['order']['status'];
