@@ -1,7 +1,4 @@
 <?php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
 
 $order_to_delete = !empty($_GET['id']) ? $_GET['id'] : null;
 $reason = !empty($_GET['reason']) ? $_GET['reason'] : null;
@@ -16,10 +13,9 @@ include_once dirname(__FILE__) . '/../../include/settings.php';
 if (!empty($order_to_delete) && !empty($reason)) {
     $orders = new Orders();
     $orderDetail = $orders->getOrder($order_to_delete);
-    print_r($order_to_delete);
-    echo '-------';
-    print_r($orderDetail);
     $currentStatus = $orderDetail['order']['status'];
+    $doubleEntry = new DoubleEntry();
+    $doubleEntry->deleteTransactionByOrderId($orderDetail['order']['id']);
     if (in_array((int)$orderDetail['order']['status'], [2, 8, 9])) {
         // rollback products first
         $products = new Products();
