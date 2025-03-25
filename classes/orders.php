@@ -875,8 +875,10 @@ class Orders extends Connection
             $prepare->bindParam(':id', $id, PDO::PARAM_STR);
             $prepare->execute();
             $res = $prepare->fetch(PDO::FETCH_ASSOC);
+            $result['id'] = $id;
             $result['order'] = $res;
             print_r($res);
+            exit;
             if (!empty($result['order'])) {
                 $full_name = '';
                 if ($disableConcat) {
