@@ -6,11 +6,11 @@ define('SITE_URL', '/');
 date_default_timezone_set('Asia/Karachi');
 ini_set('max_input_vars', 20000);
 
-// ini_set('display_errors', 1);
-// ini_set('display_startup_errors', 1);
-// error_reporting(E_ALL);
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
-error_reporting(0);
+// error_reporting(0);
 
 if (empty($_SESSION) && $loginPage != true) {
     header('location: ' . SITE_URL . 'login.php');
@@ -27,6 +27,62 @@ $shop = !empty($_SESSION['shop']) ? $_SESSION['shop'] : [];
 // => add column in accounts = shopId, owner_id, opening_balance
 // => add table = account_ledger_entries -> add column -> payment_mode = default 1 cash
 // => ALTER TABLE `store` ADD `assets` INT NULL DEFAULT NULL AFTER `sale_date`, ADD `cash` INT NULL AFTER `assets`, ADD `expense` INT NULL AFTER `cash`, ADD `receivable` INT NULL AFTER `expense`, ADD `payable` INT NULL AFTER `receivable`, ADD `sale_discount` INT NULL AFTER `payable`, ADD `purchase_discount` INT NULL AFTER `sale_discount`;
+
+// prepared_products
+
+// CREATE TABLE worker (
+//     id INT AUTO_INCREMENT PRIMARY KEY, -- Unique identifier for each worker
+//     shop_id INT NOT NULL,             -- Shop identifier
+//     owner_id INT NOT NULL,            -- Owner identifier
+//     full_name VARCHAR(255) NOT NULL,  -- Full name of the worker
+//     email VARCHAR(255),        -- Email of the worker (optional, unique)
+//     designation VARCHAR(100),         -- Designation of the worker
+//     doj DATE NOT NULL,                -- Date of joining
+//     contact_1 VARCHAR(15) NOT NULL,   -- Primary contact number
+//     contact_2 VARCHAR(15),            -- Secondary contact number (optional)
+//     emg_contact_1 VARCHAR(15),        -- Emergency contact 1
+//     emg_contact_2 VARCHAR(15),        -- Emergency contact 2 (optional)
+//     rate_per_practical DECIMAL(10, 2) NOT NULL, -- Rate per practical for the worker
+//     account_id INT,                   -- Associated account ID (optional)
+//     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Record creation timestamp
+//     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP -- Last update timestamp
+// );
+
+
+// CREATE TABLE workorder (
+//     id INT AUTO_INCREMENT PRIMARY KEY,      -- Unique identifier for each workorder
+//     worker_id INT NOT NULL,                 -- Reference to the worker (required)
+//     status TINYINT(1) NOT NULL,             -- Status: 1 = processing, 2 = completed
+//     flag TINYINT(1) DEFAULT 1,              -- Payment flag: 1 = pending, 2 = paid
+//     shop_id INT NOT NULL,                   -- Reference to the shop (required)
+//     owner_id INT NOT NULL,                  -- Reference to the owner (required)
+//     price DECIMAL(15, 2) DEFAULT 0.00,      -- Total price of the work order
+//     payment_amount DECIMAL(15, 2) DEFAULT 0.00, -- Amount paid for the work order
+//     discount DECIMAL(15, 2) DEFAULT 0.00,   -- Discount applied to the work order
+//     wo_date DATE NOT NULL,                  -- Work order creation date
+//     ref_no VARCHAR(255) DEFAULT NULL,       -- Reference number for the work order
+//     description TEXT DEFAULT NULL,          -- Description or notes for the work order
+//     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Record creation timestamp
+//     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- Last update timestamp
+//     FOREIGN KEY (worker_id) REFERENCES worker(id) ON DELETE CASCADE -- Worker relationship
+// );
+
+// CREATE TABLE workorder_items (
+//     id INT AUTO_INCREMENT PRIMARY KEY,              -- Unique identifier for each item
+//     workorder_id INT NOT NULL,                      -- Reference to the workorder (required)
+//     product_id INT NOT NULL,                        -- Reference to the product (required)
+//     qty INT NOT NULL,                               -- Quantity of products
+//     practical_qty INT NOT NULL,                     -- Number of practicals per product
+//     cost_per_practical DECIMAL(10, 2) NOT NULL,     -- Cost per practical
+//     saleprice_per_practical DECIMAL(10, 2) NOT NULL,-- Sale price per practical
+//     discount DECIMAL(10, 2) DEFAULT 0.00,          -- Discount applied (optional, default 0)
+//     total_price DECIMAL(15, 2) GENERATED ALWAYS AS (qty * practical_qty * cost_per_practical) STORED, -- Total cost
+//     total_cost  DECIMAL(15, 2) GENERATED ALWAYS AS (qty * practical_qty * saleprice_per_practical - discount) STORED, -- Total price after discount
+//     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Record creation timestamp
+//     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- Last update timestamp
+//     FOREIGN KEY (workorder_id) REFERENCES workorder(id) ON DELETE CASCADE, -- Workorder relationship
+//     FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE -- Product relationship
+// );
 
 $pages = [
     "assign" => "Assign Book",
