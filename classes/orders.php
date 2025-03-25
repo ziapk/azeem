@@ -877,7 +877,8 @@ class Orders extends Connection
             $res = $prepare->fetch(PDO::FETCH_ASSOC);
             $result['id'] = $id;
             $result['order'] = $res;
-            print_r($res);
+            var_dump($res);
+            var_dump($result);
             exit;
             if (!empty($result['order'])) {
                 $full_name = '';
