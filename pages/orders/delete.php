@@ -1,4 +1,7 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
 $id = !empty($_GET['id']) ? $_GET['id'] : null;
 $reason = !empty($_GET['reason']) ? $_GET['reason'] : null;
