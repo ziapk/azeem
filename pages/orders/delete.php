@@ -12,7 +12,7 @@ include_once dirname(__FILE__) . '/../../include/settings.php';
 if (!empty($id) && !empty($reason)) {
     $orders = new Orders();
     $orderDetail = $orders->getOrder($id);
-    print_r($orderDetail);
+    print_r($id);
     $currentStatus = $orderDetail['order']['status'];
     if (in_array((int)$orderDetail['order']['status'], [2, 8, 9])) {
         // rollback products first
