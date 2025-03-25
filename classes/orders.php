@@ -874,7 +874,6 @@ class Orders extends Connection
             $prepare->bindParam(':id', $id, PDO::PARAM_STR);
             $prepare->execute();
             $result['order'] = $prepare->fetch(PDO::FETCH_ASSOC);
-            var_dump($result['order']);
             if (!empty($result['order'])) {
                 $full_name = '';
                 if ($disableConcat) {
@@ -887,7 +886,6 @@ class Orders extends Connection
                 $prepare->bindParam(':id', $id, PDO::PARAM_STR);
                 $prepare->execute();
                 $result['order_items'] = $prepare->fetchAll(PDO::FETCH_ASSOC);
-                var_dump($result['order_items']);
                 $services = $this->getOrderServices(['shopId' => $result['order']['shopId'], 'order_id' => $id]);
                 foreach ($result['order_items'] as $key => $val) {
                     $result['order_items'][$key]['expected_dates']['startDate'] = $val['start_date'];
@@ -902,10 +900,7 @@ class Orders extends Connection
                 $c = new Customers();
                 $de = new DoubleEntry();
                 $result['customer'] = $c->getCustomer($result['order']['customer_id']);
-                var_dump($result['customer']);
                 $result['transactions'] = $de->getPaymentTransactionsByAccountId($result['order']['id'], $result['customer']['account_id']);
-                var_dump($result['transactions']);
-                echo '---------------';
             }
             return $result;
         } catch (PDOException $e) {
