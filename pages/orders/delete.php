@@ -13,6 +13,7 @@ include_once dirname(__FILE__) . '/../../include/settings.php';
 if (!empty($order_to_delete) && !empty($reason)) {
     $orders = new Orders();
     $orderDetail = $orders->getOrder($order_to_delete);
+    print_r($orderDetail);exit;
     $currentStatus = $orderDetail['order']['status'];
     $doubleEntry = new DoubleEntry();
     $doubleEntry->deleteTransactionByOrderId($orderDetail['order']['id']);
