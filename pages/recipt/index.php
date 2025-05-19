@@ -194,7 +194,7 @@ $publishers = $publisherObj->getPublishers($userId);
                                 {{item.supply_date|date:'dd/MM/yyyy'}}<br />
                             </td>
                             <td style="width: 1%; white-space: nowrap">
-                                <span class="text-light">{{item.quantity}}</span> x <strong style="font-size: 20px">{{item.price * ((100 - item.discount)/100) | number:2}} </strong> Rs<br />
+                                <span class="text-light">{{item.quantity}}</span> x <strong style="font-size: 20px">{{calcPrice(item) | number:2}} </strong> Rs<br />
                             </td>
 
                         </tr>
@@ -207,7 +207,7 @@ $publishers = $publisherObj->getPublishers($userId);
                                 {{item.order_date|date:'dd/MM/yyyy'}}<br />
                             </td>
                             <td style="width: 1%; white-space: nowrap">
-                                <span class="text-light">{{item.quantity}}</span> x <strong style="font-size: 20px">{{item.price * ((100 - item.discount)/100) | number:2}} </strong> Rs<br />
+                                <span class="text-light">{{item.quantity}}</span> x <strong style="font-size: 20px">{{calcPrice(item) | number:2}} </strong> Rs<br />
                             </td>
 
                         </tr>
@@ -220,7 +220,7 @@ $publishers = $publisherObj->getPublishers($userId);
                                 {{item.return_date|date:'dd/MM/yyyy'}}<br />
                             </td>
                             <td style="width: 1%; white-space: nowrap">
-                                <span class="text-light">{{item.quantity}}</span> x <strong style="font-size: 20px">{{item.price * ((100 - item.discount)/100) | number:2}} </strong> Rs<br />
+                                <span class="text-light">{{item.quantity}}</span> x <strong style="font-size: 20px">{{calcPrice(item) | number:2}} </strong> Rs<br />
                             </td>
 
                         </tr>
@@ -1206,6 +1206,17 @@ echo mainFooter();
                 $scope.calculatePayment($scope.payWith);
             <?php } ?>
 
+        }
+
+
+        $scope.calcPrice = item => {
+            if(item.discount_type == 1 || item.discount <= 100) {
+                // percent
+                return item.price * ((100 - item.discount) / 100)
+            } else {
+                // fix
+                return item.price - item.discount
+            }
         }
         $scope.opublishers = <?php echo !empty($publishers) ? json_encode($publishers) : json_encode([]); ?>;
         $scope.publishers = <?php echo !empty($publishers) ? json_encode($publishers) : json_encode([]); ?>;
