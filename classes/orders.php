@@ -1961,7 +1961,7 @@ class Orders extends Connection
             if (!empty($product_id)) {
                 $toCondition .= " and p.id IN( $product_id ) ";
             }
-            $stmt = "SELECT o.id, oi.product_id, o.order_date, oi.price AS price, oi.discount, oi.quantity AS quantity, p.full_name, c.full_name as customerName  FROM `{$this->table}` AS o LEFT JOIN `{$this->table_sub}` AS oi ON oi.order_id=o.id LEFT JOIN `{$this->table_pro}` AS p on p.id=oi.product_id LEFT JOIN customers AS c ON c.id = o.customer_id WHERE o.shopId=:shopId " . $toCondition . " and o.flag = 1 ORDER BY oi.quantity desc";
+            $stmt = "SELECT o.id, oi.product_id, o.order_date, oi.price AS price, oi.discount, oi.quantity AS quantity, p.full_name, c.full_name as customerName  FROM `{$this->table}` AS o LEFT JOIN `{$this->table_sub}` AS oi ON oi.order_id=o.id LEFT JOIN `{$this->table_pro}` AS p on p.id=oi.product_id LEFT JOIN customers AS c ON c.id = o.customer_id WHERE o.shopId=:shopId " . $toCondition . " and o.flag = 1 ORDER BY o.order_date desc";
             $prepare = $dbh->prepare($stmt);
             $prepare->bindParam(':shopId', $shopId, PDO::PARAM_STR);
             $prepare->execute();
@@ -1984,7 +1984,7 @@ class Orders extends Connection
             if (!empty($product_id)) {
                 $toCondition .= " and p.id IN( $product_id ) ";
             }
-            $stmt = "SELECT o.id, oi.product_id, o.return_date, oi.price AS price, oi.discount, oi.quantity AS quantity, p.full_name, c.full_name as customerName, s.name as supplierName  FROM `{$this->table_ro}` AS o LEFT JOIN `{$this->table_rp}` AS oi ON oi.order_id=o.id LEFT JOIN `{$this->table_pro}` AS p on p.id=oi.product_id LEFT JOIN customers AS c ON c.id = o.customer_id and o.is_supplier = 1 LEFT JOIN `{$this->table_suppliers}` AS s ON s.id = o.customer_id and o.is_supplier = 2  WHERE o.shopId=:shopId " . $toCondition . " and o.flag = 1 ORDER BY oi.quantity desc";
+            $stmt = "SELECT o.id, oi.product_id, o.return_date, oi.price AS price, oi.discount, oi.quantity AS quantity, p.full_name, c.full_name as customerName, s.name as supplierName  FROM `{$this->table_ro}` AS o LEFT JOIN `{$this->table_rp}` AS oi ON oi.order_id=o.id LEFT JOIN `{$this->table_pro}` AS p on p.id=oi.product_id LEFT JOIN customers AS c ON c.id = o.customer_id and o.is_supplier = 1 LEFT JOIN `{$this->table_suppliers}` AS s ON s.id = o.customer_id and o.is_supplier = 2  WHERE o.shopId=:shopId " . $toCondition . " and o.flag = 1 ORDER BY o.return_date desc";
             $prepare = $dbh->prepare($stmt);
             $prepare->bindParam(':shopId', $shopId, PDO::PARAM_STR);
             $prepare->execute();
