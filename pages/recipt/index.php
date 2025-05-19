@@ -194,7 +194,7 @@ $publishers = $publisherObj->getPublishers($userId);
                                 {{item.supply_date|date:'dd/MM/yyyy'}}<br />
                             </td>
                             <td style="width: 1%; white-space: nowrap">
-                                <span class="text-light">{{item.quantity}}</span> x <strong style="font-size: 20px">{{calcPrice(item) | number:2}} </strong> Rs<br />
+                                <span class="text-light">{{item.quantity}}</span> x <strong style="font-size: 20px">{{calcPrice(item, 1) | number:2}} </strong> Rs<br />
                             </td>
 
                         </tr>
@@ -207,7 +207,7 @@ $publishers = $publisherObj->getPublishers($userId);
                                 {{item.order_date|date:'dd/MM/yyyy'}}<br />
                             </td>
                             <td style="width: 1%; white-space: nowrap">
-                                <span class="text-light">{{item.quantity}}</span> x <strong style="font-size: 20px">{{calcPrice(item) | number:2}} </strong> Rs<br />
+                                <span class="text-light">{{item.quantity}}</span> x <strong style="font-size: 20px">{{calcPrice(item, 2) | number:2}} </strong> Rs<br />
                             </td>
 
                         </tr>
@@ -220,7 +220,7 @@ $publishers = $publisherObj->getPublishers($userId);
                                 {{item.return_date|date:'dd/MM/yyyy'}}<br />
                             </td>
                             <td style="width: 1%; white-space: nowrap">
-                                <span class="text-light">{{item.quantity}}</span> x <strong style="font-size: 20px">{{calcPrice(item) | number:2}} </strong> Rs<br />
+                                <span class="text-light">{{item.quantity}}</span> x <strong style="font-size: 20px">{{calcPrice(item, 2) | number:2}} </strong> Rs<br />
                             </td>
 
                         </tr>
@@ -1209,8 +1209,8 @@ echo mainFooter();
         }
 
 
-        $scope.calcPrice = item => {
-            if(item.discount_type == 1 || item.discount <= 100) {
+        $scope.calcPrice = (item, discount_type) => {
+            if(discount_type == 1) {
                 // percent
                 return item.price * ((100 - item.discount) / 100)
             } else {
