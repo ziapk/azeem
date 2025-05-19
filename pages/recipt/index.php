@@ -202,7 +202,7 @@ $publishers = $publisherObj->getPublishers($userId);
                     <table ng-if="activePill == 1" class="table table-striped">
                         <tr ng-repeat="item in productSales | filter: { customerName : searchName, id : searchId,  price : searchPrice, quantity : searchQty } ">
                             <td>
-                                <strong class="text-danger">{{item.id}}</strong> | {{item.full_name}}<br />
+                                <strong class="text-danger">{{item.order_custom_id}}</strong> | {{item.full_name}}<br />
                                 <strong>{{item.customerName || item.supplierName}}</strong><br />
                                 {{item.order_date|date:'dd/MM/yyyy'}}<br />
                             </td>
