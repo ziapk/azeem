@@ -189,7 +189,7 @@ $publishers = $publisherObj->getPublishers($userId);
                     <table ng-if="activePill == 0" class="table table-striped">
                         <tr ng-repeat="item in productPurchases | filter: { customerName : searchName, id : searchId,  pprice : searchPrice, quantity : searchQty }">
                             <td>
-                                <a ng-click="openSupply(item.id, 'details')" href="javascript:void(0)"><strong class="text-danger">{{item.id}}</strong></a> | {{item.full_name}}<br />
+                                <a ng-click="openSupply(item.id, 'details', 'large')" href="javascript:void(0)"><strong class="text-danger">{{item.id}}</strong></a> | {{item.full_name}}<br />
                                 <strong>{{item.customerName || item.supplierName}}</strong><br />
                                 {{item.supply_date|date:'dd/MM/yyyy'}}<br />
                             </td>
@@ -202,7 +202,7 @@ $publishers = $publisherObj->getPublishers($userId);
                     <table ng-if="activePill == 1" class="table table-striped">
                         <tr ng-repeat="item in productSales | filter: { customerName : searchName, id : searchId,  price : searchPrice, quantity : searchQty } ">
                             <td>
-                                <a ng-click="openRecipt(item.id, 'details', 'largeView')" href="javascript:void(0)"><strong class="text-danger">{{item.order_custom_id}}</strong></a> | {{item.full_name}}<br />
+                                <a ng-click="openRecipt(item.id, 'details', 'large')" href="javascript:void(0)"><strong class="text-danger">{{item.order_custom_id}}</strong></a> | {{item.full_name}}<br />
                                 <strong>{{item.customerName || item.supplierName}}</strong><br />
                                 {{item.order_date|date:'dd/MM/yyyy'}}<br />
                             </td>
@@ -215,7 +215,7 @@ $publishers = $publisherObj->getPublishers($userId);
                     <table ng-if="activePill == 2" class="table table-striped">
                         <tr ng-repeat="item in productReturns | filter: { customerName : searchName, id : searchId,  price : searchPrice, quantity : searchQty } ">
                             <td>
-                                <a ng-click="openReturn(item.id, 'details', 'largeView')" href="javascript:void(0)"><strong class="text-danger">{{item.id}}</strong></a> | {{item.full_name}}<br />
+                                <a ng-click="openReturn(item.id, 'details', 'large')" href="javascript:void(0)"><strong class="text-danger">{{item.id}}</strong></a> | {{item.full_name}}<br />
                                 <strong>{{item.customerName || item.supplierName}}</strong><br />
                                 {{item.return_date|date:'dd/MM/yyyy'}}<br />
                             </td>
