@@ -12,7 +12,7 @@ foreach ($storeTypesArr as $key => $value) {
 }
 
 $ownerStores = $stores->getOwnerStores($userData['id']);
-$ownerStoreProducts = $productsObj->getStoreProducts($userData['id']);
+// $ownerStoreProducts = $productsObj->getStoreProducts($userData['id']);
 
 $currentStore = [];
 $storeList = [];
