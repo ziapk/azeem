@@ -172,12 +172,12 @@ $publishers = $publisherObj->getPublishers($userId);
                                 <?php include_once dirname(__FILE__) . '/table.php'; ?>
             </div>
             
-            <div ng-if="productPurchases.length || productSales.length || productReturns.length" class="col-xs-12 col-md-3">
+            <div ng-if="productPurchases.rows.length || productSales.rows.length || productReturns.rows.length" class="col-xs-12 col-md-3">
                 <button type="button" ng-click="hideList()" class="btn btn-danger btn-xs"><span class="fa fa-remove"></span> Hide</button>
                 <uib-tabset active="activePill" class="orders-tabs">
-                    <uib-tab index="0" data-tab="purchase" heading="PO ({{productPurchases.length}})"></uib-tab>
-                    <uib-tab index="1" data-tab="sale" heading="SO ({{productSales.length}})"></uib-tab>
-                    <uib-tab index="2" data-tab="return" heading="RO ({{productReturns.length}})"></uib-tab>
+                    <uib-tab index="0" data-tab="purchase" heading="PO - ({{productPurchases.totalProducts}}) ({{productPurchases.totalBills}}) "></uib-tab>
+                    <uib-tab index="1" data-tab="sale" heading="SO - ({{productSales.totalProducts}}) ({{productSales.length}})"></uib-tab>
+                    <uib-tab index="2" data-tab="return" heading="RO - ({{productReturns.totalProducts}}) ({{productReturns.length}})"></uib-tab>
                 </uib-tabset>
                 <div>
                     <input placeholder="ORDER ID" ng-model="searchId" />
@@ -187,7 +187,7 @@ $publishers = $publisherObj->getPublishers($userId);
                 </div>
                 <div style="height: 450px; overflow: auto">
                     <table ng-if="activePill == 0" class="table table-striped">
-                        <tr ng-repeat="item in productPurchases | filter: { customerName : searchName, id : searchId,  pprice : searchPrice, quantity : searchQty }">
+                        <tr ng-repeat="item in productPurchases.rows | filter: { customerName : searchName, id : searchId,  pprice : searchPrice, quantity : searchQty }">
                             <td>
                                 <a ng-click="openSupply(item.id, 'details', 'large')" href="javascript:void(0)"><strong class="text-danger">{{item.id}}</strong></a> | {{item.full_name}}<br />
                                 <strong>{{item.customerName || item.supplierName}}</strong><br />
@@ -200,7 +200,7 @@ $publishers = $publisherObj->getPublishers($userId);
                         </tr>
                     </table>
                     <table ng-if="activePill == 1" class="table table-striped">
-                        <tr ng-repeat="item in productSales | filter: { customerName : searchName, id : searchId,  price : searchPrice, quantity : searchQty } ">
+                        <tr ng-repeat="item in productSales.rows | filter: { customerName : searchName, id : searchId,  price : searchPrice, quantity : searchQty } ">
                             <td>
                                 <a ng-click="openRecipt(item.id, 'details', 'large')" href="javascript:void(0)"><strong class="text-danger">{{item.order_custom_id}}</strong></a> | {{item.full_name}}<br />
                                 <strong>{{item.customerName || item.supplierName}}</strong><br />
@@ -213,7 +213,7 @@ $publishers = $publisherObj->getPublishers($userId);
                         </tr>
                     </table>
                     <table ng-if="activePill == 2" class="table table-striped">
-                        <tr ng-repeat="item in productReturns | filter: { customerName : searchName, id : searchId,  price : searchPrice, quantity : searchQty } ">
+                        <tr ng-repeat="item in productReturns.rows | filter: { customerName : searchName, id : searchId,  price : searchPrice, quantity : searchQty } ">
                             <td>
                                 <a ng-click="openReturn(item.id, 'details', 'large')" href="javascript:void(0)"><strong class="text-danger">{{item.id}}</strong></a> | {{item.full_name}}<br />
                                 <strong>{{item.customerName || item.supplierName}}</strong><br />
@@ -839,19 +839,56 @@ echo mainFooter();
         $scope.getProductPurchases = function(product) {
             $http.get("<?php echo SITE_URL ?>api/getProductPurchases.php?product_id=" + product.id)
             .then(function(response) {
-                $scope.productPurchases = response.data.map(row => ({...row, supply_date: new Date(row.supply_date).toISOString()}));
+                let summery = {
+                    totalBills: 0,
+                    totalProducts: 0,
+                    rows: [],
+                };
+
+                summery.rows = response.data.map(row => {
+                summery.totalBills += 1;
+                summery.totalProducts += parseInt(row.quantity);
+                    return ({...row, supply_date: new Date(row.supply_date).toISOString()})
+                });
+                $scope.productPurchases = summery;
             });
         }
         $scope.getProductSales = function(product) {
             $http.get("<?php echo SITE_URL ?>api/getProductSales.php?product_id=" + product.id)
             .then(function(response) {
-                $scope.productSales = response.data;
+                
+                let summery = {
+                    totalBills: 0,
+                    totalProducts: 0,
+                    rows: [],
+                };
+
+                summery.rows = response.data;
+
+                response.data.map(row => {
+                    summery.totalBills += 1;
+                    summery.totalProducts += parseInt(row.quantity);
+                });
+                $scope.productSales = summery;
             });
         }
         $scope.getProductReturns = function(product) {
             $http.get("<?php echo SITE_URL ?>api/getProductReturns.php?product_id=" + product.id)
             .then(function(response) {
-                $scope.productReturns = response.data;
+                let summery = {
+                    totalBills: 0,
+                    totalProducts: 0,
+                    rows: [],
+                };
+
+                summery.rows = response.data;
+
+                response.data.map(row => {
+                    summery.totalBills += 1;
+                    summery.totalProducts += parseInt(row.quantity);
+                });
+
+                $scope.productReturns = summery;
             });
         }
         $scope.addMoreQty = function(obj, val, e) {
