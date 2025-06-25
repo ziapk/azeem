@@ -175,9 +175,9 @@ $publishers = $publisherObj->getPublishers($userId);
             <div ng-if="productPurchases.rows.length || productSales.rows.length || productReturns.rows.length" class="col-xs-12 col-md-3">
                 <button type="button" ng-click="hideList()" class="btn btn-danger btn-xs"><span class="fa fa-remove"></span> Hide</button>
                 <uib-tabset active="activePill" class="orders-tabs">
-                    <uib-tab index="0" data-tab="purchase" heading="PO - ({{productPurchases.totalProducts}}) ({{productPurchases.totalBills}}) "></uib-tab>
-                    <uib-tab index="1" data-tab="sale" heading="SO - ({{productSales.totalProducts}}) ({{productSales.length}})"></uib-tab>
-                    <uib-tab index="2" data-tab="return" heading="RO - ({{productReturns.totalProducts}}) ({{productReturns.length}})"></uib-tab>
+                    <uib-tab index="0" data-tab="purchase" heading="PO - {{productPurchases.totalProducts}} ({{productPurchases.totalBills}}) "></uib-tab>
+                    <uib-tab index="1" data-tab="sale" heading="SO - {{productSales.totalProducts}} ({{productSales.totalBills}})"></uib-tab>
+                    <uib-tab index="2" data-tab="return" heading="RO - {{productReturns.totalProducts}} ({{productReturns.totalBills}})"></uib-tab>
                 </uib-tabset>
                 <div>
                     <input placeholder="ORDER ID" ng-model="searchId" />
