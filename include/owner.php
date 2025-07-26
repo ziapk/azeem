@@ -145,9 +145,9 @@ $lockersList = $customerObj->getCustomers($shop['id'], 2);
                   To Customer
                 </label>
                 <ui-select ng-if="directpaymenttocustomer" custom-dropdown ng-model="payment.supplier" theme="bootstrap" ng-disabled="disabled" reset-search-input="false" title="Choose a customer">
-                  <ui-select-match placeholder="Enter a customer...">{{$select.selected.name}}</ui-select-match>
-                  <ui-select-choices repeat="address in customersList track by $index" refresh="refreshSuppliers($select.search)" refresh-delay="0">
-                    <div style="white-space: wrap;" ng-bind-html="address.name | highlight: $select.search"></div>
+                  <ui-select-match placeholder="Enter a customer...">{{$select.selected.full_name}}</ui-select-match>
+                  <ui-select-choices repeat="address in customersList track by $index" refresh="refreshCustomers($select.search)" refresh-delay="0">
+                    <div style="white-space: wrap;" ng-bind-html="address.full_name | highlight: $select.search"></div>
                   </ui-select-choices>
                 </ui-select>
                 <ui-select ng-if="!directpaymenttocustomer" custom-dropdown ng-model="payment.supplier" theme="bootstrap" ng-disabled="disabled" reset-search-input="false" title="Choose a supplier">
