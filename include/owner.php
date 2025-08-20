@@ -139,7 +139,7 @@ $lockersList = $customerObj->getCustomers($shop['id'], 2);
               Pay
             </a>
             <form ng-submit="directPayment()" class="dropdown-menu" style="padding: 15px; width: 320px">
-              <div class="form-group">
+              <div class="form-group" ng-class="{'col-sm-6': payment.royalty, 'col-sm-12': !payment.royalty}">
                 <label>
                   <input type="checkbox" ng-model="directpaymenttocustomer">
                   To Customer
