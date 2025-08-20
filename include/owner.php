@@ -139,31 +139,33 @@ $lockersList = $customerObj->getCustomers($shop['id'], 2);
               Pay
             </a>
             <form ng-submit="directPayment()" class="dropdown-menu" style="padding: 15px; width: 320px">
-              <div class="form-group" ng-class="{'col-sm-6': payment.royalty, 'col-sm-12': !payment.royalty}">
-                <label>
-                  <input type="checkbox" ng-model="directpaymenttocustomer">
-                  To Customer
-                </label>
-                <ui-select ng-if="directpaymenttocustomer" custom-dropdown ng-model="payment.supplier" theme="bootstrap" ng-disabled="disabled" reset-search-input="false" title="Choose a customer">
-                  <ui-select-match placeholder="Enter a customer...">{{$select.selected.full_name}}</ui-select-match>
-                  <ui-select-choices repeat="address in customersList track by $index" refresh="refreshCustomers($select.search)" refresh-delay="0">
-                    <div style="white-space: wrap;" ng-bind-html="address.full_name | highlight: $select.search"></div>
-                  </ui-select-choices>
-                </ui-select>
-                <ui-select ng-if="!directpaymenttocustomer" custom-dropdown ng-model="payment.supplier" theme="bootstrap" ng-disabled="disabled" reset-search-input="false" title="Choose a supplier">
-                  <ui-select-match placeholder="Enter a supplier...">{{$select.selected.name}}</ui-select-match>
-                  <ui-select-choices repeat="address in suppliersList track by $index" refresh="refreshSuppliers($select.search)" refresh-delay="0">
-                    <div style="white-space: wrap;" ng-bind-html="address.name | highlight: $select.search"></div>
-                  </ui-select-choices>
-                </ui-select>
-              </div>
-              <div class="form-group" ng-if="payment.royalty" ng-class="{'col-sm-6': payment.royalty, 'col-sm-12': !payment.royalty}">
-                <ui-select custom-dropdown ng-model="payment.author" theme="bootstrap" ng-disabled="disabled" reset-search-input="false" title="Choose an author">
-                  <ui-select-match placeholder="Enter a author...">{{$select.selected.name}}</ui-select-match>
-                  <ui-select-choices repeat="address in authorsList track by $index" refresh="refreshAuthors($select.search)" refresh-delay="0">
-                    <div style="white-space: wrap;" ng-bind-html="address.name | highlight: $select.search"></div>
-                  </ui-select-choices>
-                </ui-select>
+              <div class="row">
+                <div class="form-group" ng-class="{'col-sm-6': payment.royalty, 'col-sm-12': !payment.royalty}">
+                  <label>
+                    <input type="checkbox" ng-model="directpaymenttocustomer">
+                    To Customer
+                  </label>
+                  <ui-select ng-if="directpaymenttocustomer" custom-dropdown ng-model="payment.supplier" theme="bootstrap" ng-disabled="disabled" reset-search-input="false" title="Choose a customer">
+                    <ui-select-match placeholder="Enter a customer...">{{$select.selected.full_name}}</ui-select-match>
+                    <ui-select-choices repeat="address in customersList track by $index" refresh="refreshCustomers($select.search)" refresh-delay="0">
+                      <div style="white-space: wrap;" ng-bind-html="address.full_name | highlight: $select.search"></div>
+                    </ui-select-choices>
+                  </ui-select>
+                  <ui-select ng-if="!directpaymenttocustomer" custom-dropdown ng-model="payment.supplier" theme="bootstrap" ng-disabled="disabled" reset-search-input="false" title="Choose a supplier">
+                    <ui-select-match placeholder="Enter a supplier...">{{$select.selected.name}}</ui-select-match>
+                    <ui-select-choices repeat="address in suppliersList track by $index" refresh="refreshSuppliers($select.search)" refresh-delay="0">
+                      <div style="white-space: wrap;" ng-bind-html="address.name | highlight: $select.search"></div>
+                    </ui-select-choices>
+                  </ui-select>
+                </div>
+                <div class="form-group" ng-if="payment.royalty" ng-class="{'col-sm-6': payment.royalty, 'col-sm-12': !payment.royalty}">
+                  <ui-select custom-dropdown ng-model="payment.author" theme="bootstrap" ng-disabled="disabled" reset-search-input="false" title="Choose an author">
+                    <ui-select-match placeholder="Enter a author...">{{$select.selected.name}}</ui-select-match>
+                    <ui-select-choices repeat="address in authorsList track by $index" refresh="refreshAuthors($select.search)" refresh-delay="0">
+                      <div style="white-space: wrap;" ng-bind-html="address.name | highlight: $select.search"></div>
+                    </ui-select-choices>
+                  </ui-select>
+                </div>
               </div>
               <div class="form-group">
                 <input placeholder="Description" ng-model="payment.summery" type="text" class="form-control input-lg">
