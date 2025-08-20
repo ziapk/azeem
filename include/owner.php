@@ -157,6 +157,14 @@ $lockersList = $customerObj->getCustomers($shop['id'], 2);
                   </ui-select-choices>
                 </ui-select>
               </div>
+              <div class="form-group" ng-if="payment.royalty" ng-class="{'col-sm-6': payment.royalty, 'col-sm-12': !payment.royalty}">
+                <ui-select custom-dropdown ng-model="payment.author" theme="bootstrap" ng-disabled="disabled" reset-search-input="false" title="Choose an author">
+                  <ui-select-match placeholder="Enter a author...">{{$select.selected.name}}</ui-select-match>
+                  <ui-select-choices repeat="address in authorsList track by $index" refresh="refreshAuthors($select.search)" refresh-delay="0">
+                    <div style="white-space: wrap;" ng-bind-html="address.name | highlight: $select.search"></div>
+                  </ui-select-choices>
+                </ui-select>
+              </div>
               <div class="form-group">
                 <input placeholder="Description" ng-model="payment.summery" type="text" class="form-control input-lg">
               </div>
