@@ -194,7 +194,7 @@ $publishers = $publisherObj->getPublishers($userId);
                                 {{item.supply_date|date:'dd/MM/yyyy'}}<br />
                             </td>
                             <td style="width: 1%; white-space: nowrap">
-                                <span class="text-light">{{item.quantity}}</span> x <strong style="font-size: 20px">{{calcPrice(item, 1) | number:2}} </strong> Rs<br />
+                                <span class="text-light">{{item.quantity}}</span> x <strong style="font-size: 20px">{{item.pprice | number:2}} </strong> Rs<br />
                             </td>
                         </tr>
                     </table>
