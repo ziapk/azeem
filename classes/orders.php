@@ -1672,7 +1672,6 @@ class Orders extends Connection
         $reason = $array['reason'];
         $flag = $array['flag'];
 
-        print_r($array);exit;
         $dbh = $this->connectionPool->getConnection();
         try {
             $stmt = "UPDATE `{$this->table_ro}` SET `reason`=:reason, `flag`=:flag WHERE id=:id";
