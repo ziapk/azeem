@@ -1712,6 +1712,8 @@ class Orders extends Connection
     public function prepareReturn($array)
     {
 
+        print_r($array);exit;
+
         $customersObj = new Customers();
         $storeObj = new Store();
 
