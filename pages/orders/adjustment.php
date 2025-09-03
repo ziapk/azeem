@@ -381,7 +381,7 @@ echo mainFooter();
                 }
             }).then(res => {
                 $scope.supplierId = p.id
-                $scope.supplierName = $scope.order?.order?.customer_name || p.full_name || p.name
+                $scope.supplierName =  p?.full_name || p?.name || $scope.order?.order?.customer_name
                 $scope.supplier = {
                     ...p,
                     full_name: p.full_name || p.name,
