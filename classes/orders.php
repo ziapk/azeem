@@ -74,6 +74,13 @@ class Orders extends Connection
 
     public function prepareOrder($array)
     {
+        // @array is payload
+        // @Customer is class object
+        // @Store is class object
+        // @ShopAccounts is class object
+        // @DoubleEntry is class object
+        // @UserInfo is session information
+
         $customersObj = new Customers();
         $customer = $customersObj->getCustomer($array['customerId']);
 
@@ -134,12 +141,12 @@ class Orders extends Connection
                 $storeAccounts[$a['key_value']] = $a['account_id'];
             }
 
-            if (!empty($array['id'])) {
+            if (!empty($array['id'])) { // rollback inventory and transaction data of an existing order
 
-                $orderDetail = $this->getOrder($array['id']);
-                $currentStatus = $orderDetail['order']['status'];
+                $orderDetail = $this->getOrder($array['id']); // get full order details
+                $currentStatus = $orderDetail['order']['status']; // get current status
 
-                if (in_array($currentStatus, [2, 8, 9])) {
+                if (in_array($currentStatus, [2, 8, 9])) { // if current status is completed or partial paid or draft
 
                     // rollback products first
                     $products = new Products();
@@ -1664,6 +1671,8 @@ class Orders extends Connection
         $id = $array['id'];
         $reason = $array['reason'];
         $flag = $array['flag'];
+
+        print_r($array);exit;
         $dbh = $this->connectionPool->getConnection();
         try {
             $stmt = "UPDATE `{$this->table_ro}` SET `reason`=:reason, `flag`=:flag WHERE id=:id";
