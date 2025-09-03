@@ -1271,8 +1271,6 @@ class Orders extends Connection
         $dbh = $this->connectionPool->getConnection();
         try {
 
-            print_r($array);exit;
-
             $ref_no = !empty($array['ref_no']) ? $array['ref_no'] : null;
             $flag = $array['flag'];
             if (!empty($array['id'])) {
@@ -1711,8 +1709,6 @@ class Orders extends Connection
 
     public function prepareReturn($array)
     {
-
-        print_r($array);exit;
 
         $customersObj = new Customers();
         $storeObj = new Store();
