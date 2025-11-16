@@ -276,13 +276,38 @@ class Products extends Connection
 
 			$column = "";
 
-			$column = ", (sp.qty - sp.stock_out) as qty, sp.min_qty ";
+			$column = ", ANY_VALUE(sp.qty - sp.stock_out) as qty, ANY_VALUE(sp.min_qty) as min_qty ";
 			if (!empty($params['minQty'])) {
 				$minQry = " HAVING qty <= sp.min_qty order by p.priority desc, price desc, code desc ";
 			}
 
 			$mobileCols = "p.id,p.full_name";
-			$allCols = "group_concat(DISTINCT r.title ORDER BY r.title ASC) as rackNumbers, p.priority, p.wh_price, p.image, group_concat(DISTINCT pc.code ORDER BY pc.code ASC) as other_codes, p.author, p.barcode, p.code, p.cat_id, p.board, p.group, p.id, p.pprice, sp.pin, p.publisher_id, concat(p.id, ' | ', p.full_name) as full_name, sp.pack_qty, sp.pack_size, pub.full_name as publisherName, pub.discount_type, pub.discount_amount, CONVERT(case when (pub.discount_amount > 0) then (p.price * (1 - (pub.discount_amount / 100)) ) else p.price end, DECIMAL) as price, is_active, product_type $column";
+			$allCols = "group_concat(DISTINCT r.title ORDER BY r.title ASC) as rackNumbers, 
+			ANY_VALUE(p.priority) as priority,
+			ANY_VALUE(p.wh_price) as wh_price,
+			ANY_VALUE(p.image) as image,
+			group_concat(DISTINCT pc.code ORDER BY pc.code ASC) as other_codes,
+			ANY_VALUE(p.author) as author,
+			ANY_VALUE(p.barcode) as barcode,
+			ANY_VALUE(p.code) as code,
+			ANY_VALUE(p.cat_id) as cat_id,
+			ANY_VALUE(p.board) as board,
+			ANY_VALUE(p.group) as `group`,
+			ANY_VALUE(p.id) as id,
+			ANY_VALUE(p.pprice) as pprice,
+			ANY_VALUE(sp.pin) as pin,
+			ANY_VALUE(p.publisher_id) as publisher_id,
+			concat(ANY_VALUE(p.id), ' | ',ANY_VALUE(p.full_name)) as full_name,
+			ANY_VALUE(sp.pack_qty) as pack_qty,
+			ANY_VALUE(sp.pack_size) as pack_size,
+			ANY_VALUE(pub.full_name) as publisherName,
+			ANY_VALUE(pub.discount_type) as discount_type,
+			ANY_VALUE(pub.discount_amount) as discount_amount,
+			ANY_VALUE(CONVERT(case when (pub.discount_amount > 0) 
+			then (p.price * (1 - (pub.discount_amount / 100)) ) else p.price end, DECIMAL)) as price,
+			ANY_VALUE(is_active) as is_active,
+			ANY_VALUE(product_type) as product_type
+			$column";
 
 			$mainCols = "";
 			if (!empty($mobileCol)) {
@@ -696,7 +721,7 @@ class Products extends Connection
 		$dbh = $this->connectionPool->getConnection();
 		try {
 
-			$stmt1 = "SELECT count(*) as count FROM (SELECT st.id FROM `{$this->table_st}` as st LEFT JOIN `{$this->table}` AS p ON p.id = st.product_id LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id WHERE p.is_active = 1 and st.`owner_id`=:owner_id and st.status = 1 $shopCondition $searchQry $publisher_query group by pc.product_id, st.product_id order by p.id) AS a";
+			$stmt1 = "SELECT count(*) as count FROM (SELECT ANY_VALUE(st.id) AS id FROM `{$this->table_st}` as st LEFT JOIN `{$this->table}` AS p ON p.id = st.product_id LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id WHERE p.is_active = 1 and st.`owner_id`=:owner_id and st.status = 1 $shopCondition $searchQry $publisher_query group by pc.product_id, st.product_id order by p.id) AS a";
 			$prepare = $dbh->prepare($stmt1);
 			$prepare->bindParam(':owner_id', $owner_id, PDO::PARAM_STR);
 			$prepare->execute();
@@ -707,7 +732,31 @@ class Products extends Connection
 			$currentPage = $total_pages >= $params['page'] ? $params['page'] : $total_pages;
 			$offset =  ((!empty($currentPage) ? $currentPage : 1) - 1) * $no_of_records_per_page;
 
-			$stmt = "SELECT st.*, p.code, p.id as product_id, p.full_name, p.group, p.publisher_id, p.author, p.price FROM `{$this->table_st}` as st LEFT JOIN `{$this->table}` AS p ON p.id = st.product_id LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id WHERE p.is_active = 1 and st.`owner_id`=:owner_id and st.status = 1 $shopCondition $searchQry $publisher_query group by st.product_id, pc.product_id order by p.id desc LIMIT :offset, :perPage";
+			
+
+			$stmt = "SELECT ANY_VALUE(st.id) as `id`,
+			ANY_VALUE(st.qty) as `qty`,
+			ANY_VALUE(st.faulty_qty) as `faulty_qty`,
+			ANY_VALUE(st.stock_out) as `stock_out`,
+			ANY_VALUE(st.min_qty) as `min_qty`,
+			ANY_VALUE(st.sale_price) as `sale_price`,
+			ANY_VALUE(st.pack_size) as `pack_size`,
+			ANY_VALUE(st.pack_qty) as `pack_qty`,
+			ANY_VALUE(st.location) as `location`,
+			ANY_VALUE(st.product_id) as `product_id`,
+			ANY_VALUE(st.shopId) as `shopId`,
+			ANY_VALUE(st.pin) as `pin`,
+			ANY_VALUE(st.status) as `status`,
+			ANY_VALUE(st.owner_id) as `owner_id`,
+			ANY_VALUE(st.created_at) as `created_at`,
+
+			ANY_VALUE(p.code) AS code,
+			ANY_VALUE(p.id) AS product_id,
+			ANY_VALUE(p.full_name) AS full_name,
+			ANY_VALUE(p.group) AS `group`,
+			ANY_VALUE(p.publisher_id) AS publisher_id,
+			ANY_VALUE(p.author) AS author,
+			ANY_VALUE(p.price) AS price FROM `{$this->table_st}` as st LEFT JOIN `{$this->table}` AS p ON p.id = st.product_id LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id WHERE p.is_active = 1 and st.`owner_id`=:owner_id and st.status = 1 $shopCondition $searchQry $publisher_query group by st.product_id, pc.product_id order by p.id desc LIMIT :offset, :perPage";
 			$prepare2 = $dbh->prepare($stmt);
 			$prepare2->bindParam(':owner_id', $owner_id, PDO::PARAM_STR);
 			$prepare2->bindParam(':offset', $offset, PDO::PARAM_INT);

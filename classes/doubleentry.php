@@ -627,7 +627,7 @@ class DoubleEntry extends Connection
 			$exp = $store['sale_discount'];
 			$expHead = $store['expense'];
 			$count = 0;
-			$expenses = ['total' => 0, 'rows' => []];
+			$expenses = ['total' => [], 'rows' => []];
 			$otherList = [];
 			$otherTotals = [];
 			$purchaseReturnsList = [];
