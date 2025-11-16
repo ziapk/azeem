@@ -276,38 +276,13 @@ class Products extends Connection
 
 			$column = "";
 
-			$column = ", (sp.qty - sp.stock_out) as qty, (sp.min_qty) as min_qty ";
+			$column = ", (sp.qty - sp.stock_out) as qty, sp.min_qty ";
 			if (!empty($params['minQty'])) {
 				$minQry = " HAVING qty <= sp.min_qty order by p.priority desc, price desc, code desc ";
 			}
 
 			$mobileCols = "p.id,p.full_name";
-			$allCols = "group_concat(DISTINCT r.title ORDER BY r.title ASC) as rackNumbers, 
-			p.priority,
-			p.wh_price,
-			p.image,
-			group_concat(DISTINCT pc.code ORDER BY pc.code ASC) as other_codes,
-			p.author,
-			p.barcode,
-			p.code,
-			p.cat_id,
-			p.board,
-			p.group,
-			p.id,
-			p.pprice,
-			sp.pin,
-			p.publisher_id,
-			concat((p.id), ' | ',(p.full_name)) as full_name,
-			sp.pack_qty,
-			sp.pack_size,
-			pub.full_name,
-			pub.discount_type,
-			pub.discount_amount,
-			CONVERT(case when (pub.discount_amount > 0) 
-			then (p.price * (1 - (pub.discount_amount / 100)) ) else p.price end, DECIMAL)) as price,
-			is_active,
-			product_type
-			$column";
+			$allCols = "group_concat(DISTINCT r.title ORDER BY r.title ASC) as rackNumbers, p.priority, p.wh_price, p.image, group_concat(DISTINCT pc.code ORDER BY pc.code ASC) as other_codes, p.author, p.barcode, p.code, p.cat_id, p.board, p.group, p.id, p.pprice, sp.pin, p.publisher_id, concat(p.id, ' | ', p.full_name) as full_name, sp.pack_qty, sp.pack_size, pub.full_name as publisherName, pub.discount_type, pub.discount_amount, CONVERT(case when (pub.discount_amount > 0) then (p.price * (1 - (pub.discount_amount / 100)) ) else p.price end, DECIMAL) as price, is_active, product_type $column";
 
 			$mainCols = "";
 			if (!empty($mobileCol)) {
@@ -732,16 +707,7 @@ class Products extends Connection
 			$currentPage = $total_pages >= $params['page'] ? $params['page'] : $total_pages;
 			$offset =  ((!empty($currentPage) ? $currentPage : 1) - 1) * $no_of_records_per_page;
 
-			
-
-			$stmt = "SELECT st.*
-			p.code,
-			p.id,
-			p.full_name,
-			p.group`,
-			p.publisher_id,
-			p.author,
-			p.price FROM `{$this->table_st}` as st LEFT JOIN `{$this->table}` AS p ON p.id = st.product_id LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id WHERE p.is_active = 1 and st.`owner_id`=:owner_id and st.status = 1 $shopCondition $searchQry $publisher_query group by st.product_id, pc.product_id order by p.id desc LIMIT :offset, :perPage";
+			$stmt = "SELECT st.*, p.code, p.id as product_id, p.full_name, p.group, p.publisher_id, p.author, p.price FROM `{$this->table_st}` as st LEFT JOIN `{$this->table}` AS p ON p.id = st.product_id LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id WHERE p.is_active = 1 and st.`owner_id`=:owner_id and st.status = 1 $shopCondition $searchQry $publisher_query group by st.product_id, pc.product_id order by p.id desc LIMIT :offset, :perPage";
 			$prepare2 = $dbh->prepare($stmt);
 			$prepare2->bindParam(':owner_id', $owner_id, PDO::PARAM_STR);
 			$prepare2->bindParam(':offset', $offset, PDO::PARAM_INT);
