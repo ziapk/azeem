@@ -7,15 +7,15 @@ class ConnectionPool
 
 	// private $maxConnections = 10; // Maximum number of connections in the pool
 
-	// private $host = 'localhost';
-	// private $dbname = 'reclydmy_azeem';
-	// private $user = 'reclydmy_pos';
-	// private $pass = ';4B)pQC=K0&v';
-	
 	private $host = 'localhost';
 	private $dbname = 'reclydmy_azeem';
-	private $user = 'root';
-	private $pass = 'root';
+	private $user = 'reclydmy_pos';
+	private $pass = ';4B)pQC=K0&v';
+	
+	// private $host = 'localhost';
+	// private $dbname = 'reclydmy_azeem';
+	// private $user = 'root';
+	// private $pass = 'root';
 
 	// private $host = 'localhost';
 	// private $dbname = 'reclydmy_shops';
