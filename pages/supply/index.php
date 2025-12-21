@@ -319,6 +319,7 @@ echo mainFooter();
 
             $scope.product = "";
             if (!exists) {
+                $scope.calculatePercent(p, 1);
                 $scope.items.unshift({
                     ...p,
                     pack_size: parseFloat(p.pack_size),
@@ -486,9 +487,9 @@ echo mainFooter();
 
         $scope.calculateSum(true);
 
-        $scope.calculatePercent = product => {
+        $scope.calculatePercent = (product, calc = 0) => {
             product.discount = parseFloat(((1 - (product.pprice / product.price)) * 100).toFixed(2))
-            $scope.calculateSum()
+            if(calc == 0) $scope.calculateSum()
         }
 
 
