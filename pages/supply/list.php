@@ -47,7 +47,7 @@ echo mainHeader(['page' => 'supplies']);
                     <td>{{row.ref_no}}</td>
                     <td>{{row.customer_name || row.full_name}}</td>
                     <td>{{row.price}}</td>
-                    <td><span class="label" ng-class="{'label-success': row.status == 2, 'label-primary': row.status == 1, 'label-danger': row.status == 8}">{{statusArr[row.status].full_name | uppercase}}</span></td>
+                    <td><span class="label" ng-class="{'label-success': row.status == 2, 'label-primary': row.status == 1, 'label-warning': row.status == 8, 'label-danger': row.status == 9}">{{statusArr[row.status].full_name | uppercase}}</span></td>
                     <td>{{row.order_date}}</td>
                     <td align="right">
                         <?php if ($userData['role'] == 'owner') { ?>
