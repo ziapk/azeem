@@ -21,6 +21,7 @@ $cash = !empty($_POST['payment_amount']) ? $_POST['payment_amount'] : 0;
 $isDemandCreate = !empty($_POST['createDemand']) && $_POST['createDemand'] == "true";
 $payment_with_credit = !empty($_POST['payment_with_credit']) ? $_POST['payment_with_credit'] : 0;
 $de = new DoubleEntry();
+$payment_mode = $de->getDefaultPaymentMode($_POST);
 foreach ($accountsData as $a) {
     $storeAccounts[$a['key_value']] = $a['account_id'];
 }
@@ -256,7 +257,7 @@ if ($supply_id) {
                 'entry_type' => 'D',
                 'description' => !empty($data['description']) ? $data['description'] : '',
                 'amount' => $assetPrice, // 2000
-                'payment_mode' => $_POST['payment_mode'],
+                'payment_mode' => $payment_mode['id'],
                 'user_id' => $_SESSION['user_credentials']['id'],
             ];
             $a[] = $de->makeEntry($entry);
@@ -269,7 +270,7 @@ if ($supply_id) {
                 'entry_type' => 'D',
                 'description' => !empty($data['description']) ? $data['description'] : '',
                 'amount' => $fixAssetsValue, // 2000
-                'payment_mode' => $_POST['payment_mode'],
+                'payment_mode' => $payment_mode['id'],
                 'user_id' => $_SESSION['user_credentials']['id'],
             ];
             $a[] = $de->makeEntry($entry);
@@ -283,7 +284,7 @@ if ($supply_id) {
             'entry_type' => 'C',
             'description' => !empty($data['description']) ? $data['description'] : '',
             'amount' => $payableAmount,
-            'payment_mode' => $_POST['payment_mode'],
+            'payment_mode' => $payment_mode['id'],
             'user_id' => $_SESSION['user_credentials']['id'],
         ];
         $a[] = $de->makeEntry($entry);
@@ -296,7 +297,7 @@ if ($supply_id) {
                 'entry_type' => 'C',
                 'description' => !empty($data['description']) ? $data['description'] : '',
                 'amount' => $purchaseDiscount, // 200 @ 10%
-                'payment_mode' => $_POST['payment_mode'],
+                'payment_mode' => $payment_mode['id'],
                 'user_id' => $_SESSION['user_credentials']['id'],
             ];
             $a[] = $de->makeEntry($entry);
@@ -312,7 +313,7 @@ if ($supply_id) {
                 'entry_type' => 'D',
                 'description' => '',
                 'amount' => $cash,
-                'payment_mode' => $_POST['payment_mode'],
+                'payment_mode' => $payment_mode['id'],
                 'user_id' => $_SESSION['user_credentials']['id'],
             ];
             $a[] = $de->makeEntry($entry);
@@ -323,7 +324,7 @@ if ($supply_id) {
                 'entry_type' => 'C',
                 'description' => '',
                 'amount' => $cash, // 200 @ 10%
-                'payment_mode' => $_POST['payment_mode'],
+                'payment_mode' => $payment_mode['id'],
                 'user_id' => $_SESSION['user_credentials']['id'],
             ];
             $a[] = $de->makeEntry($entry);
