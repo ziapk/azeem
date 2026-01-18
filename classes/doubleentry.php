@@ -622,6 +622,8 @@ class DoubleEntry extends Connection
 
 			$reportDataRaw = $result;
 
+			print_r($result);exit;
+
 
 			$rows = [];
 			$exp = $store['sale_discount'];
