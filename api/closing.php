@@ -4,7 +4,7 @@ global $shop;
 $products = new Store();
 $search = 0;
 $shopId = $userData['role'] == 'owner' ? $_POST['id'] : $shop['id'];
-$shopDate = $userData['role'] == 'owner' ? $_POST['sale_date'] : $shop['sale_date'];
+$shopDate = $userData['role'] == 'owner' || $userData['role'] == 'manager' ? $_POST['sale_date'] : $shop['sale_date'];
 $closing_balance = !empty($_POST['closing_balance']) ? $_POST['closing_balance'] : 0;
 if (!empty($shopId)) {
     try {
