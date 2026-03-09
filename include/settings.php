@@ -6,11 +6,11 @@ define('SITE_URL', '/');
 date_default_timezone_set('Asia/Karachi');
 ini_set('max_input_vars', 20000);
 
-// ini_set('display_errors', 1);
-// ini_set('display_startup_errors', 1);
-// error_reporting(E_ALL);
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
-error_reporting(0);
+// error_reporting(0);
 
 if (empty($_SESSION) && $loginPage != true) {
     header('location: ' . SITE_URL . 'login.php');
