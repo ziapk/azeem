@@ -148,14 +148,14 @@ class Orders extends Connection
 
                 if (in_array($currentStatus, [2, 8, 9])) { // if current status is completed or partial paid or draft
 
-                    // rollback products first
-                    $products = new Products();
-                    foreach ($orderDetail['order_items'] as $prod) {
-                        $products->subProductQty(['product_id' => $prod['product_id'], 'quantity' => -1 * $prod['quantity'], 'pack_qty' => $prod['pack_qty'], 'owner_id' => $user['role'] == 'owner' ? $user['id'] : $user['created_by'], 'shopId' => $orderDetail['order']['shopId']]);
-                        if (!empty($customer['linked_shop'])) {
-                            $products->addProductQty($prod['product_id'], ['qty' => -1 * $prod['quantity'], 'pack_qty' => $prod['pack_qty']], $customer['linked_shop']);
-                        }
-                    }
+                    // ── INVENTORY: reverse all ledger entries for this order ──
+                    $inventory = new Inventory();
+                    $inventory->reverseByRef(
+                        Inventory::REF_ORDER,
+                        (int)$orderDetail['order']['id'],
+                        (int)($user['role'] == 'owner' ? $user['id'] : $user['created_by']),
+                        'Rollback before re-processing order #' . $orderDetail['order']['id']
+                    );
 
                     // delete transactions
                     $doubleEntry->deleteTransactionByOrderId($orderDetail['order']['id']);
@@ -446,28 +446,63 @@ class Orders extends Connection
             $prepare->execute();
             $result = $dbh->lastInsertId();
             if ($flag == 2) {
-                $products = new Products();
-                $qty = -1 * $array['quantity'];
-                $pack_qty = -1 * $array['pack_qty'];
+                // ── INVENTORY: customer return flow ──
+                $inventory = new Inventory();
                 if ($reverse) {
-                    $products->addProductQty($array['product_id'], ['qty' => $qty, 'pack_qty' => $pack_qty, 'pack_size' => $array['pack_size']], $array['shopId']);
+                    // Reversing a previously processed return — stock goes back OUT
+                    $inventory->logMovement([
+                        'product_id'    => (int)$array['product_id'],
+                        'shop_id'       => (int)$array['shopId'],
+                        'owner_id'      => (int)$array['owner_id'],
+                        'movement_type' => Inventory::SALE,
+                        'quantity'      => (float)$array['quantity'],
+                        'ref_type'      => Inventory::REF_RETURN_ORDER,
+                        'ref_id'        => (int)$array['order_id'],
+                        'note'          => 'Return reversal — stock sent back out',
+                        'created_by'    => (int)$array['user_id'],
+                    ]);
                 } else {
                     if (!empty($ownerShopId)) {
-                        $products->addProductQty($array['product_id'], ['qty' => $array['quantity'], 'pack_qty' => $array['pack_qty']], $ownerShopId);
-                        $products->subProductQty(['product_id' => $array['product_id'], 'quantity' => $array['quantity'], 'pack_qty' => $array['pack_qty'], 'owner_id' => $array['owner_id'], 'shopId' => $array['shopId']]);
+                        // Return goes to owner's shop (stock IN there)
+                        $inventory->logMovement([
+                            'product_id'    => (int)$array['product_id'],
+                            'shop_id'       => (int)$ownerShopId,
+                            'owner_id'      => (int)$array['owner_id'],
+                            'movement_type' => Inventory::RETURN_IN,
+                            'quantity'      => (float)$array['quantity'],
+                            'ref_type'      => Inventory::REF_RETURN_ORDER,
+                            'ref_id'        => (int)$array['order_id'],
+                            'note'          => 'Customer return received at owner shop',
+                            'created_by'    => (int)$array['user_id'],
+                        ]);
+                        // And comes out of the original shop
+                        $inventory->logMovement([
+                            'product_id'    => (int)$array['product_id'],
+                            'shop_id'       => (int)$array['shopId'],
+                            'owner_id'      => (int)$array['owner_id'],
+                            'movement_type' => Inventory::SALE,
+                            'quantity'      => (float)$array['quantity'],
+                            'ref_type'      => Inventory::REF_RETURN_ORDER,
+                            'ref_id'        => (int)$array['order_id'],
+                            'note'          => 'Transfer out for customer return to owner shop',
+                            'created_by'    => (int)$array['user_id'],
+                        ]);
                     } else {
-                        $products->subProductQty(['product_id' => $array['product_id'], 'quantity' => $qty, 'pack_qty' => $pack_qty, 'owner_id' => $array['owner_id'], 'shopId' => $array['shopId']]);
+                        // Simple customer return — stock comes back IN to this shop
+                        $inventory->logMovement([
+                            'product_id'    => (int)$array['product_id'],
+                            'shop_id'       => (int)$array['shopId'],
+                            'owner_id'      => (int)$array['owner_id'],
+                            'movement_type' => Inventory::RETURN_IN,
+                            'quantity'      => (float)$array['quantity'],
+                            'ref_type'      => Inventory::REF_RETURN_ORDER,
+                            'ref_id'        => (int)$array['order_id'],
+                            'note'          => 'Customer return received',
+                            'created_by'    => (int)$array['user_id'],
+                        ]);
                     }
                 }
             }
-
-            // $this->orderReturn($array['order_id'], ($action + 4));
-            // if(!empty($delete)) {
-            //     $this->deleteOrderItem($array['order_id'], $array['product_id']);
-            // }
-            // else {
-            //     $this->updateOrderItem($array['order_id'], $array['product_id'], $array['quantity']);
-            // }
             return $result;
         } catch (PDOException $e) {
             die("Error!: " . $e->getMessage() . "<br/>");
@@ -610,9 +645,19 @@ class Orders extends Connection
             $prepare->execute();
             $result = $dbh->lastInsertId();
             if ($array['flag'] == 2) {
-                $array['product_id'] = $array['service_id'];
-                $prod = new Products();
-                $prod->subProductQty($array);
+                // ── INVENTORY: raw material consumed as part of service/order ──
+                $inventory = new Inventory();
+                $inventory->logMovement([
+                    'product_id'    => (int)$array['service_id'],
+                    'shop_id'       => (int)$array['shopId'],
+                    'owner_id'      => (int)$array['owner_id'],
+                    'movement_type' => Inventory::SALE,
+                    'quantity'      => (float)($array['quantity'] ?? 1),
+                    'ref_type'      => Inventory::REF_ORDER,
+                    'ref_id'        => (int)$array['order_id'],
+                    'note'          => 'Raw material consumed in order service',
+                    'created_by'    => (int)$array['owner_id'],
+                ]);
             }
             return $result;
         } catch (PDOException $e) {
@@ -680,30 +725,33 @@ class Orders extends Connection
                 $this->createOrderService($dd);
             }
             if ($array['status'] != 1) {
-                $prod = new Products();
-                $prod->subProductQty($array);
-
+                // ── INVENTORY: log the sale as stock OUT ──
+                $inventory = new Inventory();
+                $inventory->logMovement([
+                    'product_id'    => (int)$array['product_id'],
+                    'shop_id'       => (int)$array['shopId'],
+                    'owner_id'      => (int)$array['owner_id'],
+                    'movement_type' => Inventory::SALE,
+                    'quantity'      => (float)$array['quantity'],
+                    'ref_type'      => Inventory::REF_ORDER,
+                    'ref_id'        => (int)$array['order_id'],
+                    'note'          => 'Sale order item',
+                    'created_by'    => (int)$array['owner_id'],
+                ]);
 
                 if (!empty($customer['linked_shop'])) {
-
-                    $dd = [
-                        'pprice' => $array['price'] - $array['discount'],
-                        'price' => $array['price'],
-                        'discount' => !empty($array['discount']) ? $array['discount'] : 0,
-                        'qty' => $array['quantity'],
-                        'pack_size' => !empty($array['pack_size']) ? $array['pack_size'] : 0,
-                        'pack_qty' => !empty($array['pack_qty']) ? $array['pack_qty'] : 0,
-                        'unpack_qty' => !empty($array['unpack_qty']) ? $array['unpack_qty'] : 0,
-                        'stock_out' => 0,
-                        'location' => null,
-                        'pin' => 0,
-                        'minQty' => 2,
-                        'product_id' => $array['product_id'],
-                        'shopId' => $customer['linked_shop'],
-                        'owner_id' => $array['owner_id'],
-                    ];
-
-                    $prod->assignProduct($dd);
+                    // ── INVENTORY: log SUPPLY (stock IN) on the linked shop ──
+                    $inventory->logMovement([
+                        'product_id'    => (int)$array['product_id'],
+                        'shop_id'       => (int)$customer['linked_shop'],
+                        'owner_id'      => (int)$array['owner_id'],
+                        'movement_type' => Inventory::SUPPLY,
+                        'quantity'      => (float)$array['quantity'],
+                        'ref_type'      => Inventory::REF_ORDER,
+                        'ref_id'        => (int)$array['order_id'],
+                        'note'          => 'Auto-supply from linked shop order',
+                        'created_by'    => (int)$array['owner_id'],
+                    ]);
                 }
             }
             return $result;
@@ -1772,19 +1820,14 @@ class Orders extends Connection
 
                 if (in_array($currentStatus, [2])) { // approve 
 
-                    // rollback products first
-                    foreach ($order['order_items'] as $prod) {
-                        if ($returnType == 1) { // sales return
-                            if (!empty($LinkedCustomer)) {
-                                $products->addProductQty($prod['product_id'], ['qty' => $prod['quantity'], 'pack_qty' => $prod['pack_qty']], $shopId);
-                                $products->subProductQty(['product_id' => $prod['product_id'], 'quantity' => $prod['quantity'], 'pack_qty' => $prod['pack_qty'], 'owner_id' => $storeDATA['owner_id'], 'shopId' => $ownerShopId]);
-                            } else {
-                                $products->subProductQty(['product_id' => $prod['product_id'], 'quantity' => $prod['quantity'], 'pack_qty' => $prod['pack_qty'], 'owner_id' => $storeDATA['owner_id'], 'shopId' => $shopId]);
-                            }
-                        } else { // supply return
-                            $products->addProductQty($prod['product_id'], ['qty' => $prod['quantity'], 'pack_qty' => $prod['pack_qty']], $shopId);
-                        }
-                    }
+                    // ── INVENTORY: reverse the previously approved return entries ──
+                    $inventory = new Inventory();
+                    $inventory->reverseByRef(
+                        Inventory::REF_RETURN_ORDER,
+                        (int)$order['order']['id'],
+                        (int)$storeDATA['owner_id'],
+                        'Rollback before re-processing return order #' . $order['order']['id']
+                    );
                 }
             }
         }

@@ -72,9 +72,14 @@ class Supply extends Connection
 
             if (in_array($supplyCurrentStatus, [2, 8, 9])) {
 
-                foreach ($supplyDetail['order_items'] as $prod) {
-                    $products->addProductQty($prod['product_id'], ['qty' => -1 * $prod['quantity'], 'pack_qty' => -1 * $prod['pack_qty'], 'owner_id' => $supplyDetail['order']['owner_id']], $supplyDetail['order']['shopId']);
-                }
+                // ── INVENTORY: reverse all ledger entries for this supply ──
+                $inventory = new Inventory();
+                $inventory->reverseByRef(
+                    Inventory::REF_SUPPLY,
+                    (int)$supplyDetail['order']['id'],
+                    (int)$supplyDetail['order']['owner_id'],
+                    'Rollback before re-processing supply #' . $supplyDetail['order']['id']
+                );
                 // delete transactions
                 $de->deleteTransactionBySupplyId($supplyDetail['order']['id']);
             }
@@ -149,16 +154,18 @@ class Supply extends Connection
             ];
             $totals['discount'] += $item['discount'];
             $this->createSupplyDetails($d);
-            $products->assignProduct([
-                "qty" => $item['quantity'],
-                "stock_out" => 0,
-                "product_id" => $item['product_id'],
-                "shopId" => $customer['linked_shop'],
-                "owner_id" => $storeDATA['owner_id'],
-                "location" => "",
-                "pack_size" => $d['pack_size'],
-                "pack_qty" => $d['pack_qty'],
-                "min_qty" => $d['unpack_qty'],
+            // ── INVENTORY: log stock IN for this supply item ──
+            $inventory = new Inventory();
+            $inventory->logMovement([
+                'product_id'    => (int)$item['product_id'],
+                'shop_id'       => (int)$customer['linked_shop'],
+                'owner_id'      => (int)$storeDATA['owner_id'],
+                'movement_type' => Inventory::SUPPLY,
+                'quantity'      => (float)$item['quantity'],
+                'ref_type'      => Inventory::REF_SUPPLY,
+                'ref_id'        => (int)$supply_id,
+                'note'          => 'Supply against order #' . $order['id'],
+                'created_by'    => (int)$user['id'],
             ]);
         }
 
@@ -789,10 +796,21 @@ class Supply extends Connection
             $prepare->bindParam(':type', $array['type'], PDO::PARAM_STR);
             $prepare->execute();
             $result = $dbh->lastInsertId();
-            $products = new Products();
-            $array['quantity'] = (-1 * $array['quantity']);
-            $array['pack_qty'] = (-1 * $array['pack_qty']);
-            $products->addProductQty($array['product_id'], ['qty' => $array['quantity'], 'pack_size' => $array['pack_size'], 'pack_qty' => $array['pack_qty']], $array['shopId'], $type);
+
+            // ── INVENTORY: stock returned to supplier = stock OUT ──
+            // $type: 1 = normal return to supplier, 2 = faulty
+            $inventory = new Inventory();
+            $inventory->logMovement([
+                'product_id'    => (int)$array['product_id'],
+                'shop_id'       => (int)$array['shopId'],
+                'owner_id'      => (int)($array['owner_id'] ?? $array['shopId']),
+                'movement_type' => Inventory::RETURN_OUT,
+                'quantity'      => (float)$array['quantity'],  // always pass positive; logMovement handles direction
+                'ref_type'      => Inventory::REF_SUPPLY,
+                'ref_id'        => (int)$array['supply_id'],
+                'note'          => ($type == 2 ? 'Faulty return to supplier' : 'Return to supplier') . ' — supply #' . $array['supply_id'],
+                'created_by'    => (int)$array['user_id'],
+            ]);
             return $result;
         } catch (PDOException $e) {
             die("Error!: " . $e->getMessage() . "<br/>");
