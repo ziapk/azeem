@@ -1051,6 +1051,7 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                             }
                         })
                         .then(function(response) {
+                        console.log('response', response)
                             $scope.loading = false;
                             if (status == 1) {
                                 alert(response.data.message);
