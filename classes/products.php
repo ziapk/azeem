@@ -321,6 +321,23 @@ class Products extends Connection
 			$this->connectionPool->releaseConnection($dbh);
 		}
 	}
+	public function getOwnerProductsStock($shopId = null)
+	{
+		$dbh = $this->connectionPool->getConnection();
+		try {
+			
+			$stmt = "SELECT product_id as id, qty FROM `{$this->table_st}` WHERE shopId=:shopId and status=1";
+			$prepare = $dbh->prepare($stmt);
+			$prepare->bindParam(':shopId', $shopId, PDO::PARAM_INT);
+			$prepare->execute();
+			$result = $prepare->fetchAll(PDO::FETCH_KEY_PAIR);
+			return $result;
+		} catch (PDOException $e) {
+			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
+		}
+	}
 	public function getOwnerProductsByPriority($owner_id, $shopId = null)
 	{
 		$dbh = $this->connectionPool->getConnection();
