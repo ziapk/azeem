@@ -377,26 +377,26 @@
       const p = $window.localStorage.getItem('mainList');
       if (!p || init) {
         // console.log('abce')
-        if(init) {
-          $http.get("<?php echo SITE_URL ?>api/getProductsQuantites.php?perPage=10000&status=&racks=1&session=1")
-          .then(function(response) {
-            console.log('response ===> ', response.data);
-            if(p) {
+        // if(init) {
+        //   $http.get("<?php echo SITE_URL ?>api/getProductsQuantites.php?perPage=10000&status=&racks=1&session=1")
+        //   .then(function(response) {
+        //     console.log('response ===> ', response.data);
+        //     if(p) {
 
-               const records = JSON.parse(p).records.map(product =>
-              ({...product, qty: response.data[product.id]}))
-              $window.localStorage.setItem('mainList', JSON.stringify({
-                records
-              }))
+        //        const records = JSON.parse(p).records.map(product =>
+        //       ({...product, qty: response.data[product.id]}))
+        //       $window.localStorage.setItem('mainList', JSON.stringify({
+        //         records
+        //       }))
 
-              $window.mainList = records;
+        //       $window.mainList = records;
               
-            }
-            toaster.success({
-              body: 'Items Updated!'
-            });
-          });
-        } else {
+        //     }
+        //     toaster.success({
+        //       body: 'Items Updated!'
+        //     });
+        //   });
+        // } else {
         $http.get("<?php echo SITE_URL ?>api/getProducts.php?perPage=10000&status=&racks=1&session=1")
           .then(function(response) {
             const records = response.data.records.map(({
@@ -417,7 +417,7 @@
               body: 'Items Updated!'
             });
           });
-        }
+        // }
       } else {
         $window.mainList = JSON.parse(p);
       }
