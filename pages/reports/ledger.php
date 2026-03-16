@@ -135,7 +135,7 @@ ob_start();
                 <tr>
                     <td style="border: 1px solid"><?php echo ($k + 2); ?></td>
                     <!-- Changed: display datetime instead of transaction_date -->
-                    <td style="border: 1px solid"><?php echo date('d-m-Y h:i A', strtotime($v['datetime'])); ?></td>
+                    <td style="border: 1px solid"><?php echo date('d/m/Y', strtotime($v['datetime'])); ?></td>
                     <td style="border: 1px solid"><?php echo $v['v_description']; ?></td>
                     <td style="border: 1px solid" align="right"><?php echo number_format($v['debitAmount']); ?></td>
                     <td style="border: 1px solid" align="right"><?php echo number_format($v['creditAmount']); ?></td>
