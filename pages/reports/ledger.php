@@ -8,22 +8,24 @@ $from = $_POST['from'];
 $to = $_POST['to'];
 $account_id = $_POST['account_id'];
 $entries = $doubleEntry->getLedgerByAccount($_POST);
-// $entiresFinal = $entries['rows'];
+
 $totals = ['credit' => 0, 'debit' => 0];
 foreach ($entries['rows'] as $key => $value) {
-    $entiresFinal[date('F-Y', strtotime($value['transaction_date']))]['rows'][] = $value;
-    $entiresFinal[date('F-Y', strtotime($value['transaction_date']))]['totals']['credit'] += $value['creditAmount'];
-    $entiresFinal[date('F-Y', strtotime($value['transaction_date']))]['totals']['debit'] += $value['debitAmount'];
+    // Changed: use datetime instead of transaction_date for month grouping
+    $monthKey = date('F-Y', strtotime($value['datetime']));
+    $entiresFinal[$monthKey]['rows'][] = $value;
+    $entiresFinal[$monthKey]['totals']['credit'] += $value['creditAmount'];
+    $entiresFinal[$monthKey]['totals']['debit']  += $value['debitAmount'];
     $totals['credit'] += $value['creditAmount'];
-    $totals['debit'] += $value['debitAmount'];
+    $totals['debit']  += $value['debitAmount'];
 }
 
-$headers         = array();
-$columns         = array();
-$orientation     = 'P';
-$largeFont         = false;
-$srNo             = true;
-$mediumFont        = false;
+$headers     = array();
+$columns     = array();
+$orientation = 'P';
+$largeFont   = false;
+$srNo        = true;
+$mediumFont  = false;
 
 $store = [];
 $shopAccounts = new ShopAccounts();
@@ -32,12 +34,7 @@ foreach ($accountsData as $a) {
     $store[$a['key_value']] = $a['account_id'];
 }
 $reportTitle = $shop['full_name'] . ' - ' . $shop['city'];
-
-$subtitle = "Payment Details for " . $entries['first']['title'];
-
-//$time = new datetime('Y');
-$d = new DateTime('Y');
-
+$subtitle    = "Payment Details for " . $entries['first']['title'];
 
 ob_start();
 ?>
@@ -93,6 +90,7 @@ ob_start();
 
     <?php } ?>
 </style>
+
 <table width="100%" style="border-collapse: collapse" border="0">
     <thead>
         <tr>
@@ -114,14 +112,13 @@ ob_start();
     </thead>
 </table>
 
-<?php
-
-foreach ($entiresFinal as $key => $rows) {
-?>
+<?php foreach ($entiresFinal as $key => $rows) { ?>
     <table id="resultTable" width="100%" style="border-collapse: collapse" border="0">
         <thead>
             <tr>
-                <th style="border-width: 0; font-size: 14px; font-style: italic; font-family: 'Times New Roman', Times, serif; line-height: 1.8" colspan="5">Payment Details for the month of <?php echo $key; ?></th>
+                <th style="border-width: 0; font-size: 14px; font-style: italic; font-family: 'Times New Roman', Times, serif; line-height: 1.8" colspan="6">
+                    Payment Details for the month of <?php echo $key; ?>
+                </th>
             </tr>
             <tr>
                 <th style="border: 1px solid">Sr.#</th>
@@ -136,7 +133,8 @@ foreach ($entiresFinal as $key => $rows) {
             <?php foreach ($rows['rows'] as $k => $v) { ?>
                 <tr>
                     <td style="border: 1px solid"><?php echo ($k + 2); ?></td>
-                    <td style="border: 1px solid"><?php echo $v['transaction_date']; ?></td>
+                    <!-- Changed: display datetime instead of transaction_date -->
+                    <td style="border: 1px solid"><?php echo date('d-m-Y h:i A', strtotime($v['datetime'])); ?></td>
                     <td style="border: 1px solid"><?php echo $v['v_description']; ?></td>
                     <td style="border: 1px solid" align="right"><?php echo number_format($v['debitAmount']); ?></td>
                     <td style="border: 1px solid" align="right"><?php echo number_format($v['creditAmount']); ?></td>
@@ -147,14 +145,15 @@ foreach ($entiresFinal as $key => $rows) {
         <tfoot>
             <tr>
                 <th colspan="3" align="right">Totals</th>
-                <th align="right"><?php echo number_format($rows['totals']['debit']);?></th>
-                <th align="right"><?php echo number_format($rows['totals']['credit']);?></th>
+                <th align="right"><?php echo number_format($rows['totals']['debit']); ?></th>
+                <th align="right"><?php echo number_format($rows['totals']['credit']); ?></th>
                 <th></th>
             </tr>
         </tfoot>
     </table>
+<?php } ?>
+
 <?php
-}
 $html = ob_get_contents();
 ob_clean();
 
@@ -166,7 +165,4 @@ $mpdf->WriteHTML($html);
 
 $mpdf->Output($shop['full_name'] . '-Balances.pdf', 'I');
 exit;
-
-
-
 ?>
