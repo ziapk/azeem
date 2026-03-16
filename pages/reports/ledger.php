@@ -7,6 +7,7 @@ $params = array();
 $from = $_POST['from'];
 $to = $_POST['to'];
 $account_id = $_POST['account_id'];
+$_POST['user'] = $_SESSION['user'];
 $entries = $doubleEntry->getLedgerByAccount($_POST);
 
 $totals = ['credit' => 0, 'debit' => 0];

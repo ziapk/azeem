@@ -296,19 +296,10 @@ class DoubleEntry extends Connection
 	public function getLedgerByAccount($arr = []) {
 		$dbh = $this->connectionPool->getConnection();
 		try {
-
-			 // DEBUG - remove after fixing
-			print_r("FROM: " . $arr['from']);
-			print_r("TO: " . $arr['to']);
-			print_r("account_id: " . $arr['account_id']);
-			print_r("shopId: " . $arr['user']['shopId']);
-
-			// Check actual column name in transactions table
-			$check = $dbh->query("DESCRIBE `$this->table_transactions`");
-			$cols = $check->fetchAll(PDO::FETCH_COLUMN);
-			print_r("Columns: " . implode(', ', $cols));
-
-			exit;
+			$userInfo = UserInfo();
+			$user = $userInfo['user'];
+			
+			
 
 			$countwhere = "where t.flag=1 and t.shopId=:shopId";
 			$where = "where t.flag=1 and t.shopId=:shopId";
@@ -343,7 +334,7 @@ class DoubleEntry extends Connection
 					$countwhere";
 
 			$prepare = $dbh->prepare($stmt);
-			$prepare->bindParam(':shopId', $arr['user']['shopId'], PDO::PARAM_STR);
+			$prepare->bindParam(':shopId', $user['shopId'], PDO::PARAM_STR);
 			if ($hasDateRange) {
 				$prepare->bindParam(':from', $arr['from'], PDO::PARAM_STR);
 				$prepare->bindParam(':to',   $arr['to'],   PDO::PARAM_STR);
