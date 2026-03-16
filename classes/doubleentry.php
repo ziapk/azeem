@@ -308,6 +308,8 @@ class DoubleEntry extends Connection
 			$cols = $check->fetchAll(PDO::FETCH_COLUMN);
 			print_r("Columns: " . implode(', ', $cols));
 
+			exit;
+
 			$countwhere = "where t.flag=1 and t.shopId=:shopId";
 			$where = "where t.flag=1 and t.shopId=:shopId";
 			$account_id = $arr['account_id'];
