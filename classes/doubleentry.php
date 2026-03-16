@@ -342,8 +342,6 @@ class DoubleEntry extends Connection
 			$prepare->execute();
 			$summery = $prepare->fetch(PDO::FETCH_ASSOC);
 
-			print_r($user);exit;
-
 			if ($_GET['t'] == 'c') {
 				$summery['debit'] += $arr['user']['opening_balance'];
 			} else {
