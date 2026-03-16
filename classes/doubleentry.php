@@ -294,89 +294,148 @@ class DoubleEntry extends Connection
 		}
 	}
 	public function getLedgerByAccount($arr = [])
-	{
-		$dbh = $this->connectionPool->getConnection();
-		try {
+{
+    $dbh = $this->connectionPool->getConnection();
+    try {
 
-			$userInfo = UserInfo();
-			$user = $userInfo['user'];
+        $countwhere = "where t.flag=1 and t.shopId=:shopId";
+        $where = "where t.flag=1 and t.shopId=:shopId";
+        $account_id = $arr['account_id'];
 
-			$countwhere = "where t.flag=1 and t.shopId=:shopId";
-			$where = "where t.flag=1 and t.shopId=:shopId";
-			$account_id = $arr['account_id'];
+        $type = $arr['type'];
 
-			$type = $arr['type'];
+        $str = "(acc_account_transactions.debitAmount - acc_account_transactions.creditAmount)";
+        if ($type == 's' || $type == 'emp') {
+            $str = "(acc_account_transactions.creditAmount - acc_account_transactions.debitAmount)";
+        }
 
-			$str = "(acc_account_transactions.debitAmount - acc_account_transactions.creditAmount)";
-			if ($type == 's' || $type == 'emp') {
-				$str = "(acc_account_transactions.creditAmount - acc_account_transactions.debitAmount)";
-			}
+        if (!empty($account_id)) {
+            $where .= " and a.id = $account_id";
+            $countwhere .= " and e.account_id = $account_id";
+        }
 
-			if (!empty($account_id)) {
-				$where .= " and a.id = $account_id";
-				$countwhere .= " and e.account_id = $account_id";
-			}
+        // Add datetime range filter to SQL instead of PHP
+        $hasDateRange = !empty($arr['from']) && !empty($arr['to']);
+        if ($hasDateRange) {
+            $where .= " and t.datetime >= :from AND t.datetime < DATE_ADD(:to, INTERVAL 1 DAY)";
+            $countwhere .= " and t.datetime >= :from AND t.datetime < DATE_ADD(:to, INTERVAL 1 DAY)";
+        }
 
+        // Summary / count query
+        $stmt = "SELECT 
+                    SUM(CASE WHEN e.entry_type = 'D' THEN e.amount ELSE 0 END) AS debit, 
+                    SUM(CASE WHEN e.entry_type = 'C' THEN e.amount ELSE 0 END) AS credit, 
+                    count(e.id) as total 
+                 FROM `$this->table_ledger_entries` as e 
+                 LEFT JOIN `$this->table_transactions` as t ON t.id = e.transaction_id 
+                 $countwhere";
 
-			$stmt = "SELECT SUM(CASE WHEN e.entry_type = 'D' THEN e.amount ELSE 0 END) AS debit, SUM(CASE WHEN e.entry_type = 'C' THEN e.amount ELSE 0 END) AS credit, count(e.id) as total from `$this->table_ledger_entries` as e left join `$this->table_transactions` as t on t.id = e.transaction_id $countwhere";
-			$prepare = $dbh->prepare($stmt);
-			$prepare->bindParam(':shopId', $user['shopId'], PDO::PARAM_STR);
-			$prepare->execute();
-			$summery = $prepare->fetch(PDO::FETCH_ASSOC);
+        $prepare = $dbh->prepare($stmt);
+        $prepare->bindParam(':shopId', $arr['user']['shopId'], PDO::PARAM_STR);
+        if ($hasDateRange) {
+            $prepare->bindParam(':from', $arr['from'], PDO::PARAM_STR);
+            $prepare->bindParam(':to',   $arr['to'],   PDO::PARAM_STR);
+        }
+        $prepare->execute();
+        $summery = $prepare->fetch(PDO::FETCH_ASSOC);
 
-			if ($_GET['t'] == 'c') {
-				$summery['debit'] += $arr['user']['opening_balance'];
-			} else {
-				$summery['credit'] += $arr['user']['opening_balance'];
-			}
+        if ($_GET['t'] == 'c') {
+            $summery['debit'] += $arr['user']['opening_balance'];
+        } else {
+            $summery['credit'] += $arr['user']['opening_balance'];
+        }
 
-			$paid = in_array($arr['type'], ['s', 'emp']) ? $summery['debit'] : $summery['credit'];
-			$amount = in_array($arr['type'], ['s', 'emp']) ? $summery['credit'] : $summery['debit'];
-			$balance = ($amount - $paid);
+        $paid    = in_array($arr['type'], ['s', 'emp']) ? $summery['debit']  : $summery['credit'];
+        $amount  = in_array($arr['type'], ['s', 'emp']) ? $summery['credit'] : $summery['debit'];
+        $balance = ($amount - $paid);
 
-			$summery['paid'] = $paid;
-			$summery['due'] = $amount;
-			$summery['balance'] = $balance;
+        $summery['paid']    = $paid;
+        $summery['due']     = $amount;
+        $summery['balance'] = $balance;
 
+        // Main ledger query with running balance
+        $stmt = "SELECT 
+                    transaction_id, 
+                    title, 
+                    transaction_date, 
+                    datetime,
+                    order_ref, 
+                    order_custom_id, 
+                    supply_ref, 
+                    return_ref, 
+                    transsaction_type, 
+                    v_description, 
+                    debitAmount, 
+                    creditAmount, 
+                    balance, 
+                    previousBalance, 
+                    reference  
+                 FROM (
+                    SELECT
+                        *,
+                        COALESCE(debitAmount)  as debits,
+                        COALESCE(creditAmount) as credits,
+                        (@running_balance := IF(@curr_account_id < account_id, opening_balance, @running_balance)) prev_runnng_bal,
+                        (@curr_account_id := IF(@curr_account_id < account_id, account_id, @curr_account_id)) curr_account_id,
+                        (@running_balance := @running_balance) as previousBalance,
+                        (@running_balance := @running_balance + $str) as balance
+                    FROM (
+                        SELECT 
+                            t.transsaction_type, 
+                            t.reference, 
+                            e.transaction_id, 
+                            e.payment_mode, 
+                            a.parent_id, 
+                            a.code, 
+                            e.account_id, 
+                            a.opening_balance, 
+                            a.account_type, 
+                            a.title, 
+                            e.entry_type, 
+                            t.transaction_date,
+                            t.datetime,
+                            amount, 
+                            o.order_custom_id, 
+                            t.order_ref, 
+                            t.supply_ref, 
+                            t.return_ref, 
+                            t.description as v_description, 
+                            (CASE WHEN e.entry_type = 'D' THEN e.amount ELSE 0 END) AS debitAmount, 
+                            (CASE WHEN e.entry_type = 'C' THEN e.amount ELSE 0 END) AS creditAmount 
+                        FROM `$this->table_transactions` t 
+                        LEFT JOIN `$this->table_ledger_entries` e ON e.transaction_id = t.id 
+                        LEFT JOIN `$this->table` a ON a.id = e.account_id AND a.status = 1 
+                        LEFT JOIN `$this->table_orders` as o ON o.id = t.order_ref 
+                        $where
+                    ) as acc_account_transactions,
+                    (SELECT @running_balance := 0, @curr_account_id := 0) r
+                    ORDER BY transaction_id
+                 ) A";
 
+        $prepare = $dbh->prepare($stmt);
+        $prepare->bindParam(':shopId', $arr['user']['shopId'], PDO::PARAM_STR);
+        if ($hasDateRange) {
+            $prepare->bindParam(':from', $arr['from'], PDO::PARAM_STR);
+            $prepare->bindParam(':to',   $arr['to'],   PDO::PARAM_STR);
+        }
+        $prepare->execute();
+        $result = $prepare->fetchAll(PDO::FETCH_ASSOC);
 
-			$stmt = "SELECT transaction_id, title, transaction_date, order_ref, order_custom_id, supply_ref, return_ref, transsaction_type, v_description, debitAmount, creditAmount, balance, previousBalance, reference  FROM
-			(SELECT
-			*
-			,COALESCE(debitAmount)  as debits
-			,COALESCE(creditAmount) as credits
-			,(@running_balance := IF(@curr_account_id < account_id,         opening_balance,@running_balance)) prev_runnng_bal
-			,(@curr_account_id := IF(@curr_account_id < account_id,account_id,@curr_account_id)) curr_account_id
-			,(@running_balance := @running_balance) as previousBalance
-			,(@running_balance := @running_balance + $str) as balance
-			FROM (SELECT t.transsaction_type, t.reference, e.transaction_id, e.payment_mode, a.parent_id, a.code, e.account_id, a.opening_balance, a.account_type, a.title, e.entry_type, t.transaction_date, amount, o.order_custom_id, t.order_ref, t.supply_ref, t.return_ref, t.description as v_description, (CASE WHEN e.entry_type = 'D' THEN e.amount ELSE 0 END) AS debitAmount, (CASE WHEN e.entry_type = 'C' THEN e.amount ELSE 0 END) AS creditAmount FROM `$this->table_transactions` t LEFT JOIN `$this->table_ledger_entries` e ON e.transaction_id = t.id LEFT JOIN `$this->table` a ON a.id = e.account_id and a.status = 1 left join `$this->table_orders` as o on o.id=t.order_ref $where) as acc_account_transactions,(SELECT @running_balance := 0,@curr_account_id := 0) r
-			ORDER BY transaction_id) A";
+        $first = reset($result);
+        return [
+            'count'   => sizeof($result),
+            'rows'    => $result,
+            'first'   => $first,
+            'summery' => $summery,
+            'last'    => end($result)
+        ];
 
-
-			// $stmt = "SELECT a.*, t.transaction_date, t.reference, a.description, t.description as v_description, m.title as payment_mode from `$this->table_ledger_entries` as a left join `$this->table_transactions` as t on t.id = a.transaction_id left join `$this->table_modes` as m on m.id = a.payment_mode $where order by id";
-			$prepare = $dbh->prepare($stmt);
-			$prepare->bindParam(':shopId', $user['shopId'], PDO::PARAM_STR);
-			$prepare->execute();
-			$result = $prepare->fetchAll(PDO::FETCH_ASSOC);
-			$final = [];
-			if (!empty($arr['from']) && !empty($arr['to'])) {
-				foreach ($result as $key => $value) {
-					if (date($arr['from']) <= date($value['transaction_date']) && date($value['transaction_date']) <= date($arr['to'])) {
-						$final[] = $value;
-					}
-				}
-			} else {
-				$final = $result;
-			}
-
-			$first = reset($final); // First element's value
-			return ['count' => sizeof($result), 'rows' => $final, 'first' => $first, 'summery' => $summery, 'last' => end($final)];
-		} catch (PDOException $e) {
-			die("Error!: " . $e->getMessage() . "<br/>");
-		} finally {
-			$this->connectionPool->releaseConnection($dbh);
-		}
-	}
+    } catch (PDOException $e) {
+        die("Error!: " . $e->getMessage() . "<br/>");
+    } finally {
+        $this->connectionPool->releaseConnection($dbh);
+    }
+}
 
 	public function getOnlineLedgerByAccounts($arr = [])
 	{
