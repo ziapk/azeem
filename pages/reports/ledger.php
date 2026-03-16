@@ -9,6 +9,8 @@ $to = $_POST['to'];
 $account_id = $_POST['account_id'];
 $entries = $doubleEntry->getLedgerByAccount($_POST);
 
+
+print_r($entries);exit;
 $totals = ['credit' => 0, 'debit' => 0];
 foreach ($entries['rows'] as $key => $value) {
     // Changed: use datetime instead of transaction_date for month grouping
