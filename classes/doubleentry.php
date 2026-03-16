@@ -297,6 +297,17 @@ class DoubleEntry extends Connection
 		$dbh = $this->connectionPool->getConnection();
 		try {
 
+			 // DEBUG - remove after fixing
+			print_r("FROM: " . $arr['from']);
+			print_r("TO: " . $arr['to']);
+			print_r("account_id: " . $arr['account_id']);
+			print_r("shopId: " . $arr['user']['shopId']);
+
+			// Check actual column name in transactions table
+			$check = $dbh->query("DESCRIBE `$this->table_transactions`");
+			$cols = $check->fetchAll(PDO::FETCH_COLUMN);
+			print_r("Columns: " . implode(', ', $cols));
+
 			$countwhere = "where t.flag=1 and t.shopId=:shopId";
 			$where = "where t.flag=1 and t.shopId=:shopId";
 			$account_id = $arr['account_id'];
