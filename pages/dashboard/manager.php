@@ -2,28 +2,28 @@
 
 $user = $_SESSION['user_credentials'];
 // if(!empty($user) && $user['role'] == 'manager') {
-    $customers = new Customers();
-    $user = $customers->getCustomerByLinkedShop($user['shopId']);
+    // $customers = new Customers();
+    // $user = $customers->getCustomerByLinkedShop($user['shopId']);
 
-    if(!empty($user['account'])) {
-        $de = new DoubleEntry();
+    // if(!empty($user['account'])) {
+    //     $de = new DoubleEntry();
 
-        $journel = $de->getLedgerByAccount(['account_id' => $user['account']['id'], 'type' => 'c', 'from' => $from, 'to' => $to, 'user' => $user['account']]);
-        $summery = $journel['summery'];
+    //     $journel = $de->getLedgerByAccount(['account_id' => $user['account']['id'], 'type' => 'c', 'from' => $from, 'to' => $to, 'user' => $user['account']]);
+    //     $summery = $journel['summery'];
 
-        $paid = $summery['paid'];
-        $amount = $summery['due'];
-        $balance = $summery['balance'];
+    //     $paid = $summery['paid'];
+    //     $amount = $summery['due'];
+    //     $balance = $summery['balance'];
 
-        $url = '?';
+    //     $url = '?';
 
-        foreach ($_GET as $key => $value) {
-            $url .= $key . "=" . $value . "&";
-        }
+    //     foreach ($_GET as $key => $value) {
+    //         $url .= $key . "=" . $value . "&";
+    //     }
 
 
         ?>
-        <div class="container" ng-controller="coaController">
+        <!-- <div class="container" ng-controller="coaController">
             <div class="row">
                 <div class="col-sm-8">
                     <h2>Account Summary</h2>
@@ -56,10 +56,10 @@ $user = $_SESSION['user_credentials'];
                     </table>
                 </div>
             </div>
-        </div>
-        <?php
+        </div> -->
+<?php
         
-    }
+    // }
 // }
 
-// include_once dirname(__FILE__).'/../product/index.php';
+include_once dirname(__FILE__).'/../product/index.php';
