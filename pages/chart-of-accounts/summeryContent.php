@@ -25,7 +25,7 @@ if ($type == 'c') {
     $user = $expenses->expenseByAccount($id);
 }
 
-$journel = $dentry->getLedgerByAccount(['account_id' => $id, 'type' => $type, 'from' => $from, 'to' => $to, 'user' => $user['account']]);
+$journel = $dentry->getLedgerByAccountForSummary(['account_id' => $id, 'type' => $type, 'from' => $from, 'to' => $to, 'user' => $user['account']]);
 
 $summery = $journel['first'];
 $end = $journel['last'];

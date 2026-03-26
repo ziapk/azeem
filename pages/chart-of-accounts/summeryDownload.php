@@ -19,7 +19,7 @@ if ($_GET['t'] == 'c') {
     $user = $expenses->expenseByAccount($_GET['id']);
 }
 
-$journel = $dentry->getLedgerByAccount(['account_id' => $_GET['id'], 'type' => $type, 'user' => $user['account']]);
+$journel = $dentry->getLedgerByAccountForSummary(['account_id' => $_GET['id'], 'type' => $type, 'user' => $user['account']]);
 $summery = $journel['summery'];
 
 $paid = $summery['paid'];
