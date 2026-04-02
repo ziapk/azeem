@@ -266,9 +266,12 @@ switch ($reportType) {
 			);
 		}
 
-		// Also honour the single typeahead product_id if present
-		if (!empty($_POST['product_id']) && !in_array((int)$_POST['product_id'], $product_ids)) {
-			array_unshift($product_ids, (int)$_POST['product_id']);
+		// also honour the single typeahead product_id
+		if (!empty($_POST['product_id'])) {
+			$single = (int) $_POST['product_id'];
+			if ($single && !in_array($single, $product_ids)) {
+				array_unshift($product_ids, $single);
+			}
 		}
 
 		$orders = $productObj->getProductAuditLedger($shopId, $from, $to, $product_ids);
