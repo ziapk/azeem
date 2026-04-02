@@ -1671,30 +1671,33 @@ class Products extends Connection
 		$shopId = (int) $shopId;
 
 		$productFilter = '';
-		$params        = [];
+		$bindings      = [$shopId, $from, $to];
 
 		if (!empty($productIds)) {
 			$placeholders  = implode(',', array_fill(0, count($productIds), '?'));
 			$productFilter = "AND il.product_id IN ($placeholders)";
-			$params        = $productIds;
+			$bindings      = array_merge($bindings, $productIds);
 		}
 
 		/*
-		* Window function gives TRUE running balance ordered by ledger id ASC
-		* (oldest → newest), then we outer-sort DESC so newest row shows first.
-		*
-		* Requires MySQL 8+ / MariaDB 10.2+
+		* SUM() OVER with PARTITION BY product_id gives a true per-product
+		* running balance ordered oldest→newest (ASC by id).
+		* The outer ORDER BY id DESC shows newest rows first in the report.
+		* Requires MySQL 8+ or MariaDB 10.2+
 		*/
 		$sql = "
 			SELECT
 				il.id,
 				il.product_id,
 				il.shop_id,
+				il.owner_id,
+				il.movement_type,
 				il.quantity,
+				il.ref_type,
+				il.ref_id,
+				il.note,
+				il.created_by,
 				il.created_at,
-				il.type,
-				il.reference_id,
-				il.remarks,
 				p.full_name  AS product_name,
 				p.code       AS product_code,
 				p.barcode    AS product_barcode,
@@ -1711,26 +1714,30 @@ class Products extends Connection
 			ORDER BY il.product_id ASC, il.id DESC
 		";
 
-		array_unshift($params, $shopId, $from, $to);
-
 		$stmt = $dbh->prepare($sql);
-		$stmt->execute($params);
+		$stmt->execute($bindings);
+		$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-		$rows    = $stmt->fetchAll(PDO::FETCH_ASSOC);
+		// Group by product_id
 		$grouped = [];
-
 		foreach ($rows as $row) {
-			$grouped[$row['product_id']]['meta'] = [
-				'product_id'   => $row['product_id'],
-				'product_name' => $row['product_name'],
-				'product_code' => $row['product_code'],
-				'barcode'      => $row['product_barcode'],
-			];
-			$grouped[$row['product_id']]['rows'][] = $row;
+			$pid = $row['product_id'];
+			if (!isset($grouped[$pid])) {
+				$grouped[$pid] = [
+					'meta' => [
+						'product_id'   => $pid,
+						'product_name' => $row['product_name'],
+						'product_code' => $row['product_code'],
+						'barcode'      => $row['product_barcode'],
+					],
+					'rows' => [],
+				];
+			}
+			$grouped[$pid]['rows'][] = $row;
 		}
 
 		return $grouped;
-
+		
 		} catch (PDOException $e) {
 		
 			die("Error!: " . $e->getMessage() . "<br/>");
