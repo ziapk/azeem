@@ -221,19 +221,37 @@ function auditBadge($type) {
             </tr>
         </thead>
         <tbody>
+
+        <?php
+        /* ── Opening balance row ──────────────────────────────────────── */
+        $ob = (int) $group['opening_balance'];
+        $obClass = $ob > 0 ? 'bal-pos' : ($ob < 0 ? 'bal-neg' : 'bal-zero');
+        ?>
+            <tr style="background:#f0f9ff;">
+                <td colspan="8" style="color:#1e40af;font-weight:600;font-size:11px;">
+                    Opening Balance
+                    <span style="color:#64748b;font-weight:400;font-size:10px;">
+                        (before <?php echo htmlspecialchars($from); ?>)
+                    </span>
+                </td>
+                <td class="r" style="color:#64748b">—</td>
+                <td class="r" style="color:#64748b">—</td>
+                <td class="r <?php echo $obClass; ?>" style="background:#e0f2fe;">
+                    <?php echo number_format($ob); ?>
+                </td>
+            </tr>
+
         <?php
         $totalRows = count($rows);
-        $sr = $totalRows; // count down so sr=1 is oldest (bottom of page)
+        $sr = $totalRows;
         foreach ($rows as $row):
             $qty     = (int) $row['quantity'];
-            $balance = (int) $row['running_balance'];
+            $balance = (int) $row['running_balance'];  // already = opening + period_sum
             $badge   = auditBadge($row['movement_type']);
 
             $qtyInStr  = $qty > 0 ? '+' . number_format($qty) : '';
             $qtyOutStr = $qty < 0 ? number_format(abs($qty))  : '';
-
             $balClass  = $balance > 0 ? 'bal-pos' : ($balance < 0 ? 'bal-neg' : 'bal-zero');
-            $balPrefix = $balance > 0 ? '' : ($balance < 0 ? '-' : '');
         ?>
             <tr>
                 <td><?php echo $sr--; ?></td>
@@ -249,23 +267,29 @@ function auditBadge($type) {
                         <?php echo htmlspecialchars($badge['label']); ?>
                     </span>
                 </td>
-                <td style="color:#64748b"><?php echo htmlspecialchars($row['ref_type'] ?? '—'); ?></td>
-                <td style="color:#64748b"><?php echo htmlspecialchars($row['ref_id']   ?? '—'); ?></td>
-                <td style="color:#475569;font-size:11px"><?php echo htmlspecialchars($row['note'] ?? ''); ?></td>
-                <td style="color:#64748b"><?php echo htmlspecialchars($row['created_by'] ?? '—'); ?></td>
+                <td style="color:#64748b"><?php echo htmlspecialchars($row['ref_type']    ?? '—'); ?></td>
+                <td style="color:#64748b"><?php echo htmlspecialchars($row['ref_id']      ?? '—'); ?></td>
+                <td style="color:#475569"><?php echo htmlspecialchars($row['note']        ?? ''); ?></td>
+                <td style="color:#64748b"><?php echo htmlspecialchars($row['created_by']  ?? '—'); ?></td>
                 <td class="r qty-in" ><?php echo $qtyInStr;  ?></td>
                 <td class="r qty-out"><?php echo $qtyOutStr; ?></td>
                 <td class="r <?php echo $balClass; ?>">
                     <?php echo number_format(abs($balance)); ?>
-                    <?php if ($balance < 0): ?><span style="font-size:9px;color:#b91c1c"> (neg)</span><?php endif; ?>
+                    <?php if ($balance < 0): ?>
+                        <span style="font-size:9px;color:#b91c1c"> (neg)</span>
+                    <?php endif; ?>
                 </td>
             </tr>
         <?php endforeach; ?>
+
         </tbody>
         <tfoot>
             <tr class="tfoot-row">
                 <td colspan="8">
-                    Total &mdash; <?php echo $totalRows; ?> entries
+                    Opening: <?php echo number_format($ob); ?>
+                    &nbsp;&nbsp;+In: <?php echo number_format($totalIn); ?>
+                    &nbsp;&nbsp;-Out: <?php echo number_format(abs($totalOut)); ?>
+                    &nbsp;&nbsp;= Closing
                 </td>
                 <td class="r">+<?php echo number_format($totalIn); ?></td>
                 <td class="r"><?php echo $totalOut < 0 ? '-' . number_format(abs($totalOut)) : '—'; ?></td>

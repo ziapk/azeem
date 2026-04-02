@@ -1667,77 +1667,117 @@ class Products extends Connection
 	{
 		try {
 
-		$dbh = $this->connectionPool->getConnection();
-		$shopId = (int) $shopId;
+			$dbh = $this->connectionPool->getConnection();
+			$shopId = (int) $shopId;
 
-		$productFilter = '';
-		$bindings      = [$shopId, $from, $to];
+			$productFilter = '';
+			$pidBindings   = [];
+			if (!empty($productIds)) {
+				$placeholders  = implode(',', array_fill(0, count($productIds), '?'));
+				$productFilter = "AND il.product_id IN ($placeholders)";
+				$pidBindings   = $productIds;
+			}
 
-		if (!empty($productIds)) {
-			$placeholders  = implode(',', array_fill(0, count($productIds), '?'));
-			$productFilter = "AND il.product_id IN ($placeholders)";
-			$bindings      = array_merge($bindings, $productIds);
-		}
+			// ── Query 1: Opening balance — everything BEFORE $from ────────────────
+			$stmt = $dbh->prepare("
+				SELECT
+					il.product_id,
+					p.full_name  AS product_name,
+					p.code       AS product_code,
+					p.barcode    AS product_barcode,
+					COALESCE(SUM(il.quantity), 0) AS opening_balance
+				FROM inventory_ledger il
+				LEFT JOIN products p ON p.id = il.product_id
+				WHERE il.shop_id = ?
+				AND DATE(il.created_at) < ?
+				$productFilter
+				GROUP BY il.product_id, p.full_name, p.code, p.barcode
+			");
+			$stmt->execute(array_merge([$shopId, $from], $pidBindings));
+			$openingRows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-		/*
-		* SUM() OVER with PARTITION BY product_id gives a true per-product
-		* running balance ordered oldest→newest (ASC by id).
-		* The outer ORDER BY id DESC shows newest rows first in the report.
-		* Requires MySQL 8+ or MariaDB 10.2+
-		*/
-		$sql = "
-			SELECT
-				il.id,
-				il.product_id,
-				il.shop_id,
-				il.owner_id,
-				il.movement_type,
-				il.quantity,
-				il.ref_type,
-				il.ref_id,
-				il.note,
-				il.created_by,
-				il.created_at,
-				p.full_name  AS product_name,
-				p.code       AS product_code,
-				p.barcode    AS product_barcode,
-				SUM(il.quantity) OVER (
-					PARTITION BY il.product_id
-					ORDER BY il.id ASC
-					ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
-				) AS running_balance
-			FROM inventory_ledger il
-			LEFT JOIN products p ON p.id = il.product_id
-			WHERE il.shop_id = ?
-			AND DATE(il.created_at) BETWEEN ? AND ?
-			$productFilter
-			ORDER BY il.product_id ASC, il.id DESC
-		";
-
-		$stmt = $dbh->prepare($sql);
-		$stmt->execute($bindings);
-		$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-		// Group by product_id
-		$grouped = [];
-		foreach ($rows as $row) {
-			$pid = $row['product_id'];
-			if (!isset($grouped[$pid])) {
-				$grouped[$pid] = [
-					'meta' => [
-						'product_id'   => $pid,
-						'product_name' => $row['product_name'],
-						'product_code' => $row['product_code'],
-						'barcode'      => $row['product_barcode'],
-					],
-					'rows' => [],
+			$openingMap  = [];   // pid => opening_balance (int)
+			$productInfo = [];   // pid => meta (for products with no in-range rows)
+			foreach ($openingRows as $r) {
+				$pid                = $r['product_id'];
+				$openingMap[$pid]   = (int) $r['opening_balance'];
+				$productInfo[$pid]  = [
+					'product_id'   => $pid,
+					'product_name' => $r['product_name'],
+					'product_code' => $r['product_code'],
+					'barcode'      => $r['product_barcode'],
 				];
 			}
-			$grouped[$pid]['rows'][] = $row;
-		}
 
-		return $grouped;
-		
+			// ── Query 2: In-range rows + per-product period running sum ───────────
+			$stmt = $dbh->prepare("
+				SELECT
+					il.id,
+					il.product_id,
+					il.shop_id,
+					il.owner_id,
+					il.movement_type,
+					il.quantity,
+					il.ref_type,
+					il.ref_id,
+					il.note,
+					il.created_by,
+					il.created_at,
+					p.full_name  AS product_name,
+					p.code       AS product_code,
+					p.barcode    AS product_barcode,
+					SUM(il.quantity) OVER (
+						PARTITION BY il.product_id
+						ORDER BY il.id ASC
+						ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+					) AS period_sum
+				FROM inventory_ledger il
+				LEFT JOIN products p ON p.id = il.product_id
+				WHERE il.shop_id = ?
+				AND DATE(il.created_at) BETWEEN ? AND ?
+				$productFilter
+				ORDER BY il.product_id ASC, il.id DESC
+			");
+			$stmt->execute(array_merge([$shopId, $from, $to], $pidBindings));
+			$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+			// ── Group rows and inject true running balance ─────────────────────────
+			// true running balance = opening_balance + period_sum
+			$grouped = [];
+			foreach ($rows as $row) {
+				$pid = $row['product_id'];
+				$ob  = $openingMap[$pid] ?? 0;
+
+				if (!isset($grouped[$pid])) {
+					$grouped[$pid] = [
+						'meta' => [
+							'product_id'   => $pid,
+							'product_name' => $row['product_name'],
+							'product_code' => $row['product_code'],
+							'barcode'      => $row['product_barcode'],
+						],
+						'opening_balance' => $ob,
+						'rows'            => [],
+					];
+				}
+
+				$row['running_balance'] = $ob + (int) $row['period_sum'];
+				$grouped[$pid]['rows'][] = $row;
+			}
+
+			// Products that have an opening balance but zero in-range entries
+			foreach ($openingMap as $pid => $ob) {
+				if (!isset($grouped[$pid])) {
+					$grouped[$pid] = [
+						'meta'            => $productInfo[$pid],
+						'opening_balance' => $ob,
+						'rows'            => [],
+					];
+				}
+			}
+
+			return $grouped;
+
 		} catch (PDOException $e) {
 		
 			die("Error!: " . $e->getMessage() . "<br/>");
