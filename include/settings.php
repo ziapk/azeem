@@ -276,7 +276,7 @@ $categories = [
     'Expense' => [8,9],           // Report IDs belonging to Expense
     'Returns' => [4, 5, 6, 7],       // Report IDs belonging to Sales
     'Sample' => [19,20],            // Report IDs belonging to Audit
-    'Audit' => [10, 21],            // Report IDs belonging to Audit
+    'Audit' => [10, 21, 24],            // Report IDs belonging to Audit
     'Accounting' => [11, 12, 13, 14, 15, 22, 23],            // Report IDs belonging to Audit
 ];
 
