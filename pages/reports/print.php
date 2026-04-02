@@ -254,6 +254,26 @@ switch ($reportType) {
 		include_once dirname(__FILE__) . '/payments.php';
 		exit;
 		break;
+	case '24':
+		$rawIds = !empty($_POST['product_ids']) ? $_POST['product_ids'] : '';
+		$product_ids = [];
+
+		if (!empty($rawIds)) {
+			$product_ids = array_values(
+				array_filter(
+					array_map('intval', explode(',', $rawIds))
+				)
+			);
+		}
+
+		// Also honour the single typeahead product_id if present
+		if (!empty($_POST['product_id']) && !in_array((int)$_POST['product_id'], $product_ids)) {
+			array_unshift($product_ids, (int)$_POST['product_id']);
+		}
+
+		$orders = $productObj->getProductAuditLedger($shopId, $from, $to, $product_ids);
+		include_once dirname(__FILE__) . '/productAuditReport.php';
+		exit;
 	default:
 		# code...
 		break;

@@ -1,4 +1,17 @@
 <?php
+
+// assign product with zero qty to main shop from shopid=15 to shopid=4
+
+// INSERT INTO store_products (product_id, shopId, qty)
+// SELECT sp15.product_id, 4, 0
+// FROM store_products sp15
+// LEFT JOIN store_products sp4 
+//     ON sp4.product_id = sp15.product_id 
+//     AND sp4.shopId = 4
+// WHERE sp15.shopId = 15
+// AND sp4.product_id IS NULL;
+
+
 if (!isset($_SESSION)) {
     session_start();
 }
@@ -253,6 +266,7 @@ $reportsArray = [
     21 => ['id' => 21, 'title' => 'Stock Audit (Product Wise)', 'access' => ['owner', 'manager']],
     22 => ['id' => 22, 'title' => 'Payments Records', 'access' => ['owner', 'manager']],
     23 => ['id' => 23, 'title' => 'Adjustment Records', 'access' => ['owner', 'manager']],
+    24 => ['id' => 24, 'title' => 'Product Audit (Ledger)', 'access' => ['owner', 'manager']],
 ];
 
 $categories = [

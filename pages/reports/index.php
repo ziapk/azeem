@@ -119,6 +119,19 @@ echo mainHeader(['page' => 'reports']);
             <?php } ?>
         </div>
 
+        <div class="row" ng-if="reportType == 24">
+            <div class="col-sm-12">
+                <div class="form-group">
+                    <label>Product IDs <small class="text-muted">(comma-separated, e.g. 15189,15190,15191 — or leave blank for all)</small></label>
+                    <input type="text"
+                        class="form-control"
+                        name="product_ids"
+                        ng-model="auditProductIds"
+                        placeholder="e.g. 15189, 15190">
+                </div>
+            </div>
+        </div>
+
         <div class="input-group">
             <div class="input-group-btn">
                 <input type="submit" value="Submit" name="report" class="btn btn-primary" />
