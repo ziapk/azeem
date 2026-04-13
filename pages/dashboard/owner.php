@@ -108,6 +108,14 @@ foreach ($publishersArr as $key => $value) {
                 <strong>{{shopData[li.shopId].full_name}}</strong><br />
                 Rs. <strong>{{li.price | number}}</strong> - Qty: <strong>{{li.qty - li.stock_out | number}}</strong>
                 <span class="pull-right">
+                    <button
+                        class="btn btn-xs btn-default"
+                        ng-click="syncProduct(li)"
+                        ng-disabled="li.syncing">
+                        <i ng-if="!li.syncing" class="fa fa-refresh"></i>
+                        <i ng-if="li.syncing"  class="fa fa-spinner fa-spin"></i>
+                        Sync
+                    </button>
                     <a class="btn btn-xs btn-primary" href="{{url + 'pages/product/update_item.php?id=' + li.id}}">Modify</a> |
                     <a class="btn btn-xs btn-danger" href="javascript:void(0)" ng-click="deleteStoreItem(li.id)">delete</a>
                 </span>
@@ -125,6 +133,7 @@ foreach ($publishersArr as $key => $value) {
                     <th>In Hand</th>
                     <th>Min. Qty</th>
                     <th>Placement</th>
+                    <th width="80">Sync</th>
                     <th width="150"></th>
                 </tr>
             </thead>
@@ -139,6 +148,20 @@ foreach ($publishersArr as $key => $value) {
                     <td>{{li.qty - li.stock_out}}</td>
                     <td>{{li.min_qty}}</td>
                     <td>{{li.location}}</td>
+                    <td>
+                        <button
+                            class="btn btn-xs btn-default"
+                            ng-click="syncProduct(li)"
+                            ng-disabled="li.syncing"
+                            title="Reconcile ledger & fix qty">
+                            <span ng-if="!li.syncing">
+                                <i class="fa fa-refresh"></i>
+                            </span>
+                            <span ng-if="li.syncing">
+                                <i class="fa fa-spinner fa-spin"></i>
+                            </span>
+                        </button>
+                    </td>
                     <td>
                         <a class="btn btn-xs btn-primary" href="{{url + 'pages/product/update_item.php?id=' + li.id}}">Modify</a> |
                         <a class="btn btn-xs btn-danger" href="javascript:void(0)" ng-click="deleteStoreItem(li.id)">delete</a>
@@ -302,6 +325,31 @@ foreach ($publishersArr as $key => $value) {
                 });
             }, function() {
                 $log.info('Modal dismissed at: ' + new Date());
+            });
+        };
+        $scope.syncProduct = function(li) {
+            li.syncing = true;
+
+            $http.get('<?php echo SITE_URL ?>api/sync-product.php', {
+                params: {
+                    product_id: li.product_id,
+                    shop_id:    li.shopId
+                }
+            })
+            .then(function(response) {
+                if (response.data.status === 200) {
+                    li.qty       = response.data.qty;
+                    li.stock_out = 0;
+                    toaster.success({ body: response.data.message });
+                } else {
+                    toaster.error({ body: 'Sync failed' });
+                }
+            })
+            .catch(function() {
+                toaster.error({ body: 'Sync request failed' });
+            })
+            .finally(function() {
+                li.syncing = false;
             });
         };
     });
