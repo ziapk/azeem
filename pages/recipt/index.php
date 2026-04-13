@@ -1087,6 +1087,8 @@ echo mainFooter();
                         }
                     })
                     .then(function(response) {
+                        const ids = $scope.items.map(i => i.product_id || i.id);
+                        $http.get(`<?php echo SITE_URL; ?>api/sync-product.php?product_ids=${ids.join(',')}`);
                         $scope.loading = false;
                         if (status == 1) {
                             alert(response.data.message);

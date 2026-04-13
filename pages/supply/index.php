@@ -441,6 +441,8 @@ echo mainFooter();
                     }
                 })
                 .then(function(response) {
+                    const ids = $scope.items.map(i => i.id);
+                    $http.get(`<?php echo SITE_URL; ?>api/sync-product.php?product_ids=${ids.join(',')}`);
                     $scope.items = $scope.list = [];
                     $scope.subTotal = $scope.discount = $scope.grandTotal = $scope.payment_amount = $scope.payment_with_credit = 0;
                     alert(response.data.message);

@@ -340,6 +340,8 @@ echo mainFooter();
                     }
                 })
                 .then(function(response) {
+                    const ids = $scope.items.map(i => i.id);
+                    $http.get(`<?php echo SITE_URL; ?>api/sync-product.php?product_ids=${ids.join(',')}`);
                     // window.open("<?php echo SITE_URL; ?>print?id="+response.data.order.id, "", "width=300,height=300"); 
                     // $scope.items = $scope.list = [];
                     // $scope.subTotal = $scope.discount = $scope.grandTotal = $scope.payment_amount = 0;

@@ -1051,7 +1051,9 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                             }
                         })
                         .then(function(response) {
-                        console.log('response', response)
+                            const ids = $scope.items.map(i => i.product_id || i.id);
+                            $http.get(`<?php echo SITE_URL; ?>api/sync-product.php?product_ids=${ids.join(',')}`);
+                            console.log('response', response)
                             $scope.loading = false;
                             if (status == 1) {
                                 alert(response.data.message);
