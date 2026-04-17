@@ -223,7 +223,7 @@ foreach ($publishersArr as $key => $value) {
         }
         $scope.getProducts = (page) => {
             $scope.loading = true;
-            $http.get("<?php echo SITE_URL ?>api/getStoreProducts.php", {
+            return $http.get("<?php echo SITE_URL ?>api/getStoreProducts.php", {
                     params: {
                         page: page || 1,
                         perPage: $scope.data.perPage,
@@ -363,35 +363,57 @@ foreach ($publishersArr as $key => $value) {
 
         $scope.syncAll = function() {
             if (!$scope.list || !$scope.list.length) return;
-            if (!$window.confirm('Sync all ' + $scope.list.length + ' products on this page?')) return;
 
-            $scope.syncingAll      = true;
-            $scope.syncAllTotal    = $scope.list.length;
-            $scope.syncAllDone     = 0;
-            $scope.syncAllFailed   = 0;
+            var grandTotal = parseInt($scope.data.totalRecords) || $scope.list.length;
+            if (!$window.confirm('Sync all ' + grandTotal + ' products across every page?')) return;
 
-            var queue = $scope.list.slice();
-            var runNext = function() {
-                if (!queue.length) {
-                    $scope.syncingAll = false;
-                    toaster.success({
-                        body: 'Sync complete: ' + $scope.syncAllDone + ' done'
-                              + ($scope.syncAllFailed ? ', ' + $scope.syncAllFailed + ' failed' : '')
-                    });
-                    return;
-                }
-                var li = queue.shift();
-                $scope.syncProduct(li, { silent: true })
-                    .then(function(response) {
-                        if (response && response.data && response.data.status === 200) {
-                            $scope.syncAllDone++;
-                        } else {
-                            $scope.syncAllFailed++;
-                        }
-                    })
-                    .finally(runNext);
+            $scope.syncingAll    = true;
+            $scope.syncAllTotal  = grandTotal;
+            $scope.syncAllDone   = 0;
+            $scope.syncAllFailed = 0;
+            $scope.syncAllPage   = $scope.currentPage || 1;
+
+            var finish = function() {
+                $scope.syncingAll = false;
+                toaster.success({
+                    body: 'Sync complete: ' + $scope.syncAllDone + ' done'
+                          + ($scope.syncAllFailed ? ', ' + $scope.syncAllFailed + ' failed' : '')
+                });
             };
-            runNext();
+
+            var syncCurrentPage = function() {
+                var queue = $scope.list.slice();
+                var runNext = function() {
+                    if (!queue.length) {
+                        var perPage    = parseInt($scope.data.perPage) || 1;
+                        var totalPages = Math.max(1, Math.ceil(($scope.data.totalRecords || 0) / perPage));
+                        if ($scope.syncAllPage < totalPages) {
+                            $scope.syncAllPage++;
+                            $scope.getProducts($scope.syncAllPage).then(function() {
+                                syncCurrentPage();
+                            }, function() {
+                                finish();
+                            });
+                        } else {
+                            finish();
+                        }
+                        return;
+                    }
+                    var li = queue.shift();
+                    $scope.syncProduct(li, { silent: true })
+                        .then(function(response) {
+                            if (response && response.data && response.data.status === 200) {
+                                $scope.syncAllDone++;
+                            } else {
+                                $scope.syncAllFailed++;
+                            }
+                        })
+                        .finally(runNext);
+                };
+                runNext();
+            };
+
+            syncCurrentPage();
         };
     });
 </script>
