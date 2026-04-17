@@ -593,4 +593,46 @@ class Inventory extends Connection
             $this->connectionPool->releaseConnection($dbh);
         }
     }
+
+    // ----------------------------------------------------------------
+    /**
+     * reconcileProducts — bulk version of reconcileProduct.
+     *
+     * Accepts an array of product IDs and reconciles each one.
+     * Useful after placing/editing an order, supply, or return —
+     * pass all product IDs from that transaction and everything
+     * gets healed in one call.
+     *
+     * @param int[]  $product_ids   Array of product IDs to reconcile
+     * @param int    $shop_id
+     * @param int    $owner_id
+     *
+     * @return array {
+     *   total_inserted : int     — total missing entries added across all products
+     *   products       : array   — per-product result keyed by product_id
+     *                             each entry: { inserted: int, qty: float }
+     * }
+     */
+    public function reconcileProducts(array $product_ids, int $shop_id, int $owner_id): array
+    {
+        $product_ids = array_values(array_unique(array_filter(array_map('intval', $product_ids))));
+
+        if (empty($product_ids)) {
+            return ['total_inserted' => 0, 'products' => []];
+        }
+
+        $totalInserted = 0;
+        $products      = [];
+
+        foreach ($product_ids as $product_id) {
+            $result = $this->reconcileProduct($product_id, $shop_id, $owner_id);
+            $totalInserted              += $result['inserted'];
+            $products[$product_id]       = $result;
+        }
+
+        return [
+            'total_inserted' => $totalInserted,
+            'products'       => $products,
+        ];
+    }
 }

@@ -78,6 +78,12 @@ foreach ($publishersArr as $key => $value) {
     </div>
     <!-- <h4>Hot Products</h4> -->
     <a href="<?php echo SITE_URL . "pages/product/create.php" ?>" class="btn btn-primary btn-xs pull-right" style="margin-left: 12px">Create Product</a> <a href="<?php echo SITE_URL . "pages/product/assign.php" ?>" class="btn btn-primary btn-xs pull-right">Assign Product</a>
+    <button type="button" class="btn btn-warning btn-xs pull-right" style="margin-right: 8px" ng-click="syncAll()" ng-disabled="syncingAll || !list.length">
+        <i ng-if="!syncingAll" class="fa fa-refresh"></i>
+        <i ng-if="syncingAll" class="fa fa-spinner fa-spin"></i>
+        <span ng-if="!syncingAll">Sync All</span>
+        <span ng-if="syncingAll">Syncing {{syncAllDone + syncAllFailed}} / {{syncAllTotal}}</span>
+    </button>
     <h4>Products in stores </h4>
     <div class="row">
         <div class="form-group col-sm-5">
@@ -327,10 +333,11 @@ foreach ($publishersArr as $key => $value) {
                 $log.info('Modal dismissed at: ' + new Date());
             });
         };
-        $scope.syncProduct = function(li) {
+        $scope.syncProduct = function(li, opts) {
+            opts = opts || {};
             li.syncing = true;
 
-            $http.get('<?php echo SITE_URL ?>api/sync-product.php', {
+            return $http.get('<?php echo SITE_URL ?>api/sync-product.php', {
                 params: {
                     product_id: li.product_id,
                     shop_id:    li.shopId
@@ -340,17 +347,51 @@ foreach ($publishersArr as $key => $value) {
                 if (response.data.status === 200) {
                     li.qty       = response.data.qty;
                     li.stock_out = 0;
-                    toaster.success({ body: response.data.message });
+                    if (!opts.silent) toaster.success({ body: response.data.message });
                 } else {
-                    toaster.error({ body: 'Sync failed' });
+                    if (!opts.silent) toaster.error({ body: 'Sync failed' });
                 }
+                return response;
             })
             .catch(function() {
-                toaster.error({ body: 'Sync request failed' });
+                if (!opts.silent) toaster.error({ body: 'Sync request failed' });
             })
             .finally(function() {
                 li.syncing = false;
             });
+        };
+
+        $scope.syncAll = function() {
+            if (!$scope.list || !$scope.list.length) return;
+            if (!$window.confirm('Sync all ' + $scope.list.length + ' products on this page?')) return;
+
+            $scope.syncingAll      = true;
+            $scope.syncAllTotal    = $scope.list.length;
+            $scope.syncAllDone     = 0;
+            $scope.syncAllFailed   = 0;
+
+            var queue = $scope.list.slice();
+            var runNext = function() {
+                if (!queue.length) {
+                    $scope.syncingAll = false;
+                    toaster.success({
+                        body: 'Sync complete: ' + $scope.syncAllDone + ' done'
+                              + ($scope.syncAllFailed ? ', ' + $scope.syncAllFailed + ' failed' : '')
+                    });
+                    return;
+                }
+                var li = queue.shift();
+                $scope.syncProduct(li, { silent: true })
+                    .then(function(response) {
+                        if (response && response.data && response.data.status === 200) {
+                            $scope.syncAllDone++;
+                        } else {
+                            $scope.syncAllFailed++;
+                        }
+                    })
+                    .finally(runNext);
+            };
+            runNext();
         };
     });
 </script>
