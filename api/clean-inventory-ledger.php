@@ -204,6 +204,47 @@ try {
             }
             break;
 
+        case 'reset_order_ledger':
+            // Reset ledger for a specific order and rebuild from transaction data
+            $orderId = isset($_GET['order_id']) ? (int)$_GET['order_id'] : 0;
+            $shopId = isset($_GET['shop_id']) ? (int)$_GET['shop_id'] : 0;
+            $dryRun = !isset($_GET['confirm']) || $_GET['confirm'] !== 'yes';
+
+            if (!$orderId || !$shopId) {
+                throw new Exception('order_id and shop_id parameters required');
+            }
+
+            if ($dryRun) {
+                // Count what would be affected
+                $countStmt = $dbh->prepare("SELECT COUNT(*) as count FROM inventory_ledger WHERE ref_type = 'order' AND ref_id = :order_id");
+                $countStmt->bindParam(':order_id', $orderId, PDO::PARAM_INT);
+                $countStmt->execute();
+                $count = $countStmt->fetch(PDO::FETCH_ASSOC)['count'];
+
+                echo json_encode([
+                    'success' => true,
+                    'dry_run' => true,
+                    'order_id' => $orderId,
+                    'shop_id' => $shopId,
+                    'entries_to_delete' => $count,
+                    'message' => "DRY RUN: Would delete $count ledger entries for order #$orderId and rebuild from transaction data"
+                ]);
+                break;
+            }
+
+            // Perform the actual reset
+            $result = $inventory->resetOrderLedger($orderId, $shopId, $userData['id']);
+
+            echo json_encode([
+                'success' => true,
+                'dry_run' => false,
+                'order_id' => $orderId,
+                'shop_id' => $shopId,
+                'result' => $result,
+                'message' => "Reset complete: Deleted {$result['deleted_entries']} entries, inserted {$result['inserted_entries']} entries, re-synced {$result['affected_products']} products"
+            ]);
+            break;
+
         default:
             echo json_encode([
                 'error' => 'Invalid action',
@@ -212,7 +253,8 @@ try {
                     'delete_duplicates' => 'Delete duplicate ledger entries (?shop_id=X&product_id=Y&confirm=yes)',
                     'find_by_ref' => 'Find ledger entries by reference (?ref_type=order&ref_id=123)',
                     'delete_by_ref' => 'Delete ledger entries by reference (?ref_type=order&ref_id=123&confirm=yes)',
-                    'cleanup_adjustments' => 'Remove all ADJUSTMENT entries from ledger (&confirm=yes)'
+                    'cleanup_adjustments' => 'Remove all ADJUSTMENT entries from ledger (&confirm=yes)',
+                    'reset_order_ledger' => 'Reset ledger for order and rebuild (?order_id=X&shop_id=Y&confirm=yes)'
                 ]
             ]);
     }

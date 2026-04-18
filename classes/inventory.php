@@ -692,44 +692,220 @@ class Inventory extends Connection
 
     // ----------------------------------------------------------------
     /**
-     * reconcileProducts — bulk version of reconcileProduct.
+     * resetOrderLedger — deletes all ledger entries for a specific order and rebuilds from transaction data.
      *
-     * Accepts an array of product IDs and reconciles each one.
-     * Useful after placing/editing an order, supply, or return —
-     * pass all product IDs from that transaction and everything
-     * gets healed in one call.
+     * What it does:
+     *   1. Deletes all ledger entries for the specified order
+     *   2. Rebuilds ledger entries from all sales, purchases, and returns in the transaction tables
+     *   3. Re-syncs all product quantities
      *
-     * @param int[]  $product_ids   Array of product IDs to reconcile
-     * @param int    $shop_id
-     * @param int    $owner_id
+     * @param int $order_id The order ID to reset
+     * @param int $shop_id The shop ID
+     * @param int $owner_id Used as created_by for inserted rows
      *
      * @return array {
-     *   total_inserted : int     — total missing entries added across all products
-     *   products       : array   — per-product result keyed by product_id
-     *                             each entry: { inserted: int, qty: float }
+     *   deleted_entries : int — number of ledger entries deleted
+     *   inserted_entries : int — number of ledger entries re-inserted
+     *   affected_products : int — number of products re-synced
      * }
      */
-    public function reconcileProducts(array $product_ids, int $shop_id, int $owner_id): array
+    public function resetOrderLedger(int $order_id, int $shop_id, int $owner_id): array
     {
-        $product_ids = array_values(array_unique(array_filter(array_map('intval', $product_ids))));
+        $dbh = $this->connectionPool->getConnection();
+        $deleted = 0;
+        $inserted = 0;
+        $affectedProducts = [];
 
-        if (empty($product_ids)) {
-            return ['total_inserted' => 0, 'products' => []];
+        try {
+            $dbh->beginTransaction();
+
+            // 1. Delete all ledger entries for this order
+            $delStmt = $dbh->prepare("DELETE FROM `{$this->table_ledger}` WHERE ref_type = :ref_type AND ref_id = :ref_id");
+            $delStmt->bindParam(':ref_type', self::REF_ORDER, PDO::PARAM_STR);
+            $delStmt->bindParam(':ref_id', $order_id, PDO::PARAM_INT);
+            $delStmt->execute();
+            $deleted = $delStmt->rowCount();
+
+            // 2. Get all products that were affected by this order
+            $productStmt = $dbh->prepare(
+                "SELECT DISTINCT oi.product_id
+                 FROM `order_items` oi
+                 INNER JOIN `orders` o ON o.id = oi.order_id
+                 WHERE oi.order_id = :order_id
+                   AND o.shopId = :shop_id
+                   AND o.flag = 1
+                   AND o.status IN (2, 8, 9)"
+            );
+            $productStmt->bindParam(':order_id', $order_id, PDO::PARAM_INT);
+            $productStmt->bindParam(':shop_id', $shop_id, PDO::PARAM_INT);
+            $productStmt->execute();
+            $products = $productStmt->fetchAll(PDO::FETCH_COLUMN);
+
+            // 3. Rebuild ledger entries from transaction data for ALL products
+            // (not just this order, but all transactions to ensure complete rebuild)
+
+            // Build lookup of existing entries to avoid duplicates
+            $existStmt = $dbh->prepare("SELECT ref_type, ref_id, product_id FROM `{$this->table_ledger}` WHERE shop_id = :shop_id");
+            $existStmt->bindParam(':shop_id', $shop_id, PDO::PARAM_INT);
+            $existStmt->execute();
+            $existing = [];
+            foreach ($existStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+                $existing[$row['ref_type'] . '_' . $row['ref_id'] . '_' . $row['product_id']] = true;
+            }
+
+            // Helper function to insert ledger entry if not exists
+            $insertLedger = function($movement_type, $quantity, $ref_type, $ref_id, $product_id, $note, $created_at)
+                            use ($dbh, $shop_id, $owner_id, &$existing, &$inserted, &$affectedProducts) {
+
+                $key = $ref_type . '_' . $ref_id . '_' . $product_id;
+                if (isset($existing[$key])) {
+                    return; // already exists
+                }
+
+                $stmt = $dbh->prepare(
+                    "INSERT INTO `{$this->table_ledger}`
+                        (`product_id`, `shop_id`, `owner_id`, `movement_type`,
+                         `quantity`, `ref_type`, `ref_id`, `note`, `created_by`, `created_at`)
+                     VALUES
+                        (:product_id, :shop_id, :owner_id, :movement_type,
+                         :quantity, :ref_type, :ref_id, :note, :created_by, :created_at)"
+                );
+                $stmt->bindParam(':product_id', $product_id, PDO::PARAM_INT);
+                $stmt->bindParam(':shop_id', $shop_id, PDO::PARAM_INT);
+                $stmt->bindParam(':owner_id', $owner_id, PDO::PARAM_INT);
+                $stmt->bindParam(':movement_type', $movement_type, PDO::PARAM_STR);
+                $stmt->bindParam(':quantity', $quantity, PDO::PARAM_STR);
+                $stmt->bindParam(':ref_type', $ref_type, PDO::PARAM_STR);
+                $stmt->bindParam(':ref_id', $ref_id, PDO::PARAM_INT);
+                $stmt->bindParam(':note', $note, PDO::PARAM_STR);
+                $stmt->bindParam(':created_by', $owner_id, PDO::PARAM_INT);
+                $stmt->bindParam(':created_at', $created_at, PDO::PARAM_STR);
+                $stmt->execute();
+
+                $existing[$key] = true;
+                $inserted++;
+                $affectedProducts[$product_id] = true;
+            };
+
+            // Re-insert SALES from all completed orders
+            $salesStmt = $dbh->prepare(
+                "SELECT o.id AS order_id, o.order_custom_id, oi.product_id, oi.quantity, o.order_date
+                 FROM `order_items` oi
+                 INNER JOIN `orders` o ON o.id = oi.order_id
+                 WHERE o.shopId = :shop_id
+                   AND o.flag = 1
+                   AND o.status IN (2, 8, 9)
+                   AND oi.quantity > 0"
+            );
+            $salesStmt->bindParam(':shop_id', $shop_id, PDO::PARAM_INT);
+            $salesStmt->execute();
+
+            foreach ($salesStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+                $insertLedger(
+                    self::SALE,
+                    -1 * (float)$row['quantity'],
+                    self::REF_ORDER,
+                    (int)$row['order_id'],
+                    (int)$row['product_id'],
+                    'Order #' . $row['order_custom_id'],
+                    $row['order_date']
+                );
+            }
+
+            // Re-insert SUPPLIES from all completed supplies
+            $supplyStmt = $dbh->prepare(
+                "SELECT s.id AS supply_id, si.product_id, si.quantity, s.supply_date
+                 FROM `supply_items` si
+                 INNER JOIN `supply` s ON s.id = si.supply_id
+                 WHERE s.shopId = :shop_id
+                   AND s.flag = 1
+                   AND s.status != 1
+                   AND si.quantity > 0"
+            );
+            $supplyStmt->bindParam(':shop_id', $shop_id, PDO::PARAM_INT);
+            $supplyStmt->execute();
+
+            foreach ($supplyStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+                $insertLedger(
+                    self::SUPPLY,
+                    (float)$row['quantity'],
+                    self::REF_SUPPLY,
+                    (int)$row['supply_id'],
+                    (int)$row['product_id'],
+                    'Supply #' . $row['supply_id'],
+                    $row['supply_date']
+                );
+            }
+
+            // Re-insert RETURN_IN (customer returns)
+            $returnInStmt = $dbh->prepare(
+                "SELECT ro.id AS ro_id, pr.product_id, pr.quantity, ro.return_date
+                 FROM `product_returns` pr
+                 INNER JOIN `return_orders` ro ON ro.id = pr.order_id
+                 WHERE ro.shopId = :shop_id
+                   AND ro.return_type = 1
+                   AND ro.flag = 2
+                   AND pr.quantity > 0"
+            );
+            $returnInStmt->bindParam(':shop_id', $shop_id, PDO::PARAM_INT);
+            $returnInStmt->execute();
+
+            foreach ($returnInStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+                $insertLedger(
+                    self::RETURN_IN,
+                    (float)$row['quantity'],
+                    self::REF_RETURN_ORDER,
+                    (int)$row['ro_id'],
+                    (int)$row['product_id'],
+                    'Sale return RO #' . $row['ro_id'],
+                    $row['return_date']
+                );
+            }
+
+            // Re-insert RETURN_OUT (supplier returns)
+            $returnOutStmt = $dbh->prepare(
+                "SELECT ro.id AS ro_id, pr.product_id, pr.quantity, ro.return_date
+                 FROM `product_returns` pr
+                 INNER JOIN `return_orders` ro ON ro.id = pr.order_id
+                 WHERE ro.shopId = :shop_id
+                   AND ro.return_type = 2
+                   AND ro.flag = 2
+                   AND pr.quantity > 0"
+            );
+            $returnOutStmt->bindParam(':shop_id', $shop_id, PDO::PARAM_INT);
+            $returnOutStmt->execute();
+
+            foreach ($returnOutStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+                $insertLedger(
+                    self::RETURN_OUT,
+                    -1 * (float)$row['quantity'],
+                    self::REF_RETURN_ORDER,
+                    (int)$row['ro_id'],
+                    (int)$row['product_id'],
+                    'Purchase return RO #' . $row['ro_id'],
+                    $row['return_date']
+                );
+            }
+
+            $dbh->commit();
+
+            // Re-sync all affected products
+            foreach (array_keys($affectedProducts) as $product_id) {
+                $this->syncQty($product_id, $shop_id, $dbh);
+            }
+
+            return [
+                'deleted_entries' => $deleted,
+                'inserted_entries' => $inserted,
+                'affected_products' => count($affectedProducts)
+            ];
+
+        } catch (PDOException $e) {
+            $dbh->rollBack();
+            die("Inventory::resetOrderLedger error: " . $e->getMessage());
+        } finally {
+            $this->connectionPool->releaseConnection($dbh);
         }
-
-        $totalInserted = 0;
-        $products      = [];
-
-        foreach ($product_ids as $product_id) {
-            $result = $this->reconcileProduct($product_id, $shop_id, $owner_id);
-            $totalInserted              += $result['inserted'];
-            $products[$product_id]       = $result;
-        }
-
-        return [
-            'total_inserted' => $totalInserted,
-            'products'       => $products,
-        ];
     }
 
     /**
