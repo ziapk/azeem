@@ -467,7 +467,7 @@ class Inventory extends Connection
     {
         $dbh = $this->connectionPool->getConnection();
         try {
-            $shopCondition = $shop_id !== null ? 'AND shopId = :shop_id' : '';
+            $shopCondition = $shop_id !== null ? 'AND %s.shopId = :shop_id' : '';
 
             $stmt = "SELECT COUNT(*) AS total_entries,
                             COUNT(DISTINCT CONCAT(product_id, '_', shop_id)) AS distinct_products
@@ -478,7 +478,7 @@ class Inventory extends Connection
                         WHERE si.quantity > 0
                           AND s.flag = 1
                           AND s.status != 1
-                          $shopCondition
+                          " . sprintf($shopCondition, 's') . "
 
                         UNION ALL
 
@@ -488,7 +488,7 @@ class Inventory extends Connection
                         WHERE oi.quantity > 0
                           AND o.flag = 1
                           AND o.status IN (2, 8, 9)
-                          $shopCondition
+                          " . sprintf($shopCondition, 'o') . "
 
                         UNION ALL
 
@@ -497,7 +497,7 @@ class Inventory extends Connection
                         INNER JOIN return_orders ro ON ro.id = pr.order_id
                         WHERE pr.quantity > 0
                           AND ro.flag = 2
-                          $shopCondition
+                          " . sprintf($shopCondition, 'ro') . "
                      ) AS rebuild_entries";
 
             $prepare = $dbh->prepare($stmt);
@@ -564,7 +564,7 @@ class Inventory extends Connection
             $deleted = $delStmt->rowCount();
 
             // Build the transaction feed in date order.
-            $shopFilter = $shop_id !== null ? 'AND shopId = :shop_id' : '';
+            $shopFilter = $shop_id !== null ? 'AND %s.shopId = :shop_id' : '';
             $selectSql = "SELECT product_id, shop_id, owner_id, movement_type, quantity, ref_type, ref_id, note, entry_date
                           FROM (
                               SELECT si.product_id,
@@ -582,7 +582,7 @@ class Inventory extends Connection
                               WHERE si.quantity > 0
                                 AND s.flag = 1
                                 AND s.status != 1
-                                $shopFilter
+                                " . sprintf($shopFilter, 's') . "
 
                               UNION ALL
 
@@ -601,7 +601,7 @@ class Inventory extends Connection
                               WHERE oi.quantity > 0
                                 AND o.flag = 1
                                 AND o.status IN (2, 8, 9)
-                                $shopFilter
+                                " . sprintf($shopFilter, 'o') . "
 
                               UNION ALL
 
@@ -620,7 +620,7 @@ class Inventory extends Connection
                               WHERE pr.quantity > 0
                                 AND ro.return_type = 1
                                 AND ro.flag = 2
-                                $shopFilter
+                                " . sprintf($shopFilter, 'ro') . "
 
                               UNION ALL
 
@@ -639,7 +639,7 @@ class Inventory extends Connection
                               WHERE pr.quantity > 0
                                 AND ro.return_type = 2
                                 AND ro.flag = 2
-                                $shopFilter
+                                " . sprintf($shopFilter, 'ro') . "
                           ) AS transaction_feed
                           ORDER BY entry_date ASC, sort_priority ASC, shop_id ASC, product_id ASC";
 
