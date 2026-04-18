@@ -1,0 +1,1 @@
+ssh -p 21098 -i ~/.ssh/id_rsa reclydmy@premium212.web-hosting.com 'cd public_html/azeem && git pull'

@@ -27,7 +27,7 @@ class Inventory extends Connection
     const SALE        = 'SALE';        // stock sold / dispatched        (-)
     const RETURN_IN   = 'RETURN_IN';   // customer returns to you        (+)
     const RETURN_OUT  = 'RETURN_OUT';  // you return to supplier         (-)
-    const ADJUSTMENT  = 'ADJUSTMENT';  // manual correction              (+/-)
+    // ADJUSTMENT removed - only SALE, PURCHASE, RETURNS allowed
 
     // ----------------------------------------------------------------
     //  REF TYPES
@@ -292,7 +292,7 @@ class Inventory extends Connection
     /**
      * reverseByRef — reverses ALL ledger entries tied to a specific ref.
      * Used when rolling back a completed order or supply.
-     * Inserts compensating entries (opposite sign) then re-syncs qty.
+     * Inserts compensating entries with SAME movement_type but OPPOSITE quantity.
      *
      * @param string $ref_type   'order' | 'supply' | 'return_order'
      * @param int    $ref_id     The order_id or supply_id
@@ -303,10 +303,9 @@ class Inventory extends Connection
     {
         $dbh = $this->connectionPool->getConnection();
         try {
-            // Fetch all original entries for this ref
+            // Fetch all original entries for this ref (exclude any existing reversals)
             $stmt = "SELECT * FROM `{$this->table_ledger}`
                      WHERE ref_type = :ref_type AND ref_id = :ref_id
-                       AND movement_type NOT IN ('ADJUSTMENT')
                      ORDER BY id ASC";
             $prepare = $dbh->prepare($stmt);
             $prepare->bindParam(':ref_type', $ref_type, PDO::PARAM_STR);
@@ -317,7 +316,7 @@ class Inventory extends Connection
             $affected = []; // track which product+shop combos need syncQty
 
             foreach ($entries as $entry) {
-                // Insert the reversal row (flip the quantity sign)
+                // Insert the reversal row (flip the quantity sign, keep same movement_type)
                 $reverseQty = (float)$entry['quantity'] * -1;
 
                 $ins = "INSERT INTO `{$this->table_ledger}`
@@ -326,19 +325,19 @@ class Inventory extends Connection
                         VALUES
                             (:product_id, :shop_id, :owner_id, :movement_type,
                              :quantity, :ref_type, :ref_id, :note, :created_by)";
-                $movementType = 'ADJUSTMENT';
+
                 $reversalNote = $note ?: "Reversal of $ref_type #$ref_id";
 
                 $ip = $dbh->prepare($ins);
-                $ip->bindParam(':product_id',    $entry['product_id'], PDO::PARAM_INT);
-                $ip->bindParam(':shop_id',       $entry['shop_id'],    PDO::PARAM_INT);
-                $ip->bindParam(':owner_id',      $entry['owner_id'],   PDO::PARAM_INT);
-                $ip->bindParam(':movement_type', $movementType,        PDO::PARAM_STR);
-                $ip->bindParam(':quantity',      $reverseQty,          PDO::PARAM_STR);
-                $ip->bindParam(':ref_type',      $ref_type,            PDO::PARAM_STR);
-                $ip->bindParam(':ref_id',        $ref_id,              PDO::PARAM_INT);
-                $ip->bindParam(':note',          $reversalNote,        PDO::PARAM_STR);
-                $ip->bindParam(':created_by',    $created_by,          PDO::PARAM_INT);
+                $ip->bindParam(':product_id',    $entry['product_id'],    PDO::PARAM_INT);
+                $ip->bindParam(':shop_id',       $entry['shop_id'],       PDO::PARAM_INT);
+                $ip->bindParam(':owner_id',      $entry['owner_id'],      PDO::PARAM_INT);
+                $ip->bindParam(':movement_type', $entry['movement_type'], PDO::PARAM_STR); // Same type, opposite qty
+                $ip->bindParam(':quantity',      $reverseQty,             PDO::PARAM_STR);
+                $ip->bindParam(':ref_type',      $ref_type,               PDO::PARAM_STR);
+                $ip->bindParam(':ref_id',        $ref_id,                 PDO::PARAM_INT);
+                $ip->bindParam(':note',          $reversalNote,           PDO::PARAM_STR);
+                $ip->bindParam(':created_by',    $created_by,             PDO::PARAM_INT);
                 $ip->execute();
 
                 $affected[$entry['product_id'] . '_' . $entry['shop_id']] = [

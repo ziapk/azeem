@@ -154,6 +154,56 @@ try {
             ]);
             break;
 
+        case 'cleanup_adjustments':
+            // Remove all ADJUSTMENT entries from inventory ledger
+            $dryRun = !isset($_GET['confirm']) || $_GET['confirm'] !== 'yes';
+
+            $dbh = $inventory->connectionPool->getConnection();
+            try {
+                // Count ADJUSTMENT entries
+                $countStmt = $dbh->prepare("SELECT COUNT(*) as count FROM inventory_ledger WHERE movement_type = 'ADJUSTMENT'");
+                $countStmt->execute();
+                $count = $countStmt->fetch(PDO::FETCH_ASSOC)['count'];
+
+                if ($count == 0) {
+                    echo json_encode([
+                        'success' => true,
+                        'message' => 'No ADJUSTMENT entries found in inventory ledger'
+                    ]);
+                    break;
+                }
+
+                // Get affected products for re-sync
+                $affectedStmt = $dbh->prepare("SELECT DISTINCT product_id, shop_id FROM inventory_ledger WHERE movement_type = 'ADJUSTMENT'");
+                $affectedStmt->execute();
+                $affectedProducts = $affectedStmt->fetchAll(PDO::FETCH_ASSOC);
+
+                if (!$dryRun) {
+                    // Delete ADJUSTMENT entries
+                    $delStmt = $dbh->prepare("DELETE FROM inventory_ledger WHERE movement_type = 'ADJUSTMENT'");
+                    $delStmt->execute();
+
+                    // Re-sync affected products
+                    foreach ($affectedProducts as $product) {
+                        $inventory->syncQty($product['product_id'], $product['shop_id'], $dbh);
+                    }
+                }
+
+                echo json_encode([
+                    'success' => true,
+                    'dry_run' => $dryRun,
+                    'adjustment_entries_count' => $count,
+                    'affected_products' => $affectedProducts,
+                    'message' => $dryRun ?
+                        "DRY RUN: Would delete $count ADJUSTMENT entries and re-sync " . count($affectedProducts) . " products" :
+                        "Deleted $count ADJUSTMENT entries and re-synced " . count($affectedProducts) . " products"
+                ]);
+
+            } finally {
+                $inventory->connectionPool->releaseConnection($dbh);
+            }
+            break;
+
         default:
             echo json_encode([
                 'error' => 'Invalid action',
@@ -161,7 +211,8 @@ try {
                     'find_duplicates' => 'Find duplicate ledger entries (?shop_id=X&product_id=Y)',
                     'delete_duplicates' => 'Delete duplicate ledger entries (?shop_id=X&product_id=Y&confirm=yes)',
                     'find_by_ref' => 'Find ledger entries by reference (?ref_type=order&ref_id=123)',
-                    'delete_by_ref' => 'Delete ledger entries by reference (?ref_type=order&ref_id=123&confirm=yes)'
+                    'delete_by_ref' => 'Delete ledger entries by reference (?ref_type=order&ref_id=123&confirm=yes)',
+                    'cleanup_adjustments' => 'Remove all ADJUSTMENT entries from ledger (&confirm=yes)'
                 ]
             ]);
     }
