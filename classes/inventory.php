@@ -580,6 +580,7 @@ class Inventory extends Connection
                               FROM supply_items si
                               INNER JOIN supply s ON s.id = si.supply_id
                               WHERE si.quantity > 0
+                                AND si.product_id IS NOT NULL
                                 AND s.flag = 1
                                 AND s.status != 1
                                 " . sprintf($shopFilter, 's') . "
@@ -599,6 +600,7 @@ class Inventory extends Connection
                               FROM order_items oi
                               INNER JOIN orders o ON o.id = oi.order_id
                               WHERE oi.quantity > 0
+                                AND oi.product_id IS NOT NULL
                                 AND o.flag = 1
                                 AND o.status IN (2, 8, 9)
                                 " . sprintf($shopFilter, 'o') . "
@@ -618,6 +620,7 @@ class Inventory extends Connection
                               FROM product_returns pr
                               INNER JOIN return_orders ro ON ro.id = pr.order_id
                               WHERE pr.quantity > 0
+                                AND pr.product_id IS NOT NULL
                                 AND ro.return_type = 1
                                 AND ro.flag = 2
                                 " . sprintf($shopFilter, 'ro') . "
@@ -637,6 +640,7 @@ class Inventory extends Connection
                               FROM product_returns pr
                               INNER JOIN return_orders ro ON ro.id = pr.order_id
                               WHERE pr.quantity > 0
+                                AND pr.product_id IS NOT NULL
                                 AND ro.return_type = 2
                                 AND ro.flag = 2
                                 " . sprintf($shopFilter, 'ro') . "
@@ -660,6 +664,10 @@ class Inventory extends Connection
             $insertStmt = $dbh->prepare($insertSql);
 
             foreach ($feedRows as $row) {
+                if (empty($row['product_id'])) {
+                    continue;
+                }
+
                 $insertStmt->bindValue(':product_id', $row['product_id'], PDO::PARAM_INT);
                 $insertStmt->bindValue(':shop_id', $row['shop_id'], PDO::PARAM_INT);
                 $insertStmt->bindValue(':owner_id', $owner_id, PDO::PARAM_INT);
