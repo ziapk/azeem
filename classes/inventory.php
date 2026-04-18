@@ -829,7 +829,13 @@ class Inventory extends Connection
 
         } catch (PDOException $e) {
             $dbh->rollBack();
-            die("Inventory::resetOrderLedger error: " . $e->getMessage());
+            // Instead of dying, return the error so we can see what went wrong
+            return [
+                'error' => $e->getMessage(),
+                'deleted_entries' => $deleted,
+                'inserted_entries' => $inserted,
+                'affected_products' => count($affectedProducts)
+            ];
         } finally {
             $this->connectionPool->releaseConnection($dbh);
         }

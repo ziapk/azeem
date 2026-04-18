@@ -234,6 +234,18 @@ try {
             $ownerId = $userData['id'] ?? 1; // Default to 1 if not set
             $result = $inventory->resetOrderLedger($orderId, $shopId, $ownerId);
 
+            // Check if there was an error
+            if (isset($result['error'])) {
+                echo json_encode([
+                    'success' => false,
+                    'error' => $result['error'],
+                    'order_id' => $orderId,
+                    'shop_id' => $shopId,
+                    'partial_result' => $result
+                ]);
+                exit;
+            }
+
             echo json_encode([
                 'success' => true,
                 'dry_run' => false,
