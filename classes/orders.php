@@ -2054,4 +2054,210 @@ class Orders extends Connection
             $this->connectionPool->releaseConnection($dbh);
         }
     }
+
+    /**
+     * findDuplicateOrders — finds orders with duplicate reference numbers
+     *
+     * @param int $shopId Optional: limit to specific shop
+     * @param string $criteria 'ref_no' or 'customer_date' (customer_name + order_date)
+     * @return array Array of duplicate groups, each containing order IDs
+     */
+    public function findDuplicateOrders(int $shopId = null, string $criteria = 'ref_no'): array
+    {
+        $dbh = $this->connectionPool->getConnection();
+        try {
+            $where = "";
+            $params = [];
+
+            if ($shopId) {
+                $where = "WHERE shopId = :shopId";
+                $params[':shopId'] = $shopId;
+            }
+
+            if ($criteria === 'ref_no') {
+                // Find orders with same ref_no (non-empty)
+                $stmt = "SELECT ref_no, GROUP_CONCAT(id ORDER BY id) as order_ids, COUNT(*) as count
+                         FROM `{$this->table}`
+                         WHERE ref_no IS NOT NULL AND ref_no != '' $where
+                         GROUP BY ref_no
+                         HAVING COUNT(*) > 1
+                         ORDER BY ref_no";
+            } elseif ($criteria === 'customer_date') {
+                // Find orders with same customer_name and order_date
+                $stmt = "SELECT CONCAT(customer_name, '_', DATE(order_date)) as key_field,
+                                GROUP_CONCAT(id ORDER BY id) as order_ids, COUNT(*) as count
+                         FROM `{$this->table}`
+                         WHERE customer_name IS NOT NULL AND customer_name != '' $where
+                         GROUP BY key_field
+                         HAVING COUNT(*) > 1
+                         ORDER BY key_field";
+            } else {
+                throw new Exception("Invalid criteria: $criteria");
+            }
+
+            $prepare = $dbh->prepare($stmt);
+            foreach ($params as $key => $value) {
+                $prepare->bindValue($key, $value, PDO::PARAM_INT);
+            }
+            $prepare->execute();
+            $duplicates = $prepare->fetchAll(PDO::FETCH_ASSOC);
+
+            // Format the results
+            $result = [];
+            foreach ($duplicates as $dup) {
+                $orderIds = explode(',', $dup['order_ids']);
+                $result[] = [
+                    'criteria' => $criteria,
+                    'key' => $criteria === 'ref_no' ? $dup['ref_no'] : $dup['key_field'],
+                    'count' => $dup['count'],
+                    'order_ids' => array_map('intval', $orderIds),
+                    'orders' => $this->getOrdersByIds($orderIds, $dbh)
+                ];
+            }
+
+            return $result;
+
+        } catch (PDOException $e) {
+            die("Orders::findDuplicateOrders error: " . $e->getMessage());
+        } finally {
+            $this->connectionPool->releaseConnection($dbh);
+        }
+    }
+
+    /**
+     * getOrdersByIds — helper method to get order details for multiple IDs
+     */
+    private function getOrdersByIds(array $ids, $dbh = null): array
+    {
+        $ownConnection = ($dbh === null);
+        if ($ownConnection) {
+            $dbh = $this->connectionPool->getConnection();
+        }
+
+        try {
+            $placeholders = str_repeat('?,', count($ids) - 1) . '?';
+            $stmt = "SELECT id, order_custom_id, customer_name, ref_no, order_date, status, price, paid_amount
+                     FROM `{$this->table}`
+                     WHERE id IN ($placeholders)
+                     ORDER BY id";
+
+            $prepare = $dbh->prepare($stmt);
+            $prepare->execute($ids);
+            $orders = $prepare->fetchAll(PDO::FETCH_ASSOC);
+
+            return $orders;
+
+        } catch (PDOException $e) {
+            die("Orders::getOrdersByIds error: " . $e->getMessage());
+        } finally {
+            if ($ownConnection) {
+                $this->connectionPool->releaseConnection($dbh);
+            }
+        }
+    }
+
+    /**
+     * deleteDuplicateOrders — deletes duplicate orders, keeping the most recent one
+     *
+     * @param array $duplicateGroups Array from findDuplicateOrders()
+     * @param bool $dryRun If true, just return what would be deleted without actually deleting
+     * @return array Results of the operation
+     */
+    public function deleteDuplicateOrders(array $duplicateGroups, bool $dryRun = true): array
+    {
+        $results = [
+            'deleted_orders' => [],
+            'kept_orders' => [],
+            'errors' => [],
+            'total_processed' => 0,
+            'dry_run' => $dryRun
+        ];
+
+        foreach ($duplicateGroups as $group) {
+            $orderIds = $group['order_ids'];
+
+            // Keep the order with the highest ID (most recent)
+            $keepId = max($orderIds);
+            $deleteIds = array_diff($orderIds, [$keepId]);
+
+            $results['kept_orders'][] = $keepId;
+            $results['total_processed'] += count($deleteIds);
+
+            if (!$dryRun) {
+                foreach ($deleteIds as $orderId) {
+                    try {
+                        $this->deleteOrder($orderId);
+                        $results['deleted_orders'][] = $orderId;
+                    } catch (Exception $e) {
+                        $results['errors'][] = "Failed to delete order $orderId: " . $e->getMessage();
+                    }
+                }
+            } else {
+                $results['deleted_orders'] = array_merge($results['deleted_orders'], $deleteIds);
+            }
+        }
+
+        return $results;
+    }
+
+    /**
+     * deleteOrder — deletes an order and all related data (items, services, transactions, inventory)
+     */
+    public function deleteOrder(int $orderId): bool
+    {
+        $dbh = $this->connectionPool->getConnection();
+        try {
+            $dbh->beginTransaction();
+
+            // Get order details first
+            $order = $this->getOrder($orderId);
+            if (!$order) {
+                throw new Exception("Order $orderId not found");
+            }
+
+            // Delete order items
+            $stmt = "DELETE FROM `{$this->table_sub}` WHERE order_id = :order_id";
+            $prepare = $dbh->prepare($stmt);
+            $prepare->bindParam(':order_id', $orderId, PDO::PARAM_INT);
+            $prepare->execute();
+
+            // Delete order services
+            $stmt = "DELETE FROM `{$this->table_oservice}` WHERE order_id = :order_id";
+            $prepare = $dbh->prepare($stmt);
+            $prepare->bindParam(':order_id', $orderId, PDO::PARAM_INT);
+            $prepare->execute();
+
+            // Delete transactions
+            $doubleEntry = new DoubleEntry();
+            $doubleEntry->deleteTransactionByOrderId($orderId);
+
+            // Reverse inventory if order was completed
+            if (in_array($order['order']['status'], [2, 8, 9])) {
+                $inventory = new Inventory();
+                $inventory->cleanupReversals(Inventory::REF_ORDER, $orderId, $dbh);
+                $inventory->reverseByRef(
+                    Inventory::REF_ORDER,
+                    $orderId,
+                    $order['order']['user_id'] ?? 1,
+                    "Deleting order #$orderId",
+                    $dbh
+                );
+            }
+
+            // Finally delete the order
+            $stmt = "DELETE FROM `{$this->table}` WHERE id = :id";
+            $prepare = $dbh->prepare($stmt);
+            $prepare->bindParam(':id', $orderId, PDO::PARAM_INT);
+            $prepare->execute();
+
+            $dbh->commit();
+            return true;
+
+        } catch (Exception $e) {
+            $dbh->rollBack();
+            throw $e;
+        } finally {
+            $this->connectionPool->releaseConnection($dbh);
+        }
+    }
 }
