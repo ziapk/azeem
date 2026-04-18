@@ -256,6 +256,46 @@ try {
             ]);
             break;
 
+        case 'rebuild_ledger':
+            // Delete all ledger entries and rebuild the inventory ledger from transaction history
+            $shopId = isset($_GET['shop_id']) ? (int)$_GET['shop_id'] : null;
+            $dryRun = !isset($_GET['confirm']) || $_GET['confirm'] !== 'yes';
+
+            if ($dryRun) {
+                $stats = $inventory->countRebuildEntriesFromTransactions($shopId);
+                echo json_encode([
+                    'success' => true,
+                    'dry_run' => true,
+                    'shop_id' => $shopId,
+                    'entries_to_insert' => $stats['total_entries'],
+                    'products_to_sync' => $stats['distinct_products'],
+                    'message' => "DRY RUN: Would delete all ledger entries " . ($shopId ? "for shop $shopId " : "for all shops ") . "and rebuild from transactions in date order"
+                ]);
+                break;
+            }
+
+            $ownerId = $userData['id'] ?? 1;
+            $result = $inventory->rebuildLedgerFromTransactions($shopId, $ownerId);
+
+            if (isset($result['error'])) {
+                echo json_encode([
+                    'success' => false,
+                    'error' => $result['error'],
+                    'shop_id' => $shopId,
+                    'partial_result' => $result
+                ]);
+                exit;
+            }
+
+            echo json_encode([
+                'success' => true,
+                'dry_run' => false,
+                'shop_id' => $shopId,
+                'result' => $result,
+                'message' => "Rebuild complete: Deleted {$result['deleted_entries']} entries, inserted {$result['inserted_entries']} entries, synced {$result['affected_products']} products"
+            ]);
+            break;
+
         default:
             echo json_encode([
                 'error' => 'Invalid action',
@@ -265,7 +305,8 @@ try {
                     'find_by_ref' => 'Find ledger entries by reference (?ref_type=order&ref_id=123)',
                     'delete_by_ref' => 'Delete ledger entries by reference (?ref_type=order&ref_id=123&confirm=yes)',
                     'cleanup_adjustments' => 'Remove all ADJUSTMENT entries from ledger (&confirm=yes)',
-                    'reset_order_ledger' => 'Reset ledger for order and rebuild (?order_id=X&shop_id=Y&confirm=yes)'
+                    'reset_order_ledger' => 'Reset ledger for order and rebuild (?order_id=X&shop_id=Y&confirm=yes)',
+                    'rebuild_ledger' => 'Delete all ledger entries and rebuild from transactions (?shop_id=X optional&confirm=yes)'
                 ]
             ]);
     }

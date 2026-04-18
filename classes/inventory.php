@@ -412,7 +412,7 @@ class Inventory extends Connection
      *
      * @param int $shop_id  Optional: only reset products in this shop, or all shops if null
      */
-    public function resetAllProductLedgers(int $shop_id = null): void
+    public function resetAllProductLedgers(?int $shop_id = null): void
     {
         $dbh = $this->connectionPool->getConnection();
         try {
@@ -450,6 +450,257 @@ class Inventory extends Connection
 
         } catch (PDOException $e) {
             die("Inventory::resetAllProductLedgers error: " . $e->getMessage());
+        } finally {
+            $this->connectionPool->releaseConnection($dbh);
+        }
+    }
+
+    // ----------------------------------------------------------------
+    /**
+     * countRebuildEntriesFromTransactions — returns the number of ledger entries and distinct product/shop combinations
+     * that would be rebuilt from sales, supply, and return transaction data.
+     *
+     * @param int|null $shop_id Optional shop scope
+     * @return array { total_entries: int, distinct_products: int }
+     */
+    public function countRebuildEntriesFromTransactions(?int $shop_id = null): array
+    {
+        $dbh = $this->connectionPool->getConnection();
+        try {
+            $shopCondition = $shop_id !== null ? 'AND shopId = :shop_id' : '';
+
+            $stmt = "SELECT COUNT(*) AS total_entries,
+                            COUNT(DISTINCT CONCAT(product_id, '_', shop_id)) AS distinct_products
+                     FROM (
+                        SELECT si.product_id, s.shopId AS shop_id
+                        FROM supply_items si
+                        INNER JOIN supply s ON s.id = si.supply_id
+                        WHERE si.quantity > 0
+                          AND s.flag = 1
+                          AND s.status != 1
+                          $shopCondition
+
+                        UNION ALL
+
+                        SELECT oi.product_id, o.shopId AS shop_id
+                        FROM order_items oi
+                        INNER JOIN orders o ON o.id = oi.order_id
+                        WHERE oi.quantity > 0
+                          AND o.flag = 1
+                          AND o.status IN (2, 8, 9)
+                          $shopCondition
+
+                        UNION ALL
+
+                        SELECT pr.product_id, ro.shopId AS shop_id
+                        FROM product_returns pr
+                        INNER JOIN return_orders ro ON ro.id = pr.order_id
+                        WHERE pr.quantity > 0
+                          AND ro.flag = 2
+                          $shopCondition
+                     ) AS rebuild_entries";
+
+            $prepare = $dbh->prepare($stmt);
+            if ($shop_id !== null) {
+                $prepare->bindValue(':shop_id', $shop_id, PDO::PARAM_INT);
+            }
+            $prepare->execute();
+            $row = $prepare->fetch(PDO::FETCH_ASSOC);
+
+            return [
+                'total_entries' => (int)($row['total_entries'] ?? 0),
+                'distinct_products' => (int)($row['distinct_products'] ?? 0)
+            ];
+
+        } catch (PDOException $e) {
+            die("Inventory::countRebuildEntriesFromTransactions error: " . $e->getMessage());
+        } finally {
+            $this->connectionPool->releaseConnection($dbh);
+        }
+    }
+
+    /**
+     * rebuildLedgerFromTransactions — deletes all ledger entries and rebuilds them from source transactions.
+     * Entries are inserted in chronological order by transaction date.
+     *
+     * @param int|null $shop_id Optional shop scope
+     * @param int $owner_id Used as owner_id / created_by for new ledger rows
+     * @return array { deleted_entries: int, inserted_entries: int, affected_products: int }
+     */
+    public function rebuildLedgerFromTransactions(?int $shop_id = null, int $owner_id = 1): array
+    {
+        $dbh = $this->connectionPool->getConnection();
+        $deleted = 0;
+        $inserted = 0;
+        $affectedProducts = [];
+
+        try {
+            $dbh->beginTransaction();
+
+            // Determine all products that should be re-synced for the target shop(s).
+            $productSelect = "SELECT DISTINCT product_id, shopId AS shop_id FROM `{$this->table_st}`" .
+                             ($shop_id !== null ? " WHERE shopId = :shop_id" : '');
+            $productStmt = $dbh->prepare($productSelect);
+            if ($shop_id !== null) {
+                $productStmt->bindValue(':shop_id', $shop_id, PDO::PARAM_INT);
+            }
+            $productStmt->execute();
+            $productsToSync = $productStmt->fetchAll(PDO::FETCH_ASSOC);
+            foreach ($productsToSync as $row) {
+                $key = $row['product_id'] . '_' . $row['shop_id'];
+                $affectedProducts[$key] = [
+                    'product_id' => (int)$row['product_id'],
+                    'shop_id' => (int)$row['shop_id']
+                ];
+            }
+
+            // Delete all existing ledger entries in scope before rebuild.
+            $deleteSql = "DELETE FROM `{$this->table_ledger}`" . ($shop_id !== null ? " WHERE shop_id = :shop_id" : '');
+            $delStmt = $dbh->prepare($deleteSql);
+            if ($shop_id !== null) {
+                $delStmt->bindValue(':shop_id', $shop_id, PDO::PARAM_INT);
+            }
+            $delStmt->execute();
+            $deleted = $delStmt->rowCount();
+
+            // Build the transaction feed in date order.
+            $shopFilter = $shop_id !== null ? 'AND shopId = :shop_id' : '';
+            $selectSql = "SELECT product_id, shop_id, owner_id, movement_type, quantity, ref_type, ref_id, note, entry_date
+                          FROM (
+                              SELECT si.product_id,
+                                     s.shopId AS shop_id,
+                                     :owner_id AS owner_id,
+                                     '" . self::SUPPLY . "' AS movement_type,
+                                     si.quantity AS quantity,
+                                     '" . self::REF_SUPPLY . "' AS ref_type,
+                                     s.id AS ref_id,
+                                     CONCAT('Supply #', s.id) AS note,
+                                     s.supply_date AS entry_date,
+                                     1 AS sort_priority
+                              FROM supply_items si
+                              INNER JOIN supply s ON s.id = si.supply_id
+                              WHERE si.quantity > 0
+                                AND s.flag = 1
+                                AND s.status != 1
+                                $shopFilter
+
+                              UNION ALL
+
+                              SELECT oi.product_id,
+                                     o.shopId AS shop_id,
+                                     :owner_id AS owner_id,
+                                     '" . self::SALE . "' AS movement_type,
+                                     -oi.quantity AS quantity,
+                                     '" . self::REF_ORDER . "' AS ref_type,
+                                     o.id AS ref_id,
+                                     CONCAT('Order #', o.order_custom_id) AS note,
+                                     o.order_date AS entry_date,
+                                     3 AS sort_priority
+                              FROM order_items oi
+                              INNER JOIN orders o ON o.id = oi.order_id
+                              WHERE oi.quantity > 0
+                                AND o.flag = 1
+                                AND o.status IN (2, 8, 9)
+                                $shopFilter
+
+                              UNION ALL
+
+                              SELECT pr.product_id,
+                                     ro.shopId AS shop_id,
+                                     :owner_id AS owner_id,
+                                     '" . self::RETURN_IN . "' AS movement_type,
+                                     pr.quantity AS quantity,
+                                     '" . self::REF_RETURN_ORDER . "' AS ref_type,
+                                     ro.id AS ref_id,
+                                     CONCAT('Sale return RO #', ro.id) AS note,
+                                     ro.return_date AS entry_date,
+                                     2 AS sort_priority
+                              FROM product_returns pr
+                              INNER JOIN return_orders ro ON ro.id = pr.order_id
+                              WHERE pr.quantity > 0
+                                AND ro.return_type = 1
+                                AND ro.flag = 2
+                                $shopFilter
+
+                              UNION ALL
+
+                              SELECT pr.product_id,
+                                     ro.shopId AS shop_id,
+                                     :owner_id AS owner_id,
+                                     '" . self::RETURN_OUT . "' AS movement_type,
+                                     -pr.quantity AS quantity,
+                                     '" . self::REF_RETURN_ORDER . "' AS ref_type,
+                                     ro.id AS ref_id,
+                                     CONCAT('Purchase return RO #', ro.id) AS note,
+                                     ro.return_date AS entry_date,
+                                     4 AS sort_priority
+                              FROM product_returns pr
+                              INNER JOIN return_orders ro ON ro.id = pr.order_id
+                              WHERE pr.quantity > 0
+                                AND ro.return_type = 2
+                                AND ro.flag = 2
+                                $shopFilter
+                          ) AS transaction_feed
+                          ORDER BY entry_date ASC, sort_priority ASC, shop_id ASC, product_id ASC";
+
+            $feedStmt = $dbh->prepare($selectSql);
+            $feedStmt->bindValue(':owner_id', $owner_id, PDO::PARAM_INT);
+            if ($shop_id !== null) {
+                $feedStmt->bindValue(':shop_id', $shop_id, PDO::PARAM_INT);
+            }
+            $feedStmt->execute();
+            $feedRows = $feedStmt->fetchAll(PDO::FETCH_ASSOC);
+
+            $insertSql = "INSERT INTO `{$this->table_ledger}`
+                            (`product_id`, `shop_id`, `owner_id`, `movement_type`,
+                             `quantity`, `ref_type`, `ref_id`, `note`, `created_by`, `created_at`)
+                          VALUES
+                            (:product_id, :shop_id, :owner_id, :movement_type,
+                             :quantity, :ref_type, :ref_id, :note, :created_by, :created_at)";
+            $insertStmt = $dbh->prepare($insertSql);
+
+            foreach ($feedRows as $row) {
+                $insertStmt->bindValue(':product_id', $row['product_id'], PDO::PARAM_INT);
+                $insertStmt->bindValue(':shop_id', $row['shop_id'], PDO::PARAM_INT);
+                $insertStmt->bindValue(':owner_id', $owner_id, PDO::PARAM_INT);
+                $insertStmt->bindValue(':movement_type', $row['movement_type'], PDO::PARAM_STR);
+                $insertStmt->bindValue(':quantity', $row['quantity'], PDO::PARAM_STR);
+                $insertStmt->bindValue(':ref_type', $row['ref_type'], PDO::PARAM_STR);
+                $insertStmt->bindValue(':ref_id', $row['ref_id'], PDO::PARAM_INT);
+                $insertStmt->bindValue(':note', $row['note'], PDO::PARAM_STR);
+                $insertStmt->bindValue(':created_by', $owner_id, PDO::PARAM_INT);
+                $insertStmt->bindValue(':created_at', $row['entry_date'], PDO::PARAM_STR);
+                $insertStmt->execute();
+
+                $inserted++;
+                $key = $row['product_id'] . '_' . $row['shop_id'];
+                $affectedProducts[$key] = [
+                    'product_id' => (int)$row['product_id'],
+                    'shop_id' => (int)$row['shop_id']
+                ];
+            }
+
+            $dbh->commit();
+
+            // Sync all products affected by the shop scope or rebuild feed.
+            foreach ($affectedProducts as $product) {
+                $this->syncQty($product['product_id'], $product['shop_id'], $dbh);
+            }
+
+            return [
+                'deleted_entries' => $deleted,
+                'inserted_entries' => $inserted,
+                'affected_products' => count($affectedProducts)
+            ];
+
+        } catch (PDOException $e) {
+            $dbh->rollBack();
+            return [
+                'error' => $e->getMessage(),
+                'deleted_entries' => $deleted,
+                'inserted_entries' => $inserted,
+                'affected_products' => count($affectedProducts)
+            ];
         } finally {
             $this->connectionPool->releaseConnection($dbh);
         }
@@ -848,7 +1099,7 @@ class Inventory extends Connection
      * @param int $productId Optional: limit to specific product
      * @return array Array of duplicate groups
      */
-    public function findDuplicateLedgerEntries(int $shopId = null, int $productId = null): array
+    public function findDuplicateLedgerEntries(?int $shopId = null, ?int $productId = null): array
     {
         $dbh = $this->connectionPool->getConnection();
         try {
