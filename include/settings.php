@@ -15,7 +15,7 @@
 if (!isset($_SESSION)) {
     session_start();
 }
-define('SITE_URL', '/azeem/');
+define('SITE_URL', '/');
 date_default_timezone_set('Asia/Karachi');
 ini_set('max_input_vars', 20000);
 
