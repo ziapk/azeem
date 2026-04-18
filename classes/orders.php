@@ -146,18 +146,17 @@ class Orders extends Connection
                 $orderDetail = $this->getOrder($array['id']); // get full order details
                 $currentStatus = $orderDetail['order']['status']; // get current status
 
+                // ALWAYS clean up previous reversals first, before checking status
+                // This prevents accumulation of ADJUSTMENT entries on repeated edits
+                $inventory = new Inventory();
+                $inventory->cleanupReversals(
+                    Inventory::REF_ORDER,
+                    (int)$orderDetail['order']['id']
+                );
+
                 if (in_array($currentStatus, [2, 8, 9])) { // if current status is completed or partial paid or draft
 
-                    // ── INVENTORY: Clean up any previous reversals, then reverse all ledger entries ──
-                    $inventory = new Inventory();
-                    
-                    // First, remove any previous ADJUSTMENT entries to prevent accumulating reversals
-                    $inventory->cleanupReversals(
-                        Inventory::REF_ORDER,
-                        (int)$orderDetail['order']['id']
-                    );
-                    
-                    // Now apply the reversal
+                    // ── INVENTORY: Now apply the reversal after cleanup ──
                     $inventory->reverseByRef(
                         Inventory::REF_ORDER,
                         (int)$orderDetail['order']['id'],

@@ -362,13 +362,20 @@ class Inventory extends Connection
     /**
      * cleanupReversals — removes all previous reversal (ADJUSTMENT) entries for a given ref.
      * Call this BEFORE reverseByRef to prevent accumulating multiple reversals.
+     * Uses provided $dbh connection to avoid transaction issues.
      *
      * @param string $ref_type   'order' | 'supply' | 'return_order'
      * @param int    $ref_id     The order_id or supply_id
+     * @param PDO    $dbh        Database connection (optional - creates new if not provided)
      */
-    public function cleanupReversals(string $ref_type, int $ref_id): void
+    public function cleanupReversals(string $ref_type, int $ref_id, $dbh = null): void
     {
-        $dbh = $this->connectionPool->getConnection();
+        $needsRelease = false;
+        if (!$dbh) {
+            $dbh = $this->connectionPool->getConnection();
+            $needsRelease = true;
+        }
+
         try {
             // Fetch all ADJUSTMENT entries for this ref to find affected products
             $stmt = "SELECT DISTINCT product_id, shop_id FROM `{$this->table_ledger}`
@@ -380,24 +387,28 @@ class Inventory extends Connection
             $prepare->execute();
             $affected = $prepare->fetchAll(PDO::FETCH_ASSOC);
 
-            // Delete all ADJUSTMENT entries for this ref
-            $del = "DELETE FROM `{$this->table_ledger}`
-                    WHERE ref_type = :ref_type AND ref_id = :ref_id
-                      AND movement_type = 'ADJUSTMENT'";
-            $dp = $dbh->prepare($del);
-            $dp->bindParam(':ref_type', $ref_type, PDO::PARAM_STR);
-            $dp->bindParam(':ref_id',   $ref_id,   PDO::PARAM_INT);
-            $dp->execute();
+            if (!empty($affected)) {
+                // Delete all ADJUSTMENT entries for this ref
+                $del = "DELETE FROM `{$this->table_ledger}`
+                        WHERE ref_type = :ref_type AND ref_id = :ref_id
+                          AND movement_type = 'ADJUSTMENT'";
+                $dp = $dbh->prepare($del);
+                $dp->bindParam(':ref_type', $ref_type, PDO::PARAM_STR);
+                $dp->bindParam(':ref_id',   $ref_id,   PDO::PARAM_INT);
+                $dp->execute();
 
-            // Resync all affected products
-            foreach ($affected as $item) {
-                $this->syncQty($item['product_id'], $item['shop_id'], $dbh);
+                // Resync all affected products
+                foreach ($affected as $item) {
+                    $this->syncQty($item['product_id'], $item['shop_id'], $dbh);
+                }
             }
 
         } catch (PDOException $e) {
             die("Inventory::cleanupReversals error: " . $e->getMessage());
         } finally {
-            $this->connectionPool->releaseConnection($dbh);
+            if ($needsRelease && $dbh) {
+                $this->connectionPool->releaseConnection($dbh);
+            }
         }
     }
 
