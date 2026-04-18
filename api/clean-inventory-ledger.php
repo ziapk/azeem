@@ -9,6 +9,14 @@ if (!isset($_SESSION['user_credentials'])) {
 
 $inventory = new Inventory();
 
+// Debug output if requested
+if (isset($_GET['debug'])) {
+    echo "DEBUG: API started, user authenticated\n";
+    echo "DEBUG: userData: " . json_encode($userData) . "\n";
+    echo "DEBUG: action: " . ($_GET['action'] ?? 'none') . "\n";
+    flush();
+}
+
 try {
     $action = $_GET['action'] ?? '';
 
@@ -210,6 +218,11 @@ try {
             $shopId = isset($_GET['shop_id']) ? (int)$_GET['shop_id'] : 0;
             $dryRun = !isset($_GET['confirm']) || $_GET['confirm'] !== 'yes';
 
+            if (isset($_GET['debug'])) {
+                error_reporting(E_ALL);
+                ini_set('display_errors', 1);
+            }
+
             if (!$orderId || !$shopId) {
                 throw new Exception('order_id and shop_id parameters required');
             }
@@ -230,9 +243,22 @@ try {
                 break;
             }
 
+            // Debug: Check if we get here
+            if (isset($_GET['debug'])) {
+                echo "DEBUG: About to call resetOrderLedger\n";
+                flush();
+            }
+
             // Perform the actual reset
             $ownerId = $userData['id'] ?? 1; // Default to 1 if not set
             $result = $inventory->resetOrderLedger($orderId, $shopId, $ownerId);
+
+            // Debug: Check if we get here
+            if (isset($_GET['debug'])) {
+                echo "DEBUG: resetOrderLedger returned\n";
+                var_dump($result);
+                flush();
+            }
 
             // Check if there was an error
             if (isset($result['error'])) {
