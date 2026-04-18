@@ -721,8 +721,8 @@ class Inventory extends Connection
 
             // 1. Delete all ledger entries for this order
             $delStmt = $dbh->prepare("DELETE FROM `{$this->table_ledger}` WHERE ref_type = :ref_type AND ref_id = :ref_id");
-            $delStmt->bindParam(':ref_type', self::REF_ORDER, PDO::PARAM_STR);
-            $delStmt->bindParam(':ref_id', $order_id, PDO::PARAM_INT);
+            $delStmt->bindValue(':ref_type', self::REF_ORDER, PDO::PARAM_STR);
+            $delStmt->bindValue(':ref_id', $order_id, PDO::PARAM_INT);
             $delStmt->execute();
             $deleted = $delStmt->rowCount();
 
@@ -736,8 +736,8 @@ class Inventory extends Connection
                    AND o.flag = 1
                    AND o.status IN (2, 8, 9)"
             );
-            $productStmt->bindParam(':order_id', $order_id, PDO::PARAM_INT);
-            $productStmt->bindParam(':shop_id', $shop_id, PDO::PARAM_INT);
+            $productStmt->bindValue(':order_id', $order_id, PDO::PARAM_INT);
+            $productStmt->bindValue(':shop_id', $shop_id, PDO::PARAM_INT);
             $productStmt->execute();
             $products = $productStmt->fetchAll(PDO::FETCH_COLUMN);
 
@@ -746,7 +746,7 @@ class Inventory extends Connection
 
             // Build lookup of existing entries to avoid duplicates
             $existStmt = $dbh->prepare("SELECT ref_type, ref_id, product_id FROM `{$this->table_ledger}` WHERE shop_id = :shop_id");
-            $existStmt->bindParam(':shop_id', $shop_id, PDO::PARAM_INT);
+            $existStmt->bindValue(':shop_id', $shop_id, PDO::PARAM_INT);
             $existStmt->execute();
             $existing = [];
             foreach ($existStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
@@ -770,16 +770,16 @@ class Inventory extends Connection
                         (:product_id, :shop_id, :owner_id, :movement_type,
                          :quantity, :ref_type, :ref_id, :note, :created_by, :created_at)"
                 );
-                $stmt->bindParam(':product_id', $product_id, PDO::PARAM_INT);
-                $stmt->bindParam(':shop_id', $shop_id, PDO::PARAM_INT);
-                $stmt->bindParam(':owner_id', $owner_id, PDO::PARAM_INT);
-                $stmt->bindParam(':movement_type', $movement_type, PDO::PARAM_STR);
-                $stmt->bindParam(':quantity', $quantity, PDO::PARAM_STR);
-                $stmt->bindParam(':ref_type', $ref_type, PDO::PARAM_STR);
-                $stmt->bindParam(':ref_id', $ref_id, PDO::PARAM_INT);
-                $stmt->bindParam(':note', $note, PDO::PARAM_STR);
-                $stmt->bindParam(':created_by', $owner_id, PDO::PARAM_INT);
-                $stmt->bindParam(':created_at', $created_at, PDO::PARAM_STR);
+                $stmt->bindValue(':product_id', $product_id, PDO::PARAM_INT);
+                $stmt->bindValue(':shop_id', $shop_id, PDO::PARAM_INT);
+                $stmt->bindValue(':owner_id', $owner_id, PDO::PARAM_INT);
+                $stmt->bindValue(':movement_type', $movement_type, PDO::PARAM_STR);
+                $stmt->bindValue(':quantity', $quantity, PDO::PARAM_STR);
+                $stmt->bindValue(':ref_type', $ref_type, PDO::PARAM_STR);
+                $stmt->bindValue(':ref_id', $ref_id, PDO::PARAM_INT);
+                $stmt->bindValue(':note', $note, PDO::PARAM_STR);
+                $stmt->bindValue(':created_by', $owner_id, PDO::PARAM_INT);
+                $stmt->bindValue(':created_at', $created_at, PDO::PARAM_STR);
                 $stmt->execute();
 
                 $existing[$key] = true;
@@ -798,8 +798,8 @@ class Inventory extends Connection
                    AND o.status IN (2, 8, 9)
                    AND oi.quantity > 0"
             );
-            $salesStmt->bindParam(':order_id', $order_id, PDO::PARAM_INT);
-            $salesStmt->bindParam(':shop_id', $shop_id, PDO::PARAM_INT);
+            $salesStmt->bindValue(':order_id', $order_id, PDO::PARAM_INT);
+            $salesStmt->bindValue(':shop_id', $shop_id, PDO::PARAM_INT);
             $salesStmt->execute();
 
             foreach ($salesStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
