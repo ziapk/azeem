@@ -360,55 +360,99 @@ class Inventory extends Connection
     }
 
     /**
-     * cleanupReversals — removes all previous reversal (ADJUSTMENT) entries for a given ref.
-     * Call this BEFORE reverseByRef to prevent accumulating multiple reversals.
-     * Uses provided $dbh connection to avoid transaction issues.
+     * resetProductLedger — deletes all ledger entries for a product and re-syncs quantity.
+     * WARNING: This will recalculate quantity from scratch. Use only for corrupted data.
      *
-     * @param string $ref_type   'order' | 'supply' | 'return_order'
-     * @param int    $ref_id     The order_id or supply_id
-     * @param PDO    $dbh        Database connection (optional - creates new if not provided)
+     * @param int $product_id
+     * @param int $shop_id
+     * @param string $movement_type  Optional: only delete entries of this type (e.g., 'ADJUSTMENT')
+     * @param bool $delete_all      If true, deletes ALL entries; if false, only specified type
      */
-    public function cleanupReversals(string $ref_type, int $ref_id, $dbh = null): void
+    public function resetProductLedger(int $product_id, int $shop_id, string $movement_type = '', bool $delete_all = false): void
     {
-        $needsRelease = false;
-        if (!$dbh) {
-            $dbh = $this->connectionPool->getConnection();
-            $needsRelease = true;
-        }
-
+        $dbh = $this->connectionPool->getConnection();
         try {
-            // Fetch all ADJUSTMENT entries for this ref to find affected products
-            $stmt = "SELECT DISTINCT product_id, shop_id FROM `{$this->table_ledger}`
-                     WHERE ref_type = :ref_type AND ref_id = :ref_id
-                       AND movement_type = 'ADJUSTMENT'";
-            $prepare = $dbh->prepare($stmt);
-            $prepare->bindParam(':ref_type', $ref_type, PDO::PARAM_STR);
-            $prepare->bindParam(':ref_id',   $ref_id,   PDO::PARAM_INT);
-            $prepare->execute();
-            $affected = $prepare->fetchAll(PDO::FETCH_ASSOC);
+            // Build WHERE clause
+            $where = "WHERE product_id = :product_id AND shop_id = :shop_id";
+            $params = [
+                ':product_id' => $product_id,
+                ':shop_id' => $shop_id
+            ];
 
-            if (!empty($affected)) {
-                // Delete all ADJUSTMENT entries for this ref
-                $del = "DELETE FROM `{$this->table_ledger}`
-                        WHERE ref_type = :ref_type AND ref_id = :ref_id
-                          AND movement_type = 'ADJUSTMENT'";
-                $dp = $dbh->prepare($del);
-                $dp->bindParam(':ref_type', $ref_type, PDO::PARAM_STR);
-                $dp->bindParam(':ref_id',   $ref_id,   PDO::PARAM_INT);
-                $dp->execute();
-
-                // Resync all affected products
-                foreach ($affected as $item) {
-                    $this->syncQty($item['product_id'], $item['shop_id'], $dbh);
-                }
+            if (!$delete_all && !empty($movement_type)) {
+                $where .= " AND movement_type = :movement_type";
+                $params[':movement_type'] = $movement_type;
             }
+
+            // Delete the specified entries
+            $delStmt = "DELETE FROM `{$this->table_ledger}` $where";
+            $del = $dbh->prepare($delStmt);
+            foreach ($params as $key => $value) {
+                $del->bindValue($key, $value, is_int($value) ? PDO::PARAM_INT : PDO::PARAM_STR);
+            }
+            $deleted = $del->execute();
+
+            // Re-sync the quantity from remaining ledger entries
+            $this->syncQty($product_id, $shop_id, $dbh);
+
+            // Log what was done
+            $action = $delete_all ? 'ALL entries' : ($movement_type ?: 'specified') . ' entries';
+            error_log("Inventory::resetProductLedger: Deleted $action for product $product_id in shop $shop_id, re-synced quantity");
 
         } catch (PDOException $e) {
-            die("Inventory::cleanupReversals error: " . $e->getMessage());
+            die("Inventory::resetProductLedger error: " . $e->getMessage());
         } finally {
-            if ($needsRelease && $dbh) {
-                $this->connectionPool->releaseConnection($dbh);
+            $this->connectionPool->releaseConnection($dbh);
+        }
+    }
+
+    /**
+     * resetAllProductLedgers — deletes all ledger entries for ALL products and re-syncs all quantities.
+     * EXTREME WARNING: This will recalculate ALL product quantities from scratch.
+     * Use only when the entire inventory ledger is corrupted.
+     *
+     * @param int $shop_id  Optional: only reset products in this shop, or all shops if null
+     */
+    public function resetAllProductLedgers(int $shop_id = null): void
+    {
+        $dbh = $this->connectionPool->getConnection();
+        try {
+            // Get all affected product+shop combinations
+            $where = "";
+            $params = [];
+            if ($shop_id !== null) {
+                $where = "WHERE shop_id = :shop_id";
+                $params[':shop_id'] = $shop_id;
             }
+
+            $stmt = "SELECT DISTINCT product_id, shop_id FROM `{$this->table_ledger}` $where";
+            $prepare = $dbh->prepare($stmt);
+            foreach ($params as $key => $value) {
+                $prepare->bindValue($key, $value, PDO::PARAM_INT);
+            }
+            $prepare->execute();
+            $products = $prepare->fetchAll(PDO::FETCH_ASSOC);
+
+            // Delete all ledger entries
+            $delStmt = "DELETE FROM `{$this->table_ledger}`" . ($shop_id ? " WHERE shop_id = :shop_id" : "");
+            $del = $dbh->prepare($delStmt);
+            if ($shop_id) {
+                $del->bindParam(':shop_id', $shop_id, PDO::PARAM_INT);
+            }
+            $del->execute();
+
+            // Re-sync all affected products (quantities will be 0 since all entries deleted)
+            foreach ($products as $product) {
+                $this->syncQty($product['product_id'], $product['shop_id'], $dbh);
+            }
+
+            $scope = $shop_id ? "shop $shop_id" : "all shops";
+            error_log("Inventory::resetAllProductLedgers: Reset ALL ledger entries for $scope, re-synced all quantities to 0");
+
+        } catch (PDOException $e) {
+            die("Inventory::resetAllProductLedgers error: " . $e->getMessage());
+        } finally {
+            $this->connectionPool->releaseConnection($dbh);
         }
     }
 
