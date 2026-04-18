@@ -1,0 +1,173 @@
+<?php
+include_once dirname(__FILE__) . '/../include/settings.php';
+
+if (!isset($_SESSION['user_credentials'])) {
+    http_response_code(401);
+    echo json_encode(['error' => 'Unauthorized']);
+    exit;
+}
+
+$inventory = new Inventory();
+
+try {
+    $action = $_GET['action'] ?? '';
+
+    switch ($action) {
+        case 'find_duplicates':
+            // Find duplicate inventory ledger entries
+            $shopId = isset($_GET['shop_id']) ? (int)$_GET['shop_id'] : null;
+            $productId = isset($_GET['product_id']) ? (int)$_GET['product_id'] : null;
+
+            $duplicates = $inventory->findDuplicateLedgerEntries($shopId, $productId);
+
+            echo json_encode([
+                'success' => true,
+                'total_groups' => count($duplicates),
+                'duplicates' => $duplicates
+            ]);
+            break;
+
+        case 'delete_duplicates':
+            // Delete duplicate inventory ledger entries (dry run by default)
+            $shopId = isset($_GET['shop_id']) ? (int)$_GET['shop_id'] : null;
+            $productId = isset($_GET['product_id']) ? (int)$_GET['product_id'] : null;
+            $dryRun = !isset($_GET['confirm']) || $_GET['confirm'] !== 'yes';
+
+            // First find duplicates
+            $duplicates = $inventory->findDuplicateLedgerEntries($shopId, $productId);
+
+            if (empty($duplicates)) {
+                echo json_encode([
+                    'success' => true,
+                    'message' => 'No duplicate inventory ledger entries found'
+                ]);
+                break;
+            }
+
+            // Delete duplicates
+            $results = $inventory->deleteDuplicateLedgerEntries($duplicates, $dryRun);
+
+            echo json_encode([
+                'success' => true,
+                'dry_run' => $dryRun,
+                'results' => $results,
+                'message' => $dryRun ?
+                    "DRY RUN: Would delete " . count($results['deleted_entries']) . " duplicate entries, keeping " . count($results['kept_entries']) . " original entries" :
+                    "Deleted " . count($results['deleted_entries']) . " duplicate entries, kept " . count($results['kept_entries']) . " original entries. Re-synced " . count($results['affected_products']) . " products"
+            ]);
+            break;
+
+        case 'find_by_ref':
+            // Find all ledger entries for a specific reference
+            $refType = $_GET['ref_type'] ?? '';
+            $refId = isset($_GET['ref_id']) ? (int)$_GET['ref_id'] : 0;
+
+            if (empty($refType) || !$refId) {
+                throw new Exception('ref_type and ref_id parameters required');
+            }
+
+            $entries = $inventory->findLedgerEntriesByRef($refType, $refId);
+
+            echo json_encode([
+                'success' => true,
+                'ref_type' => $refType,
+                'ref_id' => $refId,
+                'total_entries' => count($entries),
+                'entries' => $entries
+            ]);
+            break;
+
+        case 'delete_by_ref':
+            // Delete all ledger entries for a specific reference
+            $refType = $_GET['ref_type'] ?? '';
+            $refId = isset($_GET['ref_id']) ? (int)$_GET['ref_id'] : 0;
+            $dryRun = !isset($_GET['confirm']) || $_GET['confirm'] !== 'yes';
+
+            if (empty($refType) || !$refId) {
+                throw new Exception('ref_type and ref_id parameters required');
+            }
+
+            $entries = $inventory->findLedgerEntriesByRef($refType, $refId);
+
+            if (empty($entries)) {
+                echo json_encode([
+                    'success' => true,
+                    'message' => "No ledger entries found for $refType #$refId"
+                ]);
+                break;
+            }
+
+            $affectedProducts = [];
+            $deletedIds = [];
+
+            if (!$dryRun) {
+                $dbh = $inventory->connectionPool->getConnection();
+                try {
+                    $dbh->beginTransaction();
+
+                    foreach ($entries as $entry) {
+                        $stmt = "DELETE FROM inventory_ledger WHERE id = :id";
+                        $prepare = $dbh->prepare($stmt);
+                        $prepare->bindParam(':id', $entry['id'], PDO::PARAM_INT);
+                        $prepare->execute();
+                        $deletedIds[] = $entry['id'];
+
+                        $affectedProducts[$entry['product_id'] . '_' . $entry['shop_id']] = [
+                            'product_id' => $entry['product_id'],
+                            'shop_id' => $entry['shop_id']
+                        ];
+                    }
+
+                    $dbh->commit();
+
+                    // Re-sync affected products
+                    foreach ($affectedProducts as $product) {
+                        $inventory->syncQty($product['product_id'], $product['shop_id']);
+                    }
+
+                } catch (Exception $e) {
+                    $dbh->rollBack();
+                    throw $e;
+                } finally {
+                    $inventory->connectionPool->releaseConnection($dbh);
+                }
+            } else {
+                $deletedIds = array_column($entries, 'id');
+                foreach ($entries as $entry) {
+                    $affectedProducts[$entry['product_id'] . '_' . $entry['shop_id']] = [
+                        'product_id' => $entry['product_id'],
+                        'shop_id' => $entry['shop_id']
+                    ];
+                }
+            }
+
+            echo json_encode([
+                'success' => true,
+                'dry_run' => $dryRun,
+                'ref_type' => $refType,
+                'ref_id' => $refId,
+                'deleted_entries' => $deletedIds,
+                'affected_products' => array_values($affectedProducts),
+                'message' => $dryRun ?
+                    "DRY RUN: Would delete " . count($deletedIds) . " ledger entries for $refType #$refId" :
+                    "Deleted " . count($deletedIds) . " ledger entries for $refType #$refId. Re-synced " . count($affectedProducts) . " products"
+            ]);
+            break;
+
+        default:
+            echo json_encode([
+                'error' => 'Invalid action',
+                'available_actions' => [
+                    'find_duplicates' => 'Find duplicate ledger entries (?shop_id=X&product_id=Y)',
+                    'delete_duplicates' => 'Delete duplicate ledger entries (?shop_id=X&product_id=Y&confirm=yes)',
+                    'find_by_ref' => 'Find ledger entries by reference (?ref_type=order&ref_id=123)',
+                    'delete_by_ref' => 'Delete ledger entries by reference (?ref_type=order&ref_id=123&confirm=yes)'
+                ]
+            ]);
+    }
+
+} catch (Exception $e) {
+    http_response_code(400);
+    echo json_encode(['error' => $e->getMessage()]);
+}
+?>

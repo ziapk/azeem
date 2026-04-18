@@ -732,4 +732,178 @@ class Inventory extends Connection
             'products'       => $products,
         ];
     }
+
+    /**
+     * findDuplicateLedgerEntries — finds duplicate inventory ledger entries
+     *
+     * @param int $shopId Optional: limit to specific shop
+     * @param int $productId Optional: limit to specific product
+     * @return array Array of duplicate groups
+     */
+    public function findDuplicateLedgerEntries(int $shopId = null, int $productId = null): array
+    {
+        $dbh = $this->connectionPool->getConnection();
+        try {
+            $where = "";
+            $params = [];
+
+            if ($shopId) {
+                $where .= " AND shop_id = :shop_id";
+                $params[':shop_id'] = $shopId;
+            }
+
+            if ($productId) {
+                $where .= " AND product_id = :product_id";
+                $params[':product_id'] = $productId;
+            }
+
+            // Find exact duplicates (same product, shop, movement_type, quantity, ref_type, ref_id, note)
+            $stmt = "SELECT
+                        product_id, shop_id, movement_type, quantity, ref_type, ref_id, note,
+                        COUNT(*) as count,
+                        GROUP_CONCAT(id ORDER BY id) as entry_ids,
+                        GROUP_CONCAT(created_at ORDER BY id) as created_dates
+                     FROM `{$this->table_ledger}`
+                     WHERE 1=1 $where
+                     GROUP BY product_id, shop_id, movement_type, quantity, ref_type, ref_id, note
+                     HAVING COUNT(*) > 1
+                     ORDER BY product_id, shop_id, COUNT(*) DESC";
+
+            $prepare = $dbh->prepare($stmt);
+            foreach ($params as $key => $value) {
+                $prepare->bindValue($key, $value, PDO::PARAM_INT);
+            }
+            $prepare->execute();
+            $duplicates = $prepare->fetchAll(PDO::FETCH_ASSOC);
+
+            // Format the results
+            $result = [];
+            foreach ($duplicates as $dup) {
+                $entryIds = explode(',', $dup['entry_ids']);
+                $createdDates = explode(',', $dup['created_dates']);
+
+                $result[] = [
+                    'product_id' => $dup['product_id'],
+                    'shop_id' => $dup['shop_id'],
+                    'movement_type' => $dup['movement_type'],
+                    'quantity' => $dup['quantity'],
+                    'ref_type' => $dup['ref_type'],
+                    'ref_id' => $dup['ref_id'],
+                    'note' => $dup['note'],
+                    'count' => $dup['count'],
+                    'entry_ids' => array_map('intval', $entryIds),
+                    'created_dates' => $createdDates,
+                    'total_quantity' => $dup['quantity'] * $dup['count']
+                ];
+            }
+
+            return $result;
+
+        } catch (PDOException $e) {
+            die("Inventory::findDuplicateLedgerEntries error: " . $e->getMessage());
+        } finally {
+            $this->connectionPool->releaseConnection($dbh);
+        }
+    }
+
+    /**
+     * deleteDuplicateLedgerEntries — deletes duplicate inventory ledger entries, keeping one
+     *
+     * @param array $duplicateGroups Array from findDuplicateLedgerEntries()
+     * @param bool $dryRun If true, just return what would be deleted without actually deleting
+     * @return array Results of the operation
+     */
+    public function deleteDuplicateLedgerEntries(array $duplicateGroups, bool $dryRun = true): array
+    {
+        $results = [
+            'deleted_entries' => [],
+            'kept_entries' => [],
+            'errors' => [],
+            'total_processed' => 0,
+            'dry_run' => $dryRun,
+            'affected_products' => []
+        ];
+
+        $affectedProducts = [];
+
+        foreach ($duplicateGroups as $group) {
+            $entryIds = $group['entry_ids'];
+
+            // Keep the entry with the lowest ID (oldest)
+            $keepId = min($entryIds);
+            $deleteIds = array_diff($entryIds, [$keepId]);
+
+            $results['kept_entries'][] = $keepId;
+            $results['total_processed'] += count($deleteIds);
+
+            $affectedProducts[$group['product_id'] . '_' . $group['shop_id']] = [
+                'product_id' => $group['product_id'],
+                'shop_id' => $group['shop_id']
+            ];
+
+            if (!$dryRun) {
+                $dbh = $this->connectionPool->getConnection();
+                try {
+                    $dbh->beginTransaction();
+
+                    // Delete duplicate entries
+                    foreach ($deleteIds as $entryId) {
+                        $stmt = "DELETE FROM `{$this->table_ledger}` WHERE id = :id";
+                        $prepare = $dbh->prepare($stmt);
+                        $prepare->bindParam(':id', $entryId, PDO::PARAM_INT);
+                        $prepare->execute();
+                        $results['deleted_entries'][] = $entryId;
+                    }
+
+                    $dbh->commit();
+                } catch (Exception $e) {
+                    $dbh->rollBack();
+                    $results['errors'][] = "Failed to delete entries for product {$group['product_id']}: " . $e->getMessage();
+                } finally {
+                    $this->connectionPool->releaseConnection($dbh);
+                }
+            } else {
+                $results['deleted_entries'] = array_merge($results['deleted_entries'], $deleteIds);
+            }
+        }
+
+        // Re-sync quantities for affected products
+        if (!$dryRun && !empty($affectedProducts)) {
+            foreach ($affectedProducts as $product) {
+                $this->syncQty($product['product_id'], $product['shop_id']);
+            }
+            $results['affected_products'] = array_values($affectedProducts);
+        }
+
+        return $results;
+    }
+
+    /**
+     * findLedgerEntriesByRef — finds all ledger entries for a specific reference
+     *
+     * @param string $refType 'order', 'supply', 'return_order', 'manual'
+     * @param int $refId The reference ID
+     * @return array Array of ledger entries
+     */
+    public function findLedgerEntriesByRef(string $refType, int $refId): array
+    {
+        $dbh = $this->connectionPool->getConnection();
+        try {
+            $stmt = "SELECT * FROM `{$this->table_ledger}`
+                     WHERE ref_type = :ref_type AND ref_id = :ref_id
+                     ORDER BY id";
+
+            $prepare = $dbh->prepare($stmt);
+            $prepare->bindParam(':ref_type', $refType, PDO::PARAM_STR);
+            $prepare->bindParam(':ref_id', $refId, PDO::PARAM_INT);
+            $prepare->execute();
+
+            return $prepare->fetchAll(PDO::FETCH_ASSOC);
+
+        } catch (PDOException $e) {
+            die("Inventory::findLedgerEntriesByRef error: " . $e->getMessage());
+        } finally {
+            $this->connectionPool->releaseConnection($dbh);
+        }
+    }
 }
