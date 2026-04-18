@@ -215,11 +215,9 @@ try {
             }
 
             if ($dryRun) {
-                // Count what would be affected
-                $countStmt = $dbh->prepare("SELECT COUNT(*) as count FROM inventory_ledger WHERE ref_type = 'order' AND ref_id = :order_id");
-                $countStmt->bindParam(':order_id', $orderId, PDO::PARAM_INT);
-                $countStmt->execute();
-                $count = $countStmt->fetch(PDO::FETCH_ASSOC)['count'];
+                // Count what would be affected - use inventory class method instead of direct DB access
+                $entries = $inventory->findLedgerEntriesByRef('order', $orderId);
+                $count = count($entries);
 
                 echo json_encode([
                     'success' => true,
@@ -233,7 +231,8 @@ try {
             }
 
             // Perform the actual reset
-            $result = $inventory->resetOrderLedger($orderId, $shopId, $userData['id']);
+            $ownerId = $userData['id'] ?? 1; // Default to 1 if not set
+            $result = $inventory->resetOrderLedger($orderId, $shopId, $ownerId);
 
             echo json_encode([
                 'success' => true,

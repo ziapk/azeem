@@ -741,8 +741,8 @@ class Inventory extends Connection
             $productStmt->execute();
             $products = $productStmt->fetchAll(PDO::FETCH_COLUMN);
 
-            // 3. Rebuild ledger entries from transaction data for ALL products
-            // (not just this order, but all transactions to ensure complete rebuild)
+            // 3. Rebuild ledger entries from transaction data for THIS SPECIFIC ORDER ONLY
+            // (not the entire ledger, just the order that was deleted)
 
             // Build lookup of existing entries to avoid duplicates
             $existStmt = $dbh->prepare("SELECT ref_type, ref_id, product_id FROM `{$this->table_ledger}` WHERE shop_id = :shop_id");
@@ -787,16 +787,18 @@ class Inventory extends Connection
                 $affectedProducts[$product_id] = true;
             };
 
-            // Re-insert SALES from all completed orders
+            // Re-insert SALES for THIS SPECIFIC ORDER only
             $salesStmt = $dbh->prepare(
                 "SELECT o.id AS order_id, o.order_custom_id, oi.product_id, oi.quantity, o.order_date
                  FROM `order_items` oi
                  INNER JOIN `orders` o ON o.id = oi.order_id
-                 WHERE o.shopId = :shop_id
+                 WHERE o.id = :order_id
+                   AND o.shopId = :shop_id
                    AND o.flag = 1
                    AND o.status IN (2, 8, 9)
                    AND oi.quantity > 0"
             );
+            $salesStmt->bindParam(':order_id', $order_id, PDO::PARAM_INT);
             $salesStmt->bindParam(':shop_id', $shop_id, PDO::PARAM_INT);
             $salesStmt->execute();
 
@@ -809,81 +811,6 @@ class Inventory extends Connection
                     (int)$row['product_id'],
                     'Order #' . $row['order_custom_id'],
                     $row['order_date']
-                );
-            }
-
-            // Re-insert SUPPLIES from all completed supplies
-            $supplyStmt = $dbh->prepare(
-                "SELECT s.id AS supply_id, si.product_id, si.quantity, s.supply_date
-                 FROM `supply_items` si
-                 INNER JOIN `supply` s ON s.id = si.supply_id
-                 WHERE s.shopId = :shop_id
-                   AND s.flag = 1
-                   AND s.status != 1
-                   AND si.quantity > 0"
-            );
-            $supplyStmt->bindParam(':shop_id', $shop_id, PDO::PARAM_INT);
-            $supplyStmt->execute();
-
-            foreach ($supplyStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
-                $insertLedger(
-                    self::SUPPLY,
-                    (float)$row['quantity'],
-                    self::REF_SUPPLY,
-                    (int)$row['supply_id'],
-                    (int)$row['product_id'],
-                    'Supply #' . $row['supply_id'],
-                    $row['supply_date']
-                );
-            }
-
-            // Re-insert RETURN_IN (customer returns)
-            $returnInStmt = $dbh->prepare(
-                "SELECT ro.id AS ro_id, pr.product_id, pr.quantity, ro.return_date
-                 FROM `product_returns` pr
-                 INNER JOIN `return_orders` ro ON ro.id = pr.order_id
-                 WHERE ro.shopId = :shop_id
-                   AND ro.return_type = 1
-                   AND ro.flag = 2
-                   AND pr.quantity > 0"
-            );
-            $returnInStmt->bindParam(':shop_id', $shop_id, PDO::PARAM_INT);
-            $returnInStmt->execute();
-
-            foreach ($returnInStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
-                $insertLedger(
-                    self::RETURN_IN,
-                    (float)$row['quantity'],
-                    self::REF_RETURN_ORDER,
-                    (int)$row['ro_id'],
-                    (int)$row['product_id'],
-                    'Sale return RO #' . $row['ro_id'],
-                    $row['return_date']
-                );
-            }
-
-            // Re-insert RETURN_OUT (supplier returns)
-            $returnOutStmt = $dbh->prepare(
-                "SELECT ro.id AS ro_id, pr.product_id, pr.quantity, ro.return_date
-                 FROM `product_returns` pr
-                 INNER JOIN `return_orders` ro ON ro.id = pr.order_id
-                 WHERE ro.shopId = :shop_id
-                   AND ro.return_type = 2
-                   AND ro.flag = 2
-                   AND pr.quantity > 0"
-            );
-            $returnOutStmt->bindParam(':shop_id', $shop_id, PDO::PARAM_INT);
-            $returnOutStmt->execute();
-
-            foreach ($returnOutStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
-                $insertLedger(
-                    self::RETURN_OUT,
-                    -1 * (float)$row['quantity'],
-                    self::REF_RETURN_ORDER,
-                    (int)$row['ro_id'],
-                    (int)$row['product_id'],
-                    'Purchase return RO #' . $row['ro_id'],
-                    $row['return_date']
                 );
             }
 
