@@ -148,8 +148,16 @@ class Orders extends Connection
 
                 if (in_array($currentStatus, [2, 8, 9])) { // if current status is completed or partial paid or draft
 
-                    // ── INVENTORY: reverse all ledger entries for this order ──
+                    // ── INVENTORY: Clean up any previous reversals, then reverse all ledger entries ──
                     $inventory = new Inventory();
+                    
+                    // First, remove any previous ADJUSTMENT entries to prevent accumulating reversals
+                    $inventory->cleanupReversals(
+                        Inventory::REF_ORDER,
+                        (int)$orderDetail['order']['id']
+                    );
+                    
+                    // Now apply the reversal
                     $inventory->reverseByRef(
                         Inventory::REF_ORDER,
                         (int)$orderDetail['order']['id'],

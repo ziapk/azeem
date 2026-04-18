@@ -359,6 +359,48 @@ class Inventory extends Connection
         }
     }
 
+    /**
+     * cleanupReversals — removes all previous reversal (ADJUSTMENT) entries for a given ref.
+     * Call this BEFORE reverseByRef to prevent accumulating multiple reversals.
+     *
+     * @param string $ref_type   'order' | 'supply' | 'return_order'
+     * @param int    $ref_id     The order_id or supply_id
+     */
+    public function cleanupReversals(string $ref_type, int $ref_id): void
+    {
+        $dbh = $this->connectionPool->getConnection();
+        try {
+            // Fetch all ADJUSTMENT entries for this ref to find affected products
+            $stmt = "SELECT DISTINCT product_id, shop_id FROM `{$this->table_ledger}`
+                     WHERE ref_type = :ref_type AND ref_id = :ref_id
+                       AND movement_type = 'ADJUSTMENT'";
+            $prepare = $dbh->prepare($stmt);
+            $prepare->bindParam(':ref_type', $ref_type, PDO::PARAM_STR);
+            $prepare->bindParam(':ref_id',   $ref_id,   PDO::PARAM_INT);
+            $prepare->execute();
+            $affected = $prepare->fetchAll(PDO::FETCH_ASSOC);
+
+            // Delete all ADJUSTMENT entries for this ref
+            $del = "DELETE FROM `{$this->table_ledger}`
+                    WHERE ref_type = :ref_type AND ref_id = :ref_id
+                      AND movement_type = 'ADJUSTMENT'";
+            $dp = $dbh->prepare($del);
+            $dp->bindParam(':ref_type', $ref_type, PDO::PARAM_STR);
+            $dp->bindParam(':ref_id',   $ref_id,   PDO::PARAM_INT);
+            $dp->execute();
+
+            // Resync all affected products
+            foreach ($affected as $item) {
+                $this->syncQty($item['product_id'], $item['shop_id'], $dbh);
+            }
+
+        } catch (PDOException $e) {
+            die("Inventory::cleanupReversals error: " . $e->getMessage());
+        } finally {
+            $this->connectionPool->releaseConnection($dbh);
+        }
+    }
+
     // ----------------------------------------------------------------
     /**
      * reconcileProduct — heals the ledger for one product in one shop.
