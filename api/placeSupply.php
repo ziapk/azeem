@@ -147,10 +147,14 @@ if (!empty($_POST['id'])) {
     $saleDate = !empty($overide) ? $orderDetail['order']['supply_date'] : $storeDATA['sale_date'];
 
     if (in_array($orderDetail['order']['status'], [2, 8, 9])) {
-        // rollback products first
-        foreach ($orderDetail['order_items'] as $prod) {
-            $products->addProductQty($prod['product_id'], ['qty' => -1 * $prod['quantity'], 'pack_size' => $prod['pack_size'], 'pack_qty' => -1 * $prod['pack_qty']], $orderDetail['order']['shopId']);
-        }
+        // ── INVENTORY: reverse all ledger entries for this supply ──
+        $inventory = new Inventory();
+        $inventory->reverseByRef(
+            Inventory::REF_SUPPLY,
+            (int)$orderDetail['order']['id'],
+            (int)$ownerId,
+            'Rollback before re-processing supply #' . $orderDetail['order']['id']
+        );
         // delete transactions
         $de->deleteTransactionBySupplyId($orderDetail['order']['id']);
     }
@@ -202,21 +206,37 @@ if (sizeof($demandProducts)) {
 if ($supply_id) {
     if (sizeof($items)) {
         $supply->deleteSupplyDetails($supply_id);
+        $inventory = new Inventory();
         foreach ($items as $item) {
+            $totalQty = $item['qty']  + (!empty($item['unpack_qty']) ? $item['unpack_qty'] : 0);
             $d = [
                 'supply_id' => $supply_id,
                 'product_id' => $item['product_id'],
                 'product_title' => $item['full_name'],
-                'quantity' => $item['qty']  + (!empty($item['unpack_qty']) ? $item['unpack_qty'] : 0),
+                'quantity' => $totalQty,
                 'discount' => !empty($item['discount']) ? $item['discount'] : 0,
                 'price' => $item['price'],
                 'pprice' => $item['pprice'],
                 'pack_size' => !empty($item['pack_size']) ? $item['pack_size'] : 0,
                 'pack_qty' => !empty($item['pack_qty']) ? $item['pack_qty'] : 0,
                 'unpack_qty' => !empty($item['unpack_qty']) ? $item['unpack_qty'] : 0,
-                'unpack_qty' => !empty($item['unpack_qty']) ? $item['unpack_qty'] : 0,
             ];
             $supply->createSupplyDetails($d);
+
+            if ($status != 1) {
+                // ── INVENTORY: log stock IN for this supply item ──
+                $inventory->logMovement([
+                    'product_id'    => (int)$item['product_id'],
+                    'shop_id'       => (int)$item['shopId'],
+                    'owner_id'      => (int)$item['owner_id'],
+                    'movement_type' => Inventory::SUPPLY,
+                    'quantity'      => (float)$totalQty,
+                    'ref_type'      => Inventory::REF_SUPPLY,
+                    'ref_id'        => (int)$supply_id,
+                    'note'          => 'Supply #' . $supply_id,
+                    'created_by'    => (int)$userData['id'],
+                ]);
+            }
         }
     }
 
