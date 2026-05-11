@@ -148,9 +148,35 @@ function auditBadge($type) {
         body { padding: 0; }
         .product-block { page-break-inside: avoid; }
     }
+
+    .ref-link {
+        color: #1d4ed8;
+        text-decoration: underline;
+        cursor: pointer;
+        background: none;
+        border: none;
+        padding: 0;
+        font: inherit;
+        font-size: 11px;
+    }
+    .ref-link:hover { color: #1e40af; }
 </style>
 </head>
 <body>
+
+<script>
+var siteUrl = '<?php echo defined('SITE_URL') ? addslashes(SITE_URL) : '/'; ?>';
+
+function openRefModal(refType, refId) {
+    var urls = {
+        order:        siteUrl + 'print?id=' + refId + '&detail=true&largeView=large',
+        supply:       siteUrl + 'print/supply.php?id=' + refId + '&detail=true&largeView=large',
+        return_order: siteUrl + 'print/return.php?id=' + refId + '&detail=true&largeView=large'
+    };
+    var url = urls[refType];
+    if (url) window.open(url, '', 'width=800,height=600');
+}
+</script>
 
 <div class="report-title">Product Audit — Ledger Report</div>
 <div class="report-meta">
@@ -267,8 +293,21 @@ function auditBadge($type) {
                         <?php echo htmlspecialchars($badge['label']); ?>
                     </span>
                 </td>
-                <td style="color:#64748b"><?php echo htmlspecialchars($row['ref_type']    ?? '—'); ?></td>
-                <td style="color:#64748b"><?php echo htmlspecialchars($row['ref_id']      ?? '—'); ?></td>
+                <td style="color:#64748b"><?php echo htmlspecialchars($row['ref_type'] ?? '—'); ?></td>
+                <td style="color:#64748b"><?php
+                    $refType = $row['ref_type'] ?? '';
+                    $refId   = $row['ref_id']   ?? null;
+                    $clickable = in_array($refType, ['order', 'supply', 'return_order']) && $refId;
+                    if ($clickable):
+                ?>
+                    <button class="ref-link"
+                        onclick="openRefModal('<?php echo addslashes($refType); ?>', <?php echo (int)$refId; ?>)">
+                        <?php echo (int)$refId; ?>
+                    </button>
+                <?php else: ?>
+                    <?php echo htmlspecialchars($refId ?? '—'); ?>
+                <?php endif; ?>
+                </td>
                 <td style="color:#475569"><?php echo htmlspecialchars($row['note']        ?? ''); ?></td>
                 <td style="color:#64748b"><?php echo htmlspecialchars($row['created_by']  ?? '—'); ?></td>
                 <td class="r qty-in" ><?php echo $qtyInStr;  ?></td>
