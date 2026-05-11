@@ -146,15 +146,88 @@ if (!empty($_POST['id'])) {
 
     $saleDate = !empty($overide) ? $orderDetail['order']['supply_date'] : $storeDATA['sale_date'];
 
+    $remainingOldSupplyQty = [];
+    // Only carry forward old quantities when the supply was already active (had inventory logged).
+    // Parked supplies (status=1) have no ledger entries, so all items must be treated as new.
+    if ($currentStatus != 1) {
+        foreach ($orderDetail['order_items'] as $item) {
+            $qty = (float)$item['quantity'];
+            if ($qty > 0) {
+                $remainingOldSupplyQty[$item['product_id']] = ($remainingOldSupplyQty[$item['product_id']] ?? 0) + $qty;
+            }
+        }
+    }
+
     if (in_array($orderDetail['order']['status'], [2, 8, 9])) {
-        // ── INVENTORY: reverse all ledger entries for this supply ──
         $inventory = new Inventory();
-        $inventory->reverseByRef(
-            Inventory::REF_SUPPLY,
-            (int)$orderDetail['order']['id'],
-            (int)$ownerId,
-            'Rollback before re-processing supply #' . $orderDetail['order']['id']
-        );
+
+        if ($status == 1) {
+            // ── INVENTORY: reverse entire supply when moving to park/draft — no new inventory should remain.
+            $inventory->reverseByRef(
+                Inventory::REF_SUPPLY,
+                (int)$orderDetail['order']['id'],
+                (int)$ownerId,
+                'Rollback before re-processing supply #' . $orderDetail['order']['id']
+            );
+        } else {
+            $oldEntries = [];
+            foreach ($orderDetail['order_items'] as $item) {
+                $qty = (float)$item['quantity'];
+                if ($qty <= 0) {
+                    continue;
+                }
+                $oldEntries[] = [
+                    'product_id' => $item['product_id'],
+                    'shop_id' => (int)$_POST['shopId'],
+                    'movement_type' => Inventory::SUPPLY,
+                    'quantity' => $qty,
+                ];
+            }
+
+            $newEntries = [];
+            foreach ($items as $item) {
+                $qty = (float)$item['qty'] + (!empty($item['unpack_qty']) ? (float)$item['unpack_qty'] : 0);
+                if ($qty <= 0) {
+                    continue;
+                }
+                $newEntries[] = [
+                    'product_id' => $item['product_id'],
+                    'shop_id' => (int)$_POST['shopId'],
+                    'movement_type' => Inventory::SUPPLY,
+                    'quantity' => $qty,
+                ];
+            }
+
+            $oldMap = [];
+            foreach ($oldEntries as $entry) {
+                $key = $entry['product_id'] . '|' . $entry['shop_id'] . '|' . $entry['movement_type'];
+                $oldMap[$key] = ($oldMap[$key] ?? 0) + $entry['quantity'];
+            }
+            $newMap = [];
+            foreach ($newEntries as $entry) {
+                $key = $entry['product_id'] . '|' . $entry['shop_id'] . '|' . $entry['movement_type'];
+                $newMap[$key] = ($newMap[$key] ?? 0) + $entry['quantity'];
+            }
+
+            foreach ($oldMap as $key => $oldQty) {
+                $newQty = $newMap[$key] ?? 0;
+                if ($oldQty > $newQty) {
+                    list($product_id, $shop_id, $movement_type) = explode('|', $key);
+                    $inventory->logMovement([
+                        'product_id' => (int)$product_id,
+                        'shop_id' => (int)$shop_id,
+                        'owner_id' => (int)$ownerId,
+                        'movement_type' => $inventory->invertMovementType($movement_type),
+                        'quantity' => (float)($oldQty - $newQty),
+                        'ref_type' => Inventory::REF_SUPPLY,
+                        'ref_id' => (int)$orderDetail['order']['id'],
+                        'note' => 'Partial rollback before re-processing supply #' . $orderDetail['order']['id'],
+                        'created_by' => (int)$ownerId,
+                    ]);
+                }
+            }
+        }
+
         // delete transactions
         $de->deleteTransactionBySupplyId($orderDetail['order']['id']);
     }
@@ -162,12 +235,28 @@ if (!empty($_POST['id'])) {
 
 if (sizeof($items)) {
 
-    foreach ($items as $item) {
+    foreach ($items as &$item) {
+        $qty = (float)$item['qty'] + (!empty($item['unpack_qty']) ? (float)$item['unpack_qty'] : 0);
+        $inventoryQuantity = 0;
+        if (!empty($remainingOldSupplyQty[$item['product_id']])) {
+            if ($qty > $remainingOldSupplyQty[$item['product_id']]) {
+                $inventoryQuantity = $qty - $remainingOldSupplyQty[$item['product_id']];
+                $remainingOldSupplyQty[$item['product_id']] = 0;
+            } else {
+                $remainingOldSupplyQty[$item['product_id']] -= $qty;
+                $inventoryQuantity = 0;
+            }
+        } else {
+            $inventoryQuantity = $qty;
+        }
+        $item['inventory_quantity'] = $inventoryQuantity;
+
         $products->assignProduct($item);
         if (!empty($item['pin'])) {
             $products->setPriority($item['product_id'], 1);
         }
     }
+    unset($item);
 }
 
 $supplier = $supplierObj->getSupplier($supplierId);
@@ -223,14 +312,14 @@ if ($supply_id) {
             ];
             $supply->createSupplyDetails($d);
 
-            if ($status != 1) {
+            if ($status != 1 && !empty($item['inventory_quantity'])) {
                 // ── INVENTORY: log stock IN for this supply item ──
                 $inventory->logMovement([
                     'product_id'    => (int)$item['product_id'],
                     'shop_id'       => (int)$item['shopId'],
                     'owner_id'      => (int)$item['owner_id'],
                     'movement_type' => Inventory::SUPPLY,
-                    'quantity'      => (float)$totalQty,
+                    'quantity'      => (float)$item['inventory_quantity'],
                     'ref_type'      => Inventory::REF_SUPPLY,
                     'ref_id'        => (int)$supply_id,
                     'note'          => 'Supply #' . $supply_id,

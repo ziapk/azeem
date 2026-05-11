@@ -511,6 +511,56 @@ class Supply extends Connection
         }
     }
 
+    public function deleteSupply(int $supplyId): bool
+    {
+        $dbh = $this->connectionPool->getConnection();
+        try {
+            $dbh->beginTransaction();
+
+            $supply = $this->getOrder($supplyId);
+            if (empty($supply['order']['id'])) {
+                throw new Exception("Supply #$supplyId not found");
+            }
+
+            // Reverse inventory if supply was active (status != 1 means stock was logged)
+            if ((int)$supply['order']['status'] !== 1) {
+                $inventory = new Inventory();
+                $inventory->reverseByRef(
+                    Inventory::REF_SUPPLY,
+                    $supplyId,
+                    (int)($supply['order']['owner_id'] ?? $supply['order']['user_id'] ?? 1),
+                    "Deleting supply #$supplyId",
+                    $dbh
+                );
+            }
+
+            // Delete double-entry transactions
+            $de = new DoubleEntry();
+            $de->deleteTransactionBySupplyId($supplyId);
+
+            // Delete supply_items
+            $stmt = "DELETE FROM `{$this->table_sub}` WHERE supply_id = :id";
+            $prepare = $dbh->prepare($stmt);
+            $prepare->bindValue(':id', $supplyId, PDO::PARAM_INT);
+            $prepare->execute();
+
+            // Delete the supply row
+            $stmt = "DELETE FROM `{$this->table}` WHERE id = :id";
+            $prepare = $dbh->prepare($stmt);
+            $prepare->bindValue(':id', $supplyId, PDO::PARAM_INT);
+            $prepare->execute();
+
+            $dbh->commit();
+            return true;
+
+        } catch (Exception $e) {
+            $dbh->rollBack();
+            throw $e;
+        } finally {
+            $this->connectionPool->releaseConnection($dbh);
+        }
+    }
+
     public function makeTransaction($array)
     {
         $dbh = $this->connectionPool->getConnection();

@@ -36,6 +36,7 @@ class Inventory extends Connection
     const REF_ORDER        = 'order';
     const REF_RETURN_ORDER = 'return_order';
     const REF_MANUAL       = 'manual';
+    const REF_EXCHANGE     = 'exchange';
 
     // ----------------------------------------------------------------
     /**
@@ -104,6 +105,21 @@ class Inventory extends Connection
         } finally {
             $this->connectionPool->releaseConnection($dbh);
         }
+    }
+
+    // ----------------------------------------------------------------
+    /**
+     * invertMovementType — returns the opposite inventory movement for a reversal.
+     */
+    public function invertMovementType(string $movement_type): string
+    {
+        return match ($movement_type) {
+            self::SALE => self::RETURN_IN,
+            self::RETURN_IN => self::SALE,
+            self::SUPPLY => self::RETURN_OUT,
+            self::RETURN_OUT => self::SUPPLY,
+            default => $movement_type,
+        };
     }
 
     // ----------------------------------------------------------------
@@ -299,62 +315,73 @@ class Inventory extends Connection
      * @param int    $created_by User performing the reversal
      * @param string $note       Reason for reversal
      */
-    public function reverseByRef(string $ref_type, int $ref_id, int $created_by, string $note = ''): void
+    public function reverseByRef(string $ref_type, int $ref_id, int $created_by, string $note = '', $externalDbh = null): void
     {
-        $dbh = $this->connectionPool->getConnection();
+        $ownConnection = ($externalDbh === null);
+        $dbh = $ownConnection ? $this->connectionPool->getConnection() : $externalDbh;
         try {
-            // Fetch all original entries for this ref (exclude any existing reversals)
-            $stmt = "SELECT * FROM `{$this->table_ledger}`
+            // Group by (product, shop, owner, movement_type) and sum quantities.
+            // This gives us the NET outstanding balance for each combo, so we only
+            // insert the single compensating row needed to reach zero — even if this
+            // ref has been partially reversed before (repeated draft/re-approve cycles).
+            $stmt = "SELECT product_id, shop_id, owner_id, movement_type,
+                            SUM(quantity) AS net_qty
+                     FROM `{$this->table_ledger}`
                      WHERE ref_type = :ref_type AND ref_id = :ref_id
-                     ORDER BY id ASC";
+                     GROUP BY product_id, shop_id, owner_id, movement_type
+                     HAVING SUM(quantity) != 0";
+
             $prepare = $dbh->prepare($stmt);
             $prepare->bindParam(':ref_type', $ref_type, PDO::PARAM_STR);
             $prepare->bindParam(':ref_id',   $ref_id,   PDO::PARAM_INT);
             $prepare->execute();
-            $entries = $prepare->fetchAll(PDO::FETCH_ASSOC);
+            $netEntries = $prepare->fetchAll(PDO::FETCH_ASSOC);
 
-            $affected = []; // track which product+shop combos need syncQty
+            if (empty($netEntries)) {
+                return;
+            }
 
-            foreach ($entries as $entry) {
-                // Insert the reversal row (flip the quantity sign, keep same movement_type)
-                $reverseQty = (float)$entry['quantity'] * -1;
+            $affected = [];
+            $reversalNote = $note ?: "Reversal of $ref_type #$ref_id";
 
-                $ins = "INSERT INTO `{$this->table_ledger}`
-                            (`product_id`, `shop_id`, `owner_id`, `movement_type`,
-                             `quantity`, `ref_type`, `ref_id`, `note`, `created_by`)
-                        VALUES
-                            (:product_id, :shop_id, :owner_id, :movement_type,
-                             :quantity, :ref_type, :ref_id, :note, :created_by)";
+            $ins = "INSERT INTO `{$this->table_ledger}`
+                        (`product_id`, `shop_id`, `owner_id`, `movement_type`,
+                         `quantity`, `ref_type`, `ref_id`, `note`, `created_by`)
+                    VALUES
+                        (:product_id, :shop_id, :owner_id, :movement_type,
+                         :quantity, :ref_type, :ref_id, :note, :created_by)";
 
-                $reversalNote = $note ?: "Reversal of $ref_type #$ref_id";
+            foreach ($netEntries as $entry) {
+                $reverseQty = (float)$entry['net_qty'] * -1;
 
                 $ip = $dbh->prepare($ins);
-                $ip->bindParam(':product_id',    $entry['product_id'],    PDO::PARAM_INT);
-                $ip->bindParam(':shop_id',       $entry['shop_id'],       PDO::PARAM_INT);
-                $ip->bindParam(':owner_id',      $entry['owner_id'],      PDO::PARAM_INT);
-                $ip->bindParam(':movement_type', $entry['movement_type'], PDO::PARAM_STR); // Same type, opposite qty
-                $ip->bindParam(':quantity',      $reverseQty,             PDO::PARAM_STR);
-                $ip->bindParam(':ref_type',      $ref_type,               PDO::PARAM_STR);
-                $ip->bindParam(':ref_id',        $ref_id,                 PDO::PARAM_INT);
-                $ip->bindParam(':note',          $reversalNote,           PDO::PARAM_STR);
-                $ip->bindParam(':created_by',    $created_by,             PDO::PARAM_INT);
+                $ip->bindValue(':product_id',    $entry['product_id'],    PDO::PARAM_INT);
+                $ip->bindValue(':shop_id',       $entry['shop_id'],       PDO::PARAM_INT);
+                $ip->bindValue(':owner_id',      $entry['owner_id'],      PDO::PARAM_INT);
+                $ip->bindValue(':movement_type', $entry['movement_type'], PDO::PARAM_STR);
+                $ip->bindValue(':quantity',      $reverseQty,             PDO::PARAM_STR);
+                $ip->bindValue(':ref_type',      $ref_type,               PDO::PARAM_STR);
+                $ip->bindValue(':ref_id',        $ref_id,                 PDO::PARAM_INT);
+                $ip->bindValue(':note',          $reversalNote,           PDO::PARAM_STR);
+                $ip->bindValue(':created_by',    $created_by,             PDO::PARAM_INT);
                 $ip->execute();
 
                 $affected[$entry['product_id'] . '_' . $entry['shop_id']] = [
-                    'product_id' => $entry['product_id'],
-                    'shop_id'    => $entry['shop_id'],
+                    'product_id' => (int)$entry['product_id'],
+                    'shop_id'    => (int)$entry['shop_id'],
                 ];
             }
 
-            // Sync all affected products
-            foreach ($affected as $key => $item) {
+            foreach ($affected as $item) {
                 $this->syncQty($item['product_id'], $item['shop_id'], $dbh);
             }
 
         } catch (PDOException $e) {
             die("Inventory::reverseByRef error: " . $e->getMessage());
         } finally {
-            $this->connectionPool->releaseConnection($dbh);
+            if ($ownConnection) {
+                $this->connectionPool->releaseConnection($dbh);
+            }
         }
     }
 
@@ -498,6 +525,20 @@ class Inventory extends Connection
                         WHERE pr.quantity > 0
                           AND ro.flag = 2
                           " . sprintf($shopCondition, 'ro') . "
+
+                        UNION ALL
+
+                        SELECT ex.from_id AS product_id, ex.shop_id
+                        FROM products_exchange_logs ex
+                        WHERE ex.from_qty > 0
+                          " . ($shop_id !== null ? 'AND ex.shop_id = :shop_id' : '') . "
+
+                        UNION ALL
+
+                        SELECT ex.to_id AS product_id, ex.shop_id
+                        FROM products_exchange_logs ex
+                        WHERE ex.to_qty > 0
+                          " . ($shop_id !== null ? 'AND ex.shop_id = :shop_id' : '') . "
                      ) AS rebuild_entries";
 
             $prepare = $dbh->prepare($stmt);
@@ -644,6 +685,40 @@ class Inventory extends Connection
                                 AND ro.return_type = 2
                                 AND ro.flag = 2
                                 " . sprintf($shopFilter, 'ro') . "
+
+                              UNION ALL
+
+                              SELECT ex.from_id AS product_id,
+                                     ex.shop_id AS shop_id,
+                                     :owner_id AS owner_id,
+                                     '" . self::SALE . "' AS movement_type,
+                                     -ex.from_qty AS quantity,
+                                     '" . self::REF_EXCHANGE . "' AS ref_type,
+                                     ex.id AS ref_id,
+                                     CONCAT('Exchange out #', ex.id) AS note,
+                                     ex.created_at AS entry_date,
+                                     5 AS sort_priority
+                              FROM products_exchange_logs ex
+                              WHERE ex.from_qty > 0
+                                AND ex.from_id IS NOT NULL
+                                " . ($shop_id !== null ? 'AND ex.shop_id = :shop_id' : '') . "
+
+                              UNION ALL
+
+                              SELECT ex.to_id AS product_id,
+                                     ex.shop_id AS shop_id,
+                                     :owner_id AS owner_id,
+                                     '" . self::SUPPLY . "' AS movement_type,
+                                     ex.to_qty AS quantity,
+                                     '" . self::REF_EXCHANGE . "' AS ref_type,
+                                     ex.id AS ref_id,
+                                     CONCAT('Exchange in #', ex.id) AS note,
+                                     ex.created_at AS entry_date,
+                                     5 AS sort_priority
+                              FROM products_exchange_logs ex
+                              WHERE ex.to_qty > 0
+                                AND ex.to_id IS NOT NULL
+                                " . ($shop_id !== null ? 'AND ex.shop_id = :shop_id' : '') . "
                           ) AS transaction_feed
                           ORDER BY entry_date ASC, sort_priority ASC, shop_id ASC, product_id ASC";
 
@@ -923,7 +998,57 @@ class Inventory extends Connection
             }
 
             // ----------------------------------------------------------
-            // 6. Recalculate store_products.qty from the now-complete ledger
+            // 6. EXCHANGE OUT — bare book converted (stock leaves)
+            // ----------------------------------------------------------
+            $exchFromStmt = $dbh->prepare(
+                "SELECT ex.id AS exchange_id, ex.from_qty, ex.created_at
+                 FROM `products_exchange_logs` ex
+                 WHERE ex.from_id  = :product_id
+                   AND ex.shop_id  = :shop_id
+                   AND ex.from_qty > 0"
+            );
+            $exchFromStmt->bindParam(':product_id', $product_id, PDO::PARAM_INT);
+            $exchFromStmt->bindParam(':shop_id',    $shop_id,    PDO::PARAM_INT);
+            $exchFromStmt->execute();
+
+            foreach ($exchFromStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+                $insertLedger(
+                    self::SALE,
+                    -1 * (float)$row['from_qty'],
+                    self::REF_EXCHANGE,
+                    (int)$row['exchange_id'],
+                    'Exchange out #' . $row['exchange_id'],
+                    $row['created_at']
+                );
+            }
+
+            // ----------------------------------------------------------
+            // 7. EXCHANGE IN — coated book received (stock arrives)
+            // ----------------------------------------------------------
+            $exchToStmt = $dbh->prepare(
+                "SELECT ex.id AS exchange_id, ex.to_qty, ex.created_at
+                 FROM `products_exchange_logs` ex
+                 WHERE ex.to_id   = :product_id
+                   AND ex.shop_id = :shop_id
+                   AND ex.to_qty  > 0"
+            );
+            $exchToStmt->bindParam(':product_id', $product_id, PDO::PARAM_INT);
+            $exchToStmt->bindParam(':shop_id',    $shop_id,    PDO::PARAM_INT);
+            $exchToStmt->execute();
+
+            foreach ($exchToStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+                $insertLedger(
+                    self::SUPPLY,
+                    (float)$row['to_qty'],
+                    self::REF_EXCHANGE,
+                    (int)$row['exchange_id'],
+                    'Exchange in #' . $row['exchange_id'],
+                    $row['created_at']
+                );
+            }
+
+            // ----------------------------------------------------------
+            // 8. Recalculate store_products.qty from the now-complete ledger
             // ----------------------------------------------------------
             $this->syncQty($product_id, $shop_id, $dbh);
 

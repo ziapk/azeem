@@ -16,16 +16,40 @@ if (!empty($_POST)) {
         $shopId = $shop['id'];
 
         $productObj = new Products();
+        $inventory  = new Inventory();
         $create = [];
         foreach ($_POST['items'] as $value) {
-            $productObj->subProductQty(['product_id' => $value['fromId'], 'quantity' => $value['qty'],  'owner_id' => $owner_id,  'shopId' => $shopId]);
-
-            $productObj->addProductQty($value['toId'], ['qty' => $value['qty']], $shopId, 1);
-            
-            $value['owner_id'] = $owner_id;
-            $value['shopId'] = $shopId;
+            $value['owner_id']   = $owner_id;
+            $value['shopId']     = $shopId;
             $value['created_by'] = $created_by;
-            $create[] = $productObj->createExchange($value);
+
+            $exchangeId = $productObj->createExchange($value);
+            $create[] = $exchangeId;
+
+            if ($exchangeId) {
+                $inventory->logMovement([
+                    'product_id'    => (int)$value['fromId'],
+                    'shop_id'       => (int)$shopId,
+                    'owner_id'      => (int)$owner_id,
+                    'movement_type' => Inventory::SALE,
+                    'quantity'      => -1 * (float)$value['qty'],
+                    'ref_type'      => Inventory::REF_EXCHANGE,
+                    'ref_id'        => (int)$exchangeId,
+                    'note'          => 'Exchange out #' . $exchangeId,
+                    'created_by'    => (int)$created_by,
+                ]);
+                $inventory->logMovement([
+                    'product_id'    => (int)$value['toId'],
+                    'shop_id'       => (int)$shopId,
+                    'owner_id'      => (int)$owner_id,
+                    'movement_type' => Inventory::SUPPLY,
+                    'quantity'      => (float)$value['qty'],
+                    'ref_type'      => Inventory::REF_EXCHANGE,
+                    'ref_id'        => (int)$exchangeId,
+                    'note'          => 'Exchange in #' . $exchangeId,
+                    'created_by'    => (int)$created_by,
+                ]);
+            }
         }
 
 
