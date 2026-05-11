@@ -113,13 +113,13 @@ class Inventory extends Connection
      */
     public function invertMovementType(string $movement_type): string
     {
-        return match ($movement_type) {
-            self::SALE => self::RETURN_IN,
-            self::RETURN_IN => self::SALE,
-            self::SUPPLY => self::RETURN_OUT,
-            self::RETURN_OUT => self::SUPPLY,
-            default => $movement_type,
-        };
+        switch ($movement_type) {
+            case self::SALE:       return self::RETURN_IN;
+            case self::RETURN_IN:  return self::SALE;
+            case self::SUPPLY:     return self::RETURN_OUT;
+            case self::RETURN_OUT: return self::SUPPLY;
+            default:               return $movement_type;
+        }
     }
 
     // ----------------------------------------------------------------

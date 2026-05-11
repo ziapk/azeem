@@ -1,9 +1,5 @@
 <?php
 include_once dirname(__FILE__) . '/../include/settings.php';
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
 try {
     $supply = new Supply();
     $orders = new Orders();
@@ -26,8 +22,5 @@ try {
         echo json_encode($response);
     }
 } catch (PDOException $e) {
-    http_response_code(400);
-    error_log($e->getMessage());
-    echo json_encode($e->getMessage());
-    // die("Error!: " . $e->getMessage() . "<br/>");
+    die("Error!: " . $e->getMessage() . "<br/>");
 }
