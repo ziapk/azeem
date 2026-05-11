@@ -724,7 +724,7 @@ class Products extends Connection
 			$currentPage = $total_pages >= $params['page'] ? $params['page'] : $total_pages;
 			$offset =  ((!empty($currentPage) ? $currentPage : 1) - 1) * $no_of_records_per_page;
 
-			$stmt = "SELECT st.*, p.code, p.id as product_id, p.full_name, p.group, p.publisher_id, p.author, p.price FROM `{$this->table_st}` as st LEFT JOIN `{$this->table}` AS p ON p.id = st.product_id LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id WHERE p.is_active = 1 and st.`owner_id`=:owner_id and st.status = 1 $shopCondition $searchQry $publisher_query group by st.product_id, pc.product_id LIMIT :offset, :perPage order by p.id desc";
+			$stmt = "SELECT st.*, p.code, p.id as product_id, p.full_name, p.group, p.publisher_id, p.author, p.price FROM `{$this->table_st}` as st LEFT JOIN `{$this->table}` AS p ON p.id = st.product_id LEFT JOIN {$this->pc_table} as pc ON pc.product_id = p.id WHERE p.is_active = 1 and st.`owner_id`=:owner_id and st.status = 1 $shopCondition $searchQry $publisher_query group by st.product_id, pc.product_id order by p.id desc LIMIT :offset, :perPage";
 			$prepare2 = $dbh->prepare($stmt);
 			$prepare2->bindParam(':owner_id', $owner_id, PDO::PARAM_STR);
 			$prepare2->bindParam(':offset', $offset, PDO::PARAM_INT);
@@ -1287,7 +1287,7 @@ class Products extends Connection
 			$offset = (($currentPage - 1) < 0 ? 0 : ($currentPage - 1)) * $no_of_records_per_page;
 			$search = "(from_id LIKE '%" . $params["search"] . "%' OR to_id LIKE '%" . $params["search"] . "%' OR p1.full_name LIKE '%" . $params["search"] . "%' OR p2.full_name LIKE '%" . $params["search"] . "%') ";
 			
-			$stmt = "SELECT p1.full_name as fromProduct, p2.full_name as toProduct, u.full_name as createdBy, ex.*, from_ex_qty - from_qty as from_after_qty, to_ex_qty + to_qty as to_after_qty FROM `{$this->table_ex}` as ex left join `{$this->users}` as u on u.id=ex.created_by left join `{$this->table}` as p1 on p1.id=ex.from_id left join `{$this->table}` as p2 on p2.id=ex.to_id WHERE $search and ex.shop_id=:shopId and ex.owner_id=:owner_id LIMIT :offset, :perPage order by ex.id desc";
+			$stmt = "SELECT p1.full_name as fromProduct, p2.full_name as toProduct, u.full_name as createdBy, ex.*, from_ex_qty - from_qty as from_after_qty, to_ex_qty + to_qty as to_after_qty FROM `{$this->table_ex}` as ex left join `{$this->users}` as u on u.id=ex.created_by left join `{$this->table}` as p1 on p1.id=ex.from_id left join `{$this->table}` as p2 on p2.id=ex.to_id WHERE $search and ex.shop_id=:shopId and ex.owner_id=:owner_id ORDER BY ex.id DESC LIMIT :offset, :perPage";
 			$prepare = $dbh->prepare($stmt);
 			$prepare->bindParam(':shopId', $params['shopId'], PDO::PARAM_INT);
 			$prepare->bindParam(':offset', $offset, PDO::PARAM_INT);
