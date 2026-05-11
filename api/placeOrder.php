@@ -22,5 +22,6 @@ try {
         echo json_encode($response);
     }
 } catch (PDOException $e) {
+    error_log($e->getMessage());
     die("Error!: " . $e->getMessage() . "<br/>");
 }
