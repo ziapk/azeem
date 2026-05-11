@@ -1287,7 +1287,7 @@ class Products extends Connection
 			$offset = (($currentPage - 1) < 0 ? 0 : ($currentPage - 1)) * $no_of_records_per_page;
 			$search = "(from_id LIKE '%" . $params["search"] . "%' OR to_id LIKE '%" . $params["search"] . "%' OR p1.full_name LIKE '%" . $params["search"] . "%' OR p2.full_name LIKE '%" . $params["search"] . "%') ";
 			
-			$stmt = "SELECT p1.full_name as fromProduct, p2.full_name as toProduct, u.full_name as createdBy, ex.*, from_ex_qty - from_qty as from_after_qty, to_ex_qty + to_qty as to_after_qty FROM `{$this->table_ex}` as ex left join `{$this->users}` as u on u.id=ex.created_by left join `{$this->table}` as p1 on p1.id=ex.from_id left join `{$this->table}` as p2 on p2.id=ex.to_id WHERE $search and ex.shop_id=:shopId and ex.owner_id=:owner_id LIMIT :offset, :perPage";
+			$stmt = "SELECT p1.full_name as fromProduct, p2.full_name as toProduct, u.full_name as createdBy, ex.*, from_ex_qty - from_qty as from_after_qty, to_ex_qty + to_qty as to_after_qty FROM `{$this->table_ex}` as ex left join `{$this->users}` as u on u.id=ex.created_by left join `{$this->table}` as p1 on p1.id=ex.from_id left join `{$this->table}` as p2 on p2.id=ex.to_id WHERE $search and ex.shop_id=:shopId and ex.owner_id=:owner_id LIMIT :offset, :perPage order by ex.id desc";
 			$prepare = $dbh->prepare($stmt);
 			$prepare->bindParam(':shopId', $params['shopId'], PDO::PARAM_INT);
 			$prepare->bindParam(':offset', $offset, PDO::PARAM_INT);
