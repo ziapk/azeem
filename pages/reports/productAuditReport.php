@@ -195,8 +195,8 @@ function openRefModal(refType, refId) {
     $meta = $group['meta'];
     $rows = $group['rows'];
 
-    // rows are DESC — first row = latest running_balance (closing)
-    $closingBalance = (int) ($rows[0]['running_balance'] ?? 0);
+    // rows are ASC — last row = latest running_balance (closing)
+    $closingBalance = (int) ($rows[count($rows) - 1]['running_balance'] ?? 0);
 
     $totalIn  = 0;
     $totalOut = 0;
@@ -268,8 +268,7 @@ function openRefModal(refType, refId) {
             </tr>
 
         <?php
-        $totalRows = count($rows);
-        $sr = $totalRows;
+        $sr = 1;
         foreach ($rows as $row):
             $qty     = (int) $row['quantity'];
             $balance = (int) $row['running_balance'];  // already = opening + period_sum
@@ -280,7 +279,7 @@ function openRefModal(refType, refId) {
             $balClass  = $balance > 0 ? 'bal-pos' : ($balance < 0 ? 'bal-neg' : 'bal-zero');
         ?>
             <tr>
-                <td><?php echo $sr--; ?></td>
+                <td><?php echo $sr++; ?></td>
                 <td><?php echo (int) $row['id']; ?></td>
                 <td style="white-space:nowrap">
                     <?php echo date('d M y', strtotime($row['created_at'])); ?>

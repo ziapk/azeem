@@ -1736,7 +1736,7 @@ class Products extends Connection
 				WHERE il.shop_id = ?
 				AND DATE(il.created_at) BETWEEN ? AND ?
 				$productFilter
-				ORDER BY il.product_id ASC, il.id DESC
+				ORDER BY il.product_id ASC, il.id ASC
 			");
 			$stmt->execute(array_merge([$shopId, $from, $to], $pidBindings));
 			$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
