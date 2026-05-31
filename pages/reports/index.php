@@ -122,12 +122,24 @@ echo mainHeader(['page' => 'reports']);
         <div class="row" ng-if="reportType == 24">
             <div class="col-sm-12">
                 <div class="form-group">
-                    <label>Product IDs <small class="text-muted">(comma-separated, e.g. 15189,15190,15191 — or leave blank for all)</small></label>
-                    <input type="text"
-                        class="form-control"
-                        name="product_ids"
-                        ng-model="auditProductIds"
-                        placeholder="e.g. 15189, 15190">
+                    <label>Select Products <small class="text-muted">(search and add multiple — or leave blank for all)</small></label>
+                    <div class="form-control" style="height:auto; min-height:34px; padding:4px 6px;" ng-click="$event.target.querySelector && $event.target.tagName !== 'INPUT' && $event.currentTarget.querySelector('input').focus()">
+                        <span class="label label-primary" ng-repeat="p in selectedProducts" style="display:inline-block; margin:2px; padding:4px 6px; font-size:13px;">
+                            {{p.full_name}}
+                            <a href="" ng-click="removeProduct($index); $event.preventDefault()" style="color:#fff; margin-left:4px; text-decoration:none;">&times;</a>
+                        </span>
+                        <input type="text"
+                            ng-model="productIdsSearch"
+                            placeholder="Search Products"
+                            uib-typeahead="address as address.full_name for address in searchProduct($viewValue)"
+                            ng-model-options="{debounce: 100}"
+                            typeahead-template-url="row.html"
+                            typeahead-show-hint="true"
+                            typeahead-min-length="1"
+                            typeahead-on-select="addProduct($item)"
+                            style="border:none; outline:none; box-shadow:none; min-width:160px; display:inline-block; width:auto;">
+                    </div>
+                    <input type="hidden" name="product_ids" ng-value="selectedProductIds()">
                 </div>
             </div>
         </div>
@@ -191,6 +203,22 @@ echo mainHeader(['page' => 'reports']);
                 return secondfilteredArray.slice(0, 30);
             }
         }
+
+        // Multiple product selection for reportType 24 (reuses searchProduct as the source)
+        $scope.selectedProducts = [];
+        $scope.productIdsSearch = '';
+        $scope.addProduct = function(item) {
+            if (item && !$scope.selectedProducts.some(p => p.id == item.id)) {
+                $scope.selectedProducts.push(item);
+            }
+            $scope.productIdsSearch = '';
+        };
+        $scope.removeProduct = function(index) {
+            $scope.selectedProducts.splice(index, 1);
+        };
+        $scope.selectedProductIds = function() {
+            return $scope.selectedProducts.map(p => p.id).join(',');
+        };
     });
 </script>
 <script type="text/ng-template" id="row.html">
