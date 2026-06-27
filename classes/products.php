@@ -1788,4 +1788,106 @@ class Products extends Connection
 		
 		} 
 	}
+
+	// Per-product purchase & sale transaction ledger (Product Purchase / Sale report)
+	public function getProductPurchaseSaleLedger($params)
+	{
+		$dbh = $this->connectionPool->getConnection();
+		try {
+			$shopId     = $params['shopId'];
+			$from       = $params['from']        ?? null;
+			$to         = $params['to']          ?? null;
+			$productIds = $params['product_ids'] ?? [];
+
+			$pFilter = '';
+			$sFilter = '';
+			$pBind   = [];
+			$sBind   = [];
+			if (!empty($productIds)) {
+				$ph      = implode(',', array_fill(0, count($productIds), '?'));
+				$pFilter = " AND oi.product_id IN ($ph)";
+				$sFilter = " AND oi.product_id IN ($ph)";
+				$pBind   = array_values($productIds);
+				$sBind   = array_values($productIds);
+			}
+
+			$pDate = '';
+			$sDate = '';
+			$pDateBind = [];
+			$sDateBind = [];
+			if ($from) { $pDate .= ' AND DATE(o.supply_date) >= ?'; $sDate .= ' AND DATE(o.order_date) >= ?'; $pDateBind[] = $from; $sDateBind[] = $from; }
+			if ($to)   { $pDate .= ' AND DATE(o.supply_date) <= ?'; $sDate .= ' AND DATE(o.order_date) <= ?'; $pDateBind[] = $to;   $sDateBind[] = $to; }
+
+			$sql = "
+				SELECT * FROM (
+					SELECT
+						oi.product_id,
+						p.full_name   AS product_name,
+						p.code        AS product_code,
+						p.barcode     AS product_barcode,
+						'purchase'    AS txn_type,
+						o.id          AS txn_id,
+						o.supply_date AS txn_date,
+						ROUND(SUM(oi.pprice * oi.quantity), 2) AS line_total
+					FROM supply o
+					JOIN supply_items oi ON oi.supply_id = o.id
+					LEFT JOIN products p ON p.id = oi.product_id
+					WHERE o.shopId = ? AND o.flag = 1 $pDate $pFilter
+					GROUP BY o.id, oi.product_id
+
+					UNION ALL
+
+					SELECT
+						oi.product_id,
+						p.full_name  AS product_name,
+						p.code       AS product_code,
+						p.barcode    AS product_barcode,
+						'sale'       AS txn_type,
+						o.id         AS txn_id,
+						o.order_date AS txn_date,
+						ROUND(SUM(oi.price * oi.quantity), 2) AS line_total
+					FROM orders o
+					JOIN order_items oi ON oi.order_id = o.id
+					LEFT JOIN products p ON p.id = oi.product_id
+					WHERE o.shopId = ? AND o.flag = 1 $sDate $sFilter
+					GROUP BY o.id, oi.product_id
+				) AS t
+				ORDER BY t.product_id ASC, t.txn_date ASC, t.txn_id ASC
+			";
+
+			$bind = array_merge(
+				[$shopId], $pDateBind, $pBind,
+				[$shopId], $sDateBind, $sBind
+			);
+
+			$stmt = $dbh->prepare($sql);
+			$stmt->execute($bind);
+			$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+			$grouped = [];
+			foreach ($rows as $r) {
+				$pid = $r['product_id'];
+				if (!isset($grouped[$pid])) {
+					$grouped[$pid] = [
+						'meta' => [
+							'product_id'   => $pid,
+							'product_name' => $r['product_name'],
+							'product_code' => $r['product_code'],
+							'barcode'      => $r['product_barcode'],
+						],
+						'rows' => [],
+					];
+				}
+				$grouped[$pid]['rows'][] = $r;
+			}
+
+			return $grouped;
+
+		} catch (PDOException $e) {
+			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
+		}
+	}
+
 }

@@ -119,7 +119,7 @@ echo mainHeader(['page' => 'reports']);
             <?php } ?>
         </div>
 
-        <div class="row" ng-if="reportType == 24">
+        <div class="row" ng-if="reportType == 24 || reportType == 25">
             <div class="col-sm-12">
                 <div class="form-group">
                     <label>Select Products <small class="text-muted">(search and add multiple — or leave blank for all)</small></label>

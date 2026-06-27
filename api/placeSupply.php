@@ -327,6 +327,22 @@ if ($supply_id) {
                 ]);
             }
         }
+
+        // ── INVENTORY: reconcile the cached store_products.qty against the ledger
+        // for EVERY product in this supply. logMovement()/reverseByRef() only fire
+        // for changed quantities, so an item whose qty was unchanged (or a parked
+        // supply) would otherwise keep the inflated value written by the legacy
+        // assignProduct() += above — that is the "++ on every update" bug. syncQty
+        // sets qty = SUM(ledger), which is the single source of truth.
+        $reconciled = [];
+        foreach ($items as $item) {
+            $key = $item['product_id'] . '|' . $item['shopId'];
+            if (isset($reconciled[$key])) {
+                continue;
+            }
+            $reconciled[$key] = true;
+            $inventory->syncQty((int)$item['product_id'], (int)$item['shopId']);
+        }
     }
 
     if ($status != 1) {

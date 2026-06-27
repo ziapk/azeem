@@ -277,6 +277,26 @@ switch ($reportType) {
 		$orders = $productObj->getProductAuditLedger($shopId, $from, $to, $product_ids);
 		include_once dirname(__FILE__) . '/productAuditReport.php';
 		exit;
+	case '25':
+		$rawIds = !empty($_POST['product_ids']) ? $_POST['product_ids'] : '';
+		$product_ids = [];
+		if (!empty($rawIds)) {
+			$product_ids = array_values(array_filter(array_map('intval', explode(',', $rawIds))));
+		}
+		if (!empty($_POST['product_id'])) {
+			$single = (int) $_POST['product_id'];
+			if ($single && !in_array($single, $product_ids)) {
+				array_unshift($product_ids, $single);
+			}
+		}
+		$orders = $productObj->getProductPurchaseSaleLedger([
+			'shopId'      => $shopId,
+			'from'        => $from,
+			'to'          => $to,
+			'product_ids' => $product_ids,
+		]);
+		include_once dirname(__FILE__) . '/productPurchaseSaleReport.php';
+		exit;
 	default:
 		# code...
 		break;
