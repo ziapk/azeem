@@ -127,12 +127,15 @@ class Orders extends Connection
 
             $storeDATA = $storeObj->getStore($shop['id']);
 
+            // always computed: the ledger reads these below even on 0-payment
+            // (credit / fully discounted) orders.
+            $gst = round($array['subTotal'] * ((!empty($array['gst']) ? $array['gst'] : 0) / 100));
+            $service_charges = round($array['subTotal'] * ((!empty($array['service_charges']) ? $array['service_charges'] : 0) / 100));
+
             if ($array['status'] == 1) {
                 $status = 1; // parked
                 $parked = true;
             } else if (!empty($array['payment_amount'])) {
-                $gst = round($array['subTotal'] * ($array['gst'] / 100));
-                $service_charges = round($array['subTotal'] * ($array['service_charges'] / 100));
                 $status = 8;
                 if ((($array['subTotal'] + $gst + $service_charges) - $array['discount'] - $array['payment_amount']) == 0) {
                     $status = 2;
@@ -362,14 +365,14 @@ class Orders extends Connection
                             'owner_id' => $user['role'] == 'owner' ? $user['id'] : $user['created_by'],
                             'product_id' => $item['id'],
                             'order_id' => $order_id,
-                            'description' => $item['description'],
+                            'description' => isset($item['description']) ? $item['description'] : '',
                             'quantity' => $qty,
                             'pack_size' => !empty($item['pack_size']) ? $item['pack_size'] : 0,
                             'pack_qty' => !empty($item['pack_qty']) ? $item['pack_qty'] : 0,
                             'unpack_qty' => !empty($item['unpack_qty']) ? $item['unpack_qty'] : 0,
                             'discount' => $discount,
                             'discount_type' => !empty($item['discount_type']) ? $item['discount_type'] : 1,
-                            'price' => $item['price'],
+                            'price' => isset($item['price']) ? $item['price'] : 0,
                             'services' => $item['services'],
                             'raw_items' => $rawItems,
                             'status' => $array['status'],
@@ -381,7 +384,10 @@ class Orders extends Connection
                             'inventory_quantity' => $inventoryQuantity,
                         ];
 
-                        $totalDiscount += $item['discount'];
+                        // discount coming from the cart is PER UNIT, while `subTotal`
+                        // is already net of discount AND multiplied by qty — so the
+                        // ledger gross must use the discount times the quantity too.
+                        $totalDiscount += (float)$discount * $qty;
                         $c[] = $this->createOrderDetails($d, $customer);
                     }
                 }

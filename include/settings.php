@@ -17,7 +17,9 @@ if (!isset($_SESSION)) {
 }
 define('SITE_URL', '/');
 date_default_timezone_set('Asia/Karachi');
-ini_set('max_input_vars', 20000);
+// NOTE: max_input_vars is PHP_INI_PERDIR — ini_set() here is a no-op and the
+// limit stays at php.ini's value (1000 by default). It is raised in .user.ini
+// / .htaccess at the app root instead. See api/placeOrder.php for why it matters.
 
 // ini_set('display_errors', 1);
 // ini_set('display_startup_errors', 1);

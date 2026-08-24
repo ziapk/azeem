@@ -1045,9 +1045,9 @@ if (in_array($order['order']['status'], [1, 2, 8, 9]) || !empty($_GET['dup'])) {
                         overide: $scope.overide
                     }
 
-                    $http.post("<?php echo SITE_URL ?>api/placeOrder.php", $httpParamSerializerJQLike($scope.form), {
+                    $http.post("<?php echo SITE_URL ?>api/placeOrder.php", $scope.form, {
                             headers: {
-                                'Content-Type': 'application/x-www-form-urlencoded'
+                                'Content-Type': 'application/json'
                             }
                         })
                         .then(function(response) {

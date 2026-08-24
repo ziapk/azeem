@@ -1,3 +1,14 @@
 <IfModule mod_headers.c>
     Header set Access-Control-Allow-Origin "*"
 </IfModule>
+
+# Same as .user.ini above, for hosts running PHP as an Apache module.
+# Guarded by IfModule: php_value in .htaccess is a fatal 500 under CGI/FPM.
+<IfModule mod_php.c>
+    php_value max_input_vars 20000
+    php_value post_max_size 32M
+</IfModule>
+<IfModule mod_php7.c>
+    php_value max_input_vars 20000
+    php_value post_max_size 32M
+</IfModule>

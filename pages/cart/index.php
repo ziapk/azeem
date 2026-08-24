@@ -322,9 +322,9 @@ echo mainHeader();
             }
 
 
-            $http.post("<?php echo SITE_URL ?>api/placeOrder.php", $httpParamSerializerJQLike($scope.form), {
+            $http.post("<?php echo SITE_URL ?>api/placeOrder.php", $scope.form, {
                     headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
+                        'Content-Type': 'application/json'
                     }
                 })
                 .then(function(response) {
