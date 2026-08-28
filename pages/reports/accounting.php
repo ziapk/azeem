@@ -241,6 +241,46 @@ ob_start();
 	</tbody>
 </table>
 <?php if ($reportType == '10') {
+	if (!empty($reportDataOther['purchaseRecords'])) { ?>
+		<h4 style="margin: 10px 0">Purchases</h4>
+		<table class="table" id="resultTable" width="100%" style="border-collapse: collapse" border="1">
+			<thead>
+				<tr>
+					<th width="30">S.#</th>
+					<th>Account Code</th>
+					<th>Account Title</th>
+					<?php foreach ($modesList['records'] as $m) { ?>
+						<th><?php echo $m['title']; ?></th>
+					<?php } ?>
+					<th>Credit Purchase</th>
+				</tr>
+			</thead>
+			<tbody>
+				<?php $pCount = 1;
+				foreach ($reportDataOther['purchaseRecords'] as $row) { ?>
+					<tr>
+						<td width="10"><?php echo $pCount; ?></td>
+						<td><?php echo $row['code']; ?></td>
+						<td><?php echo $row['title']; ?></td>
+						<?php foreach ($modesList['records'] as $m) { ?>
+							<td align="right"><?php echo number_format($row[$m['id']], 0); ?></td>
+						<?php } ?>
+						<td align="right"><?php echo number_format($row['netCreditPurchases'], 0); ?></td>
+					</tr>
+				<?php $pCount++;
+				} ?>
+				<tr>
+					<th></th>
+					<th>Total</th>
+					<th><?php echo number_format($reportDataOther['purchaseFooter']['totalCredit'], 0); ?></th>
+					<?php foreach ($modesList['records'] as $m) { ?>
+						<th align="right"><?php echo number_format($reportDataOther['purchaseFooter'][$m['id']], 0); ?></th>
+					<?php } ?>
+					<th align="right"><?php echo number_format($reportDataOther['purchaseFooter']['netCreditPurchases'], 0); ?></th>
+				</tr>
+			</tbody>
+		</table>
+	<?php }
 	if (!empty($reportDataOther['expenses']['rows'])) { ?>
 		<h4 style="margin: 10px 0">Expenses Summery</h4>
 		<table class="table" id="resultTable" width="100%" style="border-collapse: collapse" border="1">

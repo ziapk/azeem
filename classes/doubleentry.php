@@ -778,6 +778,7 @@ class DoubleEntry extends Connection
 			$otherList = [];
 			$otherTotals = [];
 			$purchaseReturnsList = [];
+			$purchaseRows = [];
 			$exchange = 0;
 			$payments = 0;
 			$deposit = 0;
@@ -891,11 +892,17 @@ class DoubleEntry extends Connection
 					}
 
 					if (in_array($value['transsaction_type'], ['PURCHASE'])) {
+						$purchaseRows[$value['account_id']]['row'] = $value;
 						if ($value['entry_type'] == 'D') {
+							// paid to the supplier at purchase time
+							$purchaseRows[$value['account_id']]['totalPaid'] += $value['amount'];
+							$purchaseRows[$value['account_id']]['paid'][$value['payment_mode']] += $value['amount'];
 							if ($cashModeId == $value['payment_mode']) {
 								$purchasePayments += $value['amount'];
 							}
 						} else {
+							// credit entry on the supplier account = invoice value
+							$purchaseRows[$value['account_id']]['totalCredit'] += $value['amount'];
 							$consider = false;
 						}
 					}
@@ -941,6 +948,32 @@ class DoubleEntry extends Connection
 					$reportData1 = array_values($final);
 				}
 			}
+			$purchaseRecords = [];
+			$purchaseFooter = ['totalCredit' => 0, 'totalPaid' => 0, 'netCreditPurchases' => 0];
+			foreach ($modesList['records'] as $m) {
+				$purchaseFooter[$m['id']] = 0;
+			}
+			foreach ($purchaseRows as $accountId => $transaction) {
+				if (empty($transaction['row']['title'])) {
+					continue;
+				}
+				$record = [
+					'code' => $transaction['row']['code'],
+					'title' => $transaction['row']['title'],
+					'totalCredit' => !empty($transaction['totalCredit']) ? $transaction['totalCredit'] : 0,
+					'totalPaid' => !empty($transaction['totalPaid']) ? $transaction['totalPaid'] : 0,
+				];
+				foreach ($modesList['records'] as $m) {
+					$record[$m['id']] = !empty($transaction['paid'][$m['id']]) ? $transaction['paid'][$m['id']] : 0;
+					$purchaseFooter[$m['id']] += $record[$m['id']];
+				}
+				$record['netCreditPurchases'] = $record['totalCredit'] - $record['totalPaid'];
+				$purchaseFooter['totalCredit'] += $record['totalCredit'];
+				$purchaseFooter['totalPaid'] += $record['totalPaid'];
+				$purchaseFooter['netCreditPurchases'] += $record['netCreditPurchases'];
+				$purchaseRecords[] = $record;
+			}
+
 			$reportData = [];
 
 			$count = 0;
@@ -986,6 +1019,8 @@ class DoubleEntry extends Connection
 			$reportData['other']['purchase_returns'] = $purchase_returns;
 			$reportData['other']['purchases'] = $purchases;
 			$reportData['other']['purchasesCount'] = $purchasesCount;
+			$reportData['other']['purchaseRecords'] = $purchaseRecords;
+			$reportData['other']['purchaseFooter'] = $purchaseFooter;
 			$reportData['other']['purchasePayments'] = $purchasePayments;
 			$reportData['other']['sale_returns'] = $sale_returns;
 			$reportData['other']['payments'] = $payments;
