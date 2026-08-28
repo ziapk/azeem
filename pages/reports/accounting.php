@@ -385,7 +385,7 @@ ob_start();
 		<tr>
 			<td></td>
 			<td></td>
-			<td align="left">Purchases (Invoice Value)</td>
+			<td align="left">Purchases (<?php echo (int)$reportDataOther['purchasesCount']; ?> invoices)</td>
 			<td align="right"><?php echo number_format($reportDataOther['purchases'], 0); ?></td>
 		</tr>
 	</table>

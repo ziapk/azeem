@@ -733,6 +733,27 @@ class Supply extends Connection
         }
     }
 
+    public function purchasesSummary($shopId, $from, $to)
+    {
+        $dbh = $this->connectionPool->getConnection();
+        try {
+            // Invoice value of the purchases listed on pages/supply/list.php for the
+            // same period: everything except parked (status 1) and deleted (flag != 1).
+            $stmt = "SELECT COUNT(*) as total, COALESCE(SUM(price - discount), 0) as amount FROM `{$this->table}` WHERE shopId=:shopId and flag = 1 and status != 1 and DATE(supply_date) BETWEEN :fromDate AND :toDate";
+            $prepare = $dbh->prepare($stmt);
+            $prepare->bindParam(':shopId', $shopId, PDO::PARAM_STR);
+            $prepare->bindParam(':fromDate', $from, PDO::PARAM_STR);
+            $prepare->bindParam(':toDate', $to, PDO::PARAM_STR);
+            $prepare->execute();
+            $result = $prepare->fetch(PDO::FETCH_ASSOC);
+            return $result;
+        } catch (PDOException $e) {
+            die("Error!: " . $e->getMessage() . "<br/>");
+        } finally {
+            $this->connectionPool->releaseConnection($dbh);
+        }
+    }
+
     public function manageWallet($array)
     {
 

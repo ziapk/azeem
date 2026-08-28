@@ -786,8 +786,14 @@ class DoubleEntry extends Connection
 			$cashSale = 0;
 			$sale_returns = 0;
 			$purchase_returns = 0;
-			$purchases = 0;
 			$purchasePayments = 0;
+			// Invoice value of the period's purchases, read from the supply table so the
+			// figure matches the Purchase Orders list rather than depending on how each
+			// supplier account is filed under the chart of accounts.
+			$supplyObj = new Supply();
+			$purchasesSummary = $supplyObj->purchasesSummary($array['shopId'], $fromDate, $toDate);
+			$purchases = !empty($purchasesSummary['amount']) ? $purchasesSummary['amount'] : 0;
+			$purchasesCount = !empty($purchasesSummary['total']) ? $purchasesSummary['total'] : 0;
 			$receivingList = 0;
 			$final = [];
 			$modes = [];
@@ -890,8 +896,6 @@ class DoubleEntry extends Connection
 								$purchasePayments += $value['amount'];
 							}
 						} else {
-							// credit entry on the supplier account = invoice value of the purchase
-							$purchases += $value['amount'];
 							$consider = false;
 						}
 					}
@@ -981,6 +985,7 @@ class DoubleEntry extends Connection
 			$reportData['other']['receivings'] = $receivings;
 			$reportData['other']['purchase_returns'] = $purchase_returns;
 			$reportData['other']['purchases'] = $purchases;
+			$reportData['other']['purchasesCount'] = $purchasesCount;
 			$reportData['other']['purchasePayments'] = $purchasePayments;
 			$reportData['other']['sale_returns'] = $sale_returns;
 			$reportData['other']['payments'] = $payments;
