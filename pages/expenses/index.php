@@ -4,18 +4,30 @@ $expenseObj = new Expenses();
 
 
 $ordersObj = new Orders();
+$categoryObj = new Categories();
+$ownerId = $userData['role'] == 'owner' ? $userData['id'] : $userData['created_by'];
+$expenseCategories = $categoryObj->getCategories('exp', $ownerId);
+usort($expenseCategories, function ($a, $b) {
+    return strcasecmp($a['groupName'] . $a['full_name'], $b['groupName'] . $b['full_name']);
+});
+
 $dateLabel = "Sales for ";
 $start = $end = date('Y-m-d');
+
+$filters = [
+    'cat_id' => !empty($_GET['cat_id']) ? $_GET['cat_id'] : '',
+    'description' => !empty($_GET['description']) ? $_GET['description'] : ''
+];
 
 if (isset($_GET['report'])) {
     $from = $_GET['from'];
     $to = $_GET['to'];
-    $expenseData = $expenseObj->getShopExpenses($userData['shopId'], $from, $to);
+    $expenseData = $expenseObj->getShopExpenses($userData['shopId'], $from, $to, $filters);
     $dateLabel .= '<strong>' . $from . '</strong> to <strong>' . $to . '</strong>';
     $start = date('Y-m-d', strtotime($from));
     $end = date('Y-m-d', strtotime($to));
 } else {
-    $expenseData = $expenseObj->getShopExpenses($userData['shopId'], date('Y-m-d'));
+    $expenseData = $expenseObj->getShopExpenses($userData['shopId'], date('Y-m-d'), null, $filters);
     $dateLabel .= '<strong>' . date('Y-m-d') . '</strong>';
     $start = date('Y-m-d');
     $end = date('Y-m-d');
@@ -32,6 +44,19 @@ echo mainHeader(['page' => 'expense']);
         <h4><?php echo $dateLabel; ?></h4>
         <div class="input-group">
             <input class="form-control datepicker" type="text" value="" readonly />
+            <div class="input-group-btn" style="width: 25%">
+                <select name="cat_id" class="form-control">
+                    <option value="">All Categories</option>
+                    <?php foreach ($expenseCategories as $cat) { ?>
+                        <option value="<?php echo $cat['id']; ?>" <?php echo $filters['cat_id'] == $cat['id'] ? 'selected' : ''; ?>>
+                            <?php echo htmlspecialchars($cat['full_name'] . (!empty($cat['groupName']) ? ' (' . $cat['groupName'] . ')' : '')); ?>
+                        </option>
+                    <?php } ?>
+                </select>
+            </div>
+            <div class="input-group-btn" style="width: 25%">
+                <input type="text" name="description" class="form-control" placeholder="Description" value="<?php echo htmlspecialchars($filters['description']); ?>" />
+            </div>
             <div class="input-group-btn">
                 <input type="submit" value="Submit" name="report" class="btn btn-primary" />
             </div>
@@ -50,6 +75,7 @@ echo mainHeader(['page' => 'expense']);
                 <tr>
                     <th width="100px">Sr.#</th>
                     <th width="150px">Name</th>
+                    <th width="150px">Category</th>
                     <th>Description</th>
                     <th width="150px">Price</th>
                     <th width="150px">Date</th>
@@ -64,6 +90,7 @@ echo mainHeader(['page' => 'expense']);
                     <tr>
                         <td><?php echo $key + 1; ?></td>
                         <td><?php echo $cust['title']; ?></td>
+                        <td><?php echo $cust['category_name']; ?></td>
                         <td><?php echo $cust['description']; ?></td>
                         <td><?php echo $cust['price']; ?></td>
                         <td><?php echo date('d M Y', strtotime($cust['exp_date'])); ?></td>
@@ -76,7 +103,7 @@ echo mainHeader(['page' => 'expense']);
             <tfoot>
                 <tr>
                     <th>Total</th>
-                    <th colspan="6">
+                    <th colspan="7">
                         <table style="text-align: right" width="100%" cellspacing="0" cellpadding="0">
                             <tr>
                                 <th style="text-align: right">Number of Expenses</th>

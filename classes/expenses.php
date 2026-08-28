@@ -5,20 +5,26 @@ class Expenses extends Connection
 
 	private $table = 'expenses';
 
-	public function getShopExpenses($shop_id, $date, $to = null)
+	public function getShopExpenses($shop_id, $date, $to = null, $filters = [])
 	{
 		$dbh = $this->connectionPool->getConnection();
 		try {
 
 			$toCondition = "";
 			if (!empty($to)) {
-				$toCondition .= " AND exp_date>='" . $date . "' AND exp_date<='" . $to . "'";
+				$toCondition .= " AND e.exp_date>='" . $date . "' AND e.exp_date<='" . $to . "'";
 			} else {
-				$toCondition .= " AND exp_date>='" . $date . "'";
+				$toCondition .= " AND e.exp_date>='" . $date . "'";
 			}
 
+			if (!empty($filters['cat_id'])) {
+				$toCondition .= " AND e.cat_id=" . intval($filters['cat_id']);
+			}
+			if (!empty($filters['description'])) {
+				$toCondition .= " AND e.description LIKE " . $dbh->quote('%' . $filters['description'] . '%');
+			}
 
-			$stmt = "SELECT * FROM `{$this->table}` WHERE `shop_id`=:shop_id $toCondition ";
+			$stmt = "SELECT e.*, c.full_name as category_name FROM `{$this->table}` as e LEFT JOIN `category` as c ON c.id = e.cat_id WHERE e.`shop_id`=:shop_id $toCondition ";
 			$prepare = $dbh->prepare($stmt);
 			$prepare->bindParam(':shop_id', $shop_id, PDO::PARAM_STR);
 			$prepare->execute();
