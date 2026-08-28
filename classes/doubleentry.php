@@ -786,6 +786,8 @@ class DoubleEntry extends Connection
 			$cashSale = 0;
 			$sale_returns = 0;
 			$purchase_returns = 0;
+			$purchases = 0;
+			$purchasePayments = 0;
 			$receivingList = 0;
 			$final = [];
 			$modes = [];
@@ -873,7 +875,7 @@ class DoubleEntry extends Connection
 					if (in_array($value['transsaction_type'], ['PURCHASE_RETURN'])) {
 						if ($value['entry_type'] == 'D' && $store['purchase_returns'] == $value['account_id']) {
 							if ($cashModeId == $value['payment_mode']) {
-								$payments += $value['amount'];
+								$purchase_returns += $value['amount'];
 							} else {
 								$consider = false;
 							}
@@ -885,9 +887,11 @@ class DoubleEntry extends Connection
 					if (in_array($value['transsaction_type'], ['PURCHASE'])) {
 						if ($value['entry_type'] == 'D') {
 							if ($cashModeId == $value['payment_mode']) {
-								$payments += $value['amount'];
+								$purchasePayments += $value['amount'];
 							}
 						} else {
+							// credit entry on the supplier account = invoice value of the purchase
+							$purchases += $value['amount'];
 							$consider = false;
 						}
 					}
@@ -976,6 +980,8 @@ class DoubleEntry extends Connection
 			$reportData['other']['otherTotals'] = $otherTotals;
 			$reportData['other']['receivings'] = $receivings;
 			$reportData['other']['purchase_returns'] = $purchase_returns;
+			$reportData['other']['purchases'] = $purchases;
+			$reportData['other']['purchasePayments'] = $purchasePayments;
 			$reportData['other']['sale_returns'] = $sale_returns;
 			$reportData['other']['payments'] = $payments;
 			$reportData['other']['deposit'] = $deposit;
@@ -987,7 +993,7 @@ class DoubleEntry extends Connection
 			$creditsale = empty($footer['netCreditSales']) ? 0 : $footer['netCreditSales'];
 			$texpense = $reportData['other']['cashTotals']["exp"];
 			$cash = ($tsale + $receivings + $purchase_returns + $withdrawal);
-			$deduction = ($sale_returns + $texpense + $payments + $deposit);
+			$deduction = ($sale_returns + $texpense + $payments + $purchasePayments + $deposit);
 			$netCash = ($tsale + $receivings + $purchase_returns) - $deduction;
 
 			$reportData['other']['cash'] = $cash;

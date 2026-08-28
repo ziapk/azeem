@@ -352,21 +352,22 @@ ob_start();
 			<th align="right"><?php echo number_format($reportDataOther['sale_returns'], 0); ?></td>
 		</tr>
 		<tr>
-			<th align="left">Sale via CASH
-				</td>
-			<th align="right"><?php echo number_format($reportDataOther['cashSale'], 0); ?></td>
-			<th align="left">Payments</td>
-			<th align="right"><?php echo number_format($reportDataOther['payments'], 0); ?></td>
+			<th align="left">Sale via CASH</th>
+			<th align="right"><?php echo number_format($reportDataOther['cashSale'], 0); ?></th>
+			<th align="left">Purchase via CASH</th>
+			<th align="right"><?php echo number_format($reportDataOther['purchasePayments'], 0); ?></th>
 		</tr>
 		<tr>
 			<th align="left">Receivings</th>
 			<th align="right"><?php echo number_format($reportDataOther['receivings'], 0); ?></th>
-			<th align="left">Expenses</td>
-			<th align="right"><?php echo number_format($reportDataOther['texpense'], 0); ?></td>
+			<th align="left">Payments</th>
+			<th align="right"><?php echo number_format($reportDataOther['payments'], 0); ?></th>
 		</tr>
 		<tr>
 			<th align="left">Purchase Returns</th>
 			<th align="right"><?php echo number_format($reportDataOther['purchase_returns'], 0); ?></th>
+			<th align="left">Expenses</th>
+			<th align="right"><?php echo number_format($reportDataOther['texpense'], 0); ?></th>
 		</tr>
 		<tr>
 			<th align="left">Pay via locker or Cash out</th>
@@ -381,6 +382,12 @@ ob_start();
 			<th align="left">Total</th>
 			<th align="right"><?php echo number_format($reportDataOther['deduction'], 0); ?></th>
 		</tr>
+		<tr>
+			<td></td>
+			<td></td>
+			<td align="left">Purchases (Invoice Value)</td>
+			<td align="right"><?php echo number_format($reportDataOther['purchases'], 0); ?></td>
+		</tr>
 	</table>
 
 	<h5 style="margin: 5px 0">Totals</h5>
@@ -394,7 +401,7 @@ ob_start();
 			<th align="right"><?php echo number_format($reportDataOther['deduction'], 0); ?></th>
 		</tr>
 		<tr>
-			<th align="left">Net Total</td>
+			<th align="left">Net Total</th>
 			<th align="right"><?php echo number_format($reportDataOther['totalNetSale'], 0); ?></th>
 		</tr>
 	</table>
