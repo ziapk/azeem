@@ -422,12 +422,6 @@ ob_start();
 			<th align="left">Total</th>
 			<th align="right"><?php echo number_format($reportDataOther['deduction'], 0); ?></th>
 		</tr>
-		<tr>
-			<td></td>
-			<td></td>
-			<td align="left">Purchases (<?php echo (int)$reportDataOther['purchasesCount']; ?> invoices)</td>
-			<td align="right"><?php echo number_format($reportDataOther['purchases'], 0); ?></td>
-		</tr>
 	</table>
 
 	<h5 style="margin: 5px 0">Totals</h5>
