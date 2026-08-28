@@ -704,6 +704,11 @@ class Supply extends Connection
                 $toCondition = " AND o.id='" . $params['orderId'] . "' ";
             }
 
+            if (!empty($params['supplier_name'])) {
+                $supplierName = $dbh->quote('%' . $params['supplier_name'] . '%');
+                $toCondition = " AND (c.full_name LIKE " . $supplierName . " OR s.name LIKE " . $supplierName . ") ";
+            }
+
             if ($params['orderType'] == 'cash') {
                 $toCondition .= " AND o.payment_amount > 0 and o.status = 2 ";
             }

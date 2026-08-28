@@ -16,6 +16,9 @@ echo mainHeader(['page' => 'supplies']);
             </div>
             <input date-range-picker class="form-control date-picker" type="text" ng-model="datePicker.date" options="{ locale: {format: 'DD/MM/YYYY'}}" />
             <div class="input-group-btn">
+                <input type="text" ng-model="supplier_name" class="form-control" style="width: 150px" placeholder="Supplier Name" />
+            </div>
+            <div class="input-group-btn">
                 <input type="submit" value="Submit" name="report" class="btn btn-primary" />
             </div>
         </div>
@@ -109,6 +112,9 @@ echo mainFooter();
             }
         };
 
+        $scope.orderId = '';
+        $scope.supplier_name = '';
+
         $scope.statusArr = <?php echo json_encode($orderStatusArr); ?>
 
         $scope.getReport = (form, activeValue) => {
@@ -119,6 +125,7 @@ echo mainFooter();
                         from: moment($scope.datePicker.date.startDate).format('YYYY-MM-DD'),
                         to: moment($scope.datePicker.date.endDate).format('YYYY-MM-DD'),
                         orderId: $scope.orderId,
+                        supplier_name: $scope.supplier_name,
                         orderType
                     }
                 })

@@ -5,6 +5,7 @@ $data = [
     'from' => $_GET['from'],
     'to' => $_GET['to'],
     'orderId' => $_GET['orderId'],
+    'supplier_name' => $_GET['supplier_name'],
     'orderType' => !empty($_GET['orderType']) ? $_GET['orderType'] : 'all'
 ];
 $orders = $ordersObj->userOrders($userData['shopId'], $data);
