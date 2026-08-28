@@ -11,22 +11,25 @@ $orders = $ordersObj->userReturnOrders($userData['shopId'], $data);
 $data = [];
 $data['records'] = $orders;
 $data['income'] = 0;
+$data['return'] = 0;
+$data['totalReturn'] = 0;
+$data['park'] = 0;
+$data['credit'] = 0;
+$data['via'] = [];
+// flag 1 = parked/draft return, flag 2 = submitted return
 foreach ($orders as $row) {
-    if ($row['flag'] == 1) {
-        $data['totalIncome'] += $row['price'] - $row['discount'];
+    $value = $row['price'] - $row['discount'];
+    if ($row['flag'] == 2) {
+        $data['totalReturn'] += $value;
+        $data['return'] += $row['paid'];
+        $data['credit'] += $value - $row['paid'];
         if (!empty($row['prices'])) {
             foreach ($row['prices'] as $id => $amount) {
-                $data['via'][$id] += $amount;
+                $data['via'][$id] = (!empty($data['via'][$id]) ? $data['via'][$id] : 0) + $amount;
             }
         }
     } else {
-        $data['totalReturn'] += $row['paid'];
-    }
-    $data['credit'] += $row['price'] - $row['discount'] - $row['paid'];
-    if ($row['flag'] == 1) {
-        $data['return'] += $row['paid'];
-    } else {
-        $data['return'] += 0;
+        $data['park'] += $value;
     }
 }
 $data['total'] = sizeof($orders);
