@@ -281,47 +281,81 @@ ob_start();
 			</tbody>
 		</table>
 	<?php }
-	if (!empty($reportDataOther['expenses']['rows'])) { ?>
+	if (!empty($reportDataOther['expenses']['accounts'])) {
+		$expenseData = $reportDataOther['expenses'];
+		// One column per date is unreadable past a month, so switch to months.
+		$periods = count($expenseData['dates']) > 31 ? $expenseData['months'] : $expenseData['dates'];
+		$periodLabel = count($expenseData['dates']) > 31 ? 'Month' : 'Date';
+	?>
 		<h4 style="margin: 10px 0">Expenses Summery</h4>
 		<table class="table" id="resultTable" width="100%" style="border-collapse: collapse" border="1">
-			<?php foreach ($reportDataOther['expenses']['rows'] as $date => $value) {
-				$total = 0;
-				foreach (array_chunk($value['row'], 6) as $mainRows) {
-			?>
+			<thead>
+				<tr>
+					<th width="30">S.#</th>
+					<th align="left">Expense Account</th>
+					<?php foreach ($modesList['records'] as $rr) { ?>
+						<th align="right"><?php echo $rr['title']; ?></th>
+					<?php } ?>
+					<th align="right">Total</th>
+				</tr>
+			</thead>
+			<tbody>
+				<?php $eCount = 1;
+				foreach ($expenseData['accounts'] as $account) { ?>
 					<tr>
-						<th rowspan="2">Date</th>
-						<?php foreach ($mainRows as $row) {
-							$title = array_values($row)[0]['title'];
+						<td width="10"><?php echo $eCount; ?></td>
+						<td align="left"><?php echo $account['title']; ?></td>
+						<?php foreach ($modesList['records'] as $rr) {
+							$tag = ($cashModeId == $rr['id']) ? 'th' : 'td';
 						?>
-							<th colspan="<?php echo count($modesList['records']); ?>"><?php echo $title; ?></th>
-						<?php }; ?>
-					</tr>
-					<tr>
-						<?php foreach ($mainRows as $row) { ?>
-							<?php foreach ($modesList['records'] as $rr) {
-								$tag = ($cashModeId == $rr['id']) ? 'th' : 'td';
-
-							?>
-								<<?php echo $tag; ?> style="text-align: center; font-size: 8px"><?php echo $rr['title']; ?></<?php echo $tag; ?>>
-							<?php }; ?>
-						<?php }; ?>
-					</tr>
-					<tr>
-						<td style="white-space: nowrap;"><?php echo $date; ?></td>
-						<?php
-						foreach ($mainRows as $id => $row3) {
-							$cashTotals["exp"] += $row3[$cashModeId]['amount'];
-							foreach ($modesList['records'] as $rr) {
-
-								$tag = ($cashModeId == $rr['id']) ? 'th' : 'td';
-						?>
-								<<?php echo $tag; ?> align="right"><?php echo number_format($row3[$rr['id']]['amount'], 0); ?></<?php echo $tag; ?>>
-							<?php };
-							?>
+							<<?php echo $tag; ?> align="right"><?php echo number_format(!empty($account['modes'][$rr['id']]) ? $account['modes'][$rr['id']] : 0, 0); ?></<?php echo $tag; ?>>
 						<?php } ?>
+						<th align="right"><?php echo number_format($account['total'], 0); ?></th>
 					</tr>
-			<?php }
-			} ?>
+				<?php $eCount++;
+				} ?>
+				<tr>
+					<th></th>
+					<th align="left">Total</th>
+					<?php foreach ($modesList['records'] as $rr) { ?>
+						<th align="right"><?php echo number_format(!empty($expenseData['total'][$rr['id']]) ? $expenseData['total'][$rr['id']] : 0, 0); ?></th>
+					<?php } ?>
+					<th align="right"><?php echo number_format($expenseData['grandTotal'], 0); ?></th>
+				</tr>
+			</tbody>
+		</table>
+
+		<h5 style="margin: 5px 0">Expenses by <?php echo $periodLabel; ?></h5>
+		<table class="table" id="resultTable" width="100%" style="border-collapse: collapse" border="1">
+			<thead>
+				<tr>
+					<th align="left"><?php echo $periodLabel; ?></th>
+					<?php foreach ($modesList['records'] as $rr) { ?>
+						<th align="right"><?php echo $rr['title']; ?></th>
+					<?php } ?>
+					<th align="right">Total</th>
+				</tr>
+			</thead>
+			<tbody>
+				<?php foreach ($periods as $period => $amounts) { ?>
+					<tr>
+						<td align="left" style="white-space: nowrap;"><?php echo $period; ?></td>
+						<?php foreach ($modesList['records'] as $rr) {
+							$tag = ($cashModeId == $rr['id']) ? 'th' : 'td';
+						?>
+							<<?php echo $tag; ?> align="right"><?php echo number_format(!empty($amounts[$rr['id']]) ? $amounts[$rr['id']] : 0, 0); ?></<?php echo $tag; ?>>
+						<?php } ?>
+						<th align="right"><?php echo number_format($amounts['total'], 0); ?></th>
+					</tr>
+				<?php } ?>
+				<tr>
+					<th align="left">Total</th>
+					<?php foreach ($modesList['records'] as $rr) { ?>
+						<th align="right"><?php echo number_format(!empty($expenseData['total'][$rr['id']]) ? $expenseData['total'][$rr['id']] : 0, 0); ?></th>
+					<?php } ?>
+					<th align="right"><?php echo number_format($expenseData['grandTotal'], 0); ?></th>
+				</tr>
+			</tbody>
 		</table>
 	<?php } ?>
 	<h5 style="margin: 5px 0">Other Totals</h5>

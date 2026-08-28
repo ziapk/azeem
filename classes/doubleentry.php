@@ -823,6 +823,18 @@ class DoubleEntry extends Connection
 						}
 						$expenses['rows'][$value['transaction_date']]['total'][$value['payment_mode']] += $value['amount'];
 						$expenses['total'][$value['payment_mode']] += $value['amount'];
+
+						// Flattened views for the summery tables: one row per expense
+						// account, and one row per date / per month for long ranges.
+						$month = substr($value['transaction_date'], 0, 7);
+						$expenses['accounts'][$value['account_id']]['title'] = $value['title'];
+						$expenses['accounts'][$value['account_id']]['modes'][$value['payment_mode']] += $value['amount'];
+						$expenses['accounts'][$value['account_id']]['total'] += $value['amount'];
+						$expenses['dates'][$value['transaction_date']][$value['payment_mode']] += $value['amount'];
+						$expenses['dates'][$value['transaction_date']]['total'] += $value['amount'];
+						$expenses['months'][$month][$value['payment_mode']] += $value['amount'];
+						$expenses['months'][$month]['total'] += $value['amount'];
+						$expenses['grandTotal'] += $value['amount'];
 					}
 				} elseif (in_array($value['transsaction_type'], ['DIRECT_RECEIVING', 'CASH_RECEIVED'])) {
 					if ($store['receivable'] == $value['parent_id']) {
@@ -914,6 +926,18 @@ class DoubleEntry extends Connection
 				$count++;
 			}
 
+
+			if (!empty($expenses['accounts'])) {
+				uasort($expenses['accounts'], function ($a, $b) {
+					return $b['total'] <=> $a['total'];
+				});
+			}
+			if (!empty($expenses['dates'])) {
+				ksort($expenses['dates']);
+			}
+			if (!empty($expenses['months'])) {
+				ksort($expenses['months']);
+			}
 
 			// $rows2 = [];
 			$totals = ['expense' => 0, 'gross' => 0, 'net' => 0];
