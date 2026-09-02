@@ -20,14 +20,18 @@ $service_charges = 0;
 $price = 0;
 $aprice = 0;
 
+// Tax and balance come from billTotals() in include/settings.php so the invoice
+// prices the bill exactly as Orders::prepareOrder saved it. $price stays
+// "gross + tax" because the discount is subtracted again where $net is worked out.
+$totals = orderTotals($order['order']);
 if (!empty($order['order']['price'])) {
-    $gst = round($order['order']['price'] * ($order['order']['gst'] / 100));
-    $service_charges = round($order['order']['price'] * ($order['order']['service_charges'] / 100));
+    $gst = $totals['gst'];
+    $service_charges = $totals['service_charges'];
     $price = $order['order']['price'] + $gst + $service_charges;
 }
 
 $currentBalance = $blc['balance'];
-$balance = ($price - $order['order']['discount']) - $order['order']['paid_amount'];
+$balance = $totals['balance'];
 
 ?>
 <link href="https://fonts.googleapis.com/css?family=Courgette&display=swap" rel="stylesheet">

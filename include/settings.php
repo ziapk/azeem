@@ -454,3 +454,45 @@ function convertNumberToWord($num)
     }
     return ucwords(implode(' ', $words)) . ' Rupees only';
 }
+
+/**
+ * billTotals — the one place a bill's tax and balance are worked out.
+ *
+ * GST and service charges are levied on the DISCOUNTED value (subTotal minus the
+ * bill discount), which is the base the POS quotes and the cashier collects. This
+ * used to be re-derived in three places off three slightly different bases, and the
+ * server's copy taxed the gross subTotal: every discounted bill was then short by
+ * the tax on the discount, so it could never satisfy the paid-in-full test, the
+ * customer's ledger kept a phantom receivable, and the invoice printed an amount
+ * still due. Callers: Orders::prepareOrder, print/index.php, api/getSaleReport.php.
+ *
+ * The browser-side twin of this rule lives in assets/js/bill-calc.js — keep them
+ * in step.
+ */
+function billTotals($subTotal, $discount, $gstPercent, $serviceChargesPercent, $paidAmount = 0)
+{
+    $taxable = (float) $subTotal - (float) $discount;
+    $gst = round($taxable * (((float) $gstPercent) / 100));
+    $serviceCharges = round($taxable * (((float) $serviceChargesPercent) / 100));
+    $net = $taxable + $gst + $serviceCharges;
+
+    return [
+        'taxable'         => $taxable,
+        'gst'             => $gst,
+        'service_charges' => $serviceCharges,
+        'net'             => $net,
+        'balance'         => $net - (float) $paidAmount,
+    ];
+}
+
+/** billTotals() for a row out of the `orders` table. */
+function orderTotals($order)
+{
+    return billTotals(
+        isset($order['price']) ? $order['price'] : 0,
+        isset($order['discount']) ? $order['discount'] : 0,
+        isset($order['gst']) ? $order['gst'] : 0,
+        isset($order['service_charges']) ? $order['service_charges'] : 0,
+        isset($order['paid_amount']) ? $order['paid_amount'] : 0
+    );
+}

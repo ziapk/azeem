@@ -516,6 +516,11 @@ echo mainFooter();
         $scope.payment_total = 0;
         $scope.overide = false;
 
+        // Quantity ceiling and all cart arithmetic live in assets/js/bill-calc.js
+        // so every screen shares one implementation.
+        const MAX_QTY = BillCalc.MAX_QTY;
+        const clampQty = BillCalc.clampQty;
+
 
 
         $scope.addAllBooks = (books, key) => {
@@ -666,7 +671,7 @@ echo mainFooter();
         }
         $scope.directlyAdd = function(val, obj) {
             if (val > 0) {
-                obj.qty = val
+                obj.qty = clampQty(val)
             }
             $scope.calculateSum();
         }
@@ -674,7 +679,7 @@ echo mainFooter();
         $scope.directlyPrice = function(val, obj) {
             if (val > 0) {
                 var v = val / obj.price;
-                obj.qty = v;
+                obj.qty = clampQty(v);
             }
             $scope.calculateSum();
         }
@@ -890,7 +895,7 @@ echo mainFooter();
         }
         $scope.addMoreQty = function(obj, val, e) {
             if (val > 0) {
-                obj.qty = parseFloat(obj.qty) + (parseFloat(val));
+                obj.qty = clampQty(parseFloat(obj.qty) + (parseFloat(val)));
             }
             $scope.calculateSum();
         }
@@ -901,7 +906,7 @@ echo mainFooter();
         }
 
         $scope.addQty = function(row) {
-            row.qty++;
+            row.qty = clampQty((parseFloat(row.qty) || 0) + 1);
             $scope.calculateSum();
         }
         $scope.subQty = function(row) {
@@ -1127,104 +1132,21 @@ echo mainFooter();
 
         $scope.calculateSum = (c) => {
             const customerData = c || $scope.customerData;
-            let subtotal = 0;
-            $scope.discountPercentValue = 0;
-            let counter = 1;
-            let forCounter = 1;
-            for (const product of $scope.items) {
-                product.price = product.price || 0;
-                if (product.product_type != 5) {
-                    product.srno = counter;
-                    counter++;
-                } else {
-                    product.frsrno = forCounter;
-                    forCounter++;
-                }
-                if (product.pack_qty && $scope.show_bundle) {
-                    product.qty = (product.pack_size || 1) * product.pack_qty;
-                }
 
-                let qty = $scope.show_bundle ? (product.qty + (product.unpack_qty || 0)) : product.qty;
-                if(product.sizes?.length) {
-                    let sizesQty = 0;
-                    product.sizes.map(r => {
-                        sizesQty += parseInt(r.qty || 0);
-                    });
+            // All cart arithmetic lives in assets/js/bill-calc.js — one implementation
+            // shared by every screen that shows a cart. Only UI concerns stay here.
+            Object.assign($scope, BillCalc.compute({
+                items: $scope.items,
+                customerData: customerData,
+                show_bundle: $scope.show_bundle,
+                discount: $scope.discount,
+                gst: $scope.gst,
+                service_charges: $scope.service_charges,
+                discountAmount: $scope.discountAmount,
+                total_discount_type: $scope.total_discount_type,
+            }));
 
-                    if(sizesQty) {
-                        product.qty = parseInt(sizesQty);
-                    }
-                }
-                if (!$scope.show_bundle) {
-                    product.unpack_qty = 0;
-                    product.pack_qty = 0;
-                    // product.pack_size = 0;
-                }
-
-                if (product.product_type == 1 || product.product_type != 1 && !product.services?.length && !product.raw_items?.length) {
-                    if (product.discount_type == 2) {
-
-                        if (parseFloat(customerData.default_discount)) {
-                            product.discount_value = product.price;
-                        }
-
-                        product.discount = (product.discount_value || 0)
-                        product.discount_value = parseFloat(product.discount_value || 0);
-                        product.discount_percent = product.discount_value || 0;
-                        subtotal += ((product.price - (product.discount || 0)) * qty);
-                    } else if (!product.discount_value && customerData.discount_array?.length && customerData.discount_array?.filter(r => r.publisher_id == product.publisher_id).length) {
-                        const row = customerData.discount_array.find(r => r.publisher_id == product.publisher_id);
-                        const price = parseFloat(product.price);
-                        product.discount = price * (parseFloat(row.discount_value) / 100);
-                        product.discount_value = row.discount_value;
-                        product.discount_percent = row.discount_value + "%";
-                        subtotal += ((product.price - product.discount) * qty);
-                    } else {
-                        const price = parseFloat(product.price);
-                        if (parseFloat(customerData.default_discount)) {
-                            product.discount_value = customerData.default_discount;
-                        }
-                        if (product.discount_value) {
-                            product.discount = price * (parseFloat(product.discount_value || 0) / 100);
-                            $scope.discountPercentValue += (product.discount * qty);
-                            product.discount_percent = product.discount_value + "%";
-                            product.discount_value = parseFloat(product.discount_value);
-                        } else {
-                            product.discount_percent = '';
-                            product.discount_value = '';
-                            product.discount = 0;
-                        }
-                        subtotal += ((price - product.discount) * qty);
-                    }
-                } else {
-                    product.price = 0;
-                    product.services?.forEach(row => {
-                        product.price += (row.price || 0) * (row.qty || 1)
-                    })
-                    product.raw_items?.forEach(row => {
-                        product.price += (row.price || 0) * (row.qty || 1)
-                    })
-                    subtotal += product.price * qty;
-                }
-            };
-            $scope.subTotal = subtotal;
-            $scope.payment_amount_before_tax = $scope.subTotal - $scope.discount;
-            $scope.payment_amount = $scope.subTotal - $scope.discount;
-            $scope.grandTotal = $scope.payment_amount = $scope.payment_amount + Math.round($scope.payment_amount * ($scope.gst / 100)) + Math.round($scope.payment_amount * ($scope.service_charges / 100));
             $window.sessionStorage.setItem('shopping', JSON.stringify($scope.items));
-
-            $scope.total_discount_value = $scope.discountAmount;
-
-            if($scope.total_discount_type === 1 && $scope.subTotal) {
-                if($scope.discountAmount <= 100) {
-
-                    $scope.total_discount_value = $scope.subTotal * (parseFloat($scope.discountAmount) / 100);
-
-                }
-            }
-            else {
-                $scope.total_discount_value = $scope.discountAmount;
-            }
 
             
 

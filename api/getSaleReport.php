@@ -24,8 +24,12 @@ array_multisort(array_column($orders, 'order_custom_id'), SORT_DESC, $orders);
 $data = [];
 $data['income'] = 0;
 foreach ($orders as $key => $row) {
-    $orders[$key]['gst'] = round($row['price'] * (intval($row['gst']) / 100));
-    $orders[$key]['service_charges'] = round($row['price'] * (intval($row['service_charges']) / 100));
+    // Tax comes from billTotals() in include/settings.php — same rule as the order
+    // and the invoice. (It also uses floatval, so a fractional rate like 17.5%
+    // survives; this line used to intval it down to 17.)
+    $rowTotals = orderTotals($row);
+    $orders[$key]['gst'] = $rowTotals['gst'];
+    $orders[$key]['service_charges'] = $rowTotals['service_charges'];
     $orders[$key]['price'] += $orders[$key]['service_charges'] + $orders[$key]['gst'];
     if ($row['flag'] == 1) {
         $data['totalIncome'] += $row['price'] - $row['discount'];

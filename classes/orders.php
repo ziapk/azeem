@@ -129,15 +129,32 @@ class Orders extends Connection
 
             // always computed: the ledger reads these below even on 0-payment
             // (credit / fully discounted) orders.
-            $gst = round($array['subTotal'] * ((!empty($array['gst']) ? $array['gst'] : 0) / 100));
-            $service_charges = round($array['subTotal'] * ((!empty($array['service_charges']) ? $array['service_charges'] : 0) / 100));
+            //
+            // TAX BASE: GST and service charges are levied on the DISCOUNTED value
+            // (subTotal - bill discount) — the same base the POS screen quotes and
+            // the cashier actually collects. Charging them on the gross subTotal
+            // instead over-billed every discounted sale by the tax on the discount,
+            // so the bill could never satisfy the paid-in-full test below (it stuck
+            // on status 8 "Partial Paid"), the customer's ledger kept a phantom
+            // receivable, and the printed invoice showed an amount still due.
+            // print/index.php and api/getSaleReport.php must use this same base.
+            $billDiscount = !empty($array['discount']) ? (float)$array['discount'] : 0;
+            $totals = billTotals(
+                $array['subTotal'],
+                $billDiscount,
+                !empty($array['gst']) ? $array['gst'] : 0,
+                !empty($array['service_charges']) ? $array['service_charges'] : 0
+            );
+            $taxableValue = $totals['taxable'];
+            $gst = $totals['gst'];
+            $service_charges = $totals['service_charges'];
 
             if ($array['status'] == 1) {
                 $status = 1; // parked
                 $parked = true;
             } else if (!empty($array['payment_amount'])) {
                 $status = 8;
-                if ((($array['subTotal'] + $gst + $service_charges) - $array['discount'] - $array['payment_amount']) == 0) {
+                if (($totals['net'] - $array['payment_amount']) == 0) {
                     $status = 2;
                 }
             }

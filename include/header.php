@@ -47,6 +47,7 @@ function mainHeader($params = null)
         <script src="<?php echo SITE_URL; ?>assets/vendor/chartjs-plugin-datalabels.min.js"></script>
         <script src="<?php echo SITE_URL; ?>assets/vendor/angular-sanitize.min.js"></script>
         <script type="text/javascript" src="<?php echo SITE_URL; ?>assets/js/ui-bootstrap-tpls-2.5.0.min.js"></script>
+        <script type="text/javascript" src="<?php echo SITE_URL; ?>assets/js/bill-calc.js"></script>
     </head>
     <script>
         var app = angular.module('mainApp', ['ui.bootstrap', 'daterangepicker', 'toaster', 'ui.select', 'ngSanitize']);
