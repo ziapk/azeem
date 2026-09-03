@@ -2126,6 +2126,115 @@ class DoubleEntry extends Connection
 		}
 	}
 
+	/**
+	 * Every transaction id this order has ever owned, oldest first — retired ones
+	 * (flag=2) included, so they are revived rather than left dead while a new id is
+	 * minted alongside them.
+	 *
+	 * Re-posting an edited order used to retire every transaction and insert brand-new
+	 * ones. Because the ledger is ordered by transaction id (`order by t.id desc`, and
+	 * `ORDER BY transaction_id` in the statement views), a fresh id sent the bill to the
+	 * top of the ledger no matter what date it carried — so an edited back-dated invoice
+	 * jumped out of its place in the flow, and the old rows were left behind with their
+	 * entries orphaned under them.
+	 *
+	 * Retired rows are deliberately in scope. An order that was parked had its ledger
+	 * wiped to flag=2; without them, un-parking it would mint new ids and move the bill
+	 * all over again. Claiming them in id order also means an order converges back on
+	 * the ids it started with — its original position — and consumes the dead rows
+	 * instead of adding to them. upsertTransaction() flips flag back to 1 as it claims
+	 * one, and anything left over is retired by the caller.
+	 */
+	public function getReusableTransactionIdsByOrderId($orderId)
+	{
+		$dbh = $this->connectionPool->getConnection();
+		try {
+			$stmt = "SELECT id FROM `{$this->table_transactions}` WHERE order_ref=:order_ref ORDER BY id ASC";
+			$prepare = $dbh->prepare($stmt);
+			$prepare->bindParam(':order_ref', $orderId, PDO::PARAM_STR);
+			$prepare->execute();
+			return $prepare->fetchAll(PDO::FETCH_COLUMN, 0);
+		} catch (PDOException $e) {
+			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
+		}
+	}
+
+	/**
+	 * Drop a transaction's ledger entries, keeping the transaction itself.
+	 *
+	 * A hard delete on purpose: these rows are replaced wholesale by the caller on
+	 * the next line, and the entry set legitimately changes shape between saves (the
+	 * discount, GST and service-charge entries exist only when non-zero, and a bill
+	 * flipping to credit loses its whole payment side), so there is nothing to match
+	 * up field by field.
+	 */
+	public function clearEntriesByTransactionId($transactionId)
+	{
+		$dbh = $this->connectionPool->getConnection();
+		try {
+			$stmt = "DELETE FROM `{$this->table_ledger_entries}` WHERE transaction_id=:transaction_id";
+			$prepare = $dbh->prepare($stmt);
+			$prepare->bindParam(':transaction_id', $transactionId, PDO::PARAM_INT);
+			$prepare->execute();
+			return $prepare->rowCount();
+		} catch (PDOException $e) {
+			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
+		}
+	}
+
+	/**
+	 * Re-post a transaction in place from a new payload: refresh its header, wipe its
+	 * entries and hand back the SAME id so the caller writes the new entries under
+	 * it. Falls back to a plain insert when there is no existing transaction to reuse
+	 * (a new order, or one coming back from park).
+	 */
+	public function upsertTransaction($existingId, $array)
+	{
+		if (empty($existingId)) {
+			return $this->makeTransaction($array);
+		}
+
+		$dbh = $this->connectionPool->getConnection();
+		try {
+			$stmt = "UPDATE `{$this->table_transactions}` SET `description`=:description, `reference`=:reference, `transaction_date`=:transaction_date, `transsaction_type`=:transaction_type, `flag`=1 WHERE id=:id";
+			$prepare = $dbh->prepare($stmt);
+			$prepare->bindParam(':description', $array['description'], PDO::PARAM_STR);
+			$prepare->bindParam(':reference', $array['reference'], PDO::PARAM_STR);
+			$prepare->bindParam(':transaction_date', $array['transaction_date'], PDO::PARAM_STR);
+			$prepare->bindParam(':transaction_type', $array['transaction_type'], PDO::PARAM_STR);
+			$prepare->bindParam(':id', $existingId, PDO::PARAM_INT);
+			$prepare->execute();
+		} catch (PDOException $e) {
+			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
+		}
+
+		$this->clearEntriesByTransactionId($existingId);
+		return $existingId;
+	}
+
+	/** Retire a transaction this order no longer needs (e.g. the bill went to credit). */
+	public function retireTransaction($id)
+	{
+		$dbh = $this->connectionPool->getConnection();
+		try {
+			$stmt = "UPDATE `{$this->table_transactions}` SET flag=2 WHERE id=:id";
+			$prepare = $dbh->prepare($stmt);
+			$prepare->bindParam(':id', $id, PDO::PARAM_INT);
+			$prepare->execute();
+			return $prepare->rowCount();
+		} catch (PDOException $e) {
+			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
+		}
+	}
+
 	// insert method
 	public function makeEntry($array)
 	{

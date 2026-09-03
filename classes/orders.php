@@ -322,8 +322,15 @@ class Orders extends Connection
                         }
                     }
 
-                    // delete transactions
-                    $doubleEntry->deleteTransactionByOrderId($orderDetail['order']['id']);
+                    // Only retire the ledger when the order is leaving the books.
+                    // A parked order has no ledger, so its transactions must go. For a
+                    // normal edit we deliberately leave them standing: the posting block
+                    // below UPDATES those same transaction rows from the new payload,
+                    // which keeps each bill's id — and so its place in the ledger, which
+                    // is ordered by transaction id — exactly where it was.
+                    if ($isBecomingParked) {
+                        $doubleEntry->deleteTransactionByOrderId($orderDetail['order']['id']);
+                    }
                 }
             }
             $order_id = $this->createOrder($data);
@@ -439,7 +446,16 @@ class Orders extends Connection
                         'supply_ref' => null,
                     ];
 
-                    $makeTransactionId = $doubleEntry->makeTransaction($makeTransaction);
+                    // Update the transactions this order already owns from the new
+                    // payload rather than minting new ids on every save.
+                    $existingTransactionIds = $doubleEntry->getReusableTransactionIdsByOrderId($order_id);
+                    $transactionSlot = 0;
+
+                    $makeTransactionId = $doubleEntry->upsertTransaction(
+                        isset($existingTransactionIds[$transactionSlot]) ? $existingTransactionIds[$transactionSlot] : null,
+                        $makeTransaction
+                    );
+                    $transactionSlot++;
 
                     // assets debit entry - credit
                     // assets receivable entry - debit
@@ -516,7 +532,11 @@ class Orders extends Connection
                     $a[] = $doubleEntry->makeEntry($entry);
 
                     if (!empty($cash)) {
-                        $makeTransactionId = $doubleEntry->makeTransaction($makeTransaction);
+                        $makeTransactionId = $doubleEntry->upsertTransaction(
+                            isset($existingTransactionIds[$transactionSlot]) ? $existingTransactionIds[$transactionSlot] : null,
+                            $makeTransaction
+                        );
+                        $transactionSlot++;
                         foreach ($array['payment_with'] as $value) {
                             if (!empty($value['amount'])) {
                                 // cash credit entry
@@ -545,6 +565,15 @@ class Orders extends Connection
                             }
                         }
                     }
+
+                    // Retire any transaction this order used to own but no longer needs —
+                    // a bill that was part-paid and is now pure credit posts one
+                    // transaction where it previously posted two, and the leftover would
+                    // otherwise keep its payment entries live and show the bill as paid.
+                    for ($i = $transactionSlot; $i < count($existingTransactionIds); $i++) {
+                        $doubleEntry->retireTransaction($existingTransactionIds[$i]);
+                    }
+
                     $newsletter = new Newsletter();
                     $send = $newsletter->send([
                         'subject' => "Order.#" . $orderDetail['order']['order_custom_id'] . " has been generated",
@@ -1230,21 +1259,33 @@ class Orders extends Connection
                 $toCondition .= " AND o.price = o.discount ";
             }
 
-            if ($params['orderType'] == 'linked') {
-                $toCondition .= " AND o.linked_shop = :shopId ";
-            } else {
-                $toCondition .= " AND o.shopId=:shopId ";
-            }
+            // The shop scope is kept OUT of $toCondition. Searching by bill number or
+            // customer name deliberately replaces the date/type filters — you are after
+            // one specific bill, not a range — but it used to assign over $toCondition
+            // and take ` AND o.shopId=:shopId ` with it. :shopId was still bound below,
+            // against a statement that no longer contained the placeholder, so every
+            // such search died with "Invalid parameter number: number of bound variables
+            // does not match number of tokens" instead of returning the bill.
+            $shopCondition = $params['orderType'] == 'linked'
+                ? " AND o.linked_shop = :shopId "
+                : " AND o.shopId=:shopId ";
+
             if (!empty($params['orderId'])) {
-                $toCondition = " AND o.order_custom_id='" . $params['orderId'] . "' ";
+                $toCondition = " AND o.order_custom_id = :orderId ";
             }
             if (!empty($params['customer_name'])) {
-                $toCondition = " AND o.customer_name != '' AND o.customer_name like '%" . $params['customer_name'] . "%' ";
+                $toCondition = " AND o.customer_name != '' AND o.customer_name LIKE :customerName ";
             }
 
-            $stmt = "SELECT o.*, full_name, account_id, is_default FROM `{$this->table}` AS o LEFT JOIN customers AS c ON c.id = o.customer_id WHERE ((o.flag = 1) or (o.flag = 2 and o.status IN (5,6,7))) " . $toCondition . ' ' . $flagCondition . ' ORDER BY id desc';
+            $stmt = "SELECT o.*, full_name, account_id, is_default FROM `{$this->table}` AS o LEFT JOIN customers AS c ON c.id = o.customer_id WHERE ((o.flag = 1) or (o.flag = 2 and o.status IN (5,6,7))) " . $toCondition . ' ' . $shopCondition . ' ' . $flagCondition . ' ORDER BY id desc';
             $prepare = $dbh->prepare($stmt);
             $prepare->bindParam(':shopId', $shopId, PDO::PARAM_STR);
+            if (!empty($params['orderId'])) {
+                $prepare->bindValue(':orderId', $params['orderId'], PDO::PARAM_STR);
+            }
+            if (!empty($params['customer_name'])) {
+                $prepare->bindValue(':customerName', '%' . $params['customer_name'] . '%', PDO::PARAM_STR);
+            }
             $prepare->execute();
             $result = $prepare->fetchAll(PDO::FETCH_ASSOC);
             $orderIds = [];
