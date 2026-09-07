@@ -461,9 +461,15 @@ if ($largeView) {
                         <?php
                         $totalDist = $order['order']['discount'];
                         foreach ($order['order_items'] as $item) {
+                            // Gross Total is the sum of the line Totals printed below, so it
+                            // has to add up on every return. It used to sit behind the
+                            // show_discount guard — and `return_orders` has no show_discount
+                            // column at all, so that test was never true and EVERY return
+                            // receipt printed "Gross Total 0" while each line showed its own
+                            // total. Only the discount tally stays behind the guard.
+                            $aprice += $item['quantity'] * ($item['price']);
                             if (!empty($order['order']['show_discount'])) {
                                 $totalDist += $item['discount'] * $item['quantity'];
-                                $aprice += $item['quantity'] * ($item['price']);
                             }
                         ?>
                             <tr style="border: 0">

@@ -488,9 +488,15 @@ if ($largeView) {
                     $totalDist = $order['order']['discount'];
                     foreach ($order['order_items'] as $item) {
                         if ($item['product_type'] != 5) {
+                            // Gross Total is the sum of the line Totals printed below, so it
+                            // has to add up on every bill. It used to be accumulated inside
+                            // the show_discount guard alongside $totalDist, so a bill with the
+                            // discount column switched off printed "Gross Total 0" while every
+                            // line still showed its own total. Only the discount tally belongs
+                            // behind the switch — that is what the switch is for.
+                            $aprice += $item['quantity'] * ($item['price']);
                             if (!empty($order['order']['show_discount'])) {
                                 $totalDist += $item['discount'] * $item['quantity'];
-                                $aprice += $item['quantity'] * ($item['price']);
                             }
                     ?>
                             <tr style="border: 0">
