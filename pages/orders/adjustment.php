@@ -267,6 +267,37 @@ echo mainFooter();
             select: false,
         })) || [];
 
+        // Hold an in-progress return across a reload or an accidental navigation, the
+        // way the POS cart does.
+        //
+        // Keyed PER ORDER: this screen is always scoped to one bill (?id=) or one
+        // existing return (?return=), so a single shared key would restore order A's
+        // draft on top of order B. Not 'shopping' either — that is the POS cart, whose
+        // rows carry a different shape. The ids are cast to int because they land in a
+        // JS string literal.
+        const RETURN_DRAFT_KEY = 'returnDraft:<?php echo !empty($return) ? 'r' . (int) $return : 'o' . (int) $id; ?>';
+        try {
+            const savedReturn = JSON.parse($window.sessionStorage.getItem(RETURN_DRAFT_KEY) || 'null');
+            if (Array.isArray(savedReturn) && savedReturn.length) {
+                $scope.items = savedReturn.map(row => ({
+                    ...row,
+                    qty: parseFloat(row.qty || 0),
+                    price: parseFloat(row.price || 0),
+                    pprice: parseFloat(row.pprice || 0),
+                    unpack_qty: parseFloat(row.unpack_qty || 0),
+                    pack_qty: parseFloat(row.pack_qty || 0),
+                    pack_size: parseFloat(row.pack_size || 0),
+                    discount: parseFloat(row.discount || 0),
+                    discount_value: parseFloat(row.discount_value || 0),
+                    discount_type: parseInt(row.discount_type) || 2,
+                }));
+            }
+        } catch (e) {
+            // unreadable draft (hand-edited, or written by an older build) — drop it
+            // rather than leaving the screen stuck on a parse error every load
+            $window.sessionStorage.removeItem(RETURN_DRAFT_KEY);
+        }
+
         $scope.list = [];
         $scope.priceList = [];
         $scope.customerData = {};
@@ -314,7 +345,9 @@ echo mainFooter();
             $scope.grandTotal = 0;
             $scope.discount = 0;
             $scope.supplier = null;
-
+            // this runs when the shop is switched, which starts the return over; leave
+            // the draft behind and it would reappear on the next reload
+            $window.sessionStorage.removeItem(RETURN_DRAFT_KEY);
         }
 
         $scope.addFreshProduct = function() {
@@ -591,6 +624,9 @@ echo mainFooter();
                     window.open("<?php echo SITE_URL; ?>print/return.php?&detail=true&largeView=large&id=" + response.data.order.id, "", "width=600,height=900");
                     $scope.items = $scope.list = [];
                     $scope.subTotal = $scope.discount = $scope.grandTotal = $scope.payment_amount = 0;
+                    // clear before the reload below, or the return that was just saved
+                    // would be restored as a fresh draft
+                    $window.sessionStorage.removeItem(RETURN_DRAFT_KEY);
                     alert(response.data.message);
                     $window.location.reload()
                 });
@@ -628,8 +664,12 @@ echo mainFooter();
             })
             $scope.subTotal = subtotal;
             $scope.grandTotal = $scope.subTotal - $scope.discount - $scope.givenDiscount;
-            console.log($scope.grandTotal)
             $scope.payment_amount = $scope.grandTotal;
+            try {
+                $window.sessionStorage.setItem(RETURN_DRAFT_KEY, JSON.stringify($scope.items));
+            } catch (e) {
+                // a full or disabled store must not take the totals down with it
+            }
         }
 
         $('body').on('keydown', 'input', function(e) {

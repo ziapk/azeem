@@ -168,6 +168,37 @@ echo mainFooter();
             qty: parseFloat(item.quantity || 0) - parseFloat(item.unpack_qty || 0),
             discount: parseFloat(item.discount)
         })) || [];
+
+        // Hold an unsaved supply across a reload or an accidental navigation, the way
+        // the POS cart does.
+        //
+        // Scoped to a NEW supply on purpose: with ?id= present the items above came
+        // from the server, and restoring a stale draft over them would silently edit
+        // the wrong order. The key is deliberately NOT 'shopping' — that is the POS
+        // cart, whose rows carry price/quantity where these carry pprice/qty, so
+        // sharing the key would feed each screen the other's rows.
+        const SUPPLY_CART_KEY = 'supplyCart';
+<?php if (empty($id)) { ?>
+        try {
+            const savedSupply = JSON.parse($window.sessionStorage.getItem(SUPPLY_CART_KEY) || 'null');
+            if (Array.isArray(savedSupply) && savedSupply.length) {
+                $scope.items = savedSupply.map(row => ({
+                    ...row,
+                    price: parseFloat(row.price || 0),
+                    pprice: parseFloat(row.pprice || 0),
+                    qty: parseFloat(row.qty || 0),
+                    pack_size: parseFloat(row.pack_size || 0),
+                    pack_qty: parseFloat(row.pack_qty || 0),
+                    unpack_qty: parseFloat(row.unpack_qty || 0),
+                    discount: parseFloat(row.discount || 0),
+                }));
+            }
+        } catch (e) {
+            // unreadable draft (hand-edited, or written by an older build) — drop it
+            // rather than leaving the screen stuck on a parse error every load
+            $window.sessionStorage.removeItem(SUPPLY_CART_KEY);
+        }
+<?php } ?>
         $scope.customerData = {};
 
         $scope.subTotal = $scope.orderData?.order?.price + $scope.orderData?.order?.discount || 0;
@@ -445,6 +476,12 @@ echo mainFooter();
                     $http.get(`<?php echo SITE_URL; ?>api/sync-product.php?product_ids=${ids.join(',')}`);
                     $scope.items = $scope.list = [];
                     $scope.subTotal = $scope.discount = $scope.grandTotal = $scope.payment_amount = $scope.payment_with_credit = 0;
+<?php if (empty($id)) { ?>
+                    // clear before the reload below, or the supply that was just saved
+                    // would be restored as a fresh draft. Guarded like the writes: saving
+                    // an EDIT must not throw away a new-supply draft held in this tab.
+                    $window.sessionStorage.removeItem(SUPPLY_CART_KEY);
+<?php } ?>
                     alert(response.data.message);
                     $window.location.reload()
                 });
@@ -485,6 +522,13 @@ echo mainFooter();
             }
             $scope.subTotal = subtotal;
             $scope.grandTotal = $scope.payment_amount = $scope.subTotal - $scope.discount;
+<?php if (empty($id)) { ?>
+            try {
+                $window.sessionStorage.setItem(SUPPLY_CART_KEY, JSON.stringify($scope.items));
+            } catch (e) {
+                // a full or disabled store must not take the totals down with it
+            }
+<?php } ?>
         }
 
         $scope.calculateSum(true);
