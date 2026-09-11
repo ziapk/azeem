@@ -2694,8 +2694,11 @@ class Orders extends Connection
         try {
             $shopId = (int) $shopId;
 
-            // Park / Cancelled / Deleted are not sales.
-            $statusCond = "AND o.status NOT IN (1, 3, 4)";
+            // Park / Cancelled / Deleted are not sales. Nor is a bill whose
+            // order-level discount wipes out its whole value -- those are stock
+            // write-offs ("Stock Out Adjustment") entered as zero-value bills.
+            $statusCond = "AND o.status NOT IN (1, 3, 4)
+                           AND NOT (o.price > 0 AND o.discount >= o.price)";
 
             $select = "";
             $group  = "";
@@ -2711,15 +2714,30 @@ class Orders extends Connection
                             COUNT(DISTINCT o.id)          AS orders,
                             COUNT(DISTINCT oi.product_id) AS products,
                             SUM(oi.quantity)              AS units,
-                            SUM((oi.price - oi.discount) * oi.quantity)                AS sale_value,
-                            SUM(COALESCE(p.pprice, 0) * oi.quantity)                   AS cost_value,
-                            SUM((oi.price - oi.discount - COALESCE(p.pprice, 0)) * oi.quantity) AS profit,
+                            SUM((oi.price - oi.discount) * oi.quantity * sub.keep_factor) AS sale_value,
+                            SUM(COALESCE(p.pprice, 0) * oi.quantity)                     AS cost_value,
+                            SUM((oi.price - oi.discount) * oi.quantity * sub.keep_factor
+                                - COALESCE(p.pprice, 0) * oi.quantity)                   AS profit,
                             SUM(CASE WHEN COALESCE(p.pprice, 0) = 0
                                      THEN (oi.price - oi.discount) * oi.quantity ELSE 0 END)    AS profit_without_cost,
                             SUM(CASE WHEN COALESCE(p.pprice, 0) = 0 THEN oi.quantity ELSE 0 END) AS units_without_cost
                      FROM `{$this->table}` o
                      JOIN `{$this->table_sub}` oi ON oi.order_id = o.id
                      JOIN `{$this->table_pro}` p  ON p.id = oi.product_id AND p.is_stock_item = 1
+                     JOIN (
+                         SELECT o2.id AS order_id,
+                                CASE WHEN s2.subtotal > 0
+                                     THEN GREATEST(0, 1 - (o2.discount / s2.subtotal))
+                                     ELSE 1 END AS keep_factor
+                         FROM `{$this->table}` o2
+                         JOIN (
+                             SELECT oi2.order_id, SUM((oi2.price - oi2.discount) * oi2.quantity) AS subtotal
+                             FROM `{$this->table_sub}` oi2
+                             GROUP BY oi2.order_id
+                         ) s2 ON s2.order_id = o2.id
+                         WHERE o2.shopId = :shopId2
+                           AND DATE(o2.order_date) BETWEEN :fromDate2 AND :toDate2
+                     ) sub ON sub.order_id = o.id
                      " . ($groupBy === 'publisher' ? "LEFT JOIN `{$this->table_publisher}` pub ON pub.id = p.publisher_id" : "") . "
                      " . ($groupBy === 'customer'  ? "LEFT JOIN `{$this->table_customers}` c ON c.id = o.customer_id" : "") . "
                      WHERE o.shopId = :shopId
@@ -2737,8 +2755,11 @@ class Orders extends Connection
 
             $prepare = $dbh->prepare($stmt);
             $prepare->bindParam(':shopId', $shopId, PDO::PARAM_INT);
+            $prepare->bindParam(':shopId2', $shopId, PDO::PARAM_INT);
             $prepare->bindParam(':fromDate', $from, PDO::PARAM_STR);
             $prepare->bindParam(':toDate', $to, PDO::PARAM_STR);
+            $prepare->bindParam(':fromDate2', $from, PDO::PARAM_STR);
+            $prepare->bindParam(':toDate2', $to, PDO::PARAM_STR);
             $prepare->execute();
 
             if ($groupBy === '') {
@@ -2810,6 +2831,7 @@ class Orders extends Connection
                      WHERE o.shopId = :shopId
                        AND o.flag = 1
                        AND o.status NOT IN (1, 3, 4)
+                       AND NOT (o.price > 0 AND o.discount >= o.price)
                        AND DATE(o.order_date) BETWEEN :fromDate AND :toDate";
             $prepare = $dbh->prepare($stmt);
             $prepare->bindParam(':shopId', $shopId, PDO::PARAM_INT);
@@ -2851,6 +2873,7 @@ class Orders extends Connection
                      WHERE o.shopId = :shopId
                        AND o.flag = 1
                        AND o.status NOT IN (1, 3, 4)
+                       AND NOT (o.price > 0 AND o.discount >= o.price)
                        AND DATE(o.order_date) BETWEEN :fromDate AND :toDate
                      GROUP BY oi.product_id, p.full_name, p.code, p.price, p.pprice
                      HAVING profit < 0
@@ -2862,6 +2885,68 @@ class Orders extends Connection
             $prepare->bindParam(':toDate', $to, PDO::PARAM_STR);
             $prepare->execute();
             return $prepare->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            die("Error!: " . $e->getMessage() . "<br/>");
+        } finally {
+            $this->connectionPool->releaseConnection($dbh);
+        }
+    }
+
+    /**
+     * Bills whose order-level discount cancels their whole value -- stock
+     * write-offs entered as zero-value orders ("Stock Out Adjustment").
+     *
+     * They are not sales, so they are kept out of the margin, but the stock did
+     * leave the shop, so their cost is reported on its own.
+     */
+    public function getWriteOffSummary($shopId, $from, $to, $limit = 15)
+    {
+        $dbh = $this->connectionPool->getConnection();
+        try {
+            $shopId = (int) $shopId;
+            $limit  = (int) $limit;
+
+            $where = "o.shopId = :shopId
+                      AND o.flag = 1
+                      AND o.status NOT IN (1, 3, 4)
+                      AND o.price > 0 AND o.discount >= o.price
+                      AND DATE(o.order_date) BETWEEN :fromDate AND :toDate";
+
+            $stmt = "SELECT COUNT(DISTINCT o.id) AS orders,
+                            SUM(oi.quantity)     AS units,
+                            SUM(oi.price * oi.quantity)              AS gross_value,
+                            SUM(COALESCE(p.pprice, 0) * oi.quantity) AS cost_value
+                     FROM `{$this->table}` o
+                     JOIN `{$this->table_sub}` oi ON oi.order_id = o.id
+                     JOIN `{$this->table_pro}` p  ON p.id = oi.product_id AND p.is_stock_item = 1
+                     WHERE $where";
+            $prepare = $dbh->prepare($stmt);
+            $prepare->bindParam(':shopId', $shopId, PDO::PARAM_INT);
+            $prepare->bindParam(':fromDate', $from, PDO::PARAM_STR);
+            $prepare->bindParam(':toDate', $to, PDO::PARAM_STR);
+            $prepare->execute();
+            $totals = $prepare->fetch(PDO::FETCH_ASSOC);
+            $totals = $totals ?: ['orders' => 0, 'units' => 0, 'gross_value' => 0, 'cost_value' => 0];
+
+            $stmt = "SELECT o.id AS order_id, o.order_date,
+                            COALESCE(NULLIF(o.customer_name,''), 'Unnamed') AS reason,
+                            SUM(oi.quantity) AS units,
+                            SUM(oi.price * oi.quantity)              AS gross_value,
+                            SUM(COALESCE(p.pprice, 0) * oi.quantity) AS cost_value
+                     FROM `{$this->table}` o
+                     JOIN `{$this->table_sub}` oi ON oi.order_id = o.id
+                     JOIN `{$this->table_pro}` p  ON p.id = oi.product_id AND p.is_stock_item = 1
+                     WHERE $where
+                     GROUP BY o.id, o.order_date, reason
+                     ORDER BY cost_value DESC
+                     LIMIT $limit";
+            $prepare = $dbh->prepare($stmt);
+            $prepare->bindParam(':shopId', $shopId, PDO::PARAM_INT);
+            $prepare->bindParam(':fromDate', $from, PDO::PARAM_STR);
+            $prepare->bindParam(':toDate', $to, PDO::PARAM_STR);
+            $prepare->execute();
+
+            return ['totals' => $totals, 'rows' => $prepare->fetchAll(PDO::FETCH_ASSOC)];
         } catch (PDOException $e) {
             die("Error!: " . $e->getMessage() . "<br/>");
         } finally {

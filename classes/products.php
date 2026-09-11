@@ -2295,6 +2295,7 @@ class Products extends Connection
 			         WHERE o.shopId = :shopId
 			           AND o.flag = 1
 			           AND o.status NOT IN (1, 3, 4)
+			           AND NOT (o.price > 0 AND o.discount >= o.price)
 			           AND DATE(o.order_date) BETWEEN :fromDate AND :toDate
 			         GROUP BY oi.product_id, p.full_name, p.code, p.price, p.pprice
 			         HAVING profit < 0

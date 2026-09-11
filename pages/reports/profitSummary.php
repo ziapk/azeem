@@ -354,6 +354,54 @@ foreach ($breakdowns as $heading => $bd) {
 	</table>
 <?php } ?>
 
+<?php if (!empty($writeOffs['rows'])) { ?>
+	<h3>Stock Write-offs <small style="font-weight: normal">&mdash; zero-value bills, excluded from the profit above</small></h3>
+	<p style="font-size:9.5pt; margin:0 0 8px">
+		These bills were fully discounted to nothing, so no sale took place &mdash;
+		they are stock being written out of the system. They are kept out of the
+		sales margin, but the goods did leave the shop, so their cost is shown here.
+		<?php echo $money($writeOffs['totals']['orders']); ?> bill(s),
+		<?php echo $money($writeOffs['totals']['units']); ?> units,
+		<strong><?php echo $money($writeOffs['totals']['cost_value']); ?></strong> at cost.
+	</p>
+	<table class="brk">
+		<thead>
+			<tr>
+				<th class="l">#</th>
+				<th class="l">Bill</th>
+				<th class="l">Reason / Customer</th>
+				<th>Date</th>
+				<th>Units</th>
+				<th>Value at Sale Price</th>
+				<th>Cost</th>
+			</tr>
+		</thead>
+		<tbody>
+			<?php $i = 1;
+			foreach ($writeOffs['rows'] as $r) { ?>
+				<tr>
+					<td class="l"><?php echo $i; ?></td>
+					<td class="l">#<?php echo $r['order_id']; ?></td>
+					<td class="l"><?php echo htmlspecialchars($r['reason']); ?></td>
+					<td><?php echo date('d-m-Y', strtotime($r['order_date'])); ?></td>
+					<td><?php echo $money($r['units']); ?></td>
+					<td><?php echo $money($r['gross_value']); ?></td>
+					<td><?php echo $money($r['cost_value']); ?></td>
+				</tr>
+			<?php $i++;
+			} ?>
+		</tbody>
+		<tfoot>
+			<tr>
+				<th class="l" colspan="4">Total (all write-offs in period)</th>
+				<td><?php echo $money($writeOffs['totals']['units']); ?></td>
+				<td><?php echo $money($writeOffs['totals']['gross_value']); ?></td>
+				<td><?php echo $money($writeOffs['totals']['cost_value']); ?></td>
+			</tr>
+		</tfoot>
+	</table>
+<?php } ?>
+
 <?php if (!empty($lossMakers)) { ?>
 	<h3 style="color:#a00">Needs Attention &mdash; Sold Below Cost</h3>
 	<p style="font-size:9.5pt; margin:0 0 8px">
