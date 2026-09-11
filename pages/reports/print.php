@@ -325,6 +325,20 @@ switch ($reportType) {
 			'expense_root_ids' => [$storeAcc['expense']],
 		]);
 
+		// Balances are cumulative, so these reach back before the date range.
+		$receivables = $de->getPartyBalances([
+			'shopId'    => $shopId,
+			'parent_id' => $storeAcc['receivable'],
+			'fromDate'  => $from,
+			'toDate'    => $to,
+		]);
+		$payables = $de->getPartyBalances([
+			'shopId'    => $shopId,
+			'parent_id' => $storeAcc['payable'],
+			'fromDate'  => $from,
+			'toDate'    => $to,
+		]);
+
 		$cashMovement = $de->getCashMovementSummary([
 			'shopId'        => $shopId,
 			'fromDate'      => $from,

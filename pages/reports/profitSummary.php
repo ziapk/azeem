@@ -41,6 +41,9 @@ $netProfit = $netSalesProfit - $totalExpenses;
 $noCostUnits = (float) $margin['units_without_cost'];
 $noCostValue = (float) $margin['profit_without_cost'];
 
+// Balances are stated as at the end of the period, not for the period.
+$closingAsAt = date('d-m-Y', strtotime($to));
+
 ob_start();
 ?>
 <style>
@@ -352,6 +355,108 @@ foreach ($breakdowns as $heading => $bd) {
 			</tr>
 		</tfoot>
 	</table>
+<?php } ?>
+
+<?php
+// Receivable / payable summaries. Payables are held credit-positive, so the
+// stored debit-positive figures are flipped for display.
+$balanceBlocks = [
+	[
+		'heading'  => 'Receivable Summary &mdash; Customers',
+		'party'    => 'Customer',
+		'rows'     => $receivables,
+		'sign'     => 1,
+		'up'       => 'Billed in Period',
+		'down'     => 'Received in Period',
+		'owed'     => 'owed to the shop',
+	],
+	[
+		'heading'  => 'Payable Summary &mdash; Suppliers',
+		'party'    => 'Supplier',
+		'rows'     => $payables,
+		'sign'     => -1,
+		'up'       => 'Purchased in Period',
+		'down'     => 'Paid in Period',
+		'owed'     => 'owed by the shop',
+	],
+];
+
+foreach ($balanceBlocks as $b) {
+	if (empty($b['rows'])) {
+		continue;
+	}
+
+	$sign = $b['sign'];
+	// Totals cover every party; the table itself shows the largest balances.
+	$tOpening = $tUp = $tDown = $tClosing = 0;
+	foreach ($b['rows'] as $r) {
+		$tOpening += $sign * $r['opening'];
+		$tUp      += $sign > 0 ? $r['period_debit']  : $r['period_credit'];
+		$tDown    += $sign > 0 ? $r['period_credit'] : $r['period_debit'];
+		$tClosing += $sign * $r['closing'];
+	}
+
+	$shown = $b['rows'];
+	usort($shown, function ($x, $y) use ($sign) {
+		return abs($sign * $y['closing']) <=> abs($sign * $x['closing']);
+	});
+	$shown = array_slice($shown, 0, 25);
+	?>
+	<h3><?php echo $b['heading']; ?>
+		<small style="font-weight: normal">
+			&mdash; balance <?php echo $b['owed']; ?> as at <?php echo $closingAsAt; ?>;
+			top <?php echo count($shown); ?> of <?php echo count($b['rows']); ?>
+		</small>
+	</h3>
+	<table class="brk">
+		<thead>
+			<tr>
+				<th class="l">#</th>
+				<th class="l"><?php echo $b['party']; ?></th>
+				<th>Opening Balance</th>
+				<th><?php echo $b['up']; ?></th>
+				<th><?php echo $b['down']; ?></th>
+				<th>Closing Balance</th>
+			</tr>
+		</thead>
+		<tbody>
+			<?php $i = 1;
+			foreach ($shown as $r) {
+				$opening = $sign * $r['opening'];
+				$up      = $sign > 0 ? $r['period_debit']  : $r['period_credit'];
+				$down    = $sign > 0 ? $r['period_credit'] : $r['period_debit'];
+				$closing = $sign * $r['closing']; ?>
+				<tr>
+					<td class="l"><?php echo $i; ?></td>
+					<td class="l"><?php echo htmlspecialchars($r['title']); ?></td>
+					<td class="<?php echo $opening < 0 ? 'loss' : ''; ?>">
+						<?php echo $opening < 0 ? $neg($opening) : $money($opening); ?>
+					</td>
+					<td><?php echo $money($up); ?></td>
+					<td><?php echo $money($down); ?></td>
+					<td class="<?php echo $closing < 0 ? 'loss' : ''; ?>">
+						<strong><?php echo $closing < 0 ? $neg($closing) : $money($closing); ?></strong>
+					</td>
+				</tr>
+			<?php $i++;
+			} ?>
+		</tbody>
+		<tfoot>
+			<tr>
+				<th class="l" colspan="2">Total &mdash; all <?php echo count($b['rows']); ?> parties</th>
+				<td><?php echo $tOpening < 0 ? $neg($tOpening) : $money($tOpening); ?></td>
+				<td><?php echo $money($tUp); ?></td>
+				<td><?php echo $money($tDown); ?></td>
+				<td><?php echo $tClosing < 0 ? $neg($tClosing) : $money($tClosing); ?></td>
+			</tr>
+		</tfoot>
+	</table>
+	<p style="font-size:9pt; margin:4px 0 0">
+		A bracketed figure is the reverse of the usual direction &mdash;
+		<?php echo $sign > 0
+			? 'an advance held from a customer rather than money they owe.'
+			: 'an overpayment sitting with a supplier rather than money the shop owes.'; ?>
+	</p>
 <?php } ?>
 
 <?php if (!empty($writeOffs['rows'])) { ?>

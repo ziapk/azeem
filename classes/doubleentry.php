@@ -2511,4 +2511,84 @@ class DoubleEntry extends Connection
 			$this->connectionPool->releaseConnection($dbh);
 		}
 	}
+
+	/**
+	 * Receivable / payable balances per party (customer or supplier).
+	 *
+	 * A balance is cumulative by nature, so the opening column reaches back
+	 * before the report's date range -- the period columns show only what moved
+	 * inside it. Amounts are returned debit-positive; the caller flips the sign
+	 * for payables, where a credit balance is what the shop owes.
+	 *
+	 * $parentId is the shop's `receivable` or `payable` account.
+	 */
+	public function getPartyBalances($array)
+	{
+		$dbh = $this->connectionPool->getConnection();
+		try {
+			$shopId   = (int) $array['shopId'];
+			$parentId = (int) $array['parent_id'];
+			$from     = $array['fromDate'];
+			$to       = $array['toDate'];
+
+			$stmt = "SELECT a.id AS account_id,
+			                a.code,
+			                a.title,
+			                SUM(CASE WHEN DATE(t.transaction_date) < :fromA
+			                         THEN (CASE WHEN e.entry_type = 'D' THEN e.amount ELSE -e.amount END)
+			                         ELSE 0 END) AS opening,
+			                SUM(CASE WHEN DATE(t.transaction_date) BETWEEN :fromB AND :toB
+			                          AND e.entry_type = 'D' THEN e.amount ELSE 0 END) AS period_debit,
+			                SUM(CASE WHEN DATE(t.transaction_date) BETWEEN :fromC AND :toC
+			                          AND e.entry_type = 'C' THEN e.amount ELSE 0 END) AS period_credit
+			         FROM `$this->table_transactions` t
+			         JOIN `$this->table_ledger_entries` e ON e.transaction_id = t.id
+			         JOIN `$this->table` a ON a.id = e.account_id AND a.status = 1
+			         WHERE t.flag = 1
+			           AND t.shopId = :shopId
+			           AND a.parent_id = :parentId
+			           AND DATE(t.transaction_date) <= :toD
+			         GROUP BY a.id, a.code, a.title";
+
+			$prepare = $dbh->prepare($stmt);
+			$prepare->bindParam(':shopId', $shopId, PDO::PARAM_INT);
+			$prepare->bindParam(':parentId', $parentId, PDO::PARAM_INT);
+			foreach (['fromA', 'fromB', 'fromC'] as $k) {
+				$prepare->bindParam(':' . $k, $from, PDO::PARAM_STR);
+			}
+			foreach (['toB', 'toC', 'toD'] as $k) {
+				$prepare->bindParam(':' . $k, $to, PDO::PARAM_STR);
+			}
+			$prepare->execute();
+
+			$rows = [];
+			foreach ($prepare->fetchAll(PDO::FETCH_ASSOC) as $r) {
+				$opening = (float) $r['opening'];
+				$debit   = (float) $r['period_debit'];
+				$credit  = (float) $r['period_credit'];
+				$closing = $opening + $debit - $credit;
+
+				// A party with no balance and no movement is just noise.
+				if (round($opening, 2) == 0 && round($debit, 2) == 0
+					&& round($credit, 2) == 0 && round($closing, 2) == 0) {
+					continue;
+				}
+
+				$rows[] = [
+					'account_id'    => (int) $r['account_id'],
+					'code'          => $r['code'],
+					'title'         => $r['title'],
+					'opening'       => $opening,
+					'period_debit'  => $debit,
+					'period_credit' => $credit,
+					'closing'       => $closing,
+				];
+			}
+			return $rows;
+		} catch (PDOException $e) {
+			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
+		}
+	}
 }
