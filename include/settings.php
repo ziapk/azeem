@@ -270,6 +270,7 @@ $reportsArray = [
     23 => ['id' => 23, 'title' => 'Adjustment Records', 'access' => ['owner', 'manager']],
     24 => ['id' => 24, 'title' => 'Product Audit (Ledger)', 'access' => ['owner', 'manager']],
     25 => ['id' => 25, 'title' => 'Product Purchase / Sale Ledger', 'access' => ['owner', 'manager']],
+    26 => ['id' => 26, 'title' => 'Profit Summary (Informal)', 'access' => ['owner', 'manager']],
 ];
 
 $categories = [
@@ -280,6 +281,7 @@ $categories = [
     'Returns' => [4, 5, 6, 7],       // Report IDs belonging to Sales
     'Sample' => [19,20],            // Report IDs belonging to Audit
     'Audit' => [10, 21, 24, 25],            // Report IDs belonging to Audit
+    'Profit' => [26],                       // Informal, item-margin based
     'Accounting' => [11, 12, 13, 14, 15, 22, 23],            // Report IDs belonging to Audit
 ];
 

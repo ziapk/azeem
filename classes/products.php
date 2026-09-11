@@ -1890,4 +1890,491 @@ class Products extends Connection
 		}
 	}
 
+	/**
+	 * Value the shop's stock as at the end of $asOfDate.
+	 *
+	 * store_products.qty is only a *current* snapshot, so the quantity on a past
+	 * date is rebuilt by unwinding every inventory_ledger movement recorded after
+	 * that date. Valuation is at products.pprice (purchase price).
+	 *
+	 * A negative on-hand quantity means the stock record is wrong but the sale
+	 * that drove it is real: the goods left the shop. Those units are therefore
+	 * carried at their signed (negative) value, which pushes their cost into
+	 * COGS -- i.e. they are treated as sold. Pass $options['negative'] =
+	 * 'exclude' to drop them from the valuation instead. Either way the negative
+	 * component is reported separately so its size stays visible.
+	 */
+	public function getStockValuation($shopId, $asOfDate = null, $options = [])
+	{
+		$dbh = $this->connectionPool->getConnection();
+		try {
+			$shopId       = (int) $shopId;
+			$asOfDate     = !empty($asOfDate) ? $asOfDate : date('Y-m-d');
+			$negativeMode = !empty($options['negative']) ? $options['negative'] : 'include';
+			$unwindSql    = "";
+
+			// No ledger unwind needed when valuing as of today or later.
+			$needsUnwind = $asOfDate < date('Y-m-d');
+			if ($needsUnwind) {
+				// Compare against a plain timestamp rather than DATE(created_at),
+				// so the idx_created_at index is usable.
+				$afterTs   = date('Y-m-d 00:00:00', strtotime($asOfDate . ' +1 day'));
+				$unwindSql = "LEFT JOIN (
+						SELECT product_id, SUM(quantity) AS after_qty
+						FROM `inventory_ledger`
+						WHERE shop_id = :shopIdIl AND created_at >= :afterTs
+						GROUP BY product_id
+					) mv ON mv.product_id = sp.product_id";
+			}
+
+			$qtyExpr = $needsUnwind ? "(sp.qty - COALESCE(mv.after_qty, 0))" : "sp.qty";
+
+			$stmt = "SELECT sp.product_id,
+			                p.full_name,
+			                p.code,
+			                p.is_stock_item,
+			                $qtyExpr AS qty_as_of,
+			                COALESCE(p.pprice, 0) AS pprice
+			         FROM `$this->table_st` sp
+			         JOIN `$this->table` p ON p.id = sp.product_id
+			         $unwindSql
+			         WHERE sp.shopId = :shopId";
+
+			$prepare = $dbh->prepare($stmt);
+			$prepare->bindParam(':shopId', $shopId, PDO::PARAM_INT);
+			if ($needsUnwind) {
+				$prepare->bindParam(':shopIdIl', $shopId, PDO::PARAM_INT);
+				$prepare->bindParam(':afterTs', $afterTs, PDO::PARAM_STR);
+			}
+			$prepare->execute();
+			$rows = $prepare->fetchAll(PDO::FETCH_ASSOC);
+
+			$result = [
+				'as_of'            => $asOfDate,
+				'negative_mode'    => $negativeMode,
+				'value'            => 0.0,
+				'units'            => 0.0,
+				'products_counted' => 0,
+				// Stock held on hand, i.e. the valuation ignoring any shortfall.
+				'positive'         => ['products' => 0, 'units' => 0.0, 'value' => 0.0],
+				// Shortfall: sold-but-never-stocked units, carried as negatives.
+				'negative'         => ['products' => 0, 'units' => 0.0, 'value' => 0.0],
+				'unpriced'         => ['products' => 0, 'units' => 0.0],
+				// Amount-entry / service rows: never stock, whatever their qty says.
+				'non_stock'        => ['products' => 0, 'units' => 0.0],
+				'non_stock_items'  => [],
+				'shortfall_items'  => [],
+			];
+
+			foreach ($rows as $r) {
+				$qty    = (float) $r['qty_as_of'];
+				$pprice = (float) $r['pprice'];
+
+				if ($qty == 0) {
+					continue;
+				}
+
+				// These rows carry a rupee amount in `quantity`, not a unit count,
+				// so valuing them as stock invents inventory that never existed.
+				if (isset($r['is_stock_item']) && (int) $r['is_stock_item'] === 0) {
+					$result['non_stock']['products']++;
+					$result['non_stock']['units'] += $qty;
+					$result['non_stock_items'][] = [
+						'product_id' => $r['product_id'],
+						'full_name'  => $r['full_name'],
+						'qty'        => $qty,
+					];
+					continue;
+				}
+
+				if ($pprice <= 0) {
+					$result['unpriced']['products']++;
+					$result['unpriced']['units'] += $qty;
+					continue;
+				}
+
+				$value = $qty * $pprice;
+
+				if ($qty < 0) {
+					$result['negative']['products']++;
+					$result['negative']['units'] += $qty;
+					$result['negative']['value'] += $value;
+					$result['shortfall_items'][] = [
+						'product_id' => $r['product_id'],
+						'full_name'  => $r['full_name'],
+						'code'       => $r['code'],
+						'qty'        => $qty,
+						'pprice'     => $pprice,
+						'value'      => $value,
+					];
+					// 'include' keeps the shortfall in the valuation, so its cost
+					// lands in COGS -- those units were sold, not held.
+					if ($negativeMode === 'exclude') {
+						continue;
+					}
+				} else {
+					$result['positive']['products']++;
+					$result['positive']['units'] += $qty;
+					$result['positive']['value'] += $value;
+				}
+
+				$result['value'] += $value;
+				$result['units'] += $qty;
+				$result['products_counted']++;
+			}
+
+			// Largest shortfalls first, so the report can show the few that matter.
+			usort($result['shortfall_items'], function ($a, $b) {
+				return $a['value'] <=> $b['value'];
+			});
+
+			return $result;
+		} catch (PDOException $e) {
+			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
+		}
+	}
+
+	/**
+	 * Per-product sale / purchase activity for a set of products in a period.
+	 *
+	 * Units come from inventory_ledger because that is what actually drove the
+	 * stock position; money comes from the source documents.
+	 */
+	public function getProductActivity($shopId, $from, $to, $productIds)
+	{
+		$productIds = array_values(array_unique(array_map('intval', (array) $productIds)));
+		if (empty($productIds)) {
+			return [];
+		}
+
+		$dbh = $this->connectionPool->getConnection();
+		try {
+			$shopId = (int) $shopId;
+			$in     = implode(',', $productIds);
+			$toTs   = date('Y-m-d 23:59:59', strtotime($to));
+			$fromTs = date('Y-m-d 00:00:00', strtotime($from));
+
+			$out = [];
+			foreach ($productIds as $pid) {
+				$out[$pid] = [
+					'sale_units'      => 0.0,
+					'purchase_units'  => 0.0,
+					'return_in_units' => 0.0,
+					'sale_amount'     => 0.0,
+					'purchase_amount' => 0.0,
+				];
+			}
+
+			// Units, straight from the stock ledger.
+			$stmt = "SELECT product_id, movement_type, SUM(quantity) AS units
+			         FROM `inventory_ledger`
+			         WHERE shop_id = :shopId
+			           AND product_id IN ($in)
+			           AND created_at BETWEEN :fromTs AND :toTs
+			         GROUP BY product_id, movement_type";
+			$prepare = $dbh->prepare($stmt);
+			$prepare->bindParam(':shopId', $shopId, PDO::PARAM_INT);
+			$prepare->bindParam(':fromTs', $fromTs, PDO::PARAM_STR);
+			$prepare->bindParam(':toTs', $toTs, PDO::PARAM_STR);
+			$prepare->execute();
+			foreach ($prepare->fetchAll(PDO::FETCH_ASSOC) as $r) {
+				$pid   = (int) $r['product_id'];
+				$units = (float) $r['units'];
+				if ($r['movement_type'] === 'SALE') {
+					$out[$pid]['sale_units'] += abs($units);
+				} elseif ($r['movement_type'] === 'SUPPLY') {
+					$out[$pid]['purchase_units'] += $units;
+				} elseif ($r['movement_type'] === 'RETURN_IN') {
+					$out[$pid]['return_in_units'] += $units;
+				}
+			}
+
+			// Sale value from the order lines.
+			$stmt = "SELECT oi.product_id, SUM(oi.quantity * oi.price) AS amount
+			         FROM `order_items` oi
+			         JOIN `orders` o ON o.id = oi.order_id
+			         WHERE o.shopId = :shopId
+			           AND o.flag = 1
+			           AND oi.product_id IN ($in)
+			           AND DATE(o.order_date) BETWEEN :fromDate AND :toDate
+			         GROUP BY oi.product_id";
+			$prepare = $dbh->prepare($stmt);
+			$prepare->bindParam(':shopId', $shopId, PDO::PARAM_INT);
+			$prepare->bindParam(':fromDate', $from, PDO::PARAM_STR);
+			$prepare->bindParam(':toDate', $to, PDO::PARAM_STR);
+			$prepare->execute();
+			foreach ($prepare->fetchAll(PDO::FETCH_ASSOC) as $r) {
+				$out[(int) $r['product_id']]['sale_amount'] = (float) $r['amount'];
+			}
+
+			// Purchase value from the supply lines.
+			$stmt = "SELECT si.product_id, SUM(si.quantity * si.pprice) AS amount
+			         FROM `supply_items` si
+			         JOIN `supply` s ON s.id = si.supply_id
+			         WHERE s.shopId = :shopId
+			           AND s.flag = 1
+			           AND si.product_id IN ($in)
+			           AND DATE(s.supply_date) BETWEEN :fromDate AND :toDate
+			         GROUP BY si.product_id";
+			$prepare = $dbh->prepare($stmt);
+			$prepare->bindParam(':shopId', $shopId, PDO::PARAM_INT);
+			$prepare->bindParam(':fromDate', $from, PDO::PARAM_STR);
+			$prepare->bindParam(':toDate', $to, PDO::PARAM_STR);
+			$prepare->execute();
+			foreach ($prepare->fetchAll(PDO::FETCH_ASSOC) as $r) {
+				$out[(int) $r['product_id']]['purchase_amount'] = (float) $r['amount'];
+			}
+
+			return $out;
+		} catch (PDOException $e) {
+			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
+		}
+	}
+
+	/**
+	 * Products whose negative on-hand stock distorts the P&L, ranked by how much
+	 * cost they push into (or pull out of) COGS, with their sale/purchase
+	 * activity attached so the cause is visible.
+	 */
+	public function getStockAttentionRows($openingStock, $closingStock, $shopId, $from, $to, $limit = 20)
+	{
+		$index = function ($sv) {
+			$m = [];
+			foreach ($sv['shortfall_items'] as $i) {
+				$m[(int) $i['product_id']] = $i;
+			}
+			return $m;
+		};
+		$open  = $index($openingStock);
+		$close = $index($closingStock);
+
+		$rows = [];
+		foreach (array_unique(array_merge(array_keys($open), array_keys($close))) as $pid) {
+			$o = isset($open[$pid])  ? $open[$pid]  : null;
+			$c = isset($close[$pid]) ? $close[$pid] : null;
+			$openValue  = $o ? (float) $o['value'] : 0.0;
+			$closeValue = $c ? (float) $c['value'] : 0.0;
+
+			$rows[] = [
+				'product_id'  => $pid,
+				'full_name'   => $c ? $c['full_name'] : $o['full_name'],
+				'code'        => $c ? $c['code'] : $o['code'],
+				'pprice'      => $c ? $c['pprice'] : $o['pprice'],
+				'opening_qty' => $o ? (float) $o['qty'] : 0.0,
+				'closing_qty' => $c ? (float) $c['qty'] : 0.0,
+				// Opening shortfall minus closing shortfall = charge to COGS.
+				'cogs_effect' => $openValue - $closeValue,
+			];
+		}
+
+		usort($rows, function ($a, $b) {
+			return abs($b['cogs_effect']) <=> abs($a['cogs_effect']);
+		});
+
+		$total = count($rows);
+		$rows  = array_slice($rows, 0, $limit);
+
+		$activity = $this->getProductActivity($shopId, $from, $to, array_column($rows, 'product_id'));
+		foreach ($rows as $k => $r) {
+			$rows[$k] = array_merge($r, $activity[$r['product_id']]);
+		}
+
+		return ['rows' => $rows, 'total' => $total, 'shown' => count($rows)];
+	}
+
+	/**
+	 * Products whose sales in the period are not backed by purchases in the same
+	 * period. Uses only in-range movement -- no opening position, no prior data.
+	 *
+	 * On a purchases-basis trading account this does not change any figure; it is
+	 * the operational list of stock that went out without a supply entry.
+	 */
+	public function getUnbackedSalesRows($shopId, $from, $to, $limit = 20)
+	{
+		$dbh = $this->connectionPool->getConnection();
+		try {
+			$shopId = (int) $shopId;
+			$fromTs = date('Y-m-d 00:00:00', strtotime($from));
+			$toTs   = date('Y-m-d 23:59:59', strtotime($to));
+
+			$stmt = "SELECT il.product_id,
+			                p.full_name,
+			                p.code,
+			                COALESCE(p.pprice, 0) AS pprice,
+			                SUM(CASE WHEN il.movement_type = 'SALE'      THEN -il.quantity ELSE 0 END) AS sale_units,
+			                SUM(CASE WHEN il.movement_type = 'SUPPLY'    THEN  il.quantity ELSE 0 END) AS purchase_units,
+			                SUM(CASE WHEN il.movement_type = 'RETURN_IN' THEN  il.quantity ELSE 0 END) AS return_in_units
+			         FROM `inventory_ledger` il
+			         JOIN `$this->table` p ON p.id = il.product_id AND p.is_stock_item = 1
+			         WHERE il.shop_id = :shopId
+			           AND il.created_at BETWEEN :fromTs AND :toTs
+			         GROUP BY il.product_id, p.full_name, p.code, p.pprice
+			         HAVING sale_units > (purchase_units + return_in_units)";
+
+			$prepare = $dbh->prepare($stmt);
+			$prepare->bindParam(':shopId', $shopId, PDO::PARAM_INT);
+			$prepare->bindParam(':fromTs', $fromTs, PDO::PARAM_STR);
+			$prepare->bindParam(':toTs', $toTs, PDO::PARAM_STR);
+			$prepare->execute();
+			$found = $prepare->fetchAll(PDO::FETCH_ASSOC);
+
+			$rows = [];
+			foreach ($found as $r) {
+				$gap = (float) $r['sale_units'] - ((float) $r['purchase_units'] + (float) $r['return_in_units']);
+				$rows[] = [
+					'product_id'      => (int) $r['product_id'],
+					'full_name'       => $r['full_name'],
+					'code'            => $r['code'],
+					'pprice'          => (float) $r['pprice'],
+					'sale_units'      => (float) $r['sale_units'],
+					'purchase_units'  => (float) $r['purchase_units'],
+					'return_in_units' => (float) $r['return_in_units'],
+					'gap_units'       => $gap,
+					'gap_value'       => $gap * (float) $r['pprice'],
+				];
+			}
+
+			usort($rows, function ($a, $b) {
+				return $b['gap_value'] <=> $a['gap_value'];
+			});
+
+			$total = count($rows);
+			$rows  = array_slice($rows, 0, $limit);
+
+			$activity = $this->getProductActivity($shopId, $from, $to, array_column($rows, 'product_id'));
+			foreach ($rows as $k => $r) {
+				$rows[$k]['sale_amount']     = $activity[$r['product_id']]['sale_amount'];
+				$rows[$k]['purchase_amount'] = $activity[$r['product_id']]['purchase_amount'];
+			}
+
+			return ['rows' => $rows, 'total' => $total, 'shown' => count($rows)];
+		} catch (PDOException $e) {
+			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
+		}
+	}
+
+	/**
+	 * Products sold in the period whose recorded purchase price looks wrong.
+	 *
+	 * `products.pprice` is overwritten by every new supply, so a line entered on
+	 * a per-pack basis leaves the product costed per pack while it is still sold
+	 * per piece -- which shows up as selling below cost. Alongside the current
+	 * value this returns what was actually paid, the cheapest cost ever recorded,
+	 * and the cost from the most recent supply entered on the same unit basis as
+	 * the selling price, which is usually the right per-piece figure.
+	 *
+	 * Done in two steps on purpose: joining the supply history in one statement
+	 * made MySQL scan supply_items three times over and took ~97s.
+	 */
+	public function getPPriceReviewRows($shopId, $from, $to, $limit = 200)
+	{
+		$dbh = $this->connectionPool->getConnection();
+		try {
+			$shopId = (int) $shopId;
+			$limit  = (int) $limit;
+
+			// Step 1 -- loss-making lines in the period.
+			$stmt = "SELECT oi.product_id,
+			                p.full_name,
+			                p.code,
+			                p.price  AS sale_price,
+			                p.pprice AS current_pprice,
+			                SUM(oi.quantity) AS units,
+			                SUM((oi.price - oi.discount) * oi.quantity) AS sale_value,
+			                SUM(COALESCE(p.pprice, 0) * oi.quantity)    AS cost_value,
+			                SUM((oi.price - oi.discount - COALESCE(p.pprice, 0)) * oi.quantity) AS profit
+			         FROM `orders` o
+			         JOIN `order_items` oi ON oi.order_id = o.id
+			         JOIN `$this->table` p ON p.id = oi.product_id AND p.is_stock_item = 1
+			         WHERE o.shopId = :shopId
+			           AND o.flag = 1
+			           AND o.status NOT IN (1, 3, 4)
+			           AND DATE(o.order_date) BETWEEN :fromDate AND :toDate
+			         GROUP BY oi.product_id, p.full_name, p.code, p.price, p.pprice
+			         HAVING profit < 0
+			         ORDER BY profit ASC
+			         LIMIT $limit";
+			$prepare = $dbh->prepare($stmt);
+			$prepare->bindParam(':shopId', $shopId, PDO::PARAM_INT);
+			$prepare->bindParam(':fromDate', $from, PDO::PARAM_STR);
+			$prepare->bindParam(':toDate', $to, PDO::PARAM_STR);
+			$prepare->execute();
+			$rows = $prepare->fetchAll(PDO::FETCH_ASSOC);
+
+			if (empty($rows)) {
+				return [];
+			}
+
+			$ids = array_map('intval', array_column($rows, 'product_id'));
+			$in  = implode(',', $ids);
+
+			// Step 2a -- cheapest cost ever paid, and the newest supply row ids.
+			$stmt = "SELECT si.product_id,
+			                MIN(si.pprice) AS min_paid,
+			                MAX(si.id)     AS last_id,
+			                MAX(CASE WHEN si.price = p.price THEN si.id END) AS same_basis_id
+			         FROM `supply_items` si
+			         JOIN `supply` s ON s.id = si.supply_id
+			         JOIN `$this->table` p ON p.id = si.product_id
+			         WHERE s.shopId = :shopId
+			           AND s.flag = 1
+			           AND si.pprice > 0
+			           AND si.product_id IN ($in)
+			         GROUP BY si.product_id";
+			$prepare = $dbh->prepare($stmt);
+			$prepare->bindParam(':shopId', $shopId, PDO::PARAM_INT);
+			$prepare->execute();
+
+			$stats      = [];
+			$wantedRows = [];
+			foreach ($prepare->fetchAll(PDO::FETCH_ASSOC) as $r) {
+				$stats[(int) $r['product_id']] = $r;
+				if (!empty($r['last_id'])) {
+					$wantedRows[] = (int) $r['last_id'];
+				}
+				if (!empty($r['same_basis_id'])) {
+					$wantedRows[] = (int) $r['same_basis_id'];
+				}
+			}
+
+			// Step 2b -- resolve those supply rows to their cost and date.
+			$byId = [];
+			if (!empty($wantedRows)) {
+				$inRows = implode(',', array_unique($wantedRows));
+				$stmt   = "SELECT si.id, si.pprice, s.supply_date
+				           FROM `supply_items` si
+				           JOIN `supply` s ON s.id = si.supply_id
+				           WHERE si.id IN ($inRows)";
+				foreach ($dbh->query($stmt)->fetchAll(PDO::FETCH_ASSOC) as $r) {
+					$byId[(int) $r['id']] = $r;
+				}
+			}
+
+			foreach ($rows as $k => $row) {
+				$pid  = (int) $row['product_id'];
+				$st   = isset($stats[$pid]) ? $stats[$pid] : null;
+				$last = ($st && !empty($st['last_id']) && isset($byId[(int) $st['last_id']]))
+					? $byId[(int) $st['last_id']] : null;
+				$same = ($st && !empty($st['same_basis_id']) && isset($byId[(int) $st['same_basis_id']]))
+					? $byId[(int) $st['same_basis_id']] : null;
+
+				$rows[$k]['min_paid']        = $st ? $st['min_paid'] : null;
+				$rows[$k]['last_paid']       = $last ? $last['pprice'] : null;
+				$rows[$k]['supply_date']     = $last ? $last['supply_date'] : null;
+				$rows[$k]['same_basis_cost'] = $same ? $same['pprice'] : null;
+			}
+
+			return $rows;
+		} catch (PDOException $e) {
+			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
+		}
+	}
 }

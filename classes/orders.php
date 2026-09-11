@@ -2677,4 +2677,195 @@ class Orders extends Connection
             $this->connectionPool->releaseConnection($dbh);
         }
     }
+
+    /**
+     * Item-level margin for the informal profit report.
+     *
+     * Margin is taken straight off the order line: (price - discount - pprice)
+     * per unit. `discount` is stored as a per-unit rupee amount for both
+     * discount types, which is why it subtracts directly -- see
+     * salesProductsReport.php, which totals the same way.
+     *
+     * $groupBy: '' (totals only), 'publisher' or 'customer'.
+     */
+    public function getItemMargin($shopId, $from, $to, $groupBy = '', $limit = 0)
+    {
+        $dbh = $this->connectionPool->getConnection();
+        try {
+            $shopId = (int) $shopId;
+
+            // Park / Cancelled / Deleted are not sales.
+            $statusCond = "AND o.status NOT IN (1, 3, 4)";
+
+            $select = "";
+            $group  = "";
+            if ($groupBy === 'publisher') {
+                $select = "COALESCE(pub.full_name, 'No Publisher') AS label, p.publisher_id AS label_id,";
+                $group  = "GROUP BY p.publisher_id, label";
+            } elseif ($groupBy === 'customer') {
+                $select = "COALESCE(NULLIF(o.customer_name,''), c.full_name, 'Walk-in') AS label, o.customer_id AS label_id,";
+                $group  = "GROUP BY o.customer_id, label";
+            }
+
+            $stmt = "SELECT $select
+                            COUNT(DISTINCT o.id)          AS orders,
+                            COUNT(DISTINCT oi.product_id) AS products,
+                            SUM(oi.quantity)              AS units,
+                            SUM((oi.price - oi.discount) * oi.quantity)                AS sale_value,
+                            SUM(COALESCE(p.pprice, 0) * oi.quantity)                   AS cost_value,
+                            SUM((oi.price - oi.discount - COALESCE(p.pprice, 0)) * oi.quantity) AS profit,
+                            SUM(CASE WHEN COALESCE(p.pprice, 0) = 0
+                                     THEN (oi.price - oi.discount) * oi.quantity ELSE 0 END)    AS profit_without_cost,
+                            SUM(CASE WHEN COALESCE(p.pprice, 0) = 0 THEN oi.quantity ELSE 0 END) AS units_without_cost
+                     FROM `{$this->table}` o
+                     JOIN `{$this->table_sub}` oi ON oi.order_id = o.id
+                     JOIN `{$this->table_pro}` p  ON p.id = oi.product_id AND p.is_stock_item = 1
+                     " . ($groupBy === 'publisher' ? "LEFT JOIN `{$this->table_publisher}` pub ON pub.id = p.publisher_id" : "") . "
+                     " . ($groupBy === 'customer'  ? "LEFT JOIN `{$this->table_customers}` c ON c.id = o.customer_id" : "") . "
+                     WHERE o.shopId = :shopId
+                       AND o.flag = 1
+                       $statusCond
+                       AND DATE(o.order_date) BETWEEN :fromDate AND :toDate
+                     $group";
+
+            if ($groupBy !== '') {
+                $stmt .= " ORDER BY profit DESC";
+                if ($limit > 0) {
+                    $stmt .= " LIMIT " . (int) $limit;
+                }
+            }
+
+            $prepare = $dbh->prepare($stmt);
+            $prepare->bindParam(':shopId', $shopId, PDO::PARAM_INT);
+            $prepare->bindParam(':fromDate', $from, PDO::PARAM_STR);
+            $prepare->bindParam(':toDate', $to, PDO::PARAM_STR);
+            $prepare->execute();
+
+            if ($groupBy === '') {
+                $row = $prepare->fetch(PDO::FETCH_ASSOC);
+                return $row ?: [
+                    'orders' => 0, 'products' => 0, 'units' => 0, 'sale_value' => 0,
+                    'cost_value' => 0, 'profit' => 0, 'profit_without_cost' => 0,
+                    'units_without_cost' => 0,
+                ];
+            }
+            return $prepare->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            die("Error!: " . $e->getMessage() . "<br/>");
+        } finally {
+            $this->connectionPool->releaseConnection($dbh);
+        }
+    }
+
+    /**
+     * Margin given back on returns in the period, on the same per-unit basis,
+     * so it can be deducted from the sales margin above.
+     */
+    public function getReturnMargin($shopId, $from, $to)
+    {
+        $dbh = $this->connectionPool->getConnection();
+        try {
+            $shopId = (int) $shopId;
+            $stmt = "SELECT COUNT(DISTINCT ro.id) AS returns_count,
+                            SUM(pr.quantity)      AS units,
+                            SUM((pr.price - pr.discount) * pr.quantity)                AS sale_value,
+                            SUM((pr.price - pr.discount - COALESCE(p.pprice, 0)) * pr.quantity) AS profit
+                     FROM `{$this->table_ro}` ro
+                     JOIN `{$this->table_rp}` pr ON pr.order_id = ro.id
+                     JOIN `{$this->table_pro}` p ON p.id = pr.product_id AND p.is_stock_item = 1
+                     WHERE ro.shopId = :shopId
+                       AND ro.flag = 2
+                       AND ro.is_supplier = 1
+                       AND DATE(ro.return_date) BETWEEN :fromDate AND :toDate";
+            $prepare = $dbh->prepare($stmt);
+            $prepare->bindParam(':shopId', $shopId, PDO::PARAM_INT);
+            $prepare->bindParam(':fromDate', $from, PDO::PARAM_STR);
+            $prepare->bindParam(':toDate', $to, PDO::PARAM_STR);
+            $prepare->execute();
+            $row = $prepare->fetch(PDO::FETCH_ASSOC);
+            return $row ?: ['returns_count' => 0, 'units' => 0, 'sale_value' => 0, 'profit' => 0];
+        } catch (PDOException $e) {
+            die("Error!: " . $e->getMessage() . "<br/>");
+        } finally {
+            $this->connectionPool->releaseConnection($dbh);
+        }
+    }
+
+    /**
+     * Sales booked through amount-entry rows (is_stock_item = 0). Their revenue
+     * is real but they carry no meaningful cost, so they are reported on their
+     * own rather than dragging the margin down with a nonsense purchase price.
+     */
+    public function getNonStockSales($shopId, $from, $to)
+    {
+        $dbh = $this->connectionPool->getConnection();
+        try {
+            $shopId = (int) $shopId;
+            $stmt = "SELECT COUNT(DISTINCT oi.product_id) AS products,
+                            SUM(oi.quantity) AS units,
+                            SUM((oi.price - oi.discount) * oi.quantity) AS sale_value
+                     FROM `{$this->table}` o
+                     JOIN `{$this->table_sub}` oi ON oi.order_id = o.id
+                     JOIN `{$this->table_pro}` p  ON p.id = oi.product_id AND p.is_stock_item = 0
+                     WHERE o.shopId = :shopId
+                       AND o.flag = 1
+                       AND o.status NOT IN (1, 3, 4)
+                       AND DATE(o.order_date) BETWEEN :fromDate AND :toDate";
+            $prepare = $dbh->prepare($stmt);
+            $prepare->bindParam(':shopId', $shopId, PDO::PARAM_INT);
+            $prepare->bindParam(':fromDate', $from, PDO::PARAM_STR);
+            $prepare->bindParam(':toDate', $to, PDO::PARAM_STR);
+            $prepare->execute();
+            $row = $prepare->fetch(PDO::FETCH_ASSOC);
+            return $row ?: ['products' => 0, 'units' => 0, 'sale_value' => 0];
+        } catch (PDOException $e) {
+            die("Error!: " . $e->getMessage() . "<br/>");
+        } finally {
+            $this->connectionPool->releaseConnection($dbh);
+        }
+    }
+
+    /**
+     * Real products sold at a loss on this basis. Usually the purchase price is
+     * wrong -- a pack price against a per-piece selling price -- rather than the
+     * goods genuinely being sold below cost, so it is worth checking.
+     */
+    public function getLossMakingItems($shopId, $from, $to, $limit = 20)
+    {
+        $dbh = $this->connectionPool->getConnection();
+        try {
+            $shopId = (int) $shopId;
+            $limit  = (int) $limit;
+            $stmt = "SELECT oi.product_id,
+                            p.full_name,
+                            p.code,
+                            p.price  AS list_price,
+                            p.pprice,
+                            SUM(oi.quantity) AS units,
+                            SUM((oi.price - oi.discount) * oi.quantity) AS sale_value,
+                            SUM(COALESCE(p.pprice, 0) * oi.quantity)    AS cost_value,
+                            SUM((oi.price - oi.discount - COALESCE(p.pprice, 0)) * oi.quantity) AS profit
+                     FROM `{$this->table}` o
+                     JOIN `{$this->table_sub}` oi ON oi.order_id = o.id
+                     JOIN `{$this->table_pro}` p  ON p.id = oi.product_id AND p.is_stock_item = 1
+                     WHERE o.shopId = :shopId
+                       AND o.flag = 1
+                       AND o.status NOT IN (1, 3, 4)
+                       AND DATE(o.order_date) BETWEEN :fromDate AND :toDate
+                     GROUP BY oi.product_id, p.full_name, p.code, p.price, p.pprice
+                     HAVING profit < 0
+                     ORDER BY profit ASC
+                     LIMIT $limit";
+            $prepare = $dbh->prepare($stmt);
+            $prepare->bindParam(':shopId', $shopId, PDO::PARAM_INT);
+            $prepare->bindParam(':fromDate', $from, PDO::PARAM_STR);
+            $prepare->bindParam(':toDate', $to, PDO::PARAM_STR);
+            $prepare->execute();
+            return $prepare->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            die("Error!: " . $e->getMessage() . "<br/>");
+        } finally {
+            $this->connectionPool->releaseConnection($dbh);
+        }
+    }
 }

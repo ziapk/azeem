@@ -297,6 +297,49 @@ switch ($reportType) {
 		]);
 		include_once dirname(__FILE__) . '/productPurchaseSaleReport.php';
 		exit;
+	case '26':
+		if (empty($from) || empty($to)) {
+			echo '<h3 style="font-family: Arial, sans-serif">Please select a date range for the Profit Summary.</h3>';
+			exit;
+		}
+
+		$de           = new DoubleEntry();
+		$shopAccounts = new ShopAccounts();
+		$storeAcc     = [];
+		foreach ($shopAccounts->getSAs($shopId) as $a) {
+			$storeAcc[$a['key_value']] = $a['account_id'];
+		}
+
+		$margin       = $ordersObj->getItemMargin($shopId, $from, $to);
+		$byPublisher  = $ordersObj->getItemMargin($shopId, $from, $to, 'publisher', 25);
+		$byCustomer   = $ordersObj->getItemMargin($shopId, $from, $to, 'customer', 25);
+		$returnMargin = $ordersObj->getReturnMargin($shopId, $from, $to);
+		$nonStockSales = $ordersObj->getNonStockSales($shopId, $from, $to);
+		$lossMakers    = $ordersObj->getLossMakingItems($shopId, $from, $to, 20);
+
+		$expenseRows = $de->getPLExpenseRows([
+			'shopId'           => $shopId,
+			'fromDate'         => $from,
+			'toDate'           => $to,
+			'expense_root_ids' => [$storeAcc['expense']],
+		]);
+
+		$cashMovement = $de->getCashMovementSummary([
+			'shopId'        => $shopId,
+			'fromDate'      => $from,
+			'toDate'        => $to,
+			'receivable_id' => $storeAcc['receivable'],
+			'payable_id'    => $storeAcc['payable'],
+		]);
+
+		$stores      = new Store();
+		$selectShop  = $stores->getStore($shopId);
+		$reportTitle = $selectShop['full_name'] . ' - ' . $selectShop['city'];
+		$subtitle    = 'Profit Summary (Informal) &mdash; Between ' . $from . ' and ' . $to;
+
+		include_once dirname(__FILE__) . '/profitSummary.php';
+		exit;
+
 	default:
 		# code...
 		break;

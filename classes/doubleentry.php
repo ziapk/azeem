@@ -2259,4 +2259,256 @@ class DoubleEntry extends Connection
 			$this->connectionPool->releaseConnection($dbh);
 		}
 	}
+
+	/**
+	 * Collect an account id plus every descendant id, to any depth.
+	 * getPLStatementReport() only ever looked at `parent_id IN (...)`, which
+	 * silently dropped nested expense accounts (e.g. 239 under 210 under 21).
+	 */
+	public function getAccountDescendantIds($rootIds)
+	{
+		$rootIds = array_values(array_unique(array_map('intval', (array) $rootIds)));
+		if (empty($rootIds)) {
+			return [];
+		}
+		$dbh = $this->connectionPool->getConnection();
+		try {
+			$all     = $rootIds;
+			$frontier = $rootIds;
+			// Bounded walk: the chart of accounts is shallow, 10 levels is ample.
+			for ($depth = 0; $depth < 10 && !empty($frontier); $depth++) {
+				$in   = implode(',', array_map('intval', $frontier));
+				$stmt = "SELECT id FROM `$this->table` WHERE parent_id IN ($in) AND status = 1";
+				$rows = $dbh->query($stmt)->fetchAll(PDO::FETCH_COLUMN);
+				$next = [];
+				foreach ($rows as $id) {
+					$id = (int) $id;
+					if (!in_array($id, $all, true)) {
+						$all[]  = $id;
+						$next[] = $id;
+					}
+				}
+				$frontier = $next;
+			}
+			return $all;
+		} catch (PDOException $e) {
+			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
+		}
+	}
+
+	/**
+	 * Profit & Loss source figures, split by transaction type.
+	 *
+	 * Sales, purchases and BOTH kinds of return all post to the same trading
+	 * account, so the old SUM(CASE WHEN entry_type=...) collapse put purchase
+	 * returns into income and sale returns into purchases. Splitting on
+	 * transsaction_type is the only way to tell them apart.
+	 */
+	public function getPLStatementBreakdown($array)
+	{
+		$dbh = $this->connectionPool->getConnection();
+		try {
+			$fromDate = !empty($array['fromDate']) ? $array['fromDate'] : '';
+			$toDate   = !empty($array['toDate'])   ? $array['toDate']   : '';
+			$shopId   = !empty($array['shopId'])   ? (int) $array['shopId'] : 0;
+
+			$trading          = (int) $array['trading_account_id'];
+			$saleDiscount     = (int) $array['sale_discount_id'];
+			$saleReturns      = (int) $array['sale_returns_id'];
+			$purchaseDiscount = (int) $array['purchase_discount_id'];
+			$purchaseReturns  = (int) $array['purchase_returns_id'];
+
+			$shopIdCondition = $shopId ? "AND t.shopId = :shopId" : "";
+
+			// Signed net per (account, transaction type): debit positive, credit negative.
+			$stmt = "SELECT e.account_id,
+			                a.code,
+			                a.title,
+			                a.parent_id,
+			                t.transsaction_type,
+			                SUM(CASE WHEN e.entry_type = 'D' THEN e.amount ELSE 0 END) AS debitAmount,
+			                SUM(CASE WHEN e.entry_type = 'C' THEN e.amount ELSE 0 END) AS creditAmount
+			         FROM `$this->table_transactions` t
+			         JOIN `$this->table_ledger_entries` e ON e.transaction_id = t.id
+			         JOIN `$this->table` a ON a.id = e.account_id AND a.status = 1
+			         WHERE t.flag = 1
+			           $shopIdCondition
+			           AND DATE(t.transaction_date) BETWEEN :fromDate AND :toDate
+			           AND e.account_id IN (:trading, :saleDiscount, :saleReturns, :purchaseDiscount, :purchaseReturns)
+			         GROUP BY e.account_id, a.code, a.title, a.parent_id, t.transsaction_type";
+
+			$prepare = $dbh->prepare($stmt);
+			if ($shopId) {
+				$prepare->bindParam(':shopId', $shopId, PDO::PARAM_INT);
+			}
+			$prepare->bindParam(':fromDate', $fromDate, PDO::PARAM_STR);
+			$prepare->bindParam(':toDate', $toDate, PDO::PARAM_STR);
+			$prepare->bindParam(':trading', $trading, PDO::PARAM_INT);
+			$prepare->bindParam(':saleDiscount', $saleDiscount, PDO::PARAM_INT);
+			$prepare->bindParam(':saleReturns', $saleReturns, PDO::PARAM_INT);
+			$prepare->bindParam(':purchaseDiscount', $purchaseDiscount, PDO::PARAM_INT);
+			$prepare->bindParam(':purchaseReturns', $purchaseReturns, PDO::PARAM_INT);
+			$prepare->execute();
+			$rows = $prepare->fetchAll(PDO::FETCH_ASSOC);
+
+			$out = [
+				'gross_sales'       => 0.0,
+				'sale_returns'      => 0.0,
+				'sale_discount'     => 0.0,
+				'gross_purchases'   => 0.0,
+				'purchase_returns'  => 0.0,
+				'purchase_discount' => 0.0,
+				'unclassified'      => [],
+			];
+
+			foreach ($rows as $r) {
+				$acc    = (int) $r['account_id'];
+				$type   = (string) $r['transsaction_type'];
+				$debit  = (float) $r['debitAmount'];
+				$credit = (float) $r['creditAmount'];
+
+				if ($acc === $trading) {
+					// Credit raises income, debit raises purchases -- but only the
+					// transaction type says which bucket the amount belongs to.
+					if ($type === 'SALE') {
+						$out['gross_sales']      += $credit - $debit;
+					} elseif ($type === 'SALE_RETURN') {
+						$out['sale_returns']     += $debit - $credit;
+					} elseif ($type === 'PURCHASE') {
+						$out['gross_purchases']  += $debit - $credit;
+					} elseif ($type === 'PURCHASE_RETURN') {
+						$out['purchase_returns'] += $credit - $debit;
+					} else {
+						$out['unclassified'][] = $r;
+					}
+				} elseif ($acc === $saleDiscount) {
+					$out['sale_discount']     += $debit - $credit;
+				} elseif ($acc === $saleReturns) {
+					$out['sale_returns']      += $debit - $credit;
+				} elseif ($acc === $purchaseDiscount) {
+					$out['purchase_discount'] += $credit - $debit;
+				} elseif ($acc === $purchaseReturns) {
+					$out['purchase_returns']  += $credit - $debit;
+				} else {
+					$out['unclassified'][] = $r;
+				}
+			}
+
+			return $out;
+		} catch (PDOException $e) {
+			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
+		}
+	}
+
+	/**
+	 * Expense rows for the P&L, one row per account, nested accounts included.
+	 */
+	public function getPLExpenseRows($array)
+	{
+		$accountIds = $this->getAccountDescendantIds($array['expense_root_ids']);
+		if (empty($accountIds)) {
+			return [];
+		}
+
+		$dbh = $this->connectionPool->getConnection();
+		try {
+			$fromDate = !empty($array['fromDate']) ? $array['fromDate'] : '';
+			$toDate   = !empty($array['toDate'])   ? $array['toDate']   : '';
+			$shopId   = !empty($array['shopId'])   ? (int) $array['shopId'] : 0;
+
+			$shopIdCondition = $shopId ? "AND t.shopId = :shopId" : "";
+			$in = implode(',', array_map('intval', $accountIds));
+
+			$stmt = "SELECT e.account_id, a.code, a.title, a.parent_id,
+			                SUM(CASE WHEN e.entry_type = 'D' THEN e.amount ELSE -e.amount END) AS amount
+			         FROM `$this->table_transactions` t
+			         JOIN `$this->table_ledger_entries` e ON e.transaction_id = t.id
+			         JOIN `$this->table` a ON a.id = e.account_id AND a.status = 1
+			         WHERE t.flag = 1
+			           $shopIdCondition
+			           AND DATE(t.transaction_date) BETWEEN :fromDate AND :toDate
+			           AND e.account_id IN ($in)
+			         GROUP BY e.account_id, a.code, a.title, a.parent_id
+			         HAVING amount <> 0
+			         ORDER BY a.title ASC";
+
+			$prepare = $dbh->prepare($stmt);
+			if ($shopId) {
+				$prepare->bindParam(':shopId', $shopId, PDO::PARAM_INT);
+			}
+			$prepare->bindParam(':fromDate', $fromDate, PDO::PARAM_STR);
+			$prepare->bindParam(':toDate', $toDate, PDO::PARAM_STR);
+			$prepare->execute();
+			return $prepare->fetchAll(PDO::FETCH_ASSOC);
+		} catch (PDOException $e) {
+			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
+		}
+	}
+
+	/**
+	 * Cash actually received from customers and paid to suppliers in the period.
+	 *
+	 * This is money movement, not profit -- it is reported alongside the informal
+	 * profit figures so the two are never confused with each other.
+	 */
+	public function getCashMovementSummary($array)
+	{
+		$dbh = $this->connectionPool->getConnection();
+		try {
+			$shopId      = (int) $array['shopId'];
+			$from        = $array['fromDate'];
+			$to          = $array['toDate'];
+			$receivable  = (int) $array['receivable_id'];
+			$payable     = (int) $array['payable_id'];
+
+			$stmt = "SELECT t.transsaction_type,
+			                CASE WHEN a.parent_id = :receivable THEN 'customer'
+			                     WHEN a.parent_id = :payable    THEN 'supplier'
+			                     ELSE 'other' END AS counterpart,
+			                SUM(CASE WHEN e.entry_type = 'D' THEN e.amount ELSE -e.amount END) AS amount
+			         FROM `$this->table_transactions` t
+			         JOIN `$this->table_ledger_entries` e ON e.transaction_id = t.id
+			         JOIN `$this->table` a ON a.id = e.account_id AND a.status = 1
+			         WHERE t.flag = 1
+			           AND t.shopId = :shopId
+			           AND t.transsaction_type IN ('DIRECT_PAYMENT','DIRECT_RECEIVING')
+			           AND a.parent_id IN (:receivable2, :payable2)
+			           AND DATE(t.transaction_date) BETWEEN :fromDate AND :toDate
+			         GROUP BY t.transsaction_type, counterpart";
+
+			$prepare = $dbh->prepare($stmt);
+			$prepare->bindParam(':shopId', $shopId, PDO::PARAM_INT);
+			$prepare->bindParam(':receivable', $receivable, PDO::PARAM_INT);
+			$prepare->bindParam(':payable', $payable, PDO::PARAM_INT);
+			$prepare->bindParam(':receivable2', $receivable, PDO::PARAM_INT);
+			$prepare->bindParam(':payable2', $payable, PDO::PARAM_INT);
+			$prepare->bindParam(':fromDate', $from, PDO::PARAM_STR);
+			$prepare->bindParam(':toDate', $to, PDO::PARAM_STR);
+			$prepare->execute();
+
+			$out = ['received_from_customers' => 0.0, 'paid_to_suppliers' => 0.0, 'paid_to_customers' => 0.0];
+			foreach ($prepare->fetchAll(PDO::FETCH_ASSOC) as $r) {
+				$amount = (float) $r['amount'];
+				if ($r['transsaction_type'] === 'DIRECT_RECEIVING' && $r['counterpart'] === 'customer') {
+					// Customer account is credited as money comes in.
+					$out['received_from_customers'] += -$amount;
+				} elseif ($r['transsaction_type'] === 'DIRECT_PAYMENT' && $r['counterpart'] === 'supplier') {
+					$out['paid_to_suppliers'] += $amount;
+				} elseif ($r['transsaction_type'] === 'DIRECT_PAYMENT' && $r['counterpart'] === 'customer') {
+					$out['paid_to_customers'] += $amount;
+				}
+			}
+			return $out;
+		} catch (PDOException $e) {
+			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
+		}
+	}
 }

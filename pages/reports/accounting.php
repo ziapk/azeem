@@ -91,16 +91,63 @@ switch ($reportType) {
 		break;
 
 	case '12':
-		$params['account_ids'][] = $store['sale_discount'];
-		$params['account_ids'][] = $store['sale_returns'];
-		$params['account_ids'][] = $store['purchase_discount'];
-		$params['account_ids'][] = $store['purchase_returns'];
-		$params['account_ids'][] = $store['assets'];
-		$params['parent_ids'][] = $store['expense'];
-		$reportData = $doubleEntry->getPLStatementReport($params);
-		$subtitle = 'Profit and Loss Account' . $subtitle;
-		$headers = ['Account Code', 'Account Title', 'Debit', 'Credit'];
-		$columns = ['code', 'title', 'debitAmount', 'creditAmount'];
+		// Without a date range every figure silently comes back zero, so stop
+		// rather than hand back an empty statement that looks like real data.
+		if (empty($params['fromDate']) || empty($params['toDate'])) {
+			echo '<h3 style="font-family: Arial, sans-serif">Please select a date range for the Profit and Loss report.</h3>';
+			exit;
+		}
+
+		// Sales, purchases and both kinds of return all post to $store['assets'],
+		// so the breakdown splits them apart on transsaction_type.
+		$params['trading_account_id']   = $store['assets'];
+		$params['sale_discount_id']     = $store['sale_discount'];
+		$params['sale_returns_id']      = $store['sale_returns'];
+		$params['purchase_discount_id'] = $store['purchase_discount'];
+		$params['purchase_returns_id']  = $store['purchase_returns'];
+		$params['expense_root_ids']     = [$store['expense']];
+
+		$pl          = $doubleEntry->getPLStatementBreakdown($params);
+		$expenseRows = $doubleEntry->getPLExpenseRows($params);
+		$productsObj = new Products();
+
+		// 'purchases' = trading account: gross profit is net sales less net
+		// purchases, using only movement inside the date range. 'stock' brings in
+		// opening/closing stock valuation to derive a true COGS, which is only
+		// meaningful once the stock records are trustworthy.
+		$plBasis = (!empty($_POST['pl_basis']) && $_POST['pl_basis'] === 'stock')
+			? 'stock'
+			: 'purchases';
+
+		if ($plBasis === 'stock') {
+			// Opening stock is the closing position of the day before the period.
+			$openingStock = $productsObj->getStockValuation(
+				$params['shopId'],
+				date('Y-m-d', strtotime($params['fromDate'] . ' -1 day'))
+			);
+			$closingStock = $productsObj->getStockValuation($params['shopId'], $params['toDate']);
+
+			// Products whose stock records are wrong enough to move the bottom line.
+			$attention = $productsObj->getStockAttentionRows(
+				$openingStock,
+				$closingStock,
+				$params['shopId'],
+				$params['fromDate'],
+				$params['toDate'],
+				20
+			);
+		} else {
+			// Nothing outside the range is read at all.
+			$openingStock = $closingStock = null;
+			$attention    = $productsObj->getUnbackedSalesRows(
+				$params['shopId'],
+				$params['fromDate'],
+				$params['toDate'],
+				20
+			);
+		}
+
+		$subtitle = ($plBasis === 'stock' ? 'Profit and Loss Account' : 'Trading Account') . $subtitle;
 
 		include_once dirname(__FILE__) . '/plstatement.php';
 		exit;

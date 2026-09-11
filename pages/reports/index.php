@@ -119,6 +119,20 @@ echo mainHeader(['page' => 'reports']);
             <?php } ?>
         </div>
 
+        <div class="row" ng-if="reportType == 12">
+            <div class="col-sm-6 col-md-5 form-group">
+                <label>Basis</label>
+                <select class="form-control" name="pl_basis">
+                    <option value="purchases">Trading Account &mdash; sales less purchases (in range only)</option>
+                    <option value="stock">Profit &amp; Loss &mdash; with opening/closing stock</option>
+                </select>
+                <small class="text-muted">
+                    Trading Account reads nothing from before the date range. Use the
+                    stock basis only once opening stock is reliable.
+                </small>
+            </div>
+        </div>
+
         <div class="row" ng-if="reportType == 24 || reportType == 25">
             <div class="col-sm-12">
                 <div class="form-group">
