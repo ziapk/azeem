@@ -2712,6 +2712,11 @@ class Orders extends Connection
                 $group  = "GROUP BY o.customer_id, label";
             }
 
+            // STRAIGHT_JOIN pins the join order. None of orders, order_items or
+            // products has an index beyond its primary key, so if MySQL starts from
+            // `orders` it rescans all of order_items for every bill -- minutes, not
+            // seconds. Reading order_items once and looking the rest up by primary
+            // key is always fast. The result is identical either way.
             $stmt = "SELECT $select
                             COUNT(DISTINCT o.id)          AS orders,
                             COUNT(DISTINCT oi.product_id) AS products,
@@ -2723,20 +2728,20 @@ class Orders extends Connection
                             SUM(CASE WHEN COALESCE(p.pprice, 0) = 0
                                      THEN (oi.price - oi.discount) * oi.quantity ELSE 0 END)    AS profit_without_cost,
                             SUM(CASE WHEN COALESCE(p.pprice, 0) = 0 THEN oi.quantity ELSE 0 END) AS units_without_cost
-                     FROM `{$this->table}` o
-                     JOIN `{$this->table_sub}` oi ON oi.order_id = o.id
-                     JOIN `{$this->table_pro}` p  ON p.id = oi.product_id AND p.is_stock_item = 1
-                     JOIN (
-                         SELECT o2.id AS order_id,
+                     FROM `{$this->table_sub}` oi
+                     STRAIGHT_JOIN `{$this->table}` o ON o.id = oi.order_id
+                     STRAIGHT_JOIN `{$this->table_pro}` p ON p.id = oi.product_id AND p.is_stock_item = 1
+                     STRAIGHT_JOIN (
+                         SELECT s2.order_id,
                                 CASE WHEN s2.subtotal > 0
                                      THEN GREATEST(0, 1 - (o2.discount / s2.subtotal))
                                      ELSE 1 END AS keep_factor
-                         FROM `{$this->table}` o2
-                         JOIN (
+                         FROM (
                              SELECT oi2.order_id, SUM((oi2.price - oi2.discount) * oi2.quantity) AS subtotal
                              FROM `{$this->table_sub}` oi2
                              GROUP BY oi2.order_id
-                         ) s2 ON s2.order_id = o2.id
+                         ) s2
+                         STRAIGHT_JOIN `{$this->table}` o2 ON o2.id = s2.order_id
                          WHERE o2.shopId = :shopId2
                            AND DATE(o2.order_date) BETWEEN :fromDate2 AND :toDate2
                      ) sub ON sub.order_id = o.id
@@ -2922,6 +2927,11 @@ class Orders extends Connection
             $limit    = (int) $limit;
             $giveaway = $this->giveawayCondition($shopId);
 
+            // STRAIGHT_JOIN pins the join order. None of orders, order_items or
+            // products has an index beyond its primary key, so if MySQL starts from
+            // `orders` it rescans all of order_items for every bill -- minutes, not
+            // seconds. Reading order_items once and looking the rest up by primary
+            // key is always fast. The result is identical either way.
             $stmt = "SELECT oi.product_id,
                             p.full_name,
                             p.code,
@@ -2933,20 +2943,20 @@ class Orders extends Connection
                             SUM(COALESCE(p.pprice, 0) * oi.quantity)                     AS cost_value,
                             SUM((oi.price - oi.discount) * oi.quantity * sub.keep_factor
                                 - COALESCE(p.pprice, 0) * oi.quantity)                   AS profit
-                     FROM `{$this->table}` o
-                     JOIN `{$this->table_sub}` oi ON oi.order_id = o.id
-                     JOIN `{$this->table_pro}` p  ON p.id = oi.product_id AND p.is_stock_item = 1
-                     JOIN (
-                         SELECT o2.id AS order_id,
+                     FROM `{$this->table_sub}` oi
+                     STRAIGHT_JOIN `{$this->table}` o ON o.id = oi.order_id
+                     STRAIGHT_JOIN `{$this->table_pro}` p ON p.id = oi.product_id AND p.is_stock_item = 1
+                     STRAIGHT_JOIN (
+                         SELECT s2.order_id,
                                 CASE WHEN s2.subtotal > 0
                                      THEN GREATEST(0, 1 - (o2.discount / s2.subtotal))
                                      ELSE 1 END AS keep_factor
-                         FROM `{$this->table}` o2
-                         JOIN (
+                         FROM (
                              SELECT oi2.order_id, SUM((oi2.price - oi2.discount) * oi2.quantity) AS subtotal
                              FROM `{$this->table_sub}` oi2
                              GROUP BY oi2.order_id
-                         ) s2 ON s2.order_id = o2.id
+                         ) s2
+                         STRAIGHT_JOIN `{$this->table}` o2 ON o2.id = s2.order_id
                          WHERE o2.shopId = :shopId2
                            AND DATE(o2.order_date) BETWEEN :fromDate2 AND :toDate2
                      ) sub ON sub.order_id = o.id
