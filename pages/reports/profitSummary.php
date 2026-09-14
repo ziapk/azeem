@@ -49,6 +49,17 @@ $noCostValue = (float) $margin['profit_without_cost'];
 // Balances are stated as at the end of the period, not for the period.
 $closingAsAt = date('d-m-Y', strtotime($to));
 
+// Totals for the final summary. Receivables are debit-positive (owed to the
+// shop); payables are flipped so a positive figure is owed by the shop.
+$fsReceivable = 0.0;
+foreach ($receivables as $r) {
+	$fsReceivable += (float) $r['closing'];
+}
+$fsPayable = 0.0;
+foreach ($payables as $r) {
+	$fsPayable -= (float) $r['closing'];
+}
+
 ob_start();
 ?>
 <style>
@@ -170,6 +181,11 @@ ob_start();
 		font-weight: bold;
 		background: #f6f6f6;
 	}
+	table.fs td.sign {
+		width: 26px;
+		text-align: center;
+		font-weight: bold;
+	}
 </style>
 
 <h1><?php echo $reportTitle; ?></h1>
@@ -200,8 +216,8 @@ ob_start();
 		<?php if ($nonStockSales['sale_value'] > 0) { ?>
 			<tr>
 				<td>
-					Plus: Sales through amount-entry items
-					<small>(<?php echo $money($nonStockSales['products']); ?> row(s), no cost recorded)</small>
+					Memo: Sales through amount-entry items
+					<small>(<?php echo $money($nonStockSales['products']); ?> row(s), no cost recorded &mdash; not included in profit)</small>
 				</td>
 				<td class="amt"><?php echo $money($nonStockSales['sale_value']); ?></td>
 			</tr>
@@ -702,6 +718,98 @@ foreach ($lossGroups as $key => $grp) {
 		</li>
 	</ul>
 </div>
+
+<?php
+/*
+ * Final Summary: every figure above that moves money, one line each with its
+ * sign, so the bottom lines can be checked by adding down the column.
+ */
+// Subtracting a negative figure is an addition -- show it as one, rather than
+// as "minus (x)".
+$fsLine = function ($op, $label, $amount) use ($money) {
+	$amount = (float) $amount;
+	if ($amount < 0) {
+		$sign   = $op === '+' ? '&minus;' : '+';
+		$amount = -$amount;
+	} else {
+		$sign = $op === '+' ? '+' : '&minus;';
+	}
+	return '<tr><td class="sign">' . $sign . '</td><td>' . $label . '</td><td class="amt">'
+		. $money($amount) . '</td></tr>';
+};
+$fsTotal = function ($label, $amount, $class = 'subtotal') use ($money, $neg) {
+	$amount = (float) $amount;
+	return '<tr class="' . $class . '"><td class="sign">=</td><th>' . $label . '</th><td class="amt'
+		. ($amount < 0 ? ' loss' : '') . '">' . ($amount < 0 ? $neg($amount) : $money($amount)) . '</td></tr>';
+};
+
+$fsNetCash = (float) $cashMovement['received_from_customers']
+	- (float) $cashMovement['paid_to_suppliers']
+	- (float) $cashMovement['paid_to_customers'];
+?>
+
+<h3>Final Summary</h3>
+<table class="fs">
+	<tbody>
+		<tr class="section">
+			<th colspan="3">Profit &mdash; <?php echo $from; ?> to <?php echo $to; ?></th>
+		</tr>
+		<?php
+		echo $fsLine('+', 'Sale value (after discount)', $saleValue);
+		echo $fsLine('-', 'Purchase cost of items sold', $costValue);
+		echo $fsTotal('Sales Profit', $salesProfit);
+		if ($returnProfit != 0) {
+			echo $fsLine('-', 'Profit given back on returns', $returnProfit);
+		}
+		if ($giveawayCost != 0) {
+			echo $fsLine('-', 'Cost of goods given away (samples &amp; donations)', $giveawayCost);
+		}
+		echo $fsLine('-', 'Expenses', $totalExpenses);
+		echo $fsTotal($netProfit < 0 ? 'Net Loss' : 'Net Profit', $netProfit, 'grand');
+		?>
+
+		<tr class="section">
+			<th colspan="3">Cash &mdash; <?php echo $from; ?> to <?php echo $to; ?></th>
+		</tr>
+		<?php
+		echo $fsLine('+', 'Received from customers', $cashMovement['received_from_customers']);
+		echo $fsLine('-', 'Paid to suppliers', $cashMovement['paid_to_suppliers']);
+		if ($cashMovement['paid_to_customers'] != 0) {
+			echo $fsLine('-', 'Paid to customers', $cashMovement['paid_to_customers']);
+		}
+		echo $fsTotal('Net Cash Movement', $fsNetCash);
+		?>
+
+		<tr class="section">
+			<th colspan="3">Balances &mdash; as at <?php echo $closingAsAt; ?></th>
+		</tr>
+		<?php
+		echo $fsLine('+', 'Owed to the shop by customers', $fsReceivable);
+		echo $fsLine('-', 'Owed by the shop to suppliers', $fsPayable);
+		echo $fsTotal('Net Position', $fsReceivable - $fsPayable);
+		?>
+
+		<?php if ($nonStockSales['sale_value'] > 0 || (float) $writeOffs['totals']['cost_value'] != 0) { ?>
+			<tr class="section">
+				<th colspan="3">For reference &mdash; not included in the profit above</th>
+			</tr>
+			<?php if ($nonStockSales['sale_value'] > 0) { ?>
+				<tr>
+					<td class="sign"></td>
+					<td>Sales through amount-entry items (no cost recorded)</td>
+					<td class="amt"><?php echo $money($nonStockSales['sale_value']); ?></td>
+				</tr>
+			<?php } ?>
+			<?php if ((float) $writeOffs['totals']['cost_value'] != 0) { ?>
+				<tr>
+					<td class="sign"></td>
+					<td>Stock written off on zero-value bills, at cost</td>
+					<td class="amt"><?php echo $money($writeOffs['totals']['cost_value']); ?></td>
+				</tr>
+			<?php } ?>
+		<?php } ?>
+	</tbody>
+</table>
 
 <?php
 $html = ob_get_clean();
