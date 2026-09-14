@@ -42,6 +42,9 @@ if (!empty($_POST) && isset($_POST['update'])) {
             }
         }
         $update = $productObj->updateCustomer($data);
+        // Saved on its own: updateCustomer() is called from several places that
+        // know nothing about this flag and would clear it.
+        $flagChanged = $productObj->setGiveaway($_GET['id'], !empty($_POST['is_giveaway']));
         if (!empty($store['account_id'])) {
             $de = new DoubleEntry();
             $de->setOpeningBalance($store['account_id'], $_POST['opening_balance']);
@@ -50,7 +53,7 @@ if (!empty($_POST) && isset($_POST['update'])) {
 
 
 
-        if ($update) {
+        if ($update || $flagChanged) {
             $message = "Successfully saved!";
         } else {
             $message = "Nothing change";
@@ -114,6 +117,16 @@ echo mainHeader();
                     <option <?php echo $store['type'] == 2 ? 'selected' : ''; ?> value="2">No</option>
                     <option <?php echo $store['type'] == 1 ? 'selected' : ''; ?> value="1">Yes</option>
                 </select>
+            </div>
+            <div class="col-sm-3 form-group">
+                <label for="is_giveaway">Giveaway Account</label>
+                <div class="checkbox" style="margin-top: 5px">
+                    <label>
+                        <input type="checkbox" id="is_giveaway" name="is_giveaway" value="1" <?php echo !empty($store['is_giveaway']) ? 'checked' : ''; ?>>
+                        Samples / donations / promotions
+                    </label>
+                </div>
+                <small class="text-muted">Bills for this customer are left out of sales profit and reported as goods given away.</small>
             </div>
             <div class="col-sm-3 form-group">
                 <label for="default_discount">Discount %</label>

@@ -2698,7 +2698,9 @@ class Orders extends Connection
             // order-level discount wipes out its whole value -- those are stock
             // write-offs ("Stock Out Adjustment") entered as zero-value bills.
             $statusCond = "AND o.status NOT IN (1, 3, 4)
-                           AND NOT (o.price > 0 AND o.discount >= o.price)";
+                           AND NOT (o.price > 0 AND o.discount >= o.price)"
+                        // Samples, donations and promotions are giveaways, not sales.
+                        . $this->giveawayCondition($shopId);
 
             $select = "";
             $group  = "";
@@ -2781,6 +2783,11 @@ class Orders extends Connection
     /**
      * Margin given back on returns in the period, on the same per-unit basis,
      * so it can be deducted from the sales margin above.
+     *
+     * Only sale returns (return_type = 1). A purchase return (type 2) is goods
+     * sent back to a supplier -- even when the counterparty is a customer
+     * account, such as a shop that both buys from and sells to us -- and the
+     * ledger posts it as PURCHASE_RETURN, not as a sale reversal.
      */
     public function getReturnMargin($shopId, $from, $to)
     {
@@ -2796,7 +2803,7 @@ class Orders extends Connection
                      JOIN `{$this->table_pro}` p ON p.id = pr.product_id AND p.is_stock_item = 1
                      WHERE ro.shopId = :shopId
                        AND ro.flag = 2
-                       AND ro.is_supplier = 1
+                       AND ro.return_type = 1
                        AND DATE(ro.return_date) BETWEEN :fromDate AND :toDate";
             $prepare = $dbh->prepare($stmt);
             $prepare->bindParam(':shopId', $shopId, PDO::PARAM_INT);
@@ -2832,6 +2839,7 @@ class Orders extends Connection
                        AND o.flag = 1
                        AND o.status NOT IN (1, 3, 4)
                        AND NOT (o.price > 0 AND o.discount >= o.price)
+                       " . $this->giveawayCondition($shopId) . "
                        AND DATE(o.order_date) BETWEEN :fromDate AND :toDate";
             $prepare = $dbh->prepare($stmt);
             $prepare->bindParam(':shopId', $shopId, PDO::PARAM_INT);
@@ -2848,43 +2856,225 @@ class Orders extends Connection
     }
 
     /**
-     * Real products sold at a loss on this basis. Usually the purchase price is
-     * wrong -- a pack price against a per-piece selling price -- rather than the
-     * goods genuinely being sold below cost, so it is worth checking.
+     * Customers whose "sales" are goods given away -- samples, donations and
+     * promotions. Marked by customers.is_giveaway, set from the Update Customer
+     * page; the ids are resolved once per shop per request.
+     */
+    private static $giveawayIds = [];
+
+    public function getGiveawayCustomerIds($shopId)
+    {
+        $shopId = (int) $shopId;
+        if (isset(self::$giveawayIds[$shopId])) {
+            return self::$giveawayIds[$shopId];
+        }
+        $dbh = $this->connectionPool->getConnection();
+        try {
+            $stmt = "SELECT id FROM `{$this->table_customers}`
+                     WHERE shopId = :shopId AND is_giveaway = 1";
+            $prepare = $dbh->prepare($stmt);
+            $prepare->bindParam(':shopId', $shopId, PDO::PARAM_INT);
+            $prepare->execute();
+            self::$giveawayIds[$shopId] = array_map('intval', $prepare->fetchAll(PDO::FETCH_COLUMN));
+            return self::$giveawayIds[$shopId];
+        } catch (PDOException $e) {
+            die("Error!: " . $e->getMessage() . "<br/>");
+        } finally {
+            $this->connectionPool->releaseConnection($dbh);
+        }
+    }
+
+    /**
+     * SQL fragment that drops giveaway customers' bills -- or, with $only,
+     * keeps nothing but them.
+     */
+    public function giveawayCondition($shopId, $only = false, $alias = 'o')
+    {
+        $ids = $this->getGiveawayCustomerIds($shopId);
+        if (empty($ids)) {
+            return $only ? " AND 1 = 0 " : " ";
+        }
+        $in = implode(',', $ids);
+        return $only
+            ? " AND $alias.customer_id IN ($in) "
+            : " AND ($alias.customer_id IS NULL OR $alias.customer_id NOT IN ($in)) ";
+    }
+
+    /**
+     * Products sold at a loss in the period, split by cause.
+     *
+     *   cost_above_list -- the purchase price is at or above the list price, so
+     *                      every sale loses money whatever the discount. Almost
+     *                      always a data error, e.g. a pack price against a
+     *                      per-piece selling price.
+     *   discounted      -- the list price covers the cost, but the price actually
+     *                      received after line and bill discounts fell below it.
+     *                      A genuine loss from discounting.
+     *
+     * Bill-level discount is spread across each bill exactly as in
+     * getItemMargin(), so these losses agree with the profit figure above them.
      */
     public function getLossMakingItems($shopId, $from, $to, $limit = 20)
     {
         $dbh = $this->connectionPool->getConnection();
         try {
-            $shopId = (int) $shopId;
-            $limit  = (int) $limit;
+            $shopId   = (int) $shopId;
+            $limit    = (int) $limit;
+            $giveaway = $this->giveawayCondition($shopId);
+
             $stmt = "SELECT oi.product_id,
                             p.full_name,
                             p.code,
                             p.price  AS list_price,
                             p.pprice,
-                            SUM(oi.quantity) AS units,
-                            SUM((oi.price - oi.discount) * oi.quantity) AS sale_value,
-                            SUM(COALESCE(p.pprice, 0) * oi.quantity)    AS cost_value,
-                            SUM((oi.price - oi.discount - COALESCE(p.pprice, 0)) * oi.quantity) AS profit
+                            SUM(oi.quantity)            AS units,
+                            SUM(oi.price * oi.quantity) AS billed_value,
+                            SUM((oi.price - oi.discount) * oi.quantity * sub.keep_factor) AS sale_value,
+                            SUM(COALESCE(p.pprice, 0) * oi.quantity)                     AS cost_value,
+                            SUM((oi.price - oi.discount) * oi.quantity * sub.keep_factor
+                                - COALESCE(p.pprice, 0) * oi.quantity)                   AS profit
                      FROM `{$this->table}` o
                      JOIN `{$this->table_sub}` oi ON oi.order_id = o.id
                      JOIN `{$this->table_pro}` p  ON p.id = oi.product_id AND p.is_stock_item = 1
+                     JOIN (
+                         SELECT o2.id AS order_id,
+                                CASE WHEN s2.subtotal > 0
+                                     THEN GREATEST(0, 1 - (o2.discount / s2.subtotal))
+                                     ELSE 1 END AS keep_factor
+                         FROM `{$this->table}` o2
+                         JOIN (
+                             SELECT oi2.order_id, SUM((oi2.price - oi2.discount) * oi2.quantity) AS subtotal
+                             FROM `{$this->table_sub}` oi2
+                             GROUP BY oi2.order_id
+                         ) s2 ON s2.order_id = o2.id
+                         WHERE o2.shopId = :shopId2
+                           AND DATE(o2.order_date) BETWEEN :fromDate2 AND :toDate2
+                     ) sub ON sub.order_id = o.id
                      WHERE o.shopId = :shopId
                        AND o.flag = 1
                        AND o.status NOT IN (1, 3, 4)
                        AND NOT (o.price > 0 AND o.discount >= o.price)
+                       $giveaway
                        AND DATE(o.order_date) BETWEEN :fromDate AND :toDate
                      GROUP BY oi.product_id, p.full_name, p.code, p.price, p.pprice
                      HAVING profit < 0
-                     ORDER BY profit ASC
+                     ORDER BY profit ASC";
+            $prepare = $dbh->prepare($stmt);
+            $prepare->bindParam(':shopId', $shopId, PDO::PARAM_INT);
+            $prepare->bindParam(':shopId2', $shopId, PDO::PARAM_INT);
+            $prepare->bindParam(':fromDate', $from, PDO::PARAM_STR);
+            $prepare->bindParam(':toDate', $to, PDO::PARAM_STR);
+            $prepare->bindParam(':fromDate2', $from, PDO::PARAM_STR);
+            $prepare->bindParam(':toDate2', $to, PDO::PARAM_STR);
+            $prepare->execute();
+
+            $groups = [
+                'cost_above_list' => ['rows' => [], 'count' => 0, 'loss' => 0.0],
+                'discounted'      => ['rows' => [], 'count' => 0, 'loss' => 0.0],
+            ];
+            foreach ($prepare->fetchAll(PDO::FETCH_ASSOC) as $r) {
+                $units = (float) $r['units'];
+                $sale  = (float) $r['sale_value'];
+                $list  = (float) $r['list_price'];
+
+                // Price actually received per unit, after every discount, and how
+                // far that sits below the list price shown beside it. Measured
+                // against the list price, not the bill price: a bill can already
+                // carry a lower rate than the list before any discount is applied.
+                $r['avg_sold_at']    = $units > 0 ? $sale / $units : 0;
+                $r['below_list_pct'] = ($list > 0 && $r['avg_sold_at'] < $list)
+                    ? (1 - $r['avg_sold_at'] / $list) * 100
+                    : null;
+
+                $key = (float) $r['pprice'] >= (float) $r['list_price'] ? 'cost_above_list' : 'discounted';
+                $groups[$key]['count']++;
+                $groups[$key]['loss'] += (float) $r['profit'];
+                if (count($groups[$key]['rows']) < $limit) {
+                    $groups[$key]['rows'][] = $r;
+                }
+            }
+            return $groups;
+        } catch (PDOException $e) {
+            die("Error!: " . $e->getMessage() . "<br/>");
+        } finally {
+            $this->connectionPool->releaseConnection($dbh);
+        }
+    }
+
+    /**
+     * Goods given away to sample, donation and promotion customers.
+     *
+     * Nothing was earned on them, but the stock left the shop, so they are kept
+     * out of the sales margin and their cost is reported -- and deducted -- on
+     * its own line.
+     */
+    public function getGiveawaySummary($shopId, $from, $to, $limit = 15)
+    {
+        $shopId = (int) $shopId;
+        $result = [
+            'totals'    => ['bills' => 0, 'units' => 0, 'value_at_price' => 0, 'billed_value' => 0, 'cost_value' => 0],
+            'customers' => [],
+            'products'  => [],
+        ];
+        if (empty($this->getGiveawayCustomerIds($shopId))) {
+            return $result;
+        }
+
+        $dbh = $this->connectionPool->getConnection();
+        try {
+            $limit = (int) $limit;
+            $where = "o.shopId = :shopId
+                      AND o.flag = 1
+                      AND o.status NOT IN (1, 3, 4)
+                      AND DATE(o.order_date) BETWEEN :fromDate AND :toDate"
+                   . $this->giveawayCondition($shopId, true);
+
+            $stmt = "SELECT o.customer_id,
+                            COALESCE(c.full_name, NULLIF(o.customer_name, ''), 'Unnamed') AS label,
+                            COUNT(DISTINCT o.id)                        AS bills,
+                            SUM(oi.quantity)                            AS units,
+                            SUM(oi.price * oi.quantity)                 AS value_at_price,
+                            SUM((oi.price - oi.discount) * oi.quantity) AS billed_value,
+                            SUM(COALESCE(p.pprice, 0) * oi.quantity)    AS cost_value
+                     FROM `{$this->table}` o
+                     JOIN `{$this->table_sub}` oi ON oi.order_id = o.id
+                     JOIN `{$this->table_pro}` p  ON p.id = oi.product_id AND p.is_stock_item = 1
+                     LEFT JOIN `{$this->table_customers}` c ON c.id = o.customer_id
+                     WHERE $where
+                     GROUP BY o.customer_id, label
+                     ORDER BY cost_value DESC";
+            $prepare = $dbh->prepare($stmt);
+            $prepare->bindParam(':shopId', $shopId, PDO::PARAM_INT);
+            $prepare->bindParam(':fromDate', $from, PDO::PARAM_STR);
+            $prepare->bindParam(':toDate', $to, PDO::PARAM_STR);
+            $prepare->execute();
+            $result['customers'] = $prepare->fetchAll(PDO::FETCH_ASSOC);
+            foreach ($result['customers'] as $r) {
+                foreach (array_keys($result['totals']) as $k) {
+                    $result['totals'][$k] += (float) $r[$k];
+                }
+            }
+
+            $stmt = "SELECT oi.product_id,
+                            p.full_name,
+                            SUM(oi.quantity)                         AS units,
+                            SUM(oi.price * oi.quantity)              AS value_at_price,
+                            SUM(COALESCE(p.pprice, 0) * oi.quantity) AS cost_value
+                     FROM `{$this->table}` o
+                     JOIN `{$this->table_sub}` oi ON oi.order_id = o.id
+                     JOIN `{$this->table_pro}` p  ON p.id = oi.product_id AND p.is_stock_item = 1
+                     WHERE $where
+                     GROUP BY oi.product_id, p.full_name
+                     ORDER BY cost_value DESC
                      LIMIT $limit";
             $prepare = $dbh->prepare($stmt);
             $prepare->bindParam(':shopId', $shopId, PDO::PARAM_INT);
             $prepare->bindParam(':fromDate', $from, PDO::PARAM_STR);
             $prepare->bindParam(':toDate', $to, PDO::PARAM_STR);
             $prepare->execute();
-            return $prepare->fetchAll(PDO::FETCH_ASSOC);
+            $result['products'] = $prepare->fetchAll(PDO::FETCH_ASSOC);
+
+            return $result;
         } catch (PDOException $e) {
             die("Error!: " . $e->getMessage() . "<br/>");
         } finally {
@@ -2910,7 +3100,9 @@ class Orders extends Connection
                       AND o.flag = 1
                       AND o.status NOT IN (1, 3, 4)
                       AND o.price > 0 AND o.discount >= o.price
-                      AND DATE(o.order_date) BETWEEN :fromDate AND :toDate";
+                      AND DATE(o.order_date) BETWEEN :fromDate AND :toDate"
+                   // A giveaway customer's zero-value bill is reported as a giveaway.
+                   . $this->giveawayCondition($shopId);
 
             $stmt = "SELECT COUNT(DISTINCT o.id) AS orders,
                             SUM(oi.quantity)     AS units,

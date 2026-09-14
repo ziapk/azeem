@@ -106,6 +106,28 @@ class Customers extends Connection
 		}
 	}
 
+	/**
+	 * Mark a customer as a giveaway account -- samples, donations, promotions.
+	 * The profit reports then treat its bills as goods given away, not sales.
+	 */
+	public function setGiveaway($id, $isGiveaway)
+	{
+		$dbh = $this->connectionPool->getConnection();
+		try {
+			$flag = $isGiveaway ? 1 : 0;
+			$stmt = "UPDATE `{$this->table}` SET is_giveaway=:is_giveaway WHERE id=:id";
+			$prepare = $dbh->prepare($stmt);
+			$prepare->bindParam(':is_giveaway', $flag, PDO::PARAM_INT);
+			$prepare->bindParam(':id', $id, PDO::PARAM_INT);
+			$prepare->execute();
+			return $prepare->rowCount();
+		} catch (PDOException $e) {
+			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
+		}
+	}
+
 	public function deleteCustomer($array)
 	{
 		$dbh = $this->connectionPool->getConnection();

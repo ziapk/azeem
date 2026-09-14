@@ -2279,6 +2279,9 @@ class Products extends Connection
 			$shopId = (int) $shopId;
 			$limit  = (int) $limit;
 
+			// Samples and donations are giveaways, not mis-priced sales.
+			$giveaway = (new Orders())->giveawayCondition($shopId);
+
 			// Step 1 -- loss-making lines in the period.
 			$stmt = "SELECT oi.product_id,
 			                p.full_name,
@@ -2296,6 +2299,7 @@ class Products extends Connection
 			           AND o.flag = 1
 			           AND o.status NOT IN (1, 3, 4)
 			           AND NOT (o.price > 0 AND o.discount >= o.price)
+			           $giveaway
 			           AND DATE(o.order_date) BETWEEN :fromDate AND :toDate
 			         GROUP BY oi.product_id, p.full_name, p.code, p.price, p.pprice
 			         HAVING profit < 0

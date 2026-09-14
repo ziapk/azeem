@@ -36,7 +36,12 @@ foreach ($expenseRows as $e) {
 	$totalExpenses += (float) $e['amount'];
 }
 
-$netProfit = $netSalesProfit - $totalExpenses;
+// Samples, donations and promotions cost the shop their purchase price but
+// earned nothing, so they come off the profit on their own line instead of
+// hiding inside the sales margin as loss-making sales.
+$giveawayCost = (float) $giveaways['totals']['cost_value'] - (float) $giveaways['totals']['billed_value'];
+
+$netProfit = $netSalesProfit - $giveawayCost - $totalExpenses;
 
 $noCostUnits = (float) $margin['units_without_cost'];
 $noCostValue = (float) $margin['profit_without_cost'];
@@ -237,6 +242,25 @@ ob_start();
 			</tr>
 		<?php } ?>
 
+		<?php if ($giveaways['totals']['units'] > 0) { ?>
+			<tr class="section">
+				<th colspan="2">Samples &amp; Donations &mdash; goods given away</th>
+			</tr>
+			<?php foreach ($giveaways['customers'] as $g) { ?>
+				<tr>
+					<td>
+						<?php echo htmlspecialchars($g['label']); ?>
+						<small>(<?php echo $money($g['units']); ?> units on <?php echo $money($g['bills']); ?> bill(s), net cost)</small>
+					</td>
+					<td class="amt"><?php echo $neg($g['cost_value'] - $g['billed_value']); ?></td>
+				</tr>
+			<?php } ?>
+			<tr class="subtotal">
+				<th>Less: Cost of goods given away</th>
+				<td class="amt"><?php echo $neg($giveawayCost); ?></td>
+			</tr>
+		<?php } ?>
+
 		<tr class="section">
 			<th colspan="2">Expenses</th>
 		</tr>
@@ -280,7 +304,7 @@ ob_start();
 		</tr>
 		<?php if ($cashMovement['paid_to_customers'] != 0) { ?>
 			<tr>
-				<td>Payments refunded to Customers</td>
+				<td>Paid to Customers <small>(clearing money the shop owed them &mdash; not refunds for returns)</small></td>
 				<td class="amt"><?php echo $money($cashMovement['paid_to_customers']); ?></td>
 			</tr>
 		<?php } ?>
@@ -459,6 +483,53 @@ foreach ($balanceBlocks as $b) {
 	</p>
 <?php } ?>
 
+<?php if (!empty($giveaways['products'])) { ?>
+	<h3>Samples &amp; Donations <small style="font-weight: normal">&mdash; what was given away, top <?php echo count($giveaways['products']); ?> by cost</small></h3>
+	<p style="font-size:9.5pt; margin:0 0 8px">
+		Bills for sample, donation and promotion customers are not sales, so they
+		are kept out of the sales profit and the loss lists. The stock still left
+		the shop: <?php echo $money($giveaways['totals']['units']); ?> units costing
+		<?php echo $money($giveaways['totals']['cost_value']); ?><?php if ($giveaways['totals']['billed_value'] > 0) { ?>,
+		less <?php echo $money($giveaways['totals']['billed_value']); ?> that was billed<?php } ?> &mdash;
+		<strong><?php echo $money($giveawayCost); ?></strong> deducted from the profit above.
+	</p>
+	<table class="brk">
+		<thead>
+			<tr>
+				<th class="l">#</th>
+				<th class="l">Product</th>
+				<th>Units</th>
+				<th>Value at Sale Price</th>
+				<th>Cost</th>
+			</tr>
+		</thead>
+		<tbody>
+			<?php $i = 1;
+			foreach ($giveaways['products'] as $r) { ?>
+				<tr>
+					<td class="l"><?php echo $i; ?></td>
+					<td class="l">
+						<?php echo htmlspecialchars($r['full_name']); ?>
+						<small>(#<?php echo $r['product_id']; ?>)</small>
+					</td>
+					<td><?php echo $money($r['units']); ?></td>
+					<td><?php echo $money($r['value_at_price']); ?></td>
+					<td><?php echo $money($r['cost_value']); ?></td>
+				</tr>
+			<?php $i++;
+			} ?>
+		</tbody>
+		<tfoot>
+			<tr>
+				<th class="l" colspan="2">Total (all giveaways in period)</th>
+				<td><?php echo $money($giveaways['totals']['units']); ?></td>
+				<td><?php echo $money($giveaways['totals']['value_at_price']); ?></td>
+				<td><?php echo $money($giveaways['totals']['cost_value']); ?></td>
+			</tr>
+		</tfoot>
+	</table>
+<?php } ?>
+
 <?php if (!empty($writeOffs['rows'])) { ?>
 	<h3>Stock Write-offs <small style="font-weight: normal">&mdash; zero-value bills, excluded from the profit above</small></h3>
 	<p style="font-size:9.5pt; margin:0 0 8px">
@@ -507,19 +578,38 @@ foreach ($balanceBlocks as $b) {
 	</table>
 <?php } ?>
 
-<?php if (!empty($lossMakers)) { ?>
-	<h3 style="color:#a00">Needs Attention &mdash; Sold Below Cost</h3>
-	<p style="font-size:9.5pt; margin:0 0 8px">
-		These products show a loss on this basis. Usually the purchase price is
-		wrong &mdash; a pack price recorded against a per-piece selling price &mdash;
-		rather than the goods genuinely being sold below cost. Check
-		<strong>List Price</strong> against <strong>Purchase Price</strong>.
-		<br>
-		Correct them in
-		<a href="<?php echo SITE_URL; ?>pages/product/fix-pprice.php?shopId=<?php echo (int) $shopId; ?>&amp;from=<?php echo urlencode($from); ?>&amp;to=<?php echo urlencode($to); ?>"
-			target="_blank"><strong>Fix Purchase Prices</strong></a>, which lists every
-		affected product with the cost actually paid and lets you edit it inline.
-	</p>
+<?php
+$fixLink = SITE_URL . 'pages/product/fix-pprice.php?shopId=' . (int) $shopId
+	. '&amp;from=' . urlencode($from) . '&amp;to=' . urlencode($to);
+
+$lossGroups = [
+	'cost_above_list' => [
+		'heading' => 'Needs Attention &mdash; Purchase Price at or above List Price',
+		'intro'   => 'The recorded purchase price is at or above the list price, so these
+			lose money on every sale whatever the discount. That is almost always a data
+			error &mdash; typically a pack price recorded against a per-piece selling
+			price. Correct them in <a href="' . $fixLink . '" target="_blank"><strong>Fix
+			Purchase Prices</strong></a>.',
+	],
+	'discounted' => [
+		'heading' => 'Sold Below Cost after Discount',
+		'intro'   => 'The list price covers the cost, but the price actually received
+			&mdash; after line and bill discounts &mdash; fell below it. These are genuine
+			losses from discounting, not data errors: compare <strong>Avg Sold At</strong>
+			with <strong>Purchase Price</strong>. <strong>Below List</strong> is how far
+			the price received sat under the list price, after every discount.',
+	],
+];
+
+foreach ($lossGroups as $key => $grp) {
+	$lg = $lossMakers[$key];
+	if (empty($lg['rows'])) {
+		continue;
+	} ?>
+	<h3 style="color:#a00"><?php echo $grp['heading']; ?>
+		<small style="font-weight: normal">&mdash; top <?php echo count($lg['rows']); ?> of <?php echo $lg['count']; ?></small>
+	</h3>
+	<p style="font-size:9.5pt; margin:0 0 8px"><?php echo $grp['intro']; ?></p>
 	<table class="brk">
 		<thead>
 			<tr>
@@ -527,6 +617,8 @@ foreach ($balanceBlocks as $b) {
 				<th class="l">Product</th>
 				<th>List Price</th>
 				<th>Purchase Price</th>
+				<th>Avg Sold At</th>
+				<th>Below List</th>
 				<th>Units Sold</th>
 				<th>Sale Value</th>
 				<th>Cost</th>
@@ -535,9 +627,7 @@ foreach ($balanceBlocks as $b) {
 		</thead>
 		<tbody>
 			<?php $i = 1;
-			$lossTotal = 0;
-			foreach ($lossMakers as $r) {
-				$lossTotal += $r['profit']; ?>
+			foreach ($lg['rows'] as $r) { ?>
 				<tr>
 					<td class="l"><?php echo $i; ?></td>
 					<td class="l">
@@ -546,6 +636,8 @@ foreach ($balanceBlocks as $b) {
 					</td>
 					<td><?php echo $money($r['list_price']); ?></td>
 					<td><?php echo $money($r['pprice']); ?></td>
+					<td class="loss"><?php echo number_format($r['avg_sold_at'], 2); ?></td>
+					<td><?php echo $r['below_list_pct'] === null ? '&mdash;' : number_format($r['below_list_pct'], 1) . '%'; ?></td>
 					<td><?php echo $money($r['units']); ?></td>
 					<td><?php echo $money($r['sale_value']); ?></td>
 					<td><?php echo $money($r['cost_value']); ?></td>
@@ -556,8 +648,8 @@ foreach ($balanceBlocks as $b) {
 		</tbody>
 		<tfoot>
 			<tr>
-				<th class="l" colspan="7">Total loss on the products listed above</th>
-				<td class="loss"><?php echo $neg($lossTotal); ?></td>
+				<th class="l" colspan="9">Total loss &mdash; all <?php echo $lg['count']; ?> product(s) in this group</th>
+				<td class="loss"><?php echo $neg($lg['loss']); ?></td>
 			</tr>
 		</tfoot>
 	</table>
@@ -581,6 +673,13 @@ foreach ($balanceBlocks as $b) {
 				sales is shown on its own line with no cost attached.
 			</li>
 		<?php } ?>
+		<?php if ($giveaways['totals']['units'] > 0) { ?>
+			<li>
+				Bills for customers marked <strong>Giveaway Account</strong> on the Update
+				Customer page (samples, donations, promotions) are treated as goods given
+				away, not sales. Tick that box on any new account of this kind.
+			</li>
+		<?php } ?>
 		<?php if ($noCostUnits > 0) { ?>
 			<li>
 				<strong><?php echo $money($noCostUnits); ?> units</strong> were sold on products
@@ -589,6 +688,13 @@ foreach ($balanceBlocks as $b) {
 				so the figures above are overstated by up to that amount.
 			</li>
 		<?php } ?>
+		<li>
+			<strong>Returns</strong> are goods a customer brought back. A return reduces what
+			that customer owes; it never pays cash out by itself.
+			<strong>Paid to Customers</strong> is cash the shop actually paid a customer &mdash;
+			usually to clear a credit balance, where the customer had paid in advance or
+			the shop also buys from them. The two are unrelated and never overlap.
+		</li>
 		<li>
 			Money Movement is cash in and out during the period. It does not belong in
 			the profit calculation &mdash; a receipt may settle a bill from an earlier

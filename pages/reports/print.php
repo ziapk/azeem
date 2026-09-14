@@ -317,6 +317,7 @@ switch ($reportType) {
 		$nonStockSales = $ordersObj->getNonStockSales($shopId, $from, $to);
 		$lossMakers    = $ordersObj->getLossMakingItems($shopId, $from, $to, 20);
 		$writeOffs     = $ordersObj->getWriteOffSummary($shopId, $from, $to, 15);
+		$giveaways     = $ordersObj->getGiveawaySummary($shopId, $from, $to, 15);
 
 		$expenseRows = $de->getPLExpenseRows([
 			'shopId'           => $shopId,
