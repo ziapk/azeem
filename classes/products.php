@@ -1891,6 +1891,473 @@ class Products extends Connection
 	}
 
 	/**
+	 * Whole-life history of one product in one shop (Product Lifecycle report).
+	 *
+	 * Rebuilds one chronological feed from the source documents, using the same
+	 * inclusion rules as Inventory's ledger rebuild so the running stock agrees
+	 * with inventory_ledger, then walks it once. Every unit leaving stock is
+	 * costed at the moving weighted-average cost of the stock on hand at that
+	 * moment; before any purchase exists, products.pprice stands in (flagged).
+	 *
+	 * Bill-level discount is spread over each bill's lines as in
+	 * Orders::getItemMargin(). A bill whose discount covers its whole value is a
+	 * write-off and a bill to a giveaway customer is a giveaway -- both still move
+	 * stock, so both appear here as a loss at cost.
+	 *
+	 * Returns null when the product does not belong to $ownerId.
+	 */
+	public function getProductLifecycle($shopId, $productId, $ownerId, $giveawayIds = [])
+	{
+		$dbh = $this->connectionPool->getConnection();
+		try {
+			$shopId    = (int) $shopId;
+			$productId = (int) $productId;
+
+			// ── Product master + this shop's store row ──────────────────────────
+			$stmt = $dbh->prepare("
+				SELECT p.id, p.full_name, p.code, p.barcode, p.price, p.pprice, p.created_at,
+				       p.is_active, p.is_stock_item, p.min_qty, p.expiry,
+				       pub.full_name AS publisher_name,
+				       cat.full_name AS category_name,
+				       sp.qty        AS cached_qty,
+				       sp.sale_price AS store_price,
+				       sp.location   AS location,
+				       sp.created_at AS store_created_at
+				FROM `{$this->table}` p
+				LEFT JOIN publishers pub ON pub.id = p.publisher_id
+				LEFT JOIN category cat   ON cat.id = p.cat_id
+				LEFT JOIN `{$this->table_st}` sp ON sp.product_id = p.id AND sp.shopId = ?
+				WHERE p.id = ? AND p.owner_id = ?
+				LIMIT 1
+			");
+			$stmt->execute([$shopId, $productId, (int) $ownerId]);
+			$product = $stmt->fetch(PDO::FETCH_ASSOC);
+			if (!$product) {
+				return null;
+			}
+
+			$stmt = $dbh->prepare("SELECT COALESCE(SUM(quantity), 0) FROM inventory_ledger WHERE product_id = ? AND shop_id = ?");
+			$stmt->execute([$productId, $shopId]);
+			$product['ledger_qty'] = (float) $stmt->fetchColumn();
+
+			$events = [];
+
+			// ── Purchases (supply) ──────────────────────────────────────────────
+			// STRAIGHT_JOIN: the item tables have no index on product_id, so read
+			// them once and look the header up by primary key.
+			$stmt = $dbh->prepare("
+				SELECT s.id AS ref_id,
+				       MAX(s.supply_date) AS event_date,
+				       MAX(s.created_at)  AS event_time,
+				       MAX(s.ref_no)      AS ref_no,
+				       MAX(COALESCE(sup.name, c.full_name)) AS party,
+				       SUM(si.quantity) AS qty,
+				       SUM(si.pprice * si.quantity * (1 - COALESCE(si.discount, 0) / 100)) AS value
+				FROM supply_items si
+				STRAIGHT_JOIN supply s ON s.id = si.supply_id
+				LEFT JOIN suppliers sup ON sup.id = s.supplier_id AND s.supplier_type = 1
+				LEFT JOIN customers c   ON c.id = s.supplier_id   AND s.supplier_type = 2
+				WHERE si.product_id = ? AND si.quantity > 0
+				  AND s.shopId = ? AND s.flag = 1 AND s.status != 1
+				GROUP BY s.id
+			");
+			$stmt->execute([$productId, $shopId]);
+			foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $r) {
+				$events[] = [
+					'type'     => 'purchase',
+					'priority' => 1,
+					'date'     => substr($r['event_date'], 0, 10),
+					'time'     => $r['event_time'],
+					'ref_type' => 'supply',
+					'ref_id'   => (int) $r['ref_id'],
+					'ref_label'=> 'Purchase #' . $r['ref_id'] . ($r['ref_no'] ? ' (' . $r['ref_no'] . ')' : ''),
+					'party'    => $r['party'] ?: '—',
+					'qty'      => (float) $r['qty'],
+					'value'    => (float) $r['value'],
+					'tags'     => [],
+				];
+			}
+
+			// ── Sales (orders) ──────────────────────────────────────────────────
+			$stmt = $dbh->prepare("
+				SELECT o.id AS ref_id,
+				       MAX(o.order_custom_id) AS custom_id,
+				       MAX(o.order_date)  AS event_date,
+				       MAX(o.created_at)  AS event_time,
+				       MAX(o.customer_id) AS customer_id,
+				       MAX(COALESCE(NULLIF(o.customer_name, ''), c.full_name, 'Walk-in')) AS party,
+				       MAX(o.price)    AS bill_price,
+				       MAX(o.discount) AS bill_discount,
+				       SUM(oi.quantity)               AS qty,
+				       SUM(oi.price * oi.quantity)    AS gross,
+				       SUM(oi.discount * oi.quantity) AS line_discount
+				FROM order_items oi
+				STRAIGHT_JOIN orders o ON o.id = oi.order_id
+				LEFT JOIN customers c ON c.id = o.customer_id
+				WHERE oi.product_id = ? AND oi.quantity > 0
+				  AND o.shopId = ? AND o.flag = 1 AND o.status IN (2, 8, 9)
+				GROUP BY o.id
+			");
+			$stmt->execute([$productId, $shopId]);
+			$sales = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+			// Each bill's full subtotal, to spread its bill-level discount.
+			$subtotals = [];
+			foreach (array_chunk(array_column($sales, 'ref_id'), 1000) as $ids) {
+				$ph   = implode(',', array_fill(0, count($ids), '?'));
+				$st2  = $dbh->prepare("SELECT order_id, SUM((price - discount) * quantity) FROM order_items WHERE order_id IN ($ph) GROUP BY order_id");
+				$st2->execute($ids);
+				$subtotals += $st2->fetchAll(PDO::FETCH_KEY_PAIR);
+			}
+
+			$giveawayIds = array_map('intval', $giveawayIds);
+			foreach ($sales as $r) {
+				$subtotal     = (float) ($subtotals[$r['ref_id']] ?? 0);
+				$billDiscount = (float) $r['bill_discount'];
+				$keep         = $subtotal > 0 ? max(0, 1 - $billDiscount / $subtotal) : 1;
+				$afterLine    = (float) $r['gross'] - (float) $r['line_discount'];
+
+				$tags = [];
+				if ((float) $r['bill_price'] > 0 && $billDiscount >= (float) $r['bill_price']) {
+					$tags[] = 'write-off';
+				}
+				if ($r['customer_id'] && in_array((int) $r['customer_id'], $giveawayIds, true)) {
+					$tags[] = 'giveaway';
+				}
+
+				$events[] = [
+					'type'          => 'sale',
+					'priority'      => 3,
+					'date'          => substr($r['event_date'], 0, 10),
+					'time'          => $r['event_time'],
+					'ref_type'      => 'order',
+					'ref_id'        => (int) $r['ref_id'],
+					'ref_label'     => 'Bill #' . ($r['custom_id'] ?: $r['ref_id']),
+					'party'         => $r['party'],
+					'customer_id'   => (int) $r['customer_id'],
+					'qty'           => (float) $r['qty'],
+					'gross'         => (float) $r['gross'],
+					'discount'      => (float) $r['line_discount'] + $afterLine * (1 - $keep),
+					'value'         => $afterLine * $keep,
+					'tags'          => $tags,
+				];
+			}
+
+			// ── Returns: 1 = customer returned to us, 2 = we returned to supplier ──
+			$stmt = $dbh->prepare("
+				SELECT ro.id AS ref_id, ro.return_type,
+				       MAX(ro.return_date) AS event_date,
+				       MAX(ro.datetime)    AS event_time,
+				       MAX(ro.order_id)    AS orig_order,
+				       MAX(COALESCE(NULLIF(ro.customer_name, ''), c.full_name)) AS party,
+				       SUM(pr.quantity) AS qty,
+				       SUM((pr.price - pr.discount) * pr.quantity) AS value
+				FROM product_returns pr
+				STRAIGHT_JOIN return_orders ro ON ro.id = pr.order_id
+				LEFT JOIN customers c ON c.id = ro.customer_id
+				WHERE pr.product_id = ? AND pr.quantity > 0
+				  AND ro.shopId = ? AND ro.flag = 2 AND ro.return_type IN (1, 2)
+				GROUP BY ro.id, ro.return_type
+			");
+			$stmt->execute([$productId, $shopId]);
+			foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $r) {
+				$in = (int) $r['return_type'] === 1;
+				$events[] = [
+					'type'     => $in ? 'return_in' : 'return_out',
+					'priority' => $in ? 2 : 4,
+					'date'     => substr($r['event_date'], 0, 10),
+					'time'     => $r['event_time'],
+					'ref_type' => 'return_order',
+					'ref_id'   => (int) $r['ref_id'],
+					'ref_label'=> 'Return #' . $r['ref_id'] . ($r['orig_order'] ? ' (bill ' . $r['orig_order'] . ')' : ''),
+					'party'    => $r['party'] ?: '—',
+					'qty'      => (float) $r['qty'],
+					'value'    => (float) $r['value'],
+					'tags'     => [],
+				];
+			}
+
+			// ── Exchanges (converted into / out of another product) ─────────────
+			$stmt = $dbh->prepare("
+				SELECT ex.id, ex.created_at, ex.handover, ex.from_id, ex.to_id, ex.from_qty, ex.to_qty,
+				       pf.full_name AS from_name, pt.full_name AS to_name
+				FROM `{$this->table_ex}` ex
+				LEFT JOIN `{$this->table}` pf ON pf.id = ex.from_id
+				LEFT JOIN `{$this->table}` pt ON pt.id = ex.to_id
+				WHERE ex.shop_id = ? AND (ex.from_id = ? OR ex.to_id = ?)
+			");
+			$stmt->execute([$shopId, $productId, $productId]);
+			foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $r) {
+				if ((int) $r['from_id'] === $productId && (float) $r['from_qty'] > 0) {
+					$events[] = [
+						'type' => 'exchange_out', 'priority' => 5,
+						'date' => substr($r['created_at'], 0, 10), 'time' => $r['created_at'],
+						'ref_type' => 'exchange', 'ref_id' => (int) $r['id'],
+						'ref_label' => 'Exchange #' . $r['id'] . ' → ' . $r['to_name'],
+						'party' => $r['handover'] ?: '—',
+						'qty' => (float) $r['from_qty'], 'value' => 0, 'tags' => [],
+					];
+				}
+				if ((int) $r['to_id'] === $productId && (float) $r['to_qty'] > 0) {
+					$events[] = [
+						'type' => 'exchange_in', 'priority' => 5,
+						'date' => substr($r['created_at'], 0, 10), 'time' => $r['created_at'],
+						'ref_type' => 'exchange', 'ref_id' => (int) $r['id'],
+						'ref_label' => 'Exchange #' . $r['id'] . ' ← ' . $r['from_name'],
+						'party' => $r['handover'] ?: '—',
+						'qty' => (float) $r['to_qty'], 'value' => 0, 'tags' => [],
+					];
+				}
+			}
+
+			// Same ordering as the ledger rebuild: date, then movement priority.
+			usort($events, function ($a, $b) {
+				return [$a['date'], $a['priority'], $a['time'], $a['ref_id']]
+				   <=> [$b['date'], $b['priority'], $b['time'], $b['ref_id']];
+			});
+
+			return $this->walkProductLifecycle($product, $events);
+
+		} catch (PDOException $e) {
+			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
+		}
+	}
+
+	/**
+	 * Walk a product's sorted event feed once, attaching running stock, moving
+	 * average cost and profit to every event, and rolling up the summary,
+	 * monthly, supplier, customer and milestone views.
+	 */
+	private function walkProductLifecycle(array $product, array $events)
+	{
+		$fallbackCost = (float) $product['pprice'];
+
+		$s = [
+			'purchase_count' => 0, 'purchased_qty' => 0, 'purchase_value' => 0,
+			'sale_count' => 0, 'sold_qty' => 0, 'gross_sales' => 0, 'discounts' => 0, 'revenue' => 0, 'sale_cogs' => 0,
+			'giveaway_qty' => 0, 'giveaway_cost' => 0, 'giveaway_result' => 0,
+			'writeoff_qty' => 0, 'writeoff_cost' => 0, 'writeoff_result' => 0,
+			'return_in_count' => 0, 'return_in_qty' => 0, 'return_in_value' => 0,
+			'return_out_count' => 0, 'return_out_qty' => 0, 'return_out_value' => 0,
+			'exchange_in_qty' => 0, 'exchange_out_qty' => 0, 'exchange_out_cost' => 0,
+			'estimated_cost_qty' => 0, 'stockouts' => 0,
+			'first_purchase' => null, 'last_purchase' => null, 'first_sale' => null, 'last_sale' => null,
+			'min_unit_cost' => null, 'max_unit_cost' => null, 'min_unit_price' => null, 'max_unit_price' => null,
+		];
+		$monthly    = [];
+		$suppliers  = [];
+		$customers  = [];
+		$milestones = [];
+
+		$createdAt = $product['created_at'] ?: $product['store_created_at'];
+		if ($createdAt) {
+			$milestones[] = ['date' => substr($createdAt, 0, 10), 'kind' => 'created', 'text' => 'Product created'];
+		}
+
+		$stock = 0.0;
+		$avg   = 0.0;
+		$cum   = 0.0;
+
+		foreach ($events as $i => $e) {
+			$qty    = $e['qty'];
+			$before = $stock;
+			$cost   = $avg > 0 ? $avg : $fallbackCost;
+			$e['estimated'] = false;
+			$e['cost']      = 0;
+			$e['profit']    = 0;
+
+			$m = substr($e['date'], 0, 7);
+			if (!isset($monthly[$m])) {
+				$monthly[$m] = ['in_qty' => 0, 'purchase_value' => 0, 'sold_qty' => 0, 'revenue' => 0, 'profit' => 0, 'returned_qty' => 0];
+			}
+
+			switch ($e['type']) {
+				case 'purchase':
+					$unit = $qty > 0 ? $e['value'] / $qty : 0;
+					$avg  = $stock > 0 ? ($stock * $avg + $e['value']) / ($stock + $qty) : $unit;
+					$stock += $qty;
+					$e['unit'] = $unit;
+
+					$s['purchase_count']++;
+					$s['purchased_qty']  += $qty;
+					$s['purchase_value'] += $e['value'];
+					$s['first_purchase'] = $s['first_purchase'] ?: $e['date'];
+					$s['last_purchase']  = $e['date'];
+					$s['min_unit_cost']  = $s['min_unit_cost'] === null ? $unit : min($s['min_unit_cost'], $unit);
+					$s['max_unit_cost']  = $s['max_unit_cost'] === null ? $unit : max($s['max_unit_cost'], $unit);
+					$monthly[$m]['in_qty']         += $qty;
+					$monthly[$m]['purchase_value'] += $e['value'];
+
+					$k = $e['party'];
+					if (!isset($suppliers[$k])) {
+						$suppliers[$k] = ['name' => $k, 'count' => 0, 'qty' => 0, 'value' => 0, 'first' => $e['date'], 'last' => $e['date']];
+					}
+					$suppliers[$k]['count']++;
+					$suppliers[$k]['qty']   += $qty;
+					$suppliers[$k]['value'] += $e['value'];
+					$suppliers[$k]['last']   = $e['date'];
+
+					if ($s['purchase_count'] === 1) {
+						$milestones[] = ['date' => $e['date'], 'kind' => 'purchase', 'text' => 'First purchase — ' . $this->lcQty($qty) . ' units from ' . $e['party']];
+					}
+					break;
+
+				case 'exchange_in':
+					$avg = $stock > 0 ? ($stock * $avg + $qty * $cost) / ($stock + $qty) : $cost;
+					$stock += $qty;
+					$e['cost'] = $qty * $cost;
+					$s['exchange_in_qty'] += $qty;
+					$monthly[$m]['in_qty'] += $qty;
+					break;
+
+				case 'sale':
+					$e['estimated'] = $avg <= 0;
+					$e['cost']   = $qty * $cost;
+					$e['profit'] = $e['value'] - $e['cost'];
+					$e['unit']   = $qty > 0 ? $e['value'] / $qty : 0;
+					$stock -= $qty;
+
+					if (in_array('giveaway', $e['tags'])) {
+						$s['giveaway_qty']  += $qty;
+						$s['giveaway_cost'] += $e['cost'];
+						$s['giveaway_result'] += $e['profit'];
+					} elseif (in_array('write-off', $e['tags'])) {
+						$s['writeoff_qty']  += $qty;
+						$s['writeoff_cost'] += $e['cost'];
+						$s['writeoff_result'] += $e['profit'];
+					} else {
+						$s['sale_count']++;
+						$s['sold_qty']    += $qty;
+						$s['gross_sales'] += $e['gross'];
+						$s['discounts']   += $e['discount'];
+						$s['revenue']     += $e['value'];
+						$s['sale_cogs']   += $e['cost'];
+						$s['first_sale']   = $s['first_sale'] ?: $e['date'];
+						$s['last_sale']    = $e['date'];
+						if ($e['unit'] > 0) {
+							$s['min_unit_price'] = $s['min_unit_price'] === null ? $e['unit'] : min($s['min_unit_price'], $e['unit']);
+							$s['max_unit_price'] = $s['max_unit_price'] === null ? $e['unit'] : max($s['max_unit_price'], $e['unit']);
+						}
+						$monthly[$m]['sold_qty'] += $qty;
+						$monthly[$m]['revenue']  += $e['value'];
+
+						$k = $e['customer_id'] ? 'c' . $e['customer_id'] : 'n' . strtolower($e['party']);
+						if (!isset($customers[$k])) {
+							$customers[$k] = ['name' => $e['party'], 'count' => 0, 'qty' => 0, 'value' => 0, 'profit' => 0, 'last' => $e['date']];
+						}
+						$customers[$k]['count']++;
+						$customers[$k]['qty']    += $qty;
+						$customers[$k]['value']  += $e['value'];
+						$customers[$k]['profit'] += $e['profit'];
+						$customers[$k]['last']    = $e['date'];
+
+						if ($s['sale_count'] === 1) {
+							$milestones[] = ['date' => $e['date'], 'kind' => 'sale', 'text' => 'First sale — ' . $this->lcQty($qty) . ' units to ' . $e['party']];
+						}
+					}
+					if ($e['estimated']) {
+						$s['estimated_cost_qty'] += $qty;
+					}
+					break;
+
+				case 'return_in':
+					// Refund reverses the sale; the units go back on the shelf at today's average.
+					$e['estimated'] = $avg <= 0;
+					$e['cost']   = $qty * $cost;
+					$e['profit'] = $e['cost'] - $e['value'];
+					if ($stock <= 0 && $avg <= 0) {
+						$avg = $cost;
+					}
+					$stock += $qty;
+					$s['return_in_count']++;
+					$s['return_in_qty']   += $qty;
+					$s['return_in_value'] += $e['value'];
+					$monthly[$m]['returned_qty'] += $qty;
+					$monthly[$m]['revenue']      -= $e['value'];
+					break;
+
+				case 'return_out':
+					// Supplier credit against units that were carried at average cost.
+					$e['estimated'] = $avg <= 0;
+					$e['cost']   = $qty * $cost;
+					$e['profit'] = $e['value'] - $e['cost'];
+					$stock -= $qty;
+					$s['return_out_count']++;
+					$s['return_out_qty']   += $qty;
+					$s['return_out_value'] += $e['value'];
+					break;
+
+				case 'exchange_out':
+					$e['cost'] = $qty * $cost;
+					$stock -= $qty;
+					$s['exchange_out_qty']  += $qty;
+					$s['exchange_out_cost'] += $e['cost'];
+					break;
+			}
+
+			$cum += $e['profit'];
+			$monthly[$m]['profit'] += $e['profit'];
+			$monthly[$m]['end_stock'] = $stock;
+
+			$e['balance']    = $stock;
+			$e['avg_cost']   = $avg;
+			$e['cum_profit'] = $cum;
+			$events[$i] = $e;
+
+			if ($before > 0 && $stock <= 0) {
+				$s['stockouts']++;
+				$milestones[] = ['date' => $e['date'], 'kind' => 'stockout', 'text' => 'Stock ran out'];
+			} elseif ($before <= 0 && $stock > 0 && $s['stockouts'] > 0) {
+				$milestones[] = ['date' => $e['date'], 'kind' => 'restock', 'text' => 'Back in stock — ' . $this->lcQty($stock) . ' units'];
+			}
+		}
+
+		if ($s['purchase_count'] > 1) {
+			$milestones[] = ['date' => $s['last_purchase'], 'kind' => 'purchase', 'text' => 'Last purchase'];
+		}
+		if ($s['sale_count'] > 1) {
+			$milestones[] = ['date' => $s['last_sale'], 'kind' => 'sale', 'text' => 'Last sale'];
+		}
+		usort($milestones, function ($a, $b) { return strcmp($a['date'], $b['date']); });
+
+		// Realised result on everything that has left the shelf.
+		$s['returns_net']    = array_sum(array_map(function ($e) {
+			return in_array($e['type'], ['return_in', 'return_out']) ? $e['profit'] : 0;
+		}, $events));
+		$s['gross_profit']   = $s['revenue'] - $s['sale_cogs'];
+		$s['net_profit']     = $cum;
+		$s['avg_cost']       = $avg;
+		$s['timeline_stock'] = $stock;
+		$s['first_event']    = $events ? $events[0]['date'] : null;
+		$s['last_event']     = $events ? end($events)['date'] : null;
+
+		// Cash view: what the product has cost versus what it has brought in.
+		$s['cash_out'] = $s['purchase_value'];
+		$s['cash_in']  = $s['revenue'] - $s['return_in_value'] + $s['return_out_value'];
+
+		uasort($suppliers, function ($a, $b) { return $b['qty'] <=> $a['qty']; });
+		uasort($customers, function ($a, $b) { return $b['qty'] <=> $a['qty']; });
+		ksort($monthly);
+
+		return [
+			'product'    => $product,
+			'events'     => $events,
+			'summary'    => $s,
+			'monthly'    => $monthly,
+			'suppliers'  => array_values($suppliers),
+			'customers'  => array_values($customers),
+			'milestones' => $milestones,
+		];
+	}
+
+	private function lcQty($q)
+	{
+		return number_format($q, floor($q) == $q ? 0 : 2);
+	}
+
+	/**
 	 * Value the shop's stock as at the end of $asOfDate.
 	 *
 	 * store_products.qty is only a *current* snapshot, so the quantity on a past

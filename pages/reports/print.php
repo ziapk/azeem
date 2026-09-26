@@ -355,6 +355,28 @@ switch ($reportType) {
 
 		include_once dirname(__FILE__) . '/profitSummary.php';
 		exit;
+	case '27':
+		$productId = (int) ($_POST['product_id'] ?? 0);
+		if (!$productId && !empty($_POST['product_ids'])) {
+			$productId = (int) explode(',', $_POST['product_ids'])[0];
+		}
+		if (!$productId) {
+			echo '<h3 style="font-family: Arial, sans-serif">Please select a product for the Product Lifecycle report.</h3>';
+			exit;
+		}
+
+		$ownerId = $userData['role'] == 'owner' ? $userData['id'] : $userData['created_by'];
+		$life    = $productObj->getProductLifecycle($shopId, $productId, $ownerId, $ordersObj->getGiveawayCustomerIds($shopId));
+		if (!$life) {
+			echo '<h3 style="font-family: Arial, sans-serif">Product not found.</h3>';
+			exit;
+		}
+
+		$stores     = new Store();
+		$selectShop = $stores->getStore($shopId);
+		$shopName   = $selectShop['full_name'] . ' - ' . $selectShop['city'];
+		include_once dirname(__FILE__) . '/productLifecycleReport.php';
+		exit;
 
 	default:
 		# code...
