@@ -73,24 +73,7 @@ $cover      = ($perMonth && $stockNow > 0) ? $stockNow / $perMonth : null;
 $mismatch   = $p['cached_qty'] !== null && abs((float) $p['cached_qty'] - $stockNow) > 0.001;
 $recovered  = $s['cash_out'] > 0 ? $s['cash_in'] / $s['cash_out'] * 100 : null;
 
-// Where the product stands today.
-if (!(int) $p['is_active']) {
-    $status = ['Inactive', 'st-grey', 'Product is switched off.'];
-} elseif (empty($ev)) {
-    $status = ['No activity', 'st-grey', 'Never bought or sold in this shop.'];
-} elseif ($stockNow < 0) {
-    $status = ['Negative stock', 'st-red', 'More units sold than ever received — purchases are missing or quantities are wrong.'];
-} elseif ($stockNow == 0 && $s['sold_qty'] > 0) {
-    $status = ['Sold out', 'st-amber', 'All stock sold. Last sale ' . lcDate($s['last_sale']) . '.'];
-} elseif ($s['sold_qty'] == 0) {
-    $status = ['Never sold', 'st-red', lcQty($stockNow) . ' units bought, none sold yet.'];
-} elseif ($sinceSale > 180) {
-    $status = ['Dead stock', 'st-red', 'No sale for ' . lcSpan($sinceSale) . ' with ' . lcQty($stockNow) . ' units on the shelf.'];
-} elseif ($sinceSale > 60) {
-    $status = ['Slow moving', 'st-amber', 'Last sale ' . lcSpan($sinceSale) . ' ago.'];
-} else {
-    $status = ['Active', 'st-green', 'Selling normally.'];
-}
+$status = $productObj->lifecycleStatus($p, $s);
 
 $counts = ['all' => count($ev), 'purchase' => 0, 'sale' => 0, 'return' => 0, 'exchange' => 0];
 foreach ($ev as $e) {

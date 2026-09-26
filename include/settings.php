@@ -272,6 +272,7 @@ $reportsArray = [
     25 => ['id' => 25, 'title' => 'Product Purchase / Sale Ledger', 'access' => ['owner', 'manager']],
     26 => ['id' => 26, 'title' => 'Profit Summary (Informal)', 'access' => ['owner', 'manager']],
     27 => ['id' => 27, 'title' => 'Product Lifecycle (Full Timeline)', 'access' => ['owner', 'manager']],
+    28 => ['id' => 28, 'title' => 'Party Lifecycle (Customer / Supplier / Publisher)', 'access' => ['owner', 'manager']],
 ];
 
 $categories = [
@@ -281,7 +282,7 @@ $categories = [
     'Expense' => [8,9],           // Report IDs belonging to Expense
     'Returns' => [4, 5, 6, 7],       // Report IDs belonging to Sales
     'Sample' => [19,20],            // Report IDs belonging to Audit
-    'Audit' => [10, 21, 24, 25, 27],            // Report IDs belonging to Audit
+    'Audit' => [10, 21, 24, 25, 27, 28],            // Report IDs belonging to Audit
     'Profit' => [26],                       // Informal, item-margin based
     'Accounting' => [11, 12, 13, 14, 15, 22, 23],            // Report IDs belonging to Audit
 ];

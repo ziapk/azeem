@@ -1910,13 +1910,291 @@ class Products extends Connection
 	{
 		$dbh = $this->connectionPool->getConnection();
 		try {
-			$shopId    = (int) $shopId;
 			$productId = (int) $productId;
+			$products  = $this->lifecycleProducts($dbh, $shopId, $ownerId, [$productId]);
+			if (empty($products[$productId])) {
+				return null;
+			}
+			$events = $this->lifecycleEvents($dbh, $shopId, [$productId], $giveawayIds);
+			return $this->walkProductLifecycle($products[$productId], $events[$productId] ?? []);
+		} catch (PDOException $e) {
+			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
+		}
+	}
 
-			// ── Product master + this shop's store row ──────────────────────────
+	/**
+	 * Lifecycle of every product tied to a publisher and/or an account (Party
+	 * Lifecycle report), optionally narrowed to one product.
+	 *
+	 * Scope: the given product; otherwise every product the account ever bought,
+	 * supplied or returned; intersected with (or, with no account, simply) the
+	 * publisher's products stocked in this shop.
+	 *
+	 * Each product is walked over its WHOLE history so that costs are right,
+	 * then the account's own events are picked out of it. With no account the
+	 * party is the publisher, so every event counts.
+	 *
+	 * @param array $params publisher_id, account_id, product_id, giveaway_ids
+	 */
+	public function getPartyLifecycle($shopId, $ownerId, array $params)
+	{
+		$dbh = $this->connectionPool->getConnection();
+		try {
+			$shopId      = (int) $shopId;
+			$ownerId     = (int) $ownerId;
+			$publisherId = (int) ($params['publisher_id'] ?? 0);
+			$accountId   = (int) ($params['account_id'] ?? 0);
+			$productId   = (int) ($params['product_id'] ?? 0);
+
+			$party = ['publisher' => null, 'account' => null];
+			if ($publisherId) {
+				$stmt = $dbh->prepare("SELECT id, full_name FROM publishers WHERE id = ? AND owner_id = ?");
+				$stmt->execute([$publisherId, $ownerId]);
+				$party['publisher'] = $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
+			}
+			if ($accountId) {
+				// An account can sit behind a customer, a supplier or both.
+				$stmt = $dbh->prepare("
+					SELECT a.id, a.title,
+					       (SELECT COUNT(*) FROM customers c WHERE c.account_id = a.id) AS is_customer,
+					       (SELECT COUNT(*) FROM suppliers s WHERE s.account_id = a.id) AS is_supplier
+					FROM accounts a WHERE a.id = ?
+				");
+				$stmt->execute([$accountId]);
+				$party['account'] = $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
+			}
+
+			// ── Which products ──────────────────────────────────────────────────
+			if ($productId) {
+				$ids = [$productId];
+			} elseif ($accountId) {
+				$stmt = $dbh->prepare("
+					SELECT oi.product_id FROM order_items oi
+					STRAIGHT_JOIN orders o ON o.id = oi.order_id
+					STRAIGHT_JOIN customers c ON c.id = o.customer_id AND c.account_id = :a1
+					WHERE o.shopId = :s1 AND o.flag = 1 AND o.status IN (2, 8, 9) AND oi.quantity > 0
+					UNION
+					SELECT si.product_id FROM supply_items si
+					STRAIGHT_JOIN supply s ON s.id = si.supply_id
+					LEFT JOIN suppliers sup ON sup.id = s.supplier_id AND s.supplier_type = 1
+					LEFT JOIN customers c ON c.id = s.supplier_id AND s.supplier_type = 2
+					WHERE s.shopId = :s2 AND s.flag = 1 AND s.status != 1 AND si.quantity > 0
+					  AND COALESCE(sup.account_id, c.account_id) = :a2
+					UNION
+					SELECT pr.product_id FROM product_returns pr
+					STRAIGHT_JOIN return_orders ro ON ro.id = pr.order_id
+					LEFT JOIN suppliers sup ON sup.id = ro.customer_id AND ro.is_supplier = 2
+					LEFT JOIN customers c   ON c.id = ro.customer_id   AND ro.is_supplier != 2
+					WHERE ro.shopId = :s3 AND ro.flag = 2 AND ro.return_type IN (1, 2) AND pr.quantity > 0
+					  AND COALESCE(sup.account_id, c.account_id) = :a3
+				");
+				$stmt->execute([':a1' => $accountId, ':a2' => $accountId, ':a3' => $accountId, ':s1' => $shopId, ':s2' => $shopId, ':s3' => $shopId]);
+				$ids = array_map('intval', $stmt->fetchAll(PDO::FETCH_COLUMN));
+			} elseif ($publisherId) {
+				$stmt = $dbh->prepare("
+					SELECT DISTINCT p.id FROM `{$this->table}` p
+					JOIN `{$this->table_st}` sp ON sp.product_id = p.id AND sp.shopId = ?
+					WHERE p.publisher_id = ? AND p.owner_id = ?
+				");
+				$stmt->execute([$shopId, $publisherId, $ownerId]);
+				$ids = array_map('intval', $stmt->fetchAll(PDO::FETCH_COLUMN));
+			} else {
+				$ids = [];
+			}
+
+			$products = $this->lifecycleProducts($dbh, $shopId, $ownerId, $ids);
+			if ($publisherId) {
+				$products = array_filter($products, function ($p) use ($publisherId) {
+					return (int) $p['publisher_id'] === $publisherId;
+				});
+			}
+			// Walked in batches: a big publisher or the walk-in customer can span
+			// thousands of products, too much history to hold in memory at once.
+			// Each product is walked over its WHOLE history so costs are right,
+			// then only the party's slice and the summaries are kept.
+			$feedCap   = 3000;
+			$feedTotal = 0;
+			$rows      = [];
+			$feed      = [];
+			$monthly   = [];
+			$byDate    = function ($a, $b) {
+				return [$a['date'], $a['priority'], $a['time'], $a['ref_id']]
+				   <=> [$b['date'], $b['priority'], $b['time'], $b['ref_id']];
+			};
+			foreach (array_chunk(array_keys($products), 250) as $batch) {
+				$events = $this->lifecycleEvents($dbh, $shopId, $batch, $params['giveaway_ids'] ?? []);
+				foreach ($batch as $pid) {
+					$product = $products[$pid];
+					$life = $this->walkProductLifecycle($product, $events[$pid] ?? []);
+					$mine = $accountId
+						? array_values(array_filter($life['events'], function ($e) use ($accountId) {
+							return (int) $e['account_id'] === $accountId;
+						}))
+						: $life['events'];
+
+					$ps = [
+						'purchase_count' => 0, 'bought_qty' => 0, 'bought_value' => 0,
+						'return_out_qty' => 0, 'return_out_value' => 0,
+						'sale_count' => 0, 'sold_qty' => 0, 'revenue' => 0, 'cost' => 0, 'sale_profit' => 0,
+						'free_qty' => 0, 'return_in_qty' => 0, 'return_in_value' => 0,
+						'profit' => 0, 'customer_profit' => 0, 'supplier_result' => 0,
+						'first' => null, 'last' => null,
+					];
+					foreach ($mine as $e) {
+						$ps['first']   = $ps['first'] ?: $e['date'];
+						$ps['last']    = $e['date'];
+						$ps['profit'] += $e['profit'];
+
+						$m = substr($e['date'], 0, 7);
+						if (!isset($monthly[$m])) {
+							$monthly[$m] = ['bought_qty' => 0, 'bought_value' => 0, 'sold_qty' => 0, 'revenue' => 0, 'returned_qty' => 0, 'profit' => 0];
+						}
+						$monthly[$m]['profit'] += $e['profit'];
+
+						switch ($e['type']) {
+							case 'purchase':
+								$ps['purchase_count']++;
+								$ps['bought_qty']   += $e['qty'];
+								$ps['bought_value'] += $e['value'];
+								$monthly[$m]['bought_qty']   += $e['qty'];
+								$monthly[$m]['bought_value'] += $e['value'];
+								break;
+							case 'return_out':
+								$ps['return_out_qty']   += $e['qty'];
+								$ps['return_out_value'] += $e['value'];
+								$ps['supplier_result']  += $e['profit'];
+								$monthly[$m]['returned_qty'] += $e['qty'];
+								break;
+							case 'sale':
+								$ps['customer_profit'] += $e['profit'];
+								if ($e['tags']) {
+									$ps['free_qty'] += $e['qty'];
+									break;
+								}
+								$ps['sale_count']++;
+								$ps['sold_qty']    += $e['qty'];
+								$ps['revenue']     += $e['value'];
+								$ps['cost']        += $e['cost'];
+								$ps['sale_profit'] += $e['profit'];
+								$monthly[$m]['sold_qty'] += $e['qty'];
+								$monthly[$m]['revenue']  += $e['value'];
+								break;
+							case 'return_in':
+								$ps['return_in_qty']   += $e['qty'];
+								$ps['return_in_value'] += $e['value'];
+								$ps['customer_profit'] += $e['profit'];
+								$monthly[$m]['returned_qty'] += $e['qty'];
+								$monthly[$m]['revenue']      -= $e['value'];
+								break;
+						}
+
+						$e['product_id']   = $pid;
+						$e['product_name'] = $product['full_name'];
+						$feed[] = $e;
+					}
+					$rows[$pid] = [
+						'product' => $life['product'],
+						'summary' => $life['summary'],
+						'status'  => $this->lifecycleStatus($life['product'], $life['summary']),
+						'party'   => $ps,
+					];
+					unset($events[$pid], $life);
+				}
+
+				// Keep only the most recent $feedCap events for the timeline.
+				if (count($feed) > 2 * $feedCap) {
+					usort($feed, $byDate);
+					$feed = array_slice($feed, -$feedCap);
+				}
+			}
+
+			usort($feed, $byDate);
+			$feed = array_slice($feed, -$feedCap);
+			uasort($rows, function ($a, $b) {
+				return [$b['party']['bought_qty'] + $b['party']['sold_qty'], $b['summary']['sold_qty']]
+				   <=> [$a['party']['bought_qty'] + $a['party']['sold_qty'], $a['summary']['sold_qty']];
+			});
+			ksort($monthly);
+
+			return [
+				'party'    => $party,
+				'products' => $rows,
+				'events'   => $feed,
+				'events_total' => $feedTotal,
+				'monthly'  => $monthly,
+			];
+		} catch (PDOException $e) {
+			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
+		}
+	}
+
+	/**
+	 * What each lifecycleStatus() label means, in the order the rules are
+	 * checked (the first that fits wins). Keep in step with lifecycleStatus().
+	 */
+	public function lifecycleStatusDefinitions()
+	{
+		return [
+			'Inactive'       => ['st-grey',  'Product is switched off in the product list. Shown whatever its stock or sales.'],
+			'No activity'    => ['st-grey',  'Never purchased, sold, returned or exchanged in this shop.'],
+			'Negative stock' => ['st-red',   'More units have left the shop than ever came in. A purchase is missing or a quantity is wrong — needs a stock check.'],
+			'Sold out'       => ['st-amber', 'Stock is exactly zero and the product has sold before. Reorder if it is still wanted.'],
+			'Never sold'     => ['st-red',   'Stock has come in but not a single unit has been sold yet.'],
+			'Dead stock'     => ['st-red',   'Stock on the shelf, but no sale for more than 180 days. Money is tied up — consider returning or discounting.'],
+			'Slow moving'    => ['st-amber', 'Stock on the shelf and the last sale was 61–180 days ago.'],
+			'Active'         => ['st-green', 'Stock on the shelf and sold within the last 60 days.'],
+		];
+	}
+
+	/**
+	 * Where a product stands today: [label, css class, one-line reason].
+	 * Definitions for each label: lifecycleStatusDefinitions().
+	 */
+	public function lifecycleStatus(array $p, array $s)
+	{
+		$stock     = (float) $p['ledger_qty'];
+		$sinceSale = $s['last_sale'] ? (int) (new DateTime($s['last_sale']))->diff(new DateTime('today'))->format('%r%a') : null;
+
+		if (!(int) $p['is_active']) {
+			return ['Inactive', 'st-grey', 'Product is switched off.'];
+		}
+		if (!$s['first_event']) {
+			return ['No activity', 'st-grey', 'Never bought or sold in this shop.'];
+		}
+		if ($stock < 0) {
+			return ['Negative stock', 'st-red', 'More units sold than ever received — purchases are missing or quantities are wrong.'];
+		}
+		if ($stock == 0 && $s['sold_qty'] > 0) {
+			return ['Sold out', 'st-amber', 'All stock sold. Last sale ' . date('d M Y', strtotime($s['last_sale'])) . '.'];
+		}
+		if ($s['sold_qty'] == 0) {
+			return ['Never sold', 'st-red', $this->lcQty($stock) . ' units bought, none sold yet.'];
+		}
+		if ($sinceSale > 180) {
+			return ['Dead stock', 'st-red', 'No sale for ' . $sinceSale . ' days with ' . $this->lcQty($stock) . ' units on the shelf.'];
+		}
+		if ($sinceSale > 60) {
+			return ['Slow moving', 'st-amber', 'Last sale ' . $sinceSale . ' days ago.'];
+		}
+		return ['Active', 'st-green', 'Selling normally.'];
+	}
+
+	/**
+	 * Product master rows (plus this shop's store row and inventory_ledger
+	 * balance) for the given ids, keyed by id. Other owners' products drop out.
+	 */
+	private function lifecycleProducts($dbh, $shopId, $ownerId, array $ids)
+	{
+		$products = [];
+		foreach (array_chunk(array_unique(array_map('intval', $ids)), 1000) as $chunk) {
+			$ph   = implode(',', array_fill(0, count($chunk), '?'));
 			$stmt = $dbh->prepare("
 				SELECT p.id, p.full_name, p.code, p.barcode, p.price, p.pprice, p.created_at,
-				       p.is_active, p.is_stock_item, p.min_qty, p.expiry,
+				       p.is_active, p.is_stock_item, p.min_qty, p.expiry, p.publisher_id,
 				       pub.full_name AS publisher_name,
 				       cat.full_name AS category_name,
 				       sp.qty        AS cached_qty,
@@ -1927,64 +2205,89 @@ class Products extends Connection
 				LEFT JOIN publishers pub ON pub.id = p.publisher_id
 				LEFT JOIN category cat   ON cat.id = p.cat_id
 				LEFT JOIN `{$this->table_st}` sp ON sp.product_id = p.id AND sp.shopId = ?
-				WHERE p.id = ? AND p.owner_id = ?
-				LIMIT 1
+				WHERE p.id IN ($ph) AND p.owner_id = ?
 			");
-			$stmt->execute([$shopId, $productId, (int) $ownerId]);
-			$product = $stmt->fetch(PDO::FETCH_ASSOC);
-			if (!$product) {
-				return null;
+			$stmt->execute(array_merge([(int) $shopId], $chunk, [(int) $ownerId]));
+			foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $r) {
+				if (!isset($products[$r['id']])) {
+					$r['ledger_qty'] = 0.0;
+					$products[$r['id']] = $r;
+				}
 			}
 
-			$stmt = $dbh->prepare("SELECT COALESCE(SUM(quantity), 0) FROM inventory_ledger WHERE product_id = ? AND shop_id = ?");
-			$stmt->execute([$productId, $shopId]);
-			$product['ledger_qty'] = (float) $stmt->fetchColumn();
+			$stmt = $dbh->prepare("SELECT product_id, SUM(quantity) FROM inventory_ledger WHERE shop_id = ? AND product_id IN ($ph) GROUP BY product_id");
+			$stmt->execute(array_merge([(int) $shopId], $chunk));
+			foreach ($stmt->fetchAll(PDO::FETCH_KEY_PAIR) as $pid => $qty) {
+				if (isset($products[$pid])) {
+					$products[$pid]['ledger_qty'] = (float) $qty;
+				}
+			}
+		}
+		return $products;
+	}
 
-			$events = [];
+	/**
+	 * Every stock-moving document line for the given products in one shop,
+	 * keyed by product id and sorted the way Inventory's ledger rebuild sorts
+	 * them. Each event carries the account_id of the party behind it (supplier
+	 * or customer, whichever it is) so callers can pick out one party's share.
+	 */
+	private function lifecycleEvents($dbh, $shopId, array $productIds, array $giveawayIds = [])
+	{
+		$shopId      = (int) $shopId;
+		$giveawayIds = array_map('intval', $giveawayIds);
+		$byProduct   = [];
 
-			// ── Purchases (supply) ──────────────────────────────────────────────
+		foreach (array_chunk(array_map('intval', $productIds), 1000) as $chunk) {
+			$ph = implode(',', array_fill(0, count($chunk), '?'));
+
 			// STRAIGHT_JOIN: the item tables have no index on product_id, so read
-			// them once and look the header up by primary key.
+			// each once and look the header up by primary key.
+
+			// ── Purchases (supply) ──────────────────────────────────────────
 			$stmt = $dbh->prepare("
-				SELECT s.id AS ref_id,
+				SELECT si.product_id, s.id AS ref_id,
 				       MAX(s.supply_date) AS event_date,
 				       MAX(s.created_at)  AS event_time,
 				       MAX(s.ref_no)      AS ref_no,
 				       MAX(COALESCE(sup.name, c.full_name)) AS party,
+				       MAX(COALESCE(sup.account_id, c.account_id)) AS account_id,
 				       SUM(si.quantity) AS qty,
 				       SUM(si.pprice * si.quantity * (1 - COALESCE(si.discount, 0) / 100)) AS value
 				FROM supply_items si
 				STRAIGHT_JOIN supply s ON s.id = si.supply_id
 				LEFT JOIN suppliers sup ON sup.id = s.supplier_id AND s.supplier_type = 1
 				LEFT JOIN customers c   ON c.id = s.supplier_id   AND s.supplier_type = 2
-				WHERE si.product_id = ? AND si.quantity > 0
+				WHERE si.product_id IN ($ph) AND si.quantity > 0
 				  AND s.shopId = ? AND s.flag = 1 AND s.status != 1
-				GROUP BY s.id
+				GROUP BY s.id, si.product_id
 			");
-			$stmt->execute([$productId, $shopId]);
+			$stmt->execute(array_merge($chunk, [$shopId]));
 			foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $r) {
-				$events[] = [
-					'type'     => 'purchase',
-					'priority' => 1,
-					'date'     => substr($r['event_date'], 0, 10),
-					'time'     => $r['event_time'],
-					'ref_type' => 'supply',
-					'ref_id'   => (int) $r['ref_id'],
-					'ref_label'=> 'Purchase #' . $r['ref_id'] . ($r['ref_no'] ? ' (' . $r['ref_no'] . ')' : ''),
-					'party'    => $r['party'] ?: '—',
-					'qty'      => (float) $r['qty'],
-					'value'    => (float) $r['value'],
-					'tags'     => [],
+				$byProduct[$r['product_id']][] = [
+					'type'       => 'purchase',
+					'priority'   => 1,
+					'date'       => substr($r['event_date'], 0, 10),
+					'time'       => $r['event_time'],
+					'ref_type'   => 'supply',
+					'ref_id'     => (int) $r['ref_id'],
+					'ref_label'  => 'Purchase #' . $r['ref_id'] . ($r['ref_no'] ? ' (' . $r['ref_no'] . ')' : ''),
+					'party'      => $r['party'] ?: '—',
+					'account_id' => (int) $r['account_id'],
+					'qty'        => (float) $r['qty'],
+					'value'      => (float) $r['value'],
+					'tags'       => [],
 				];
 			}
 
-			// ── Sales (orders) ──────────────────────────────────────────────────
+			// ── Sales (orders) ──────────────────────────────────────────────
 			$stmt = $dbh->prepare("
-				SELECT o.id AS ref_id,
+				SELECT oi.product_id, o.id AS ref_id,
 				       MAX(o.order_custom_id) AS custom_id,
 				       MAX(o.order_date)  AS event_date,
 				       MAX(o.created_at)  AS event_time,
 				       MAX(o.customer_id) AS customer_id,
+				       MAX(c.account_id)  AS account_id,
 				       MAX(COALESCE(NULLIF(o.customer_name, ''), c.full_name, 'Walk-in')) AS party,
 				       MAX(o.price)    AS bill_price,
 				       MAX(o.discount) AS bill_discount,
@@ -1994,23 +2297,22 @@ class Products extends Connection
 				FROM order_items oi
 				STRAIGHT_JOIN orders o ON o.id = oi.order_id
 				LEFT JOIN customers c ON c.id = o.customer_id
-				WHERE oi.product_id = ? AND oi.quantity > 0
+				WHERE oi.product_id IN ($ph) AND oi.quantity > 0
 				  AND o.shopId = ? AND o.flag = 1 AND o.status IN (2, 8, 9)
-				GROUP BY o.id
+				GROUP BY o.id, oi.product_id
 			");
-			$stmt->execute([$productId, $shopId]);
+			$stmt->execute(array_merge($chunk, [$shopId]));
 			$sales = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 			// Each bill's full subtotal, to spread its bill-level discount.
 			$subtotals = [];
-			foreach (array_chunk(array_column($sales, 'ref_id'), 1000) as $ids) {
-				$ph   = implode(',', array_fill(0, count($ids), '?'));
-				$st2  = $dbh->prepare("SELECT order_id, SUM((price - discount) * quantity) FROM order_items WHERE order_id IN ($ph) GROUP BY order_id");
+			foreach (array_chunk(array_values(array_unique(array_column($sales, 'ref_id'))), 1000) as $ids) {
+				$ph2 = implode(',', array_fill(0, count($ids), '?'));
+				$st2 = $dbh->prepare("SELECT order_id, SUM((price - discount) * quantity) FROM order_items WHERE order_id IN ($ph2) GROUP BY order_id");
 				$st2->execute($ids);
 				$subtotals += $st2->fetchAll(PDO::FETCH_KEY_PAIR);
 			}
 
-			$giveawayIds = array_map('intval', $giveawayIds);
 			foreach ($sales as $r) {
 				$subtotal     = (float) ($subtotals[$r['ref_id']] ?? 0);
 				$billDiscount = (float) $r['bill_discount'];
@@ -2025,104 +2327,108 @@ class Products extends Connection
 					$tags[] = 'giveaway';
 				}
 
-				$events[] = [
-					'type'          => 'sale',
-					'priority'      => 3,
-					'date'          => substr($r['event_date'], 0, 10),
-					'time'          => $r['event_time'],
-					'ref_type'      => 'order',
-					'ref_id'        => (int) $r['ref_id'],
-					'ref_label'     => 'Bill #' . ($r['custom_id'] ?: $r['ref_id']),
-					'party'         => $r['party'],
-					'customer_id'   => (int) $r['customer_id'],
-					'qty'           => (float) $r['qty'],
-					'gross'         => (float) $r['gross'],
-					'discount'      => (float) $r['line_discount'] + $afterLine * (1 - $keep),
-					'value'         => $afterLine * $keep,
-					'tags'          => $tags,
+				$byProduct[$r['product_id']][] = [
+					'type'        => 'sale',
+					'priority'    => 3,
+					'date'        => substr($r['event_date'], 0, 10),
+					'time'        => $r['event_time'],
+					'ref_type'    => 'order',
+					'ref_id'      => (int) $r['ref_id'],
+					'ref_label'   => 'Bill #' . ($r['custom_id'] ?: $r['ref_id']),
+					'party'       => $r['party'],
+					'customer_id' => (int) $r['customer_id'],
+					'account_id'  => (int) $r['account_id'],
+					'qty'         => (float) $r['qty'],
+					'gross'       => (float) $r['gross'],
+					'discount'    => (float) $r['line_discount'] + $afterLine * (1 - $keep),
+					'value'       => $afterLine * $keep,
+					'tags'        => $tags,
 				];
 			}
 
-			// ── Returns: 1 = customer returned to us, 2 = we returned to supplier ──
+			// ── Returns: 1 = customer returned to us, 2 = we returned to supplier.
+			// is_supplier = 2 means customer_id actually points at suppliers.
 			$stmt = $dbh->prepare("
-				SELECT ro.id AS ref_id, ro.return_type,
+				SELECT pr.product_id, ro.id AS ref_id, ro.return_type,
 				       MAX(ro.return_date) AS event_date,
 				       MAX(ro.datetime)    AS event_time,
 				       MAX(ro.order_id)    AS orig_order,
-				       MAX(COALESCE(NULLIF(ro.customer_name, ''), c.full_name)) AS party,
+				       MAX(COALESCE(NULLIF(ro.customer_name, ''), sup.name, c.full_name)) AS party,
+				       MAX(COALESCE(sup.account_id, c.account_id)) AS account_id,
 				       SUM(pr.quantity) AS qty,
 				       SUM((pr.price - pr.discount) * pr.quantity) AS value
 				FROM product_returns pr
 				STRAIGHT_JOIN return_orders ro ON ro.id = pr.order_id
-				LEFT JOIN customers c ON c.id = ro.customer_id
-				WHERE pr.product_id = ? AND pr.quantity > 0
+				LEFT JOIN suppliers sup ON sup.id = ro.customer_id AND ro.is_supplier = 2
+				LEFT JOIN customers c   ON c.id = ro.customer_id   AND ro.is_supplier != 2
+				WHERE pr.product_id IN ($ph) AND pr.quantity > 0
 				  AND ro.shopId = ? AND ro.flag = 2 AND ro.return_type IN (1, 2)
-				GROUP BY ro.id, ro.return_type
+				GROUP BY ro.id, ro.return_type, pr.product_id
 			");
-			$stmt->execute([$productId, $shopId]);
+			$stmt->execute(array_merge($chunk, [$shopId]));
 			foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $r) {
 				$in = (int) $r['return_type'] === 1;
-				$events[] = [
-					'type'     => $in ? 'return_in' : 'return_out',
-					'priority' => $in ? 2 : 4,
-					'date'     => substr($r['event_date'], 0, 10),
-					'time'     => $r['event_time'],
-					'ref_type' => 'return_order',
-					'ref_id'   => (int) $r['ref_id'],
-					'ref_label'=> 'Return #' . $r['ref_id'] . ($r['orig_order'] ? ' (bill ' . $r['orig_order'] . ')' : ''),
-					'party'    => $r['party'] ?: '—',
-					'qty'      => (float) $r['qty'],
-					'value'    => (float) $r['value'],
-					'tags'     => [],
+				$byProduct[$r['product_id']][] = [
+					'type'       => $in ? 'return_in' : 'return_out',
+					'priority'   => $in ? 2 : 4,
+					'date'       => substr($r['event_date'], 0, 10),
+					'time'       => $r['event_time'],
+					'ref_type'   => 'return_order',
+					'ref_id'     => (int) $r['ref_id'],
+					'ref_label'  => 'Return #' . $r['ref_id'] . ($r['orig_order'] ? ' (bill ' . $r['orig_order'] . ')' : ''),
+					'party'      => $r['party'] ?: '—',
+					'account_id' => (int) $r['account_id'],
+					'qty'        => (float) $r['qty'],
+					'value'      => (float) $r['value'],
+					'tags'       => [],
 				];
 			}
 
-			// ── Exchanges (converted into / out of another product) ─────────────
+			// ── Exchanges (converted into / out of another product) ─────────
 			$stmt = $dbh->prepare("
 				SELECT ex.id, ex.created_at, ex.handover, ex.from_id, ex.to_id, ex.from_qty, ex.to_qty,
 				       pf.full_name AS from_name, pt.full_name AS to_name
 				FROM `{$this->table_ex}` ex
 				LEFT JOIN `{$this->table}` pf ON pf.id = ex.from_id
 				LEFT JOIN `{$this->table}` pt ON pt.id = ex.to_id
-				WHERE ex.shop_id = ? AND (ex.from_id = ? OR ex.to_id = ?)
+				WHERE ex.shop_id = ? AND (ex.from_id IN ($ph) OR ex.to_id IN ($ph))
 			");
-			$stmt->execute([$shopId, $productId, $productId]);
+			$stmt->execute(array_merge([$shopId], $chunk, $chunk));
+			$inChunk = array_flip($chunk);
 			foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $r) {
-				if ((int) $r['from_id'] === $productId && (float) $r['from_qty'] > 0) {
-					$events[] = [
+				if (isset($inChunk[(int) $r['from_id']]) && (float) $r['from_qty'] > 0) {
+					$byProduct[$r['from_id']][] = [
 						'type' => 'exchange_out', 'priority' => 5,
 						'date' => substr($r['created_at'], 0, 10), 'time' => $r['created_at'],
 						'ref_type' => 'exchange', 'ref_id' => (int) $r['id'],
 						'ref_label' => 'Exchange #' . $r['id'] . ' → ' . $r['to_name'],
-						'party' => $r['handover'] ?: '—',
+						'party' => $r['handover'] ?: '—', 'account_id' => 0,
 						'qty' => (float) $r['from_qty'], 'value' => 0, 'tags' => [],
 					];
 				}
-				if ((int) $r['to_id'] === $productId && (float) $r['to_qty'] > 0) {
-					$events[] = [
+				if (isset($inChunk[(int) $r['to_id']]) && (float) $r['to_qty'] > 0) {
+					$byProduct[$r['to_id']][] = [
 						'type' => 'exchange_in', 'priority' => 5,
 						'date' => substr($r['created_at'], 0, 10), 'time' => $r['created_at'],
 						'ref_type' => 'exchange', 'ref_id' => (int) $r['id'],
 						'ref_label' => 'Exchange #' . $r['id'] . ' ← ' . $r['from_name'],
-						'party' => $r['handover'] ?: '—',
+						'party' => $r['handover'] ?: '—', 'account_id' => 0,
 						'qty' => (float) $r['to_qty'], 'value' => 0, 'tags' => [],
 					];
 				}
 			}
+		}
 
-			// Same ordering as the ledger rebuild: date, then movement priority.
+		// Same ordering as the ledger rebuild: date, then movement priority.
+		foreach ($byProduct as &$events) {
 			usort($events, function ($a, $b) {
 				return [$a['date'], $a['priority'], $a['time'], $a['ref_id']]
 				   <=> [$b['date'], $b['priority'], $b['time'], $b['ref_id']];
 			});
-
-			return $this->walkProductLifecycle($product, $events);
-
-		} catch (PDOException $e) {
-			die("Error!: " . $e->getMessage() . "<br/>");
-		} finally {
-			$this->connectionPool->releaseConnection($dbh);
 		}
+		unset($events);
+
+		return $byProduct;
 	}
 
 	/**

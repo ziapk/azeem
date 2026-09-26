@@ -377,6 +377,28 @@ switch ($reportType) {
 		$shopName   = $selectShop['full_name'] . ' - ' . $selectShop['city'];
 		include_once dirname(__FILE__) . '/productLifecycleReport.php';
 		exit;
+	case '28':
+		$accountId   = (int) ($_POST['account_id'] ?? 0);
+		$publisherId = (int) ($_POST['publisher_id'] ?? 0);
+		$productId   = (int) ($_POST['product_id'] ?? 0);
+		if (!$accountId && !$publisherId && !$productId) {
+			echo '<h3 style="font-family: Arial, sans-serif">Please select an account (customer / supplier) or a publisher for the Party Lifecycle report.</h3>';
+			exit;
+		}
+
+		$ownerId = $userData['role'] == 'owner' ? $userData['id'] : $userData['created_by'];
+		$party   = $productObj->getPartyLifecycle($shopId, $ownerId, [
+			'account_id'   => $accountId,
+			'publisher_id' => $publisherId,
+			'product_id'   => $productId,
+			'giveaway_ids' => $ordersObj->getGiveawayCustomerIds($shopId),
+		]);
+
+		$stores     = new Store();
+		$selectShop = $stores->getStore($shopId);
+		$shopName   = $selectShop['full_name'] . ' - ' . $selectShop['city'];
+		include_once dirname(__FILE__) . '/partyLifecycleReport.php';
+		exit;
 
 	default:
 		# code...
