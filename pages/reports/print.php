@@ -399,6 +399,27 @@ switch ($reportType) {
 		$shopName   = $selectShop['full_name'] . ' - ' . $selectShop['city'];
 		include_once dirname(__FILE__) . '/partyLifecycleReport.php';
 		exit;
+	case '29':
+		if (empty($from) || empty($to)) {
+			echo '<h3 style="font-family: Arial, sans-serif">Please select a date range for the Season Report.</h3>';
+			exit;
+		}
+
+		$ownerId = $userData['role'] == 'owner' ? $userData['id'] : $userData['created_by'];
+		$season  = $productObj->getSeasonReport($shopId, $ownerId, [
+			'from'         => $from,
+			'to'           => $to,
+			'account_id'   => (int) ($_POST['account_id'] ?? 0),
+			'publisher_id' => (int) ($_POST['publisher_id'] ?? 0),
+			'product_id'   => (int) ($_POST['product_id'] ?? 0),
+			'giveaway_ids' => $ordersObj->getGiveawayCustomerIds($shopId),
+		]);
+
+		$stores     = new Store();
+		$selectShop = $stores->getStore($shopId);
+		$shopName   = $selectShop['full_name'] . ' - ' . $selectShop['city'];
+		include_once dirname(__FILE__) . '/seasonReport.php';
+		exit;
 
 	default:
 		# code...

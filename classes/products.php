@@ -2133,6 +2133,332 @@ class Products extends Connection
 	}
 
 	/**
+	 * Season report: what happened to each product between two dates, and the
+	 * same dates a year earlier for comparison.
+	 *
+	 * Every product is still walked over its WHOLE history, so a sale in the
+	 * season is costed at what the stock actually cost -- including stock
+	 * bought before the season started. Only the events dated inside the
+	 * range are then counted.
+	 *
+	 * Scope: the given product; else products the account dealt in during
+	 * either period; else the publisher's stocked products; else (whole shop)
+	 * every product that moved in either period.
+	 *
+	 * @param array $params from, to, account_id, publisher_id, product_id, giveaway_ids
+	 */
+	public function getSeasonReport($shopId, $ownerId, array $params)
+	{
+		$dbh = $this->connectionPool->getConnection();
+		try {
+			$shopId      = (int) $shopId;
+			$ownerId     = (int) $ownerId;
+			$from        = $params['from'];
+			$to          = $params['to'];
+			$lyFrom      = date('Y-m-d', strtotime($from . ' -1 year'));
+			$lyTo        = date('Y-m-d', strtotime($to . ' -1 year'));
+			$publisherId = (int) ($params['publisher_id'] ?? 0);
+			$accountId   = (int) ($params['account_id'] ?? 0);
+			$productId   = (int) ($params['product_id'] ?? 0);
+
+			$days   = (int) (new DateTime($from))->diff(new DateTime($to))->format('%a') + 1;
+			$weekly = $days <= 92;
+
+			$party = ['publisher' => null, 'account' => null];
+			if ($publisherId) {
+				$stmt = $dbh->prepare("SELECT id, full_name FROM publishers WHERE id = ? AND owner_id = ?");
+				$stmt->execute([$publisherId, $ownerId]);
+				$party['publisher'] = $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
+			}
+			if ($accountId) {
+				$stmt = $dbh->prepare("SELECT id, title FROM accounts WHERE id = ?");
+				$stmt->execute([$accountId]);
+				$party['account'] = $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
+			}
+
+			// ── Which products ──────────────────────────────────────────────────
+			if ($productId) {
+				$ids = [$productId];
+			} elseif ($publisherId && !$accountId) {
+				$stmt = $dbh->prepare("
+					SELECT DISTINCT p.id FROM `{$this->table}` p
+					JOIN `{$this->table_st}` sp ON sp.product_id = p.id AND sp.shopId = ?
+					WHERE p.publisher_id = ? AND p.owner_id = ?
+				");
+				$stmt->execute([$shopId, $publisherId, $ownerId]);
+				$ids = array_map('intval', $stmt->fetchAll(PDO::FETCH_COLUMN));
+			} else {
+				// Anything that moved in either period (optionally for one account).
+				// The span covers both periods; rows that only moved in between
+				// fall out below because they have nothing to report.
+				$acc = function ($col) use ($accountId) {
+					return $accountId ? " AND $col = :acc" : '';
+				};
+				$stmt = $dbh->prepare("
+					SELECT oi.product_id FROM order_items oi
+					STRAIGHT_JOIN orders o ON o.id = oi.order_id
+					LEFT JOIN customers c ON c.id = o.customer_id
+					WHERE o.shopId = :s1 AND o.flag = 1 AND o.status IN (2, 8, 9) AND oi.quantity > 0
+					  AND o.order_date BETWEEN :f1 AND :t1 {$acc('c.account_id')}
+					UNION
+					SELECT si.product_id FROM supply_items si
+					STRAIGHT_JOIN supply s ON s.id = si.supply_id
+					LEFT JOIN suppliers sup ON sup.id = s.supplier_id AND s.supplier_type = 1
+					LEFT JOIN customers c ON c.id = s.supplier_id AND s.supplier_type = 2
+					WHERE s.shopId = :s2 AND s.flag = 1 AND s.status != 1 AND si.quantity > 0
+					  AND DATE(s.supply_date) BETWEEN :f2 AND :t2 {$acc('COALESCE(sup.account_id, c.account_id)')}
+					UNION
+					SELECT pr.product_id FROM product_returns pr
+					STRAIGHT_JOIN return_orders ro ON ro.id = pr.order_id
+					LEFT JOIN suppliers sup ON sup.id = ro.customer_id AND ro.is_supplier = 2
+					LEFT JOIN customers c   ON c.id = ro.customer_id   AND ro.is_supplier != 2
+					WHERE ro.shopId = :s3 AND ro.flag = 2 AND ro.return_type IN (1, 2) AND pr.quantity > 0
+					  AND ro.return_date BETWEEN :f3 AND :t3 {$acc('COALESCE(sup.account_id, c.account_id)')}
+				");
+				$bind = [];
+				foreach ([1, 2, 3] as $n) {
+					$bind[":s$n"] = $shopId;
+					$bind[":f$n"] = $lyFrom;
+					$bind[":t$n"] = $to;
+				}
+				if ($accountId) {
+					$bind[':acc'] = $accountId;
+				}
+				$stmt->execute($bind);
+				$ids = array_map('intval', $stmt->fetchAll(PDO::FETCH_COLUMN));
+			}
+
+			$products = $this->lifecycleProducts($dbh, $shopId, $ownerId, $ids);
+			if ($publisherId) {
+				$products = array_filter($products, function ($p) use ($publisherId) {
+					return (int) $p['publisher_id'] === $publisherId;
+				});
+			}
+
+			// ── Walk in batches, keep only the period slices ─────────────────────
+			$feedCap   = 3000;
+			$feedTotal = 0;
+			$rows      = [];
+			$feed      = [];
+			$buckets   = [];
+			$customers = [];
+			$suppliers = [];
+			$byDate    = function ($a, $b) {
+				return [$a['date'], $a['priority'], $a['time'], $a['ref_id']]
+				   <=> [$b['date'], $b['priority'], $b['time'], $b['ref_id']];
+			};
+
+			foreach (array_chunk(array_keys($products), 250) as $batch) {
+				$events = $this->lifecycleEvents($dbh, $shopId, $batch, $params['giveaway_ids'] ?? []);
+				foreach ($batch as $pid) {
+					$product = $products[$pid];
+					$life    = $this->walkProductLifecycle($product, $events[$pid] ?? []);
+					unset($events[$pid]);
+
+					$all   = $this->lifecyclePeriod($life['events'], $from, $to);
+					$mine  = $accountId ? $this->lifecyclePeriod($life['events'], $from, $to, $accountId) : $all;
+					$ly    = $this->lifecyclePeriod($life['events'], $lyFrom, $lyTo, $accountId);
+
+					// Services and charges hold no stock; their "balance" means nothing.
+					if (!(int) $product['is_stock_item']) {
+						foreach (['all', 'mine', 'ly'] as $v) {
+							${$v}['opening_qty'] = ${$v}['opening_value'] = ${$v}['closing_qty'] = ${$v}['closing_value'] = 0;
+						}
+					}
+
+					// Nothing to say about this product for this selection.
+					$moved = $mine['events'] || $ly['sold_qty'] || $ly['bought_qty'];
+					if (!$moved && ($accountId || !$publisherId || $all['opening_qty'] <= 0)) {
+						continue;
+					}
+
+					foreach ($mine['events'] as $e) {
+						$k = $weekly
+							? date('Y-m-d', strtotime('monday this week', strtotime($e['date'])))
+							: substr($e['date'], 0, 7);
+						if (!isset($buckets[$k])) {
+							$buckets[$k] = ['bought_qty' => 0, 'bought_value' => 0, 'sold_qty' => 0, 'revenue' => 0, 'returned_qty' => 0, 'profit' => 0];
+						}
+						$buckets[$k]['profit'] += $e['profit'];
+						if ($e['type'] === 'purchase') {
+							$buckets[$k]['bought_qty']   += $e['qty'];
+							$buckets[$k]['bought_value'] += $e['value'];
+						} elseif ($e['type'] === 'sale' && !$e['tags']) {
+							$buckets[$k]['sold_qty'] += $e['qty'];
+							$buckets[$k]['revenue']  += $e['value'];
+						} elseif ($e['type'] === 'return_in') {
+							$buckets[$k]['returned_qty'] += $e['qty'];
+							$buckets[$k]['revenue']      -= $e['value'];
+						} elseif ($e['type'] === 'return_out') {
+							$buckets[$k]['returned_qty'] += $e['qty'];
+						}
+
+						// Who the season's business was with (only useful unfiltered).
+						if (!$accountId && in_array($e['type'], ['sale', 'purchase'])) {
+							$key = $e['account_id'] ?: strtolower($e['party']);
+							if ($e['type'] === 'sale' && !$e['tags']) {
+								if (!isset($customers[$key])) {
+									$customers[$key] = ['name' => $e['party'], 'bills' => [], 'qty' => 0, 'value' => 0, 'profit' => 0];
+								}
+								$customers[$key]['bills'][$e['ref_id']] = true;
+								$customers[$key]['qty']    += $e['qty'];
+								$customers[$key]['value']  += $e['value'];
+								$customers[$key]['profit'] += $e['profit'];
+							} elseif ($e['type'] === 'purchase') {
+								if (!isset($suppliers[$key])) {
+									$suppliers[$key] = ['name' => $e['party'], 'bills' => [], 'qty' => 0, 'value' => 0];
+								}
+								$suppliers[$key]['bills'][$e['ref_id']] = true;
+								$suppliers[$key]['qty']   += $e['qty'];
+								$suppliers[$key]['value'] += $e['value'];
+							}
+						}
+
+						$e['product_id']   = $pid;
+						$e['product_name'] = $product['full_name'];
+						$feed[] = $e;
+						$feedTotal++;
+					}
+
+					unset($all['events'], $mine['events'], $ly['events']);
+					$rows[$pid] = [
+						'product' => $life['product'],
+						'status'  => $this->lifecycleStatus($life['product'], $life['summary']),
+						'all'     => $all,
+						'party'   => $mine,
+						'ly'      => $ly,
+					];
+					unset($life);
+				}
+
+				if (count($feed) > 2 * $feedCap) {
+					usort($feed, $byDate);
+					$feed = array_slice($feed, -$feedCap);
+				}
+			}
+
+			usort($feed, $byDate);
+			$feed = array_slice($feed, -$feedCap);
+			uasort($rows, function ($a, $b) {
+				return [$b['party']['sold_qty'], $b['party']['bought_qty']] <=> [$a['party']['sold_qty'], $a['party']['bought_qty']];
+			});
+			ksort($buckets);
+			foreach ([&$customers, &$suppliers] as &$list) {
+				foreach ($list as &$r) {
+					$r['bills'] = count($r['bills']);
+				}
+				unset($r);
+				uasort($list, function ($a, $b) { return $b['value'] <=> $a['value']; });
+				$list = array_values($list);
+			}
+			unset($list);
+
+			return [
+				'range'        => ['from' => $from, 'to' => $to, 'ly_from' => $lyFrom, 'ly_to' => $lyTo, 'days' => $days, 'weekly' => $weekly],
+				'party'        => $party,
+				'products'     => $rows,
+				'buckets'      => $buckets,
+				'events'       => $feed,
+				'events_total' => $feedTotal,
+				'customers'    => $customers,
+				'suppliers'    => $suppliers,
+			];
+		} catch (PDOException $e) {
+			die("Error!: " . $e->getMessage() . "<br/>");
+		} finally {
+			$this->connectionPool->releaseConnection($dbh);
+		}
+	}
+
+	/**
+	 * Slice an already-walked (costed) event feed to [$from, $to]: stock and
+	 * its value at both ends, plus what came in and went out in between.
+	 * With $accountId, the in/out figures count only that party's events;
+	 * opening and closing stock are always the product's whole stock.
+	 */
+	private function lifecyclePeriod(array $events, $from, $to, $accountId = 0)
+	{
+		$p = [
+			'opening_qty' => 0.0, 'opening_value' => 0.0, 'closing_qty' => 0.0, 'closing_value' => 0.0,
+			'purchase_count' => 0, 'bought_qty' => 0, 'bought_value' => 0,
+			'return_out_qty' => 0, 'return_out_value' => 0, 'exchange_in_qty' => 0, 'exchange_out_qty' => 0,
+			'sale_count' => 0, 'sold_qty' => 0, 'gross' => 0, 'discounts' => 0, 'revenue' => 0, 'cost' => 0, 'sale_profit' => 0,
+			'free_qty' => 0, 'free_result' => 0, 'return_in_qty' => 0, 'return_in_value' => 0,
+			'profit' => 0, 'first_sale' => null, 'last_sale' => null, 'events' => [],
+		];
+		$openAvg  = 0.0;
+		$closeAvg = null;
+		$closed   = false;
+
+		foreach ($events as $e) {
+			if ($e['date'] < $from) {
+				$p['opening_qty'] = $e['balance'];
+				$openAvg          = $e['avg_cost'];
+				continue;
+			}
+			if ($e['date'] > $to) {
+				break;
+			}
+			$p['closing_qty'] = $e['balance'];
+			$closeAvg         = $e['avg_cost'];
+			$closed           = true;
+
+			if ($accountId && (int) $e['account_id'] !== (int) $accountId) {
+				continue;
+			}
+			$p['events'][] = $e;
+			$p['profit']  += $e['profit'];
+
+			switch ($e['type']) {
+				case 'purchase':
+					$p['purchase_count']++;
+					$p['bought_qty']   += $e['qty'];
+					$p['bought_value'] += $e['value'];
+					break;
+				case 'exchange_in':
+					$p['exchange_in_qty'] += $e['qty'];
+					break;
+				case 'exchange_out':
+					$p['exchange_out_qty'] += $e['qty'];
+					break;
+				case 'return_out':
+					$p['return_out_qty']   += $e['qty'];
+					$p['return_out_value'] += $e['value'];
+					break;
+				case 'return_in':
+					$p['return_in_qty']   += $e['qty'];
+					$p['return_in_value'] += $e['value'];
+					break;
+				case 'sale':
+					if ($e['tags']) {
+						$p['free_qty']    += $e['qty'];
+						$p['free_result'] += $e['profit'];
+						break;
+					}
+					$p['sale_count']++;
+					$p['sold_qty']    += $e['qty'];
+					$p['gross']       += $e['gross'];
+					$p['discounts']   += $e['discount'];
+					$p['revenue']     += $e['value'];
+					$p['cost']        += $e['cost'];
+					$p['sale_profit'] += $e['profit'];
+					$p['first_sale']   = $p['first_sale'] ?: $e['date'];
+					$p['last_sale']    = $e['date'];
+					break;
+			}
+		}
+
+		if (!$closed) {
+			$p['closing_qty'] = $p['opening_qty'];
+			$closeAvg         = $openAvg;
+		}
+		$p['opening_value'] = max(0, $p['opening_qty']) * $openAvg;
+		$p['closing_value'] = max(0, $p['closing_qty']) * $closeAvg;
+		$p['closing_avg']   = $closeAvg;
+		return $p;
+	}
+
+	/**
 	 * What each lifecycleStatus() label means, in the order the rules are
 	 * checked (the first that fits wins). Keep in step with lifecycleStatus().
 	 */
@@ -2140,6 +2466,7 @@ class Products extends Connection
 	{
 		return [
 			'Inactive'       => ['st-grey',  'Product is switched off in the product list. Shown whatever its stock or sales.'],
+			'Non-stock'      => ['st-grey',  'A service or charge (not a stock item). Stock is not tracked and its sales carry no cost, so they count fully as income.'],
 			'No activity'    => ['st-grey',  'Never purchased, sold, returned or exchanged in this shop.'],
 			'Negative stock' => ['st-red',   'More units have left the shop than ever came in. A purchase is missing or a quantity is wrong — needs a stock check.'],
 			'Sold out'       => ['st-amber', 'Stock is exactly zero and the product has sold before. Reorder if it is still wanted.'],
@@ -2161,6 +2488,9 @@ class Products extends Connection
 
 		if (!(int) $p['is_active']) {
 			return ['Inactive', 'st-grey', 'Product is switched off.'];
+		}
+		if (isset($p['is_stock_item']) && !(int) $p['is_stock_item']) {
+			return ['Non-stock', 'st-grey', 'Service or charge — stock is not tracked, sales carry no cost.'];
 		}
 		if (!$s['first_event']) {
 			return ['No activity', 'st-grey', 'Never bought or sold in this shop.'];
@@ -2439,6 +2769,10 @@ class Products extends Connection
 	private function walkProductLifecycle(array $product, array $events)
 	{
 		$fallbackCost = (float) $product['pprice'];
+		// Services and charges (is_stock_item = 0) hold no stock, so there is
+		// nothing to cost -- their sales count as income with no cost, as in
+		// Orders::getNonStockSales().
+		$nonStock = isset($product['is_stock_item']) && !(int) $product['is_stock_item'];
 
 		$s = [
 			'purchase_count' => 0, 'purchased_qty' => 0, 'purchase_value' => 0,
@@ -2469,7 +2803,7 @@ class Products extends Connection
 		foreach ($events as $i => $e) {
 			$qty    = $e['qty'];
 			$before = $stock;
-			$cost   = $avg > 0 ? $avg : $fallbackCost;
+			$cost   = $nonStock ? 0 : ($avg > 0 ? $avg : $fallbackCost);
 			$e['estimated'] = false;
 			$e['cost']      = 0;
 			$e['profit']    = 0;
@@ -2519,7 +2853,7 @@ class Products extends Connection
 					break;
 
 				case 'sale':
-					$e['estimated'] = $avg <= 0;
+					$e['estimated'] = !$nonStock && $avg <= 0;
 					$e['cost']   = $qty * $cost;
 					$e['profit'] = $e['value'] - $e['cost'];
 					$e['unit']   = $qty > 0 ? $e['value'] / $qty : 0;
@@ -2570,7 +2904,7 @@ class Products extends Connection
 
 				case 'return_in':
 					// Refund reverses the sale; the units go back on the shelf at today's average.
-					$e['estimated'] = $avg <= 0;
+					$e['estimated'] = !$nonStock && $avg <= 0;
 					$e['cost']   = $qty * $cost;
 					$e['profit'] = $e['cost'] - $e['value'];
 					if ($stock <= 0 && $avg <= 0) {
@@ -2586,7 +2920,7 @@ class Products extends Connection
 
 				case 'return_out':
 					// Supplier credit against units that were carried at average cost.
-					$e['estimated'] = $avg <= 0;
+					$e['estimated'] = !$nonStock && $avg <= 0;
 					$e['cost']   = $qty * $cost;
 					$e['profit'] = $e['value'] - $e['cost'];
 					$stock -= $qty;
