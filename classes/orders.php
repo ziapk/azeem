@@ -199,6 +199,12 @@ class Orders extends Connection
                 $linkedShopId = !empty($orderDetail['customer']['linked_shop']) ? (int)$orderDetail['customer']['linked_shop'] : null;
                 $isBecomingParked = $status == 1;
 
+                // A parked bill is only dated when it is actually cleared: move it to
+                // the current sale date so the bill and its ledger land on that day.
+                if ($currentStatus == 1 && !$isBecomingParked) {
+                    $data['reset_order_date'] = true;
+                }
+
                 // Only carry forward old quantities when the order was already active (had inventory logged).
                 // Parked orders (status=1) have no ledger entries, so all items must be treated as new.
                 if (in_array($currentStatus, [2, 8, 9])) {
@@ -426,8 +432,9 @@ class Orders extends Connection
                     $receivable = ($assetPrice - $saleDiscount) + $gst + $service_charges;
                     $defaultId = 0;
                     
-                    $overide = $array['overide'];
-                    $saleDate = !empty($overide) ? $orderDetail['order']['order_date'] : $storeDATA['sale_date'];
+                    // Ledger entries always sit on the bill's own date, so editing an
+                    // old bill never splits it between sale reports and the ledger.
+                    $saleDate = $orderDetail['order']['order_date'];
 
                     foreach ($array['payment_with'] as $value) {
                         if (!empty($value['is_default'])) {
@@ -596,8 +603,12 @@ class Orders extends Connection
         $dbh = $this->connectionPool->getConnection();
         try {
             if (!empty($array['id'])) {
-                $stmt = "UPDATE `{$this->table}` SET `user_id`=:user_id, `customer_id`=:customer_id, `customer_name`=:customer_name, `status`=:status, `price`=:price, `paid_amount`=:paid_amount, `discount`=:discount, `shopId`=:shopId, `linked_shop`=:linked_shop, `gst`=:gst, `service_charges`=:service_charges, `summery`=:summery, `ref_no`=:ref_no, `show_discount`=:show_discount, `show_bundle`=:show_bundle, status_id=:status_id, expected_delivery_date=:expected_delivery_date WHERE id=:id";
+                $resetOrderDate = !empty($array['reset_order_date']);
+                $stmt = "UPDATE `{$this->table}` SET `user_id`=:user_id, `customer_id`=:customer_id, `customer_name`=:customer_name, `status`=:status, `price`=:price, `paid_amount`=:paid_amount, `discount`=:discount, `shopId`=:shopId, `linked_shop`=:linked_shop, `gst`=:gst, `service_charges`=:service_charges, `summery`=:summery, `ref_no`=:ref_no, `show_discount`=:show_discount, `show_bundle`=:show_bundle, status_id=:status_id, expected_delivery_date=:expected_delivery_date" . ($resetOrderDate ? ", `order_date`=:order_date" : "") . " WHERE id=:id";
                 $prepare = $dbh->prepare($stmt);
+                if ($resetOrderDate) {
+                    $prepare->bindParam(':order_date', $array['order_date'], PDO::PARAM_STR);
+                }
                 $prepare->bindParam(':user_id', $array['user_id'], PDO::PARAM_STR);
                 $prepare->bindParam(':customer_id', $array['customer_id'], PDO::PARAM_STR);
                 $prepare->bindParam(':customer_name', $array['customer_name'], PDO::PARAM_STR);
@@ -2062,12 +2073,20 @@ class Orders extends Connection
             $storeAccounts[$a['key_value']] = $a['account_id'];
         }
 
+        $returnDate = $selectedStoreDATA['sale_date'];
+
         if (!empty($array['returnOrder'])) {
 
             $order = $this->getReturnOrder($array['returnOrder']);
 
             if (!empty($order['order']['id'])) {
                 $currentStatus = $order['order']['flag'];
+
+                // An approved return keeps its own date (and so does its ledger);
+                // a draft is only dated when it is approved, on the current sale date.
+                if ($currentStatus == 2) {
+                    $returnDate = $order['order']['return_date'];
+                }
                 $isBecomingParked = $array['flag'] != 2;
 
                 if (in_array($currentStatus, [2])) { // approve 
@@ -2176,8 +2195,12 @@ class Orders extends Connection
                 }
 
                 $this->deleteReturnOrderItem($order['order']['id']);
-                // delete transactions
-                $doubleEntry->deleteTransactionByReturnId($array['returnOrder']);
+                // Only retire the ledger when the return goes back to draft. An approved
+                // edit re-posts onto the same transaction ids below, keeping the bill's
+                // place in the ledger, which is ordered by transaction id.
+                if ($isBecomingParked) {
+                    $doubleEntry->deleteTransactionByReturnId($array['returnOrder']);
+                }
             }
         }
 
@@ -2189,7 +2212,7 @@ class Orders extends Connection
             "flag" => $array['flag'],
             "shopId" => $shopId,
             "main_shop_rid" => !empty($LinkedCustomer['shopId']) ? $LinkedCustomer['shopId'] : null,
-            "return_date" => $selectedStoreDATA['sale_date'],
+            "return_date" => $returnDate,
             "owner_id" => $storeDATA['owner_id'],
             'show_bundle' => !empty($array['show_bundle']) ? 1 : 0,
             "order_id" => !empty($array['order_id']) ? $array['order_id'] : null,
@@ -2278,7 +2301,7 @@ class Orders extends Connection
 
             $makeTransaction = [
                 'description' => $config['description'],
-                'transaction_date' => $storeDATA['sale_date'],
+                'transaction_date' => $returnOrder['order']['return_date'],
                 'reference' => $array['ref_no'],
                 'transaction_type' => $config['transaction_type'],
                 'shopId' => $ownerShopId,
@@ -2286,7 +2309,16 @@ class Orders extends Connection
                 'return_ref' => $returnId
             ];
 
-            $makeTransactionId = $doubleEntry->makeTransaction($makeTransaction);
+            // Update the transaction this return already owns rather than minting a new id;
+            // anything else it used to own is retired.
+            $existingTransactionIds = $doubleEntry->getReusableTransactionIdsByReturnId($returnId);
+            $makeTransactionId = $doubleEntry->upsertTransaction(
+                isset($existingTransactionIds[0]) ? $existingTransactionIds[0] : null,
+                $makeTransaction
+            );
+            for ($i = 1; $i < count($existingTransactionIds); $i++) {
+                $doubleEntry->retireTransaction($existingTransactionIds[$i]);
+            }
 
 
             $assetPrice = $productsValue; // D 1000

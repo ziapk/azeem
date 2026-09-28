@@ -338,9 +338,6 @@ foreach ($statuses as  $value) {
     <tr>
         <th colspan="{{show_discount ? 8 : 7 }}" class="text-right">
             <a href="#" class="btn btn-success pull-left" ng-click="park()">Park For Now</a>
-            <?php if(!empty($id)) {?>
-            <label><input type="checkbox" ng-model="overide" /> Back date Entry</label>
-            <?php } ?>
             <!-- <div class="btn-group">
                     <label class="btn btn-default" ng-repeat="li in modes">
                         <input type="radio" name="mode" ng-model="payment_mode" ng-value="li.id" ng-change="printValue(li)">

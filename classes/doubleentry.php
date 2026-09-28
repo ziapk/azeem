@@ -2147,11 +2147,31 @@ class DoubleEntry extends Connection
 	 */
 	public function getReusableTransactionIdsByOrderId($orderId)
 	{
+		return $this->getReusableTransactionIds('order_ref', $orderId);
+	}
+
+	/** Same as getReusableTransactionIdsByOrderId(), for a supply bill. */
+	public function getReusableTransactionIdsBySupplyId($supplyId)
+	{
+		return $this->getReusableTransactionIds('supply_ref', $supplyId);
+	}
+
+	/** Same as getReusableTransactionIdsByOrderId(), for a return bill. */
+	public function getReusableTransactionIdsByReturnId($returnId)
+	{
+		return $this->getReusableTransactionIds('return_ref', $returnId);
+	}
+
+	private function getReusableTransactionIds($refColumn, $refId)
+	{
+		if (!in_array($refColumn, ['order_ref', 'supply_ref', 'return_ref'], true)) {
+			return [];
+		}
 		$dbh = $this->connectionPool->getConnection();
 		try {
-			$stmt = "SELECT id FROM `{$this->table_transactions}` WHERE order_ref=:order_ref ORDER BY id ASC";
+			$stmt = "SELECT id FROM `{$this->table_transactions}` WHERE `{$refColumn}`=:ref_id ORDER BY id ASC";
 			$prepare = $dbh->prepare($stmt);
-			$prepare->bindParam(':order_ref', $orderId, PDO::PARAM_STR);
+			$prepare->bindParam(':ref_id', $refId, PDO::PARAM_STR);
 			$prepare->execute();
 			return $prepare->fetchAll(PDO::FETCH_COLUMN, 0);
 		} catch (PDOException $e) {

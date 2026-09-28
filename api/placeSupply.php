@@ -137,14 +137,15 @@ if (sizeof($_POST['items'])) {
 
 $supply = new Supply();
 
-$overide = $_POST['overide'];
 $saleDate = $shop['sale_date'];
 
 if (!empty($_POST['id'])) {
     $orderDetail = $supply->getOrder($_POST['id']);
     $currentStatus = $orderDetail['order']['status'];
 
-    $saleDate = !empty($overide) ? $orderDetail['order']['supply_date'] : $storeDATA['sale_date'];
+    // An edited bill keeps its own date (and so does its ledger); a parked bill
+    // is only dated when it is cleared, so it moves to the current sale date.
+    $saleDate = ($currentStatus == 1 && $status != 1) ? $storeDATA['sale_date'] : $orderDetail['order']['supply_date'];
 
     $remainingOldSupplyQty = [];
     // Only carry forward old quantities when the supply was already active (had inventory logged).
@@ -228,8 +229,12 @@ if (!empty($_POST['id'])) {
             }
         }
 
-        // delete transactions
-        $de->deleteTransactionBySupplyId($orderDetail['order']['id']);
+        // Only retire the ledger when the bill is leaving the books (parked). A normal
+        // edit re-posts onto the same transaction ids below, keeping the bill's place
+        // in the ledger, which is ordered by transaction id.
+        if ($status == 1) {
+            $de->deleteTransactionBySupplyId($orderDetail['order']['id']);
+        }
     }
 }
 
@@ -361,7 +366,15 @@ if ($supply_id) {
             'supply_ref' => $supply_id,
         ];
 
-        $makeTransactionId = $de->makeTransaction($makeTransaction);
+        // Update the transactions this bill already owns rather than minting new ids.
+        $existingTransactionIds = $de->getReusableTransactionIdsBySupplyId($supply_id);
+        $transactionSlot = 0;
+
+        $makeTransactionId = $de->upsertTransaction(
+            isset($existingTransactionIds[$transactionSlot]) ? $existingTransactionIds[$transactionSlot] : null,
+            $makeTransaction
+        );
+        $transactionSlot++;
 
         $totalDiscount = $productsValue - $purchaseValue;
         $totalDiscount += $fixAssetsValue - $fixAssetsPurchaseValue;
@@ -430,7 +443,11 @@ if ($supply_id) {
 
 
         if (!empty($cash)) {
-            $makeTransactionId = $de->makeTransaction($makeTransaction);
+            $makeTransactionId = $de->upsertTransaction(
+                isset($existingTransactionIds[$transactionSlot]) ? $existingTransactionIds[$transactionSlot] : null,
+                $makeTransaction
+            );
+            $transactionSlot++;
             // payable credit entry
             $entry = [
                 'transaction_id' => $makeTransactionId,
@@ -454,6 +471,13 @@ if ($supply_id) {
             ];
             $a[] = $de->makeEntry($entry);
         }
+
+        // Retire any transaction this bill used to own but no longer needs (e.g. it
+        // was paid before and is now on credit, so the payment transaction must go).
+        for ($i = $transactionSlot; $i < count($existingTransactionIds); $i++) {
+            $de->retireTransaction($existingTransactionIds[$i]);
+        }
+
         $newsletter = new Newsletter();
         try {
             $send = $newsletter->send([

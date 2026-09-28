@@ -514,7 +514,6 @@ echo mainFooter();
         $scope.discount = 0;
         $scope.payment_mode = '1';
         $scope.payment_total = 0;
-        $scope.overide = false;
 
         // Quantity ceiling and all cart arithmetic live in assets/js/bill-calc.js
         // so every screen shares one implementation.
@@ -1081,8 +1080,7 @@ echo mainFooter();
                     id: $scope.id,
                     payment_mode: $scope.payment_mode,
                     status: status || 2,
-                    shopId: $scope.shopId,
-                    overide: $scope.overide
+                    shopId: $scope.shopId
                 }
 
 
