@@ -5,9 +5,19 @@ $data = [
     'from' => $_GET['from'],
     'to' => $_GET['to'],
     'orderId' => $_GET['orderId'],
-    'orderType' => !empty($_GET['orderType']) && $_GET['orderType'] == 'linked' ? 1 : 0
+    'orderType' => !empty($_GET['orderType']) && $_GET['orderType'] == 'linked' ? 1 : 0,
+    'deleted' => !empty($_GET['orderType']) && $_GET['orderType'] == 'deleted' ? 1 : 0
 ];
 $orders = $ordersObj->userReturnOrders($userData['shopId'], $data);
+
+// Deleted returns: flag the ones whose stock was never rolled back
+if (!empty($data['deleted']) && !empty($orders)) {
+    $inventory = new Inventory();
+    $outstanding = $inventory->getOutstandingByRefs(Inventory::REF_RETURN_ORDER, array_column($orders, 'id'));
+    foreach ($orders as $k => $row) {
+        $orders[$k]['stock_pending'] = $outstanding[(int)$row['id']] ?? null;
+    }
+}
 $data = [];
 $data['records'] = $orders;
 $data['income'] = 0;

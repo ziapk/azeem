@@ -42,41 +42,59 @@ echo mainHeader(['page' => 'sale_returns']);
     <uib-tabset active="activePill">
         <uib-tab select="getReport($event)" index="0" data-tab="mine" heading="My Returns"></uib-tab>
         <uib-tab select="getReport($event)" index="1" data-tab="linked" heading="Link Returns"></uib-tab>
+        <?php if ($userData['role'] === 'owner') { ?>
+            <uib-tab select="getReport($event)" index="2" data-tab="deleted" heading="Deleted Returns"></uib-tab>
+        <?php } ?>
     </uib-tabset>
+    <div ng-if="activeValue == 'deleted'" style="margin: 10px 0">
+        <a class="btn btn-sm btn-warning" ng-click="toggleAllPending()" href="javascript:void(0)">Select all pending</a>
+        <a class="btn btn-sm btn-danger" ng-click="readjustSelected()" ng-disabled="!selectedCount() || readjusting" href="javascript:void(0)">Re-adjust Stock ({{selectedCount()}})</a>
+        <small class="text-muted">Rolls back stock of selected deleted returns that were never reversed.</small>
+    </div>
     <div class="table-responsive">
         <table class="table">
             <thead>
                 <tr>
+                    <th ng-if="activeValue == 'deleted'"></th>
                     <th>Sr.#</th>
                     <th>Order. #</th>
                     <th>Customer</th>
                     <th>Price</th>
                     <th ng-repeat="mode in modes">{{mode.title}}</th>
-                    <th>Status</th>
+                    <th ng-if="activeValue != 'deleted'">Status</th>
+                    <th ng-if="activeValue == 'deleted'">Reason</th>
+                    <th ng-if="activeValue == 'deleted'">Stock</th>
                     <th>Date/time</th>
                     <th></th>
                 </tr>
             </thead>
             <tbody>
                 <tr ng-repeat="row in data.records">
+                    <td ng-if="activeValue == 'deleted'"><input type="checkbox" ng-model="selected[row.id]" ng-disabled="!row.stock_pending" /></td>
                     <td>{{$index + 1}}</td>
                     <td>{{row.id}}</td>
                     <td>{{row.customer_name || row.full_name}}</td>
                     <td>{{row.price - row.discount}}</td>
                     <td ng-repeat="mode in modes">{{row.prices[mode.id]}}</td>
-                    <td>{{statusArr[row.status].full_name}}</td>
+                    <td ng-if="activeValue != 'deleted'">{{statusArr[row.status].full_name}}</td>
+                    <td ng-if="activeValue == 'deleted'">{{row.reason}}</td>
+                    <td ng-if="activeValue == 'deleted'">
+                        <span ng-if="row.stock_pending" class="label label-danger">Pending: {{row.stock_pending.qty}} qty / {{row.stock_pending.products}} product(s)</span>
+                        <span ng-if="!row.stock_pending" class="label label-success">Adjusted</span>
+                    </td>
                     <td>{{row.order_date}}</td>
                     <td align="right">
-                        <?php if ($userData['role'] === 'owner') { ?><a class="btn btn-xs btn-default" href="<?php echo SITE_URL; ?>pages/orders/adjustment.php?return={{row.id}}">Edit</a><?php } ?>
+                        <?php if ($userData['role'] === 'owner') { ?><a class="btn btn-xs btn-default" ng-if="row.flag != 99" href="<?php echo SITE_URL; ?>pages/orders/adjustment.php?return={{row.id}}">Edit</a><?php } ?>
                         <?php if ($userData['role'] === 'manager') { ?><a class="btn btn-xs btn-default" ng-if="row.flag == 1" href="<?php echo SITE_URL; ?>pages/orders/adjustment.php?return={{row.id}}">Edit</a><?php } ?>
-                        <?php if ($userData['role'] === 'owner') { ?><a class="btn btn-xs btn-danger" ng-click="deleteRecipt(row.id)" href="javascript:void(0)">Delete</a><?php } ?>
+                        <?php if ($userData['role'] === 'owner') { ?><a class="btn btn-xs btn-danger" ng-if="row.flag != 99" ng-click="deleteRecipt(row.id)" href="javascript:void(0)">Delete</a><?php } ?>
+                        <?php if ($userData['role'] === 'owner') { ?><a class="btn btn-xs btn-warning" ng-if="row.flag == 99 && row.stock_pending" ng-click="readjust([row.id])" href="javascript:void(0)">Re-adjust</a><?php } ?>
                         <a class="btn btn-xs btn-default" ng-click="openRecipt(row.id, 'details', 'large')" href="javascript:void(0)">Large View</a>
                     </td>
                 </tr>
             </tbody>
             <tfoot>
                 <tr>
-                    <th colspan="{{8 + modes.length}}">
+                    <th colspan="{{(activeValue == 'deleted' ? 10 : 8) + modes.length}}">
                         <table style="text-align: right" width="100%" cellspacing="0" cellpadding="0">
                             <tr>
                                 <th style="text-align: right">Number of Orders</th>
@@ -128,6 +146,7 @@ echo mainFooter();
                     $scope.loading = false;
                     if (response.status === 200) {
                         $scope.data = response.data;
+                        $scope.selected = {};
                     }
                 })
         }
@@ -159,6 +178,39 @@ echo mainFooter();
                     //$scope.getPublishers(1);
                 });
             }
+        }
+
+        $scope.selected = {};
+        $scope.selectedIds = () => Object.keys($scope.selected).filter(id => $scope.selected[id]);
+        $scope.selectedCount = () => $scope.selectedIds().length;
+
+        $scope.toggleAllPending = function() {
+            const pending = ($scope.data?.records || []).filter(r => r.stock_pending);
+            const allSelected = pending.length && pending.every(r => $scope.selected[r.id]);
+            $scope.selected = {};
+            if (!allSelected) {
+                pending.forEach(r => $scope.selected[r.id] = true);
+            }
+        }
+
+        $scope.readjustSelected = function() {
+            $scope.readjust($scope.selectedIds());
+        }
+
+        $scope.readjust = function(ids) {
+            if (!ids.length || !$window.confirm('Re-adjust stock for ' + ids.length + ' deleted return order(s)? Returned quantities will be taken back out of stock.')) {
+                return;
+            }
+            $scope.readjusting = true;
+            $http.post('returnReadjust.php', { ids }).then(function(response) {
+                $scope.readjusting = false;
+                if (response?.data?.message) {
+                    $window.alert(response.data.message);
+                }
+                $scope.getReport();
+            }, function() {
+                $scope.readjusting = false;
+            });
         }
 
         $scope.returnOrder = function(id) {

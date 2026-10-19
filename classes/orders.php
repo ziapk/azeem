@@ -1362,14 +1362,20 @@ class Orders extends Connection
                 $toCondition = " AND o.id='" . $params['orderId'] . "' ";
             }
 
-            if (!empty($params['orderType'])) {
+            if (!empty($params['deleted'])) {
+                // deleted from either tab (own returns or ones linked to this shop)
+                $toCondition .= " AND (o.shopId=:shopId OR o.main_shop_rid=" . (int)$shopId . ") ";
+            } else if (!empty($params['orderType'])) {
                 $toCondition .= " AND o.main_shop_rid=:shopId ";
             } else {
                 $toCondition .= " AND o.shopId=:shopId ";
             }
 
 
-            $stmt = "SELECT o.*, o.amount as price, full_name, account_id FROM `{$this->table_ro}` AS o LEFT JOIN customers AS c ON c.id = o.customer_id WHERE (o.flag IN (1, 2)) " . $toCondition . '  ' . '  ORDER BY id desc';
+            // flag 99 = deleted return
+            $flagCondition = !empty($params['deleted']) ? "o.flag = 99" : "o.flag IN (1, 2)";
+
+            $stmt = "SELECT o.*, o.amount as price, full_name, account_id FROM `{$this->table_ro}` AS o LEFT JOIN customers AS c ON c.id = o.customer_id WHERE ($flagCondition) " . $toCondition . '  ' . '  ORDER BY id desc';
             $prepare = $dbh->prepare($stmt);
             $prepare->bindParam(':shopId', $shopId, PDO::PARAM_STR);
             $prepare->execute();
@@ -2658,6 +2664,22 @@ class Orders extends Connection
         } finally {
             $this->connectionPool->releaseConnection($dbh);
         }
+    }
+
+    /**
+     * rollbackReturnStock — reverses whatever stock this return still has in the
+     * inventory ledger. Safe to call repeatedly: reverseByRef only posts the net
+     * outstanding quantity, so a return already rolled back is left untouched.
+     */
+    public function rollbackReturnStock(int $returnId, int $createdBy, string $note = ''): void
+    {
+        $inventory = new Inventory();
+        $inventory->reverseByRef(
+            Inventory::REF_RETURN_ORDER,
+            $returnId,
+            $createdBy,
+            $note ?: "Deleting return order #$returnId"
+        );
     }
 
     public function deleteReturnOrder(int $returnId): bool

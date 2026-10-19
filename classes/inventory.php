@@ -306,6 +306,47 @@ class Inventory extends Connection
 
     // ----------------------------------------------------------------
     /**
+     * getOutstandingByRefs — for each ref_id, how much ledger quantity is still
+     * un-reversed (same grouping reverseByRef uses). A ref missing from the
+     * result has nothing left to roll back.
+     *
+     * @return array [ref_id => ['products' => int, 'qty' => float]]
+     */
+    public function getOutstandingByRefs(string $ref_type, array $ref_ids): array
+    {
+        $ref_ids = array_values(array_filter(array_map('intval', $ref_ids)));
+        if (empty($ref_ids)) {
+            return [];
+        }
+        $dbh = $this->connectionPool->getConnection();
+        try {
+            $in = implode(',', $ref_ids);
+            $stmt = "SELECT ref_id, COUNT(DISTINCT product_id) AS products, SUM(ABS(net_qty)) AS qty
+                     FROM (
+                         SELECT ref_id, product_id, SUM(quantity) AS net_qty
+                         FROM `{$this->table_ledger}`
+                         WHERE ref_type = :ref_type AND ref_id IN ($in)
+                         GROUP BY ref_id, product_id, shop_id, owner_id, movement_type
+                         HAVING SUM(quantity) != 0
+                     ) t
+                     GROUP BY ref_id";
+            $prepare = $dbh->prepare($stmt);
+            $prepare->bindParam(':ref_type', $ref_type, PDO::PARAM_STR);
+            $prepare->execute();
+            $result = [];
+            foreach ($prepare->fetchAll(PDO::FETCH_ASSOC) as $row) {
+                $result[(int)$row['ref_id']] = ['products' => (int)$row['products'], 'qty' => (float)$row['qty']];
+            }
+            return $result;
+        } catch (PDOException $e) {
+            die("Inventory::getOutstandingByRefs error: " . $e->getMessage());
+        } finally {
+            $this->connectionPool->releaseConnection($dbh);
+        }
+    }
+
+    // ----------------------------------------------------------------
+    /**
      * reverseByRef — reverses ALL ledger entries tied to a specific ref.
      * Used when rolling back a completed order or supply.
      * Inserts compensating entries with SAME movement_type but OPPOSITE quantity.
