@@ -57,6 +57,24 @@ try {
             ]);
             break;
 
+        case 'repair_returns':
+            // Audit return-order stock postings vs. the returns themselves; rebuild mismatches.
+            // Dry run by default — add &confirm=yes to apply.
+            $shopId = isset($_GET['shop_id']) ? (int)$_GET['shop_id'] : null;
+            $returnId = isset($_GET['return_id']) ? (int)$_GET['return_id'] : null;
+            $dryRun = !isset($_GET['confirm']) || $_GET['confirm'] !== 'yes';
+
+            $result = $inventory->repairReturnLedgers($shopId, $returnId, !$dryRun, (int)$_SESSION['user_credentials']['id']);
+
+            echo json_encode([
+                'success' => empty($result['error']) && empty($result['errors']),
+                'dry_run' => $dryRun,
+                'result' => $result,
+                'message' => ($dryRun ? "DRY RUN: " : "") . count($result['broken']) . " of {$result['checked']} return orders have wrong stock postings" .
+                    ($dryRun ? "" : ". Deleted {$result['deleted_entries']}, inserted {$result['inserted_entries']}, re-synced {$result['synced_products']} product/shop stocks")
+            ]);
+            break;
+
         case 'find_by_ref':
             // Find all ledger entries for a specific reference
             $refType = $_GET['ref_type'] ?? '';

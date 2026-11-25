@@ -692,7 +692,9 @@ class Orders extends Connection
             if ($flag == 2) {
                 // ── INVENTORY: customer return flow ──
                 $inventory = new Inventory();
-                $quantity = !empty($array['inventory_quantity']) ? (float)$array['inventory_quantity'] : (float)$array['quantity'];
+                // inventory_quantity is the delta vs. what was already posted on a previous
+                // approved save; 0 means "already in the ledger" and must NOT fall back to full qty.
+                $quantity = isset($array['inventory_quantity']) ? (float)$array['inventory_quantity'] : (float)$array['quantity'];
                 if ($quantity > 0) {
                     if ($reverse) {
                         // Reversing a previously processed return — stock goes back OUT

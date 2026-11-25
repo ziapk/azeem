@@ -1267,6 +1267,180 @@ class Inventory extends Connection
     }
 
     /**
+     * repairReturnLedgers — audits every return order's stock postings against the
+     * return itself and rebuilds the ones that don't match.
+     *
+     * Why: re-saving an approved return used to re-post the full quantity on every
+     * save (inventory_quantity 0 fell back to quantity), so ledgers drifted. Exact-dup
+     * matching can't catch it because later saves split into different quantities.
+     *
+     * Expected net per (product, shop), mirroring Orders::orderReturnAll():
+     *   flag != 2                       → nothing
+     *   return_type 2 (purchase return) → -qty at ro.shopId           (SALE)
+     *   return_type 1 + main_shop_rid   → +qty at main_shop_rid (RETURN_IN), -qty at ro.shopId (SALE)
+     *   return_type 1                   → +qty at ro.shopId           (RETURN_IN)
+     *
+     * A mismatching return has ALL its return_order ledger rows deleted and replaced by
+     * one clean row per (product, shop), dated at the return's first ledger posting so it
+     * keeps its place in the audit report. Only returns that already have ledger rows are
+     * checked (legacy returns without any are left alone).
+     *
+     * @param int|null $shopId     Only returns whose shopId or main_shop_rid is this shop
+     * @param int|null $returnId   Only this return order
+     * @param bool     $apply      false = dry run (report only)
+     * @param int      $createdBy  User recorded on rebuilt rows
+     */
+    public function repairReturnLedgers(?int $shopId = null, ?int $returnId = null, bool $apply = false, int $createdBy = 0): array
+    {
+        $dbh = $this->connectionPool->getConnection();
+        $eps = 0.0001;
+        $report = ['checked' => 0, 'broken' => [], 'deleted_entries' => 0, 'inserted_entries' => 0, 'synced_products' => 0];
+
+        try {
+            // Ledger state per return / product / shop
+            $sql = "SELECT ref_id, product_id, shop_id, SUM(quantity) AS net, MIN(created_at) AS first_at
+                    FROM `{$this->table_ledger}`
+                    WHERE ref_type = :ref_type" . ($returnId ? " AND ref_id = :ref_id" : "") . "
+                    GROUP BY ref_id, product_id, shop_id";
+            $st = $dbh->prepare($sql);
+            $st->bindValue(':ref_type', self::REF_RETURN_ORDER, PDO::PARAM_STR);
+            if ($returnId) {
+                $st->bindValue(':ref_id', $returnId, PDO::PARAM_INT);
+            }
+            $st->execute();
+
+            $ledger = [];   // ref_id => [ "pid_sid" => net ]
+            $firstAt = [];  // ref_id => earliest created_at
+            foreach ($st->fetchAll(PDO::FETCH_ASSOC) as $r) {
+                $rid = (int)$r['ref_id'];
+                $ledger[$rid][(int)$r['product_id'] . '_' . (int)$r['shop_id']] = (float)$r['net'];
+                if (!isset($firstAt[$rid]) || $r['first_at'] < $firstAt[$rid]) {
+                    $firstAt[$rid] = $r['first_at'];
+                }
+            }
+
+            $roStmt = $dbh->prepare("SELECT id, shopId, main_shop_rid, return_type, flag, owner_id FROM `return_orders` WHERE id = :id");
+            $itemStmt = $dbh->prepare("SELECT product_id, SUM(quantity) AS qty FROM `product_returns` WHERE order_id = :id AND quantity > 0 GROUP BY product_id");
+
+            foreach ($ledger as $rid => $actual) {
+                $roStmt->bindValue(':id', $rid, PDO::PARAM_INT);
+                $roStmt->execute();
+                $ro = $roStmt->fetch(PDO::FETCH_ASSOC);
+
+                $roShop = $ro ? (int)$ro['shopId'] : 0;
+                $mainShop = ($ro && !empty($ro['main_shop_rid'])) ? (int)$ro['main_shop_rid'] : 0;
+                if ($shopId && $roShop !== $shopId && $mainShop !== $shopId) {
+                    continue;
+                }
+                $report['checked']++;
+
+                // Expected net per product/shop
+                $expected = [];
+                if ($ro && (int)$ro['flag'] === 2) {
+                    $itemStmt->bindValue(':id', $rid, PDO::PARAM_INT);
+                    $itemStmt->execute();
+                    foreach ($itemStmt->fetchAll(PDO::FETCH_ASSOC) as $it) {
+                        $pid = (int)$it['product_id'];
+                        $qty = (float)$it['qty'];
+                        if ((int)$ro['return_type'] === 2) {
+                            $expected[$pid . '_' . $roShop] = ($expected[$pid . '_' . $roShop] ?? 0) - $qty;
+                        } elseif ($mainShop) {
+                            $expected[$pid . '_' . $mainShop] = ($expected[$pid . '_' . $mainShop] ?? 0) + $qty;
+                            $expected[$pid . '_' . $roShop] = ($expected[$pid . '_' . $roShop] ?? 0) - $qty;
+                        } else {
+                            $expected[$pid . '_' . $roShop] = ($expected[$pid . '_' . $roShop] ?? 0) + $qty;
+                        }
+                    }
+                }
+
+                $diffs = [];
+                foreach (array_unique(array_merge(array_keys($actual), array_keys($expected))) as $key) {
+                    $a = $actual[$key] ?? 0;
+                    $e = $expected[$key] ?? 0;
+                    if (abs($a - $e) > $eps) {
+                        list($pid, $sid) = explode('_', $key);
+                        $diffs[] = ['product_id' => (int)$pid, 'shop_id' => (int)$sid, 'ledger_net' => $a, 'expected_net' => $e, 'difference' => $a - $e];
+                    }
+                }
+                if (empty($diffs)) {
+                    continue;
+                }
+
+                $report['broken'][] = [
+                    'return_id' => $rid,
+                    'flag' => $ro ? (int)$ro['flag'] : null,
+                    'return_type' => $ro ? (int)$ro['return_type'] : null,
+                    'mismatches' => $diffs,
+                ];
+
+                if (!$apply) {
+                    continue;
+                }
+
+                $dbh->beginTransaction();
+                try {
+                    $del = $dbh->prepare("DELETE FROM `{$this->table_ledger}` WHERE ref_type = :ref_type AND ref_id = :ref_id");
+                    $del->bindValue(':ref_type', self::REF_RETURN_ORDER, PDO::PARAM_STR);
+                    $del->bindValue(':ref_id', $rid, PDO::PARAM_INT);
+                    $del->execute();
+                    $report['deleted_entries'] += $del->rowCount();
+
+                    $ins = $dbh->prepare(
+                        "INSERT INTO `{$this->table_ledger}`
+                            (`product_id`, `shop_id`, `owner_id`, `movement_type`, `quantity`,
+                             `ref_type`, `ref_id`, `note`, `created_by`, `created_at`)
+                         VALUES
+                            (:product_id, :shop_id, :owner_id, :movement_type, :quantity,
+                             :ref_type, :ref_id, :note, :created_by, :created_at)"
+                    );
+                    foreach ($expected as $key => $qty) {
+                        if (abs($qty) <= $eps) {
+                            continue;
+                        }
+                        list($pid, $sid) = explode('_', $key);
+                        $ins->bindValue(':product_id', (int)$pid, PDO::PARAM_INT);
+                        $ins->bindValue(':shop_id', (int)$sid, PDO::PARAM_INT);
+                        $ins->bindValue(':owner_id', (int)$ro['owner_id'], PDO::PARAM_INT);
+                        $ins->bindValue(':movement_type', $qty > 0 ? self::RETURN_IN : self::SALE, PDO::PARAM_STR);
+                        $ins->bindValue(':quantity', $qty, PDO::PARAM_STR);
+                        $ins->bindValue(':ref_type', self::REF_RETURN_ORDER, PDO::PARAM_STR);
+                        $ins->bindValue(':ref_id', $rid, PDO::PARAM_INT);
+                        $ins->bindValue(':note', 'Return order #' . $rid . ' (rebuilt: duplicate re-save postings removed)', PDO::PARAM_STR);
+                        $ins->bindValue(':created_by', $createdBy ?: (int)$ro['owner_id'], PDO::PARAM_INT);
+                        $ins->bindValue(':created_at', $firstAt[$rid], PDO::PARAM_STR);
+                        $ins->execute();
+                        $report['inserted_entries']++;
+                    }
+
+                    // Re-sync every product/shop this return touched, before or after
+                    $synced = [];
+                    foreach (array_merge(array_keys($actual), array_keys($expected)) as $key) {
+                        if (isset($synced[$key])) {
+                            continue;
+                        }
+                        list($pid, $sid) = explode('_', $key);
+                        $this->syncQty((int)$pid, (int)$sid, $dbh);
+                        $synced[$key] = true;
+                    }
+                    $report['synced_products'] += count($synced);
+
+                    $dbh->commit();
+                } catch (PDOException $e) {
+                    $dbh->rollBack();
+                    $report['errors'][] = "Return #$rid: " . $e->getMessage();
+                }
+            }
+
+            return $report;
+
+        } catch (PDOException $e) {
+            return $report + ['error' => $e->getMessage()];
+        } finally {
+            $this->connectionPool->releaseConnection($dbh);
+        }
+    }
+
+    /**
      * findDuplicateLedgerEntries — finds duplicate inventory ledger entries
      *
      * @param int $shopId Optional: limit to specific shop
