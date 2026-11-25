@@ -62,9 +62,10 @@ try {
             // Dry run by default — add &confirm=yes to apply.
             $shopId = isset($_GET['shop_id']) ? (int)$_GET['shop_id'] : null;
             $returnId = isset($_GET['return_id']) ? (int)$_GET['return_id'] : null;
+            $productId = isset($_GET['product_id']) ? (int)$_GET['product_id'] : null;
             $dryRun = !isset($_GET['confirm']) || $_GET['confirm'] !== 'yes';
 
-            $result = $inventory->repairReturnLedgers($shopId, $returnId, !$dryRun, (int)$_SESSION['user_credentials']['id']);
+            $result = $inventory->repairReturnLedgers($shopId, $returnId, !$dryRun, (int)$_SESSION['user_credentials']['id'], $productId);
 
             echo json_encode([
                 'success' => empty($result['error']) && empty($result['errors']),

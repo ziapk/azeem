@@ -160,6 +160,21 @@ function auditBadge($type) {
         font-size: 11px;
     }
     .ref-link:hover { color: #1e40af; }
+
+    .fix-btn {
+        margin-top: 4px;
+        background: #f59e0b;
+        color: #1e293b;
+        border: none;
+        border-radius: 3px;
+        padding: 3px 8px;
+        font-size: 10px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+    .fix-btn:hover { background: #fbbf24; }
+    .fix-btn:disabled { opacity: .6; cursor: wait; }
+    @media print { .fix-btn { display: none; } }
 </style>
 </head>
 <body>
@@ -175,6 +190,47 @@ function openRefModal(refType, refId) {
     };
     var url = urls[refType];
     if (url) window.open(url, '', 'width=800,height=600');
+}
+
+// Audit this product's return-order postings; rebuild the ones that don't match the return.
+function fixReturnEntries(btn, productId, shopId) {
+    var base = siteUrl + 'api/clean-inventory-ledger.php?action=repair_returns&product_id=' + productId +
+               (shopId ? '&shop_id=' + shopId : '');
+    var label = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = 'Checking…';
+
+    function done() { btn.disabled = false; btn.textContent = label; }
+    function getJson(url) {
+        return fetch(url, { credentials: 'same-origin' }).then(function (r) { return r.json(); });
+    }
+
+    getJson(base).then(function (res) {
+        var broken = (res.result && res.result.broken) || [];
+        if (!broken.length) {
+            done();
+            alert('All ' + ((res.result && res.result.checked) || 0) + ' return orders for this product are correct. Nothing to fix.');
+            return;
+        }
+        var lines = broken.map(function (b) {
+            var m = b.mismatches.filter(function (x) { return x.product_id == productId; })[0] || b.mismatches[0];
+            return 'Return #' + b.return_id + ': ledger ' + m.ledger_net + ', should be ' + m.expected_net +
+                   ' (diff ' + m.difference + ')';
+        });
+        if (!confirm(broken.length + ' return order(s) have wrong stock entries:\n\n' + lines.join('\n') +
+                     '\n\nRebuild these entries? The wrong rows will be deleted and replaced with one correct row per product.')) {
+            done();
+            return;
+        }
+        btn.textContent = 'Fixing…';
+        return getJson(base + '&confirm=yes').then(function (r2) {
+            alert(r2.message || 'Done');
+            location.reload();
+        });
+    }).catch(function (e) {
+        done();
+        alert('Failed: ' + e);
+    });
 }
 </script>
 
@@ -224,6 +280,12 @@ function openRefModal(refType, refId) {
             <div>In: <strong><?php echo number_format($totalIn); ?></strong>
                  &nbsp;Out: <strong><?php echo number_format(abs($totalOut)); ?></strong></div>
             <div class="big">Balance: <?php echo number_format($closingBalance); ?></div>
+            <?php if (in_array('return_order', array_column($rows, 'ref_type'), true)): ?>
+                <button type="button" class="fix-btn"
+                    onclick="fixReturnEntries(this, <?php echo (int) $productId; ?>, <?php echo (int) $shopId; ?>)">
+                    Fix return entries
+                </button>
+            <?php endif; ?>
         </div>
     </div>
 

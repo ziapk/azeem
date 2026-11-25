@@ -1289,8 +1289,10 @@ class Inventory extends Connection
      * @param int|null $returnId   Only this return order
      * @param bool     $apply      false = dry run (report only)
      * @param int      $createdBy  User recorded on rebuilt rows
+     * @param int|null $productId  Only returns that have ledger rows for this product
+     *                             (the whole return is still checked/rebuilt)
      */
-    public function repairReturnLedgers(?int $shopId = null, ?int $returnId = null, bool $apply = false, int $createdBy = 0): array
+    public function repairReturnLedgers(?int $shopId = null, ?int $returnId = null, bool $apply = false, int $createdBy = 0, ?int $productId = null): array
     {
         $dbh = $this->connectionPool->getConnection();
         $eps = 0.0001;
@@ -1300,12 +1302,17 @@ class Inventory extends Connection
             // Ledger state per return / product / shop
             $sql = "SELECT ref_id, product_id, shop_id, SUM(quantity) AS net, MIN(created_at) AS first_at
                     FROM `{$this->table_ledger}`
-                    WHERE ref_type = :ref_type" . ($returnId ? " AND ref_id = :ref_id" : "") . "
+                    WHERE ref_type = :ref_type" . ($returnId ? " AND ref_id = :ref_id" : "") .
+                    ($productId ? " AND ref_id IN (SELECT ref_id FROM (SELECT DISTINCT ref_id FROM `{$this->table_ledger}` WHERE ref_type = :ref_type2 AND product_id = :product_id) x)" : "") . "
                     GROUP BY ref_id, product_id, shop_id";
             $st = $dbh->prepare($sql);
             $st->bindValue(':ref_type', self::REF_RETURN_ORDER, PDO::PARAM_STR);
             if ($returnId) {
                 $st->bindValue(':ref_id', $returnId, PDO::PARAM_INT);
+            }
+            if ($productId) {
+                $st->bindValue(':ref_type2', self::REF_RETURN_ORDER, PDO::PARAM_STR);
+                $st->bindValue(':product_id', $productId, PDO::PARAM_INT);
             }
             $st->execute();
 
