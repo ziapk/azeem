@@ -129,7 +129,7 @@ echo mainHeader(['page' => 'return-repair']);
         <div class="alert alert-danger"><?php echo htmlspecialchars($audit['error']); ?></div>
     <?php } ?>
 
-    <form method="GET" class="row">
+    <form method="GET" action="<?php echo SITE_URL; ?>pages/stock/returnRepair.php" class="row">
         <?php if ($isOwner) { ?>
             <div class="col-sm-4 col-md-3 form-group">
                 <label>Shop</label>
@@ -169,7 +169,7 @@ echo mainHeader(['page' => 'return-repair']);
     <?php } ?>
 
     <?php if ($broken) { ?>
-    <form method="POST" id="rr-form" onsubmit="return rrConfirm(event)">
+    <form method="POST" action="<?php echo SITE_URL; ?>pages/stock/returnRepair.php" id="rr-form" onsubmit="return rrConfirm(event)">
         <?php if ($isOwner && $shopId) { ?><input type="hidden" name="shop_id" value="<?php echo $shopId; ?>"><?php } ?>
         <?php if ($returnId) { ?><input type="hidden" name="return_id" value="<?php echo $returnId; ?>"><?php } ?>
 
