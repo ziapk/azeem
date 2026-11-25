@@ -1448,6 +1448,65 @@ class Inventory extends Connection
     }
 
     /**
+     * getReturnLedgerRows — ledger rows (with product name) for several return orders,
+     * grouped by return id. Used by the return-ledger repair page.
+     */
+    public function getReturnLedgerRows(array $returnIds): array
+    {
+        $returnIds = array_values(array_filter(array_map('intval', $returnIds)));
+        if (empty($returnIds)) {
+            return [];
+        }
+        $dbh = $this->connectionPool->getConnection();
+        try {
+            $in = implode(',', array_fill(0, count($returnIds), '?'));
+            $st = $dbh->prepare(
+                "SELECT l.*, p.full_name AS product_name
+                 FROM `{$this->table_ledger}` l
+                 LEFT JOIN `products` p ON p.id = l.product_id
+                 WHERE l.ref_type = ? AND l.ref_id IN ($in)
+                 ORDER BY l.ref_id, l.id"
+            );
+            $st->execute(array_merge([self::REF_RETURN_ORDER], $returnIds));
+            $out = [];
+            foreach ($st->fetchAll(PDO::FETCH_ASSOC) as $r) {
+                $out[(int)$r['ref_id']][] = $r;
+            }
+            return $out;
+        } catch (PDOException $e) {
+            die("Inventory::getReturnLedgerRows error: " . $e->getMessage());
+        } finally {
+            $this->connectionPool->releaseConnection($dbh);
+        }
+    }
+
+    /**
+     * getProductNames — id => full_name for the given product ids.
+     */
+    public function getProductNames(array $productIds): array
+    {
+        $productIds = array_values(array_unique(array_filter(array_map('intval', $productIds))));
+        if (empty($productIds)) {
+            return [];
+        }
+        $dbh = $this->connectionPool->getConnection();
+        try {
+            $in = implode(',', array_fill(0, count($productIds), '?'));
+            $st = $dbh->prepare("SELECT id, full_name FROM `products` WHERE id IN ($in)");
+            $st->execute($productIds);
+            $out = [];
+            foreach ($st->fetchAll(PDO::FETCH_ASSOC) as $r) {
+                $out[(int)$r['id']] = $r['full_name'];
+            }
+            return $out;
+        } catch (PDOException $e) {
+            die("Inventory::getProductNames error: " . $e->getMessage());
+        } finally {
+            $this->connectionPool->releaseConnection($dbh);
+        }
+    }
+
+    /**
      * findDuplicateLedgerEntries — finds duplicate inventory ledger entries
      *
      * @param int $shopId Optional: limit to specific shop
