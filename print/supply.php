@@ -285,7 +285,7 @@ $qty = 0; ?>
                                 <td valign="top" style="border: 0" class="text-right" colspan="3">Total Quantity</td>
                                 <td valign="top" style="border: 0" class="text-right"><strong><?php echo abs(($qty)); ?></strong></td>
                                 <td style="border: 0"></td>
-                                <td valign="top" style="border: 0" class="text-right"><strong><?php echo number_format(abs($fullTotal)); ?></strong></td>
+                                <td valign="top" style="border: 0" class="text-right"></td>
                                 <td class="text-right ref" style="border: 0" colspan="2">Invoice Total</td>
                                 <th class="text-right ref"><?php echo number_format(abs(($aprice))); ?></th>
                             </tr>
